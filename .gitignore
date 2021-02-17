@@ -1,0 +1,14 @@
+target/
+.idea/
+
+*.class
+*.jar
+*.war
+*.ear
+*.logs
+*.iml
+*.xml
+*.target
+.eclipse
+
+src/main/java/bot/Discord.java
