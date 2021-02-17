@@ -1,5 +1,6 @@
 package bot;
 
+import bot.Engine.DraftLog;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -14,7 +15,6 @@ import java.util.List;
  * Project: LaunchPoint Bot
  * Module:  Events.java
  * Purpose: Builds the bot by adding commands and analyzing user input.
- * Usages:
  */
 public class Events extends ListenerAdapter {
 
@@ -35,13 +35,31 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Runs the "--help", "--introduce", or "--thankyou" command.
+     * Runs the "..." command.
      * @param user the user who sent the command.
      * @param ch the channel the command was ran in.
      * @param args the arguments of the command.
      */
-    private void runIntroCmd(Member user, MessageChannel ch, String[] args) {
-//        Introduction intro = new Introduction();
-//        intro.runCmd(ch, null, user, args);
+    private void runDraftCmd(Member user, MessageChannel ch, String[] args) {
+        DraftLog draft = new DraftLog();
+        draft.runCmd(ch, null, user, args);
+    }
+
+    /**
+     * Runs one of the bot's commands.
+     * @param e the command to analyze.
+     */
+    @Override
+    public void onMessageReceived(MessageReceivedEvent e) {
+        String input = e.getMessage().getContentRaw();
+        MessageChannel channel = e.getChannel();
+        String[] args = input.split(" ", 3);
+
+        switch (args[0]) {
+            case "!willyousimpforme":
+                checkArgs(channel, args, 1);
+                runDraftCmd(e.getMember(), channel, args);
+                break;
+        }
     }
 }
