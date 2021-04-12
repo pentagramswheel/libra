@@ -113,7 +113,7 @@ public class Events extends ListenerAdapter {
                 break;
             case "lpgrad":
                 List<Member> user = e.getMessage().getMentionedMembers();
-                if (checkArgs(ch, args, 6) && user.size() == 1) {
+                if (checkArgs(ch, args, 2) && user.size() == 1) {
                     runGradCmd(user, ch);
                 }
                 break;
