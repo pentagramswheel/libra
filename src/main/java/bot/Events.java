@@ -1,7 +1,7 @@
 package bot;
 
 import bot.Engine.DraftLog;
-import bot.Engine.Graduate;
+//import bot.Engine.Graduate;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -80,15 +80,15 @@ public class Events extends ListenerAdapter {
         draft.runCmd(ch, null, players, args);
     }
 
-    /**
-     * Runs the "lpwin" command.
-     * @param player the mentioned player.
-     * @param ch the channel the command was ran in.
-     */
-    private void runGradCmd(List<Member> player, MessageChannel ch) {
-        Graduate grad = new Graduate();
-        grad.runCmd(ch, null, player, null);
-    }
+//    /**
+//     * Runs the "lpwin" command.
+//     * @param player the mentioned player.
+//     * @param ch the channel the command was ran in.
+//     */
+//    private void runGradCmd(List<Member> player, MessageChannel ch) {
+//        Graduate grad = new Graduate();
+//        grad.runCmd(ch, null, player, null);
+//    }
 
     /**
      * Runs one of the bot's commands.
@@ -111,12 +111,12 @@ public class Events extends ListenerAdapter {
                     runDraftCmd(users, ch, args);
                 }
                 break;
-            case "lpgrad":
-                List<Member> user = e.getMessage().getMentionedMembers();
-                if (checkArgs(ch, args, 6) && user.size() == 1) {
-                    runGradCmd(user, ch);
-                }
-                break;
+//            case "lpgrad":
+//                List<Member> user = e.getMessage().getMentionedMembers();
+//                if (checkArgs(ch, args, 6) && user.size() == 1) {
+//                    runGradCmd(user, ch);
+//                }
+//                break;
         }
     }
 }
