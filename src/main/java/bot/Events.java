@@ -1,6 +1,6 @@
 package bot;
 
-import bot.Engine.DraftLog;
+import bot.Engine.CyclesLog;
 import bot.Engine.Graduate;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -45,15 +45,28 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Checks if all players are found within the command input.
+     * Checks if lpcycle has the correct arguments.
      * @param ch the channel to send an error message in.
-     * @param players the list of players to check.
-     * @return True if six players were found.
-     *         False otherwise.
+     * @param args the list of arguments to check.
+     * @return True if it does.
+     *         False if not.
      */
-    private boolean allPlayersExist(MessageChannel ch, List<Member> players) {
-        if (players.size() != 4) {
-            ch.sendMessage("Not all players were listed. "
+    private boolean cycleArgsValid(
+            MessageChannel ch, String[] args, List<Member> users) {
+        boolean hasEnoughArgs = args.length == 7 || args.length == 4;
+        boolean allPlayersExist = users.size() == 1 || users.size() == 4;
+        if (!hasEnoughArgs || !allPlayersExist) {
+            ch.sendMessage("Invalid cycle argument input. "
+                    + "See `lphelp` for more info.").queue();
+            return false;
+        }
+
+        boolean badQuadGamesPlayed = args.length == 7
+                && Integer.parseInt(args[5]) < Integer.parseInt(args[6]);
+        boolean badSingleGamesPlayed = args.length == 4
+                && Integer.parseInt(args[2]) < Integer.parseInt(args[3]);
+        if (badQuadGamesPlayed || badSingleGamesPlayed) {
+            ch.sendMessage("Incorrect amount of games played detected. "
                     + "See `lphelp` for more info.").queue();
             return false;
         }
@@ -66,22 +79,23 @@ public class Events extends ListenerAdapter {
      * @return the help string.
      */
     private String getHelpString() {
-        return "`lphelp` - Displays the list of commands.\n"
-                + "`lpwin [user] [user] [user] [user] [score]` - Adds win scores to given users.\n"
-                + "`lplose [user] [user] [user] [user] [score]` - Adds lose scores to given users.\n"
-                + "`lpgrad [user]` - Graduates a player from LaunchPoint.";
+        return "=== __**LaunchPoint Simp Commands**__ ===\n"
+                + "`lphelp` - Displays the list of commands.\n===\n"
+                + "`lpcycle [user] [user] [user] [user] [games played] [score]` - Adds scores to the given users.\n===\n"
+                + "`lpcycle [user] [games played] [score]` - Adds score to a single user.\n===\n"
+                + "`lpgrad [user]` - Graduates a player from LaunchPoint.\n===";
     }
 
     /**
-     * Runs the "lpwin" command.
+     * Runs the "lpwin" or "lplose" command.
      * @param players the mentioned players.
      * @param ch the channel the command was ran in.
      * @param args the arguments of the command.
      */
-    private void runDraftCmd(List<Member> players, MessageChannel ch,
+    private void runCyclesCmd(List<Member> players, MessageChannel ch,
                              String[] args) {
-        DraftLog draft = new DraftLog();
-        draft.runCmd(ch, null, players, args);
+        CyclesLog cycle = new CyclesLog();
+        cycle.runCmd(ch, null, players, args);
     }
 
     /**
@@ -102,7 +116,7 @@ public class Events extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e) {
         String input = e.getMessage().getContentRaw();
         MessageChannel ch = e.getChannel();
-        String[] args = input.split(" ", 6);
+        String[] args = input.split(" ", 7);
         List<Member> users;
         SERVER = e.getGuild();
 
@@ -110,11 +124,10 @@ public class Events extends ListenerAdapter {
             case "lphelp":
                 ch.sendMessage(getHelpString()).queue();
                 break;
-            case "lpwin":
-            case "lplose":
+            case "lpcycle":
                 users = e.getMessage().getMentionedMembers();
-                if (checkArgs(ch, args, 6) && allPlayersExist(ch, users)) {
-                    runDraftCmd(users, ch, args);
+                if (cycleArgsValid(ch, args, users)) {
+                    runCyclesCmd(users, ch, args);
                 }
                 break;
             case "lpgrad":

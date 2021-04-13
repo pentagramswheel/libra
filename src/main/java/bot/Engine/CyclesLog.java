@@ -19,25 +19,15 @@ import java.security.GeneralSecurityException;
 
 /**
  * @author  Wil Aquino
- * Date:    April 1, 2021
+ * Date:    February 17, 2021
  * Project: LaunchPoint Bot
- * Module:  Graduate.java
- * Purpose: Graduates a user from LaunchPoint.
+ * Module:  Events.java
+ * Purpose: Logs cycle information via command.
  */
-public class Graduate implements Command {
+public class CyclesLog implements Command {
 
     /**
-     * Adds graduate role to a user.
-     * @param user the given user.
-     */
-    private void addRole(Member user) {
-        Role role = Events.SERVER.getRolesByName(
-                "LaunchPoint Graduate", true).get(0);
-        Events.SERVER.addRoleToMember(user, role).queue();
-    }
-
-    /**
-     * Runs the graduation command.
+     * Runs the draft logging command.
      * @param inChannel the channel the command was sent in.
      * @param outChannel the channel to output to, if it exists.
      * @param users the users to attach to the command output, if they exist.
@@ -46,30 +36,31 @@ public class Graduate implements Command {
     @Override
     public void runCmd(MessageChannel inChannel, MessageChannel outChannel,
                        List<Member> users, String[] args) {
-        Member user = users.get(0);
-        addRole(user);
-
         try {
-            GoogleAPI link = new GoogleAPI(Discord.getGradSheetID());
-            String range = "'Graduates'";
+            GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
+            String range = "'Cycle 7'";
             Values tableVals = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> table = link.readSection(
                     inChannel, range, tableVals);
 
-            if (table == null) {
-                inChannel.sendMessage("The spreadsheet was empty.").queue();
-            } else if (table.containsKey(user.getUser().getAsTag())) {
-                inChannel.sendMessage("User has already graduated.").queue();
-            } else {
-                ArrayList<Object> lstWithName = new ArrayList<>();
-                lstWithName.add(user.getUser().getAsTag());
+            for (Member user : users) {
+                if (table == null) {
+                    inChannel.sendMessage("The spreadsheet was empty.").queue();
+                } else if (table.containsKey(user.getUser().getAsTag())) {
 
-                ValueRange appendName = new ValueRange().setValues(
-                        Collections.singletonList(lstWithName));
-                link.appendRow(range, tableVals, appendName);
+                    String userTag = user.getUser().getAsTag();
+                    PlayerStats player = table.get(userTag);
+                    inChannel.sendMessageFormat("Row %s - %s has won %s sets and lost %s sets.", player.getRow(), userTag, player.getStats().get(1), player.getStats().get(2)).queue();
 
-                inChannel.sendMessage("Player graduated from LaunchPoint.").queue();
+
+                } else {
+                    inChannel.sendMessageFormat(
+                            "%s did not previously exist.",
+                            user.getUser().getAsTag()).queue();
+                }
             }
+
+            inChannel.sendMessage("The match report was made.").queue();
         } catch (IOException | GeneralSecurityException e) {
             inChannel.sendMessage("The spreadsheet could not load.").queue();
         }

@@ -98,12 +98,18 @@ public class GoogleAPI {
                 APPLICATION_NAME).build();
     }
 
-    /** Retrieves the affiliated spreadsheet. */
+    /**
+     * Retrieves the affiliated spreadsheet.
+     * @return said spreadsheet.
+     */
     public Sheets getSheet() {
         return sheetsService;
     }
 
-    /** Retrieves the affiliated spreadsheet's ID. */
+    /**
+     * Retrieves the affiliated spreadsheet's ID.
+     * @return said ID.
+     */
     public String getSpreadsheetID() {
         return spreadsheetID;
     }
@@ -116,18 +122,23 @@ public class GoogleAPI {
      * @return said section as a map, indexed by Discord tag.
      *         null otherwise.
      */
-    public TreeMap<Object, List<Object>> getSection(
+    public TreeMap<Object, PlayerStats> readSection(
             MessageChannel inChannel, String section, Values sectionVals) {
          try {
              ValueRange response = sectionVals.get(
                      getSpreadsheetID(), section).execute();
              List<List<Object>> values = response.getValues();
 
-             TreeMap<Object, List<Object>> table = new TreeMap<>();
+             TreeMap<Object, PlayerStats> table = new TreeMap<>();
              if (values != null && !values.isEmpty()) {
+                 int i = 1;
                  for (List<Object> row : values) {
                      Object name = row.remove(0);
-                     table.put(name, row);
+                     PlayerStats rowStats = new PlayerStats(
+                             Integer.toString(i), row);
+                     i++;
+
+                     table.put(name, rowStats);
                  }
                  return table;
              }
@@ -146,7 +157,7 @@ public class GoogleAPI {
      */
     public void appendRow(String section, Values sectionVals, ValueRange row)
         throws IOException {
-        sectionVals.append(this.getSpreadsheetID(), section, row)
+        sectionVals.append(getSpreadsheetID(), section, row)
                 .setValueInputOption("USER_ENTERED")
                 .setInsertDataOption("INSERT_ROWS")
                 .setIncludeValuesInResponse(true).execute();

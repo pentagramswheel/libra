@@ -25,7 +25,7 @@ public class Main {
         try {
             jda = Events.BOT.build();
 
-            String funMessage = "lphelp | simping for everyone";
+            String funMessage = "lphelp | simping for @everyone";
             jda.getPresence().setActivity(Activity.playing(
                     funMessage));
         } catch (LoginException le) {
