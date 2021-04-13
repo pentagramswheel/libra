@@ -4,6 +4,10 @@ bot/Events.java
  bot.Events
 bot/Engine/DraftLog.java
  bot.Engine.DraftLog
+bot/Engine/GoogleAPI.java
+ bot.Engine.GoogleAPI
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
 bot/Discord.java
  bot.Discord
 bot/Main.java
