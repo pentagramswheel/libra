@@ -162,4 +162,17 @@ public class GoogleAPI {
                 .setInsertDataOption("INSERT_ROWS")
                 .setIncludeValuesInResponse(true).execute();
     }
+
+    /**
+     * Updates a row to the end of the spreadsheet section.
+     * @param section the name of the spreadsheet section.
+     * @param sectionVals the values of the spreadsheet section.
+     * @param row the row of values to update to.
+     */
+    public void updateRow(String section, Values sectionVals, ValueRange row)
+            throws IOException {
+        sectionVals.update(getSpreadsheetID(), section, row)
+                .setValueInputOption("RAW")
+                .setIncludeValuesInResponse(true).execute();
+    }
 }

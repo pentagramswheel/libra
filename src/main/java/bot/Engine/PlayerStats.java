@@ -12,14 +12,14 @@ import java.util.List;
 public class PlayerStats {
 
     /** Row position within the player's affiliated spreadsheet. */
-    private final String row;
+    private final String position;
 
     /** The player's stats. */
     private final List<Object> stats;
 
     /** Construct the object by storing row stats. */
-    public PlayerStats(String position, List<Object> vals) {
-        row = position;
+    public PlayerStats(String pos, List<Object> vals) {
+        position = pos;
         stats = vals;
     }
 
@@ -27,8 +27,8 @@ public class PlayerStats {
      * Retrieve the row number of the player's stats.
      * @return said row.
      */
-    public String getRow() {
-        return row;
+    public String getPosition() {
+        return position;
     }
 
     /**
