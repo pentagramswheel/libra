@@ -1,6 +1,8 @@
 target/
 .idea/
 .gradle/
+build/
+tokens/
 
 *.class
 *.jar

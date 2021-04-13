@@ -1,8 +1,11 @@
 package bot.Engine;
 
+import com.google.api.services.sheets.v4.model.ValueRange;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 /**
@@ -29,5 +32,26 @@ public class DraftLog implements Command {
         } else {
             inChannel.sendMessage("The loss report was made.").queue();
         }
+
+
+        Member graduate = users.get(0);
+
+//        try {
+//            sheetsService = getSheetsService();
+//            String range = "grads!A2:B3";
+//
+//            ValueRange response = sheetsService.spreadsheets().values().get(
+//                    SPREADSHEET_ID, range).execute();
+//
+//            List<List<Object>> values = response.getValues();
+//
+//            if (values == null || values.isEmpty()) {
+//                System.out.println("No spreadhsheet data was found.");
+//            } else {
+//                for ()
+//            }
+//        } catch (IOException | GeneralSecurityException e) {
+//            outputError(inChannel, "The spreadsheet could not be accessed.");
+//        }
     }
 }

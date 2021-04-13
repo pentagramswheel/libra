@@ -16,14 +16,14 @@ import javax.security.auth.login.LoginException;
  */
 public class Main {
     public static void main(String[] args) {
-        Events.bot = JDABuilder.createDefault(Discord.getToken())
+        Events.BOT = JDABuilder.createDefault(Discord.getToken())
                 .enableIntents(GatewayIntent.GUILD_PRESENCES);
         JDA jda = null;
 
-        Events.bot.addEventListeners(new Events());
+        Events.BOT.addEventListeners(new Events());
 
         try {
-            jda = Events.bot.build();
+            jda = Events.BOT.build();
 
             String funMessage = "lphelp | simping for everyone";
             jda.getPresence().setActivity(Activity.playing(
