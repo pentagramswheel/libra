@@ -1,7 +1,6 @@
 package bot.Engine;
 
 import bot.Discord;
-import bot.Events;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -24,6 +23,16 @@ import java.security.GeneralSecurityException;
  * Purpose: Logs cycle information via command.
  */
 public class CyclesLog implements Command {
+
+    /**
+     * Retrives the row value at a certain index.
+     * @param row the row to access.
+     * @param i the index to access.
+     * @return said indexed row value.
+     */
+    private int getValue(List<Object> row, int i) {
+        return Integer.parseInt(row.get(i).toString());
+    }
 
     /**
      * Checks if a set was won.
@@ -49,8 +58,9 @@ public class CyclesLog implements Command {
     private void updateUser(GoogleAPI link, Member user, String range,
                             Values tableVals, TreeMap<Object, PlayerStats> table,
                             String[] args) {
+        String userTag = user.getUser().getAsTag();
+
         try {
-            String userTag = user.getUser().getAsTag();
             PlayerStats player = table.get(userTag);
             List<Object> row = player.getStats();
 
@@ -63,14 +73,10 @@ public class CyclesLog implements Command {
                 cycleGamesWon = Integer.parseInt(args[3]);
             }
 
-            int setWins =
-                    Integer.parseInt(row.get(1).toString());
-            int setLosses =
-                    Integer.parseInt(row.get(2).toString());
-            int gamesWon =
-                    Integer.parseInt(row.get(5).toString());
-            int gamesLost =
-                    Integer.parseInt(row.get(6).toString());
+            int setWins = getValue(row, 1);
+            int setLosses = getValue(row, 2);
+            int gamesWon = getValue(row, 5);
+            int gamesLost = getValue(row, 6);
 
             if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
                 setWins++;
@@ -93,8 +99,14 @@ public class CyclesLog implements Command {
                     Collections.singletonList(Arrays.asList(
                             gamesWon, gamesLost)));
             link.updateRow(updateRange, tableVals, newRow);
+
+            sendToDiscord(String.format(
+                    "%s's leaderboard stats were updated...",
+                    userTag));
         } catch (IOException e) {
-            sendToDiscord("User could not be updated.");
+            sendToDiscord(String.format(
+                    "User %s could not be updated...",
+                    userTag));
         }
     }
 
@@ -105,12 +117,14 @@ public class CyclesLog implements Command {
      * @param range the name of the spreadsheet section
      * @param tableVals the values of the spreadsheet section.
      * @param args the user input.
+     *
+     * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
     private void addUser(GoogleAPI link, Member user, String range,
                          Values tableVals, String[] args) {
-        try {
-            String userTag = user.getUser().getAsTag();
+        String userTag = user.getUser().getAsTag();
 
+        try {
             int cycleGamesPlayed, cycleGamesWon;
             if (args.length == 7) {
                 cycleGamesPlayed = Integer.parseInt(args[5]);
@@ -135,8 +149,16 @@ public class CyclesLog implements Command {
                             userTag, user.getEffectiveName(), setWins,
                             setLosses, 0, 0, gamesWon, gamesLost, 0, 0)));
             link.appendRow(range, tableVals, newRow);
+
+            sendToDiscord(String.format(
+                    "%s was added to the leaderboard. Be sure to"
+                            + " extend the column formulas accordingly"
+                            + " (They're set to zero right now)...",
+                    userTag));
         } catch (IOException e) {
-            sendToDiscord("New user could not be added.");
+            sendToDiscord(String.format(
+                    "New user %s could not be added...",
+                    userTag));
         }
     }
 
@@ -152,7 +174,7 @@ public class CyclesLog implements Command {
         try {
             GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
 
-            // change based on the current cycle, the Sheet's current tab
+            // change based on the current cycle, the Sheet's current tab/cycle
             String range = "'Cycle 7'";
 
             Values tableVals = link.getSheet().spreadsheets().values();
@@ -166,16 +188,8 @@ public class CyclesLog implements Command {
             for (Member user : users) {
                 if (table.containsKey(user.getUser().getAsTag())) {
                     updateUser(link, user, range, tableVals, table, args);
-                    sendToDiscord(String.format(
-                            "%s's leaderboard stats were updated...",
-                            user.getUser().getAsTag()));
                 } else {
                     addUser(link, user, range, tableVals, args);
-                    sendToDiscord(String.format(
-                            "%s was added to the leaderboard. Be sure to"
-                                    + " extend the column formulas accordingly"
-                                    + " (They're set to zero right now)...",
-                            user.getUser().getAsTag()));
                 }
             }
 

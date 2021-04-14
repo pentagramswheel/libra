@@ -244,4 +244,4 @@ The `runCmd` method runs a command and outputs the result in a channel `outChann
 
 The project saves and loads data from two Google Sheets spreadsheets, one each for the `CyclesLog` and `Graduate` classes.
 
-These spreadsheets are connected and interacted with using the Google Sheets API, linked through the Gradle components of this project. Feature summary updates are also sent, through the origin channel the user originally typed commands in, by the bot using the Discord JDA API, also linked through Gradle.
+These spreadsheets are connected and interacted with using the Google Sheets API, linked through the Gradle components of this project. Feature summary updates are also sent, through the channel the user originally typed commands in, by the bot using the Discord JDA API, also linked through Gradle.

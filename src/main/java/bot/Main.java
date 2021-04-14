@@ -18,12 +18,11 @@ public class Main {
     public static void main(String[] args) {
         Events.BOT = JDABuilder.createDefault(Discord.getToken())
                 .enableIntents(GatewayIntent.GUILD_PRESENCES);
-        JDA jda = null;
 
         Events.BOT.addEventListeners(new Events());
 
         try {
-            jda = Events.BOT.build();
+            JDA jda = Events.BOT.build();
 
             String funMessage = "lphelp | simping for @everyone";
             jda.getPresence().setActivity(Activity.playing(

@@ -59,6 +59,7 @@ public class GoogleAPI {
      * @return the authorization credential.
      * @throws IOException ...
      * @throws GeneralSecurityException ...
+     * @source Twilio on YouTube
      */
     private Credential authorize()
             throws IOException, GeneralSecurityException {
@@ -123,30 +124,30 @@ public class GoogleAPI {
      */
     public TreeMap<Object, PlayerStats> readSection(
             String section, Values vals) {
-         try {
-             ValueRange response = vals.get(
-                     getSpreadsheetID(), section).execute();
-             List<List<Object>> values = response.getValues();
+        try {
+            ValueRange response = vals.get(
+                    getSpreadsheetID(), section).execute();
+            List<List<Object>> values = response.getValues();
 
-             TreeMap<Object, PlayerStats> table = new TreeMap<>();
-             if (values != null && !values.isEmpty()) {
-                 int i = 1;
-                 for (List<Object> row : values) {
-                     Object name = row.remove(0);
-                     PlayerStats rowStats = new PlayerStats(
-                             Integer.toString(i), row);
-                     i++;
+            TreeMap<Object, PlayerStats> table = new TreeMap<>();
+            if (values != null && !values.isEmpty()) {
+                int i = 1;
+                for (List<Object> row : values) {
+                    Object name = row.remove(0);
+                    PlayerStats rowStats = new PlayerStats(
+                            Integer.toString(i), row);
+                    i++;
 
-                     table.put(name, rowStats);
-                 }
-                 return table;
-             }
-         } catch (IOException e) {
-             Events.ORIGIN.sendMessage(
-                     "The spreadsheet could not load.").queue();
-         }
+                    table.put(name, rowStats);
+                }
+                return table;
+            }
+        } catch (IOException e) {
+            Events.ORIGIN.sendMessage(
+                    "The spreadsheet could not load.").queue();
+        }
 
-         return null;
+        return null;
     }
 
     /**
@@ -154,6 +155,7 @@ public class GoogleAPI {
      * @param section the table section of the spreadsheet to get.
      * @param vals the values represenatation of the spreadsheet.
      * @param row the row of values to append.
+     * @source Twilio on YouTube
      */
     public void appendRow(String section, Values vals, ValueRange row)
         throws IOException {
@@ -168,6 +170,7 @@ public class GoogleAPI {
      * @param section the table section of the spreadsheet to get.
      * @param vals the values represenatation of the spreadsheet.
      * @param row the row of values to update to.
+     * @source Twilio on YouTube
      */
     public void updateRow(String section, Values vals, ValueRange row)
             throws IOException {
