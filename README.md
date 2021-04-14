@@ -6,7 +6,9 @@
 ## Introduction
 LaunchPoint Simp is an official staff convenience bot for the Splatoon Discord server: LaunchPoint. As its official simp, not only will it simp for everyone, but it will also help everyone to as much of its capacity.
 
-##Usage##
+
+
+## Usage
 **lphelp**
 
 Outputs a list of the bot's commands.

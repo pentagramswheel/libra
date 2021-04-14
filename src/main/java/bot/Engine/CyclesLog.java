@@ -92,7 +92,6 @@ public class CyclesLog implements Command {
             newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
                             gamesWon, gamesLost)));
-
             link.updateRow(updateRange, tableVals, newRow);
         } catch (IOException e) {
             sendToDiscord("User could not be updated.");
