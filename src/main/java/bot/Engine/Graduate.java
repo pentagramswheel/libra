@@ -10,9 +10,8 @@ import net.dv8tion.jda.api.entities.Role;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.TreeMap;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -38,14 +37,13 @@ public class Graduate implements Command {
 
     /**
      * Runs the graduation command.
-     * @param inChannel the channel the command was sent in.
      * @param outChannel the channel to output to, if it exists.
      * @param users the users to attach to the command output, if they exist.
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel inChannel, MessageChannel outChannel,
-                       List<Member> users, String[] args) {
+    public void runCmd(MessageChannel outChannel, List<Member> users,
+                       String[] args) {
         Member user = users.get(0);
         addRole(user);
 
@@ -54,24 +52,24 @@ public class Graduate implements Command {
             String range = "'Graduates'";
             Values tableVals = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> table = link.readSection(
-                    inChannel, range, tableVals);
+                    range, tableVals);
 
             if (table == null) {
-                inChannel.sendMessage("The spreadsheet was empty.").queue();
+                sendToDiscord("The spreadsheet was empty.");
             } else if (table.containsKey(user.getUser().getAsTag())) {
-                inChannel.sendMessage("User has already graduated.").queue();
+                sendToDiscord("User has already graduated.");
             } else {
-                ArrayList<Object> lstWithName = new ArrayList<>();
-                lstWithName.add(user.getUser().getAsTag());
+                List<Object> lstWithName =
+                        Collections.singletonList(user.getUser().getAsTag());
 
                 ValueRange appendName = new ValueRange().setValues(
                         Collections.singletonList(lstWithName));
                 link.appendRow(range, tableVals, appendName);
 
-                inChannel.sendMessage("Player graduated from LaunchPoint.").queue();
+                sendToDiscord("Player graduated from LaunchPoint.");
             }
         } catch (IOException | GeneralSecurityException e) {
-            inChannel.sendMessage("The spreadsheet could not load.").queue();
+            sendToDiscord("The spreadsheet could not load.");
         }
     }
 }

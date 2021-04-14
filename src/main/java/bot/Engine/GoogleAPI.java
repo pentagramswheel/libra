@@ -1,6 +1,6 @@
 package bot.Engine;
 
-import net.dv8tion.jda.api.entities.MessageChannel;
+import bot.Events;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -15,12 +15,12 @@ import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Collections;
 import java.util.TreeMap;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 /**
@@ -116,14 +116,13 @@ public class GoogleAPI {
 
     /**
      * Retrieves a table section of the spreadsheet.
-     * @param inChannel the channel the command was sent in.
      * @param section the name of the spreadsheet section.
      * @param sectionVals the values of the spreadsheet section.
      * @return said section as a map, indexed by Discord tag.
      *         null otherwise.
      */
     public TreeMap<Object, PlayerStats> readSection(
-            MessageChannel inChannel, String section, Values sectionVals) {
+            String section, Values sectionVals) {
          try {
              ValueRange response = sectionVals.get(
                      getSpreadsheetID(), section).execute();
@@ -143,7 +142,8 @@ public class GoogleAPI {
                  return table;
              }
          } catch (IOException e) {
-             inChannel.sendMessage("The spreadsheet could not load.").queue();
+             Events.ORIGIN.sendMessage(
+                     "The spreadsheet could not load.").queue();
          }
 
          return null;
@@ -172,7 +172,7 @@ public class GoogleAPI {
     public void updateRow(String section, Values sectionVals, ValueRange row)
             throws IOException {
         sectionVals.update(getSpreadsheetID(), section, row)
-                .setValueInputOption("RAW")
+                .setValueInputOption("USER_ENTERED")
                 .setIncludeValuesInResponse(true).execute();
     }
 }

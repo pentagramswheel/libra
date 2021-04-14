@@ -4,13 +4,13 @@ bot/Main.java
  bot.Main
 bot/Discord.java
  bot.Discord
+bot/Engine/PlayerStats.java
+ bot.Engine.PlayerStats
 bot/Events.java
  bot.Events
 bot/Engine/CyclesLog.java
  bot.Engine.CyclesLog
 bot/Engine/GoogleAPI.java
  bot.Engine.GoogleAPI
-bot/Engine/PlayerStats.java
- bot.Engine.PlayerStats
 bot/Engine/Graduate.java
  bot.Engine.Graduate
