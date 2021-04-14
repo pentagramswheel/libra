@@ -37,7 +37,7 @@ public class GoogleAPI {
     private final Sheets sheetsService;
 
     /** Name of the application. */
-    private static final String APPLICATION_NAME = "LaunchPoint Bot";
+    private static final String APPLICATION_NAME = "LaunchPoint Simp";
 
     /** ID of the Google Sheet being used. */
     private final String spreadsheetID;
@@ -116,15 +116,15 @@ public class GoogleAPI {
 
     /**
      * Retrieves a table section of the spreadsheet.
-     * @param section the name of the spreadsheet section.
-     * @param sectionVals the values of the spreadsheet section.
+     * @param section the table section of the spreadsheet to get.
+     * @param vals the values represenatation of the spreadsheet.
      * @return said section as a map, indexed by Discord tag.
      *         null otherwise.
      */
     public TreeMap<Object, PlayerStats> readSection(
-            String section, Values sectionVals) {
+            String section, Values vals) {
          try {
-             ValueRange response = sectionVals.get(
+             ValueRange response = vals.get(
                      getSpreadsheetID(), section).execute();
              List<List<Object>> values = response.getValues();
 
@@ -151,13 +151,13 @@ public class GoogleAPI {
 
     /**
      * Appends a row to the end of the spreadsheet section.
-     * @param section the name of the spreadsheet section.
-     * @param sectionVals the values of the spreadsheet section.
+     * @param section the table section of the spreadsheet to get.
+     * @param vals the values represenatation of the spreadsheet.
      * @param row the row of values to append.
      */
-    public void appendRow(String section, Values sectionVals, ValueRange row)
+    public void appendRow(String section, Values vals, ValueRange row)
         throws IOException {
-        sectionVals.append(getSpreadsheetID(), section, row)
+        vals.append(getSpreadsheetID(), section, row)
                 .setValueInputOption("USER_ENTERED")
                 .setInsertDataOption("INSERT_ROWS")
                 .setIncludeValuesInResponse(true).execute();
@@ -165,13 +165,13 @@ public class GoogleAPI {
 
     /**
      * Updates a row to the end of the spreadsheet section.
-     * @param section the name of the spreadsheet section.
-     * @param sectionVals the values of the spreadsheet section.
+     * @param section the table section of the spreadsheet to get.
+     * @param vals the values represenatation of the spreadsheet.
      * @param row the row of values to update to.
      */
-    public void updateRow(String section, Values sectionVals, ValueRange row)
+    public void updateRow(String section, Values vals, ValueRange row)
             throws IOException {
-        sectionVals.update(getSpreadsheetID(), section, row)
+        vals.update(getSpreadsheetID(), section, row)
                 .setValueInputOption("USER_ENTERED")
                 .setIncludeValuesInResponse(true).execute();
     }

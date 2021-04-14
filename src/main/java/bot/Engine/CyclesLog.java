@@ -26,6 +26,18 @@ import java.security.GeneralSecurityException;
 public class CyclesLog implements Command {
 
     /**
+     * Checks if a set was won.
+     * @param won the amount of won games.
+     * @param played the total amount of games played.
+     * @return True if the set was won.
+     *         False if the set was lost.
+     */
+    private boolean cycleSetWon(int won, int played) {
+        double halfPlayed = (double) played / 2;
+        return won >= halfPlayed;
+    }
+
+    /**
      * Updates a user's stats within a spreadsheet.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
@@ -50,8 +62,6 @@ public class CyclesLog implements Command {
                 cycleGamesPlayed = Integer.parseInt(args[2]);
                 cycleGamesWon = Integer.parseInt(args[3]);
             }
-            boolean cycleSetWon =
-                    cycleGamesWon >= (cycleGamesPlayed / 2);
 
             int setWins =
                     Integer.parseInt(row.get(1).toString());
@@ -62,7 +72,7 @@ public class CyclesLog implements Command {
             int gamesLost =
                     Integer.parseInt(row.get(6).toString());
 
-            if (cycleSetWon) {
+            if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
                 setWins++;
             } else {
                 setLosses++;
@@ -85,8 +95,7 @@ public class CyclesLog implements Command {
 
             link.updateRow(updateRange, tableVals, newRow);
         } catch (IOException e) {
-            Events.ORIGIN.sendMessage(
-                    "User could not be updated.").queue();
+            sendToDiscord("User could not be updated.");
         }
     }
 
@@ -111,12 +120,10 @@ public class CyclesLog implements Command {
                 cycleGamesPlayed = Integer.parseInt(args[2]);
                 cycleGamesWon = Integer.parseInt(args[3]);
             }
-            boolean cycleSetWon =
-                    cycleGamesWon >= (cycleGamesPlayed / 2);
 
             int setWins = 0;
             int setLosses = 0;
-            if (cycleSetWon) {
+            if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
                 setWins++;
             } else {
                 setLosses++;
@@ -130,8 +137,7 @@ public class CyclesLog implements Command {
                             setLosses, 0, 0, gamesWon, gamesLost, 0, 0)));
             link.appendRow(range, tableVals, newRow);
         } catch (IOException e) {
-            Events.ORIGIN.sendMessage(
-                    "New user could not be added.").queue();
+            sendToDiscord("New user could not be added.");
         }
     }
 
@@ -162,14 +168,14 @@ public class CyclesLog implements Command {
                 if (table.containsKey(user.getUser().getAsTag())) {
                     updateUser(link, user, range, tableVals, table, args);
                     sendToDiscord(String.format(
-                            "%s's leaderboard stats were updated.",
+                            "%s's leaderboard stats were updated...",
                             user.getUser().getAsTag()));
                 } else {
                     addUser(link, user, range, tableVals, args);
                     sendToDiscord(String.format(
                             "%s was added to the leaderboard. Be sure to"
                                     + " extend the column formulas accordingly"
-                                    + " (They're set to zero right now).",
+                                    + " (They're set to zero right now)...",
                             user.getUser().getAsTag()));
                 }
             }

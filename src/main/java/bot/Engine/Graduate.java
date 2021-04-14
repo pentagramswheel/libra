@@ -36,17 +36,10 @@ public class Graduate implements Command {
     }
 
     /**
-     * Runs the graduation command.
-     * @param outChannel the channel to output to, if it exists.
-     * @param users the users to attach to the command output, if they exist.
-     * @param args the arguments of the command, if they exist.
+     * Graduates a user from LaunchPoint.
+     * @param user the user to graduate.
      */
-    @Override
-    public void runCmd(MessageChannel outChannel, List<Member> users,
-                       String[] args) {
-        Member user = users.get(0);
-        addRole(user);
-
+    private void graduateUser(Member user) {
         try {
             GoogleAPI link = new GoogleAPI(Discord.getGradSheetID());
             String range = "'Graduates'";
@@ -71,5 +64,19 @@ public class Graduate implements Command {
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The spreadsheet could not load.");
         }
+    }
+
+    /**
+     * Runs the graduation command.
+     * @param outChannel the channel to output to, if it exists.
+     * @param users the users to attach to the command output, if they exist.
+     * @param args the arguments of the command, if they exist.
+     */
+    @Override
+    public void runCmd(MessageChannel outChannel, List<Member> users,
+                       String[] args) {
+        Member user = users.get(0);
+        addRole(user);
+        graduateUser(user);
     }
 }
