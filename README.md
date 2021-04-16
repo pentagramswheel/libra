@@ -143,7 +143,7 @@ The `getHelpString` method retrieves the script for the `lphelp` command.
 
 **runCyclesCmd**
 
-The `runCyclesCmd` method formally runs the `lpcycle` command, loading users `players` and user input `args`.
+The `runCyclesCmd` method formally runs the `lpcycle` or `lpsub` command, loading users `players` and user input `args`.
 
 **runGradCmd**
 
@@ -263,7 +263,7 @@ The `cycleSetWon` method checks if a cycle set was won, given the amount of won 
 
 **updateUser (overloaded)**
 
-This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, detecting if they were a sub or not via flag `notSub`, at location `range` within the spreadsheet values `tableVals`, using a map `table`, given the original user input `args`.
+This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, detecting if they were a sub or not via a flag `notSub`, at location `range` within the spreadsheet values `tableVals`, using a map `table`, given the original user input `args`.
 
 **updateUser**
 
@@ -271,7 +271,7 @@ This `updateUser` method calls its overloaded self with a parameter detecting if
 
 **addUser (overloaded)**
 
-This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, detecting if they were a sub or not via flag `notSub`, at location `range` within the spreadsheet values `tableVals`, given the original user input `args`.
+This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, detecting if they were a sub or not via a flag `notSub`, at location `range` within the spreadsheet values `tableVals`, given the original user input `args`.
 
 **addUser**
 
