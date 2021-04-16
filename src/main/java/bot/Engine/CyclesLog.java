@@ -25,13 +25,21 @@ import java.security.GeneralSecurityException;
 public class CyclesLog implements Command {
 
     /**
-     * Retrives the row value at a certain index.
-     * @param row the row to access.
-     * @param i the index to access.
-     * @return said indexed row value.
+     * Retrieve the amount of set games were played.
+     * @param args the user input.
+     * @return said amount.
      */
-    private int getValue(List<Object> row, int i) {
-        return Integer.parseInt(row.get(i).toString());
+    private int getGamesPlayed(String[] args) {
+        return Integer.parseInt(args[args.length - 2]);
+    }
+
+    /**
+     * Retrieve the amount of won set games.
+     * @param args the user input
+     * @return said amount.
+     */
+    private int getGamesWon(String[] args) {
+        return Integer.parseInt(args[args.length - 1]);
     }
 
     /**
@@ -58,25 +66,16 @@ public class CyclesLog implements Command {
     private void updateUser(GoogleAPI link, Member user, String range,
                             Values tableVals, TreeMap<Object, PlayerStats> table,
                             String[] args) {
-        String userTag = user.getUser().getAsTag();
-
         try {
-            PlayerStats player = table.get(userTag);
-            List<Object> row = player.getStats();
+            PlayerStats player = table.get(user.getId());
 
-            int cycleGamesPlayed, cycleGamesWon;
-            if (args.length == 7) {
-                cycleGamesPlayed = Integer.parseInt(args[5]);
-                cycleGamesWon = Integer.parseInt(args[6]);
-            } else {
-                cycleGamesPlayed = Integer.parseInt(args[2]);
-                cycleGamesWon = Integer.parseInt(args[3]);
-            }
+            int cycleGamesPlayed = getGamesPlayed(args);
+            int cycleGamesWon = getGamesWon(args);
 
-            int setWins = getValue(row, 1);
-            int setLosses = getValue(row, 2);
-            int gamesWon = getValue(row, 5);
-            int gamesLost = getValue(row, 6);
+            int setWins = player.getSetWins();
+            int setLosses = player.getSetLosses();
+            int gamesWon = player.getGamesWon();
+            int gamesLost = player.getGamesLost();
 
             if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
                 setWins++;
@@ -87,14 +86,15 @@ public class CyclesLog implements Command {
             gamesLost += cycleGamesPlayed - cycleGamesWon;
 
             String updateRange = range + "!B" + player.getPosition()
-                    + ":D" + player.getPosition();
+                    + ":E" + player.getPosition();
             ValueRange newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
-                            user.getEffectiveName(), setWins, setLosses)));
+                            player.getName(), player.getNickname(),
+                            setWins, setLosses)));
             link.updateRow(updateRange, tableVals, newRow);
 
-            updateRange = range + "!G" + player.getPosition()
-                    + ":H" + player.getPosition();
+            updateRange = range + "!H" + player.getPosition()
+                    + ":I" + player.getPosition();
             newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
                             gamesWon, gamesLost)));
@@ -102,11 +102,11 @@ public class CyclesLog implements Command {
 
             sendToDiscord(String.format(
                     "%s's leaderboard stats were updated...",
-                    userTag));
+                    player.getName()));
         } catch (IOException e) {
             sendToDiscord(String.format(
                     "User %s could not be updated...",
-                    userTag));
+                    user.getUser().getAsTag()));
         }
     }
 
@@ -125,29 +125,24 @@ public class CyclesLog implements Command {
         String userTag = user.getUser().getAsTag();
 
         try {
-            int cycleGamesPlayed, cycleGamesWon;
-            if (args.length == 7) {
-                cycleGamesPlayed = Integer.parseInt(args[5]);
-                cycleGamesWon = Integer.parseInt(args[6]);
-            } else {
-                cycleGamesPlayed = Integer.parseInt(args[2]);
-                cycleGamesWon = Integer.parseInt(args[3]);
-            }
+            int cycleGamesPlayed = getGamesPlayed(args);
+            int cycleGamesWon = getGamesWon(args);
 
             int setWins = 0;
             int setLosses = 0;
+
             if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
                 setWins++;
             } else {
                 setLosses++;
             }
-            int gamesWon = cycleGamesWon;
-            int gamesLost = cycleGamesPlayed - cycleGamesWon;
+            int cycleGamesLost = cycleGamesPlayed - cycleGamesWon;
 
             ValueRange newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
-                            userTag, user.getEffectiveName(), setWins,
-                            setLosses, 0, 0, gamesWon, gamesLost, 0, 0)));
+                            user.getId(), userTag, user.getEffectiveName(),
+                            setWins, setLosses, 0, 0, cycleGamesWon,
+                            cycleGamesLost, 0, 0)));
             link.appendRow(range, tableVals, newRow);
 
             sendToDiscord(String.format(
@@ -174,8 +169,8 @@ public class CyclesLog implements Command {
         try {
             GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
 
-            // change based on the current cycle, the Sheet's current tab/cycle
-            String range = "'Cycle 7'";
+            // tab name of the spreadsheet
+            String range = "'Copy of Current Leaderboard'";
 
             Values tableVals = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> table = link.readSection(
@@ -186,7 +181,7 @@ public class CyclesLog implements Command {
             }
 
             for (Member user : users) {
-                if (table.containsKey(user.getUser().getAsTag())) {
+                if (table.containsKey(user.getId())) {
                     updateUser(link, user, range, tableVals, table, args);
                 } else {
                     addUser(link, user, range, tableVals, args);

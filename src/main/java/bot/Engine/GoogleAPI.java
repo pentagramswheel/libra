@@ -59,7 +59,7 @@ public class GoogleAPI {
      * @return the authorization credential.
      * @throws IOException ...
      * @throws GeneralSecurityException ...
-     * @source Twilio on YouTube
+     * @source Twilio on YouTube.
      */
     private Credential authorize()
             throws IOException, GeneralSecurityException {
@@ -119,7 +119,7 @@ public class GoogleAPI {
      * Retrieves a table section of the spreadsheet.
      * @param section the table section of the spreadsheet to get.
      * @param vals the values represenatation of the spreadsheet.
-     * @return said section as a map, indexed by Discord tag.
+     * @return said section as a map, indexed by Discord ID.
      *         null otherwise.
      */
     public TreeMap<Object, PlayerStats> readSection(
@@ -131,20 +131,19 @@ public class GoogleAPI {
 
             TreeMap<Object, PlayerStats> table = new TreeMap<>();
             if (values != null && !values.isEmpty()) {
-                int i = 1;
-                for (List<Object> row : values) {
-                    Object name = row.remove(0);
+                for (int i = 1; i < values.size(); i++) {
+                    List<Object> row = values.get(i);
+                    Object id = row.remove(0);
                     PlayerStats rowStats = new PlayerStats(
-                            Integer.toString(i), row);
-                    i++;
+                            Integer.toString(i + 1), row);
 
-                    table.put(name, rowStats);
+                    table.put(id, rowStats);
                 }
                 return table;
             }
         } catch (IOException e) {
             Events.ORIGIN.sendMessage(
-                    "The spreadsheet could not load.").queue();
+                    "The data could not load.").queue();
         }
 
         return null;
@@ -155,7 +154,7 @@ public class GoogleAPI {
      * @param section the table section of the spreadsheet to get.
      * @param vals the values represenatation of the spreadsheet.
      * @param row the row of values to append.
-     * @source Twilio on YouTube
+     * @source Twilio on YouTube.
      */
     public void appendRow(String section, Values vals, ValueRange row)
         throws IOException {
@@ -170,7 +169,7 @@ public class GoogleAPI {
      * @param section the table section of the spreadsheet to get.
      * @param vals the values represenatation of the spreadsheet.
      * @param row the row of values to update to.
-     * @source Twilio on YouTube
+     * @source Twilio on YouTube.
      */
     public void updateRow(String section, Values vals, ValueRange row)
             throws IOException {

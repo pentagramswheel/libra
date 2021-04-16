@@ -31,20 +31,27 @@ public class Events extends ListenerAdapter {
     public static MessageChannel ORIGIN;
 
     /**
-     * Checks if a command has the correct amount of arguments.
-     * @param args the list of arguments to check.
-     * @param n the number of arguments to have.
-     * @return True if it does.
-     *         False if not.
+     * Checks if lpcycle command was typed correctly.
+     * @param totalArgs the total amount of keywords typed for the command.
+     * @param userArgs the amount of users typed with the command.
+     * @return True if the format was correct.
+     *         False otherwise.
      */
-    private boolean checkArgs(String[] args, int n) {
-        if (args.length != n) {
-            ORIGIN.sendMessage("Invalid argument input. "
-                    + "See `lphelp` for more info.").queue();
-            return false;
-        }
+    private boolean cycleFormatInvalid(int totalArgs, int userArgs) {
+        boolean outsideArgRange = totalArgs < 4 || totalArgs > 7;
+        return outsideArgRange || userArgs != totalArgs - 3;
+    }
 
-        return true;
+    /**
+     * Checks if the game set parameters don't make sense.
+     * @param args the parameters to analyze.
+     * @return True if there were more wins than total games.
+     *         False otherwise.
+     */
+    private boolean gamesPlayedInvalid(String[] args) {
+        int totalArgs = args.length;
+        return Integer.parseInt(args[totalArgs - 2])
+                < Integer.parseInt(args[totalArgs - 1]);
     }
 
     /**
@@ -54,19 +61,11 @@ public class Events extends ListenerAdapter {
      *         False if not.
      */
     private boolean cycleArgsValid(String[] args, List<Member> users) {
-        boolean hasEnoughArgs = args.length == 7 || args.length == 4;
-        boolean allPlayersExist = users.size() == 1 || users.size() == 4;
-        if (!hasEnoughArgs || !allPlayersExist) {
+        if (cycleFormatInvalid(args.length, users.size())) {
             ORIGIN.sendMessage("Invalid cycle argument input. "
                     + "See `lphelp` for more info.").queue();
             return false;
-        }
-
-        boolean badQuadGamesPlayed = args.length == 7
-                && Integer.parseInt(args[5]) < Integer.parseInt(args[6]);
-        boolean badSingleGamesPlayed = args.length == 4
-                && Integer.parseInt(args[2]) < Integer.parseInt(args[3]);
-        if (badQuadGamesPlayed || badSingleGamesPlayed) {
+        } else if (gamesPlayedInvalid(args)) {
             ORIGIN.sendMessage("Incorrect amount of games played detected. "
                     + "See `lphelp` for more info.").queue();
             return false;
@@ -99,11 +98,11 @@ public class Events extends ListenerAdapter {
 
     /**
      * Runs the "lpgrad" command.
-     * @param player the mentioned player.
+     * @param players the mentioned players.
      */
-    private void runGradCmd(List<Member> player) {
+    private void runGradCmd(List<Member> players) {
         Graduate grad = new Graduate();
-        grad.runCmd(null, player, null);
+        grad.runCmd(null, players, null);
     }
 
     /**
@@ -128,9 +127,13 @@ public class Events extends ListenerAdapter {
                     runCyclesCmd(users, args);
                 }
                 break;
+            case "lpsub":
+                users = e.getMessage().getMentionedMembers();
+                //...
+                break;
             case "lpgrad":
                 users = e.getMessage().getMentionedMembers();
-                if (checkArgs(args, 2) && users.size() == 1) {
+                if (users.size() == args.length - 1) {
                     runGradCmd(users);
                 }
                 break;

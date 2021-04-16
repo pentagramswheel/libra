@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Role;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Collections;
 import java.util.TreeMap;
@@ -21,7 +22,7 @@ import java.security.GeneralSecurityException;
  * Date:    April 1, 2021
  * Project: LaunchPoint Bot
  * Module:  Graduate.java
- * Purpose: Graduates a user from LaunchPoint.
+ * Purpose: Graduates users from LaunchPoint.
  */
 public class Graduate implements Command {
 
@@ -48,18 +49,22 @@ public class Graduate implements Command {
                     range, tableVals);
 
             if (table == null) {
-                sendToDiscord("The spreadsheet was empty.");
-            } else if (table.containsKey(user.getUser().getAsTag())) {
-                sendToDiscord("User has already graduated.");
+                sendToDiscord("The retrieved data was empty.");
+            } else if (table.containsKey(user.getId())) {
+                sendToDiscord(String.format(
+                        "%s has already graduated from LaunchPoint.",
+                        user.getUser().getAsTag()));
             } else {
-                List<Object> lstWithName =
-                        Collections.singletonList(user.getUser().getAsTag());
-
                 ValueRange appendName = new ValueRange().setValues(
-                        Collections.singletonList(lstWithName));
+                    Collections.singletonList(Arrays.asList(
+                            user.getId(), user.getUser().getAsTag(),
+                            user.getEffectiveName())));
                 link.appendRow(range, tableVals, appendName);
 
-                sendToDiscord("Player graduated from LaunchPoint.");
+                sendToDiscord(String.format(
+                        "Congratulations %s. We look forward to seeing you "
+                                + "outside of LaunchPoint.",
+                        user.getUser().getAsTag()));
             }
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The spreadsheet could not load.");
@@ -75,8 +80,9 @@ public class Graduate implements Command {
     @Override
     public void runCmd(MessageChannel outChannel, List<Member> users,
                        String[] args) {
-        Member user = users.get(0);
-        addRole(user);
-        graduateUser(user);
+        for (Member user : users) {
+            addRole(user);
+            graduateUser(user);
+        }
     }
 }
