@@ -10,7 +10,6 @@ repositories {
     maven {
         url = uri('https://jcenter.bintray.com')
     }
-
     maven {
         url = uri('http://repo.maven.apache.org/maven2')
     }
