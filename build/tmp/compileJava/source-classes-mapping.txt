@@ -1,13 +1,13 @@
-bot/Main.java
- bot.Main
 bot/Engine/Graduate.java
  bot.Engine.Graduate
+bot/Engine/PlayerStats.java
+ bot.Engine.PlayerStats
 bot/Discord.java
  bot.Discord
 bot/Engine/Command.java
  bot.Engine.Command
-bot/Engine/PlayerStats.java
- bot.Engine.PlayerStats
+bot/Main.java
+ bot.Main
 bot/Engine/GoogleAPI.java
  bot.Engine.GoogleAPI
 bot/Events.java

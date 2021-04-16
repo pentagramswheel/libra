@@ -1,4 +1,4 @@
-# LaunchPoint Simp Design Document
+# LaunchPoint Simp Design Documentation
 **Contributors:** Wil Aquino
 
 **Date:** February 17, 2021
@@ -8,7 +8,7 @@ LaunchPoint Simp is an official staff convenience bot for the Splatoon Discord s
 
 
 
-## Usage
+## Command Usage
 **lphelp**
 
 Outputs a list of the bot's commands.
@@ -17,10 +17,21 @@ Outputs a list of the bot's commands.
 
 **lpcycle**
 
-Updates a player's LaunchPoint Cycles stats through an affiliated spreadsheet.
+Updates players' LaunchPoint Cycles stats through an affiliated spreadsheet.
 
 **Parameters**
-1. `user` - a Discord user in the form of a Discord ping; one or four users can be given.
+1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.
+2. `games played` - the amount of games played in a set.
+3. `score` - the amount of winning games of the set.
+
+----
+
+**lpsub**
+
+Updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet.
+
+**Parameters**
+1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.
 2. `games played` - the amount of games played in a set.
 3. `score` - the amount of winning games of the set.
 
@@ -28,10 +39,10 @@ Updates a player's LaunchPoint Cycles stats through an affiliated spreadsheet.
 
 **lpgrad**
 
-Graduates a player from LaunchPoint, logging their status on an affiliated spreadsheet and giving them the "LaunchPoint Graduate" role on the Discord server.
+Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and giving them the "LaunchPoint Graduate" role on the Discord server.
 
 **Parameters**
-1. `user` - a Discord user in the form of a Discord ping.
+1. `users` - a Discord user in the form of a Discord ping.
 
 
 
@@ -87,7 +98,12 @@ A class for storing information about a Discord user.
 
 **Instance Variables**
 1. `String position` - the row position of the user's data.
-2. `List<Object> stats` - the user's actual stats.
+2. `String name` - the user's Discord tag.
+3. `String nickname` - the user's nickname on the server.
+4. `int setWins` - the user's amount of won sets.
+5. `int setLosses` - the user's amount of lost sets.
+6. `int gamesWon` - the user's amount of won games.
+7. `int gamesLost` - the user's amount of lost games.
 
 
 ----
@@ -109,13 +125,17 @@ A class which graduates a user from LaunchPoint, processing the command `lpgrad`
 ## Algorithms
 **Events**
 
-**checkArgs**
+**cycleFormatInvalid**
 
-The `checkArgs` method ensures a command, specified as the first item of `args`, consists of `n`-1 parameters.
+The `cycleFormatInavlid` method ensures the `lpcycle` or `lpsub` command has the correct amount of total parameters `totalArgs` and correct amount of total users `userArgs`.
+
+**gamesPlayedInvalid**
+
+The `gamesPlayersInvalid` method ensures the parameter `games played` was not switched with the `score` parameter.
 
 **cycleArgsValid**
 
-The `cycleArgsValid` method ensures the `lpcycle` command, specified as the first item of `args`, consists of the correct amount of parameters and users in `users`.
+The `cycleArgsValid` method ensures the `lpcycle` or `lpsub` command, specified as the first item of `args`, was called with the correct format, given `users`.
 
 **getHelpString**
 
@@ -127,11 +147,11 @@ The `runCyclesCmd` method formally runs the `lpcycle` command, loading users `pl
 
 **runGradCmd**
 
-The `runGradCmd` method formally runs the `lpgrad` command, loading a user `player`.
+The `runGradCmd` method formally runs the `lpgrad` command, loading users `players`.
 
 **onMessageReceived**
 
-The `onMessageReceieved` method parses through user-input `e`, checking if a command was used, and executing based on the command, if any.
+The `onMessageReceieved` method parses through user input `e`, checking if a command was used, and executing based on the command, if any.
 
 
 ----
@@ -160,7 +180,7 @@ The `getSpreadSheetID` method retrieves the spreadsheet's affiliated ID.
 
 **readSection**
 
-The `readSection` method reads a section `section` of values `vals` from the spreadsheet and organizes it into a map, in the form of a red-black tree.
+The `readSection` method reads a section `section` of values `vals` from the spreadsheet and organizes it into a map, in the form of a red-black tree, indexing by Discord user ID.
 
 **appendRow**
 
@@ -196,26 +216,66 @@ The `PlayerStats` method, the class's constructor, initializes the class's insta
 
 The `getPosition` method retrieves the row number the player is located at within the spreadsheet.
 
-**getStats**
+**getName**
 
-The `getStats` method retrieves the user's actual stats.
+The `getName` method retrieves the user's Discord tag.
+
+**getNickname**
+
+The `getNickname` method retrieves the user's Discord nickname on the server.
+
+**getSetWins**
+
+The `getSetWins` method retrieves the user's amount of won sets.
+
+**getSetLosses**
+
+The `getSetLosses` method retrieves the user's amount of lost sets.
+
+**getGamesWon**
+
+The `getGamesWon` method retrieves the user's amount of won games.
+
+**getGamesLost**
+
+The `getGamesLost` method retrieves the user's amount of lost games.
 
 
 ----
 
 **CyclesLog (Engine)**
 
+**checkForSub**
+
+The `checkForSub` method checks if the included players, given in `args` were subs.
+
+**getGamesPlayed**
+
+The `getGamesPlayed` method retrieves the amount of games played, given `args`.
+
+**getGamesWon**
+
+The `getGamesWon` method retrieves the amount of games won, given `args`.
+
 **cycleSetWon**
 
 The `cycleSetWon` method checks if a cycle set was won, given the amount of won games `won` and the total amount of games played `played`.
 
+**updateUser (overloaded)**
+
+This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, detecting if they were a sub or not via flag `notSub`, at location `range` within the spreadsheet values `tableVals`, using a map `table`, given the original user input `args`.
+
 **updateUser**
 
-The `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, at location `range` within the spreadsheet values `tableVals`, using a map `table`, given the original user input `args`.
+This `updateUser` method calls its overloaded self with a parameter detecting if the user was a sub or not.
+
+**addUser (overloaded)**
+
+This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, detecting if they were a sub or not via flag `notSub`, at location `range` within the spreadsheet values `tableVals`, given the original user input `args`.
 
 **addUser**
 
-The `updateUser` method uses the GoogleAPI `link` to add the stats of a user `user`, at location `range` within the spreadsheet values `tableVals`, given the original user input `args`.
+This `addUser` method calls its overloaded self with a parameter detecting if the user was a sub or not.
 
 **runCmd**
 

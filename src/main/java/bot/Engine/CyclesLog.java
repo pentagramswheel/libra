@@ -25,6 +25,16 @@ import java.security.GeneralSecurityException;
 public class CyclesLog implements Command {
 
     /**
+     * Checks if this it the lpcycle or lpsub command.
+     * @param args the user input.
+     * @return True if the lpsub command was called.
+     *         False if the lpcycle command was called.
+     */
+    private boolean checkForSub(String[] args) {
+        return args[0].equals("lpcycle");
+    }
+
+    /**
      * Retrieve the amount of set games were played.
      * @param args the user input.
      * @return said amount.
@@ -62,10 +72,11 @@ public class CyclesLog implements Command {
      * @param tableVals the values of the spreadsheet section.
      * @param table a map of all rows of the spreadsheet.
      * @param args the user input.
+     * @param notSub a flag to check if the user is a sub or not.
      */
     private void updateUser(GoogleAPI link, Member user, String range,
                             Values tableVals, TreeMap<Object, PlayerStats> table,
-                            String[] args) {
+                            String[] args, boolean notSub) {
         try {
             PlayerStats player = table.get(user.getId());
 
@@ -77,10 +88,12 @@ public class CyclesLog implements Command {
             int gamesWon = player.getGamesWon();
             int gamesLost = player.getGamesLost();
 
-            if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
-                setWins++;
-            } else {
-                setLosses++;
+            if (notSub) {
+                if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
+                    setWins++;
+                } else {
+                    setLosses++;
+                }
             }
             gamesWon += cycleGamesWon;
             gamesLost += cycleGamesPlayed - cycleGamesWon;
@@ -111,17 +124,35 @@ public class CyclesLog implements Command {
     }
 
     /**
+     * Checks if the user is a sub, then updates a user's stats
+     * within a spreadsheet.
+     * @param link a connection to the spreadsheet.
+     * @param user the user to update the stats of.
+     * @param range the name of the spreadsheet section
+     * @param tableVals the values of the spreadsheet section.
+     * @param table a map of all rows of the spreadsheet.
+     * @param args the user input.
+     */
+    private void updateUser(GoogleAPI link, Member user, String range,
+                            Values tableVals, TreeMap<Object, PlayerStats> table,
+                            String[] args) {
+        updateUser(link, user, range, tableVals, table, args,
+                checkForSub(args));
+    }
+
+    /**
      * Adds a user's stats within a spreadsheet.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param range the name of the spreadsheet section
      * @param tableVals the values of the spreadsheet section.
      * @param args the user input.
+     * @param notSub a flag to check if the user is a sub or not.
      *
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
     private void addUser(GoogleAPI link, Member user, String range,
-                         Values tableVals, String[] args) {
+                         Values tableVals, String[] args, boolean notSub) {
         String userTag = user.getUser().getAsTag();
 
         try {
@@ -131,10 +162,12 @@ public class CyclesLog implements Command {
             int setWins = 0;
             int setLosses = 0;
 
-            if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
-                setWins++;
-            } else {
-                setLosses++;
+            if (notSub) {
+                if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
+                    setWins++;
+                } else {
+                    setLosses++;
+                }
             }
             int cycleGamesLost = cycleGamesPlayed - cycleGamesWon;
 
@@ -155,6 +188,22 @@ public class CyclesLog implements Command {
                     "New user %s could not be added...",
                     userTag));
         }
+    }
+
+    /**
+     * Checks if the user is a sub, then adds a user's stats within
+     * a spreadsheet.
+     * @param link a connection to the spreadsheet.
+     * @param user the user to update the stats of.
+     * @param range the name of the spreadsheet section
+     * @param tableVals the values of the spreadsheet section.
+     * @param args the user input.
+     *
+     * Note: Users will be added at the next EMPTY row in the spreadsheet.
+     */
+    private void addUser(GoogleAPI link, Member user, String range,
+                         Values tableVals, String[] args) {
+        addUser(link, user, range, tableVals, args, checkForSub(args));
     }
 
     /**

@@ -81,9 +81,9 @@ public class Events extends ListenerAdapter {
     private String getHelpString() {
         return "=== __**LaunchPoint Simp Commands**__ ===\n"
                 + "`lphelp` - Displays the list of commands.\n===\n"
-                + "`lpcycle [user] [user] [user] [user] [games played] [score]` - Adds scores to the given users.\n===\n"
-                + "`lpcycle [user] [games played] [score]` - Adds score to a single user.\n===\n"
-                + "`lpgrad [user]` - Graduates a player from LaunchPoint.\n===";
+                + "`lpcycle [players] [games played] [score]` - Adds scores to up to four players.\n===\n"
+                + "`lpsub [players] [games played] [score]` - Adds scores to up to four players who subbed.\n===\n"
+                + "`lpgrad [players]` - Graduates players from LaunchPoint.\n===";
     }
 
     /**
@@ -122,14 +122,11 @@ public class Events extends ListenerAdapter {
                 ORIGIN.sendMessage(getHelpString()).queue();
                 break;
             case "lpcycle":
+            case "lpsub":
                 users = e.getMessage().getMentionedMembers();
                 if (cycleArgsValid(args, users)) {
                     runCyclesCmd(users, args);
                 }
-                break;
-            case "lpsub":
-                users = e.getMessage().getMentionedMembers();
-                //...
                 break;
             case "lpgrad":
                 users = e.getMessage().getMentionedMembers();
