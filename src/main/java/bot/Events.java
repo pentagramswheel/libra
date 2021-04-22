@@ -39,7 +39,8 @@ public class Events extends ListenerAdapter {
      */
     private boolean cycleFormatInvalid(int totalArgs, int userArgs) {
         boolean outsideArgRange = totalArgs < 4 || totalArgs > 7;
-        return outsideArgRange || userArgs != totalArgs - 3;
+        boolean notEnoughPlayers = userArgs != totalArgs - 3;
+        return outsideArgRange || notEnoughPlayers;
     }
 
     /**
@@ -57,6 +58,7 @@ public class Events extends ListenerAdapter {
     /**
      * Checks if lpcycle has the correct arguments.
      * @param args the list of arguments to check.
+     * @param users the mentioned users.
      * @return True if it does.
      *         False if not.
      */
@@ -112,7 +114,7 @@ public class Events extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         String input = e.getMessage().getContentRaw();
-        String[] args = input.split(" ", 7);
+        String[] args = input.split("\\s+", 7);
         List<Member> users;
         SERVER = e.getGuild();
         ORIGIN = e.getChannel();

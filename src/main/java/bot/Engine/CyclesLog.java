@@ -219,7 +219,7 @@ public class CyclesLog implements Command {
             GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
 
             // tab name of the spreadsheet
-            String range = "'Current Leaderboard'";
+            String range = "'Copy of Current Leaderboard'";
 
             Values tableVals = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> table = link.readSection(
