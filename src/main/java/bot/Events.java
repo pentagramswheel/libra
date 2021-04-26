@@ -79,6 +79,23 @@ public class Events extends ListenerAdapter {
     }
 
     /**
+     * Checks if there are enough arguments for a, strictly, ping command.
+     * @param args the list of arguments to check.
+     * @param users the mentioned users.
+     * @return True if it does.
+     *         False if not.
+     */
+    private boolean argAmtValid(String[] args, List<Member> users) {
+        if (users.size() != args.length - 1) {
+            ORIGIN.sendMessage("Invalid argument input. "
+                    + "See `lphelp` for more info.").queue();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Retrieves the full list of commands.
      * @return the help string.
      */
@@ -88,6 +105,7 @@ public class Events extends ListenerAdapter {
                 + "`lpcycle [players] [games played] [score]` - Adds scores to up to four players.\n===\n"
                 + "`lpsub [players] [games played] [score]` - Adds scores to up to four players who subbed.\n===\n"
                 + "`lpadd [players]` - Adds players into LaunchPoint.\n===\n"
+                + "`lpcoach [players]` - Adds players to the LaunchPoint coaches.\n===\n"
                 + "`lpgrad [players]` - Graduates players from LaunchPoint.\n===";
     }
 
@@ -102,12 +120,13 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Runs the "lpadd" command.
+     * Runs the "lpadd" or "lpcoach" command.
      * @param players the mentioned players.
+     * @param args the arguments of the command.
      */
-    private void runAddCmd(List<Member> players) {
+    private void runAddCmd(List<Member> players, String[] args) {
         Add newcomer = new Add();
-        newcomer.runCmd(null, players, null);
+        newcomer.runCmd(null, players, args);
     }
 
     /**
@@ -144,15 +163,16 @@ public class Events extends ListenerAdapter {
                 }
                 break;
             case "lpadd":
+            case "lpcoach":
                 users = e.getMessage().getMentionedMembers();
 
-                if (users.size() == args.length - 1) {
-                    runAddCmd(users);
+                if (argAmtValid(args, users)) {
+                    runAddCmd(users, args);
                 }
                 break;
             case "lpgrad":
                 users = e.getMessage().getMentionedMembers();
-                if (users.size() == args.length - 1) {
+                if (argAmtValid(args, users)) {
                     runGradCmd(users);
                 }
                 break;

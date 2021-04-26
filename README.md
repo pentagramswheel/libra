@@ -152,6 +152,10 @@ The `gamesPlayersInvalid` method ensures the parameter `games played` was not sw
 
 The `cycleArgsValid` method ensures the `lpcycle` or `lpsub` command, specified as the first item of `args`, was called with the correct format, given `users`.
 
+**argAmtValid**
+
+The `argAmtValid` method ensures commands with only pings have the correct amount of parameters.
+
 **getHelpString**
 
 The `getHelpString` method retrieves the script for the `lphelp` command.
@@ -162,7 +166,7 @@ The `runCyclesCmd` method formally runs the `lpcycle` or `lpsub` command, loadin
 
 **runAddCmd**
 
-The `runAddCmd` method formally runs the `lpadd` command, loading users `players`.
+The `runAddCmd` method formally runs the `lpadd` or `lpcoach` command, loading users `players` and user input `args`.
 
 **runGradCmd**
 
@@ -311,11 +315,24 @@ The `runCmd` method runs a command and outputs the result in a channel `outChann
 
 ----
 
+**Add (Engine)**
+
+**enterUsers**
+
+The `enterUsers` method adds the "LaunchPoint" role to users `users`.
+
+**coachUsers**
+
+The `coachUsers` method adds the "Coaches" role to users `users`.
+
+**runCmd**
+
+The `runCmd` method runs a command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+
+
+----
+
 **Graduate (Engine)**
-
-**addRole**
-
-The `addRole` method adds the "LaunchPoint Graduate" role to a user `user` within the Discord server.
 
 **graduateUser**
 
