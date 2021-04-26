@@ -40,6 +40,7 @@ public class Events extends ListenerAdapter {
     private boolean cycleFormatInvalid(int totalArgs, int userArgs) {
         boolean outsideArgRange = totalArgs < 4 || totalArgs > 7;
         boolean notEnoughPlayers = userArgs != totalArgs - 3;
+
         return outsideArgRange || notEnoughPlayers;
     }
 
@@ -126,6 +127,7 @@ public class Events extends ListenerAdapter {
             case "lpcycle":
             case "lpsub":
                 users = e.getMessage().getMentionedMembers();
+
                 if (cycleArgsValid(args, users)) {
                     runCyclesCmd(users, args);
                 }
