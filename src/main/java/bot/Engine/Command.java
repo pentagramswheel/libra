@@ -3,6 +3,7 @@ package bot.Engine;
 import bot.Events;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
 
 import java.util.List;
 
@@ -22,6 +23,24 @@ public interface Command {
      * @param args the arguments of the command, if they exist.
      */
     void runCmd(MessageChannel outChannel, List<Member> users, String[] args);
+
+    /**
+     * Adds a role to a user.
+     * @param user the given user.
+     * @param role the role to add.
+     */
+    default void addRole(Member user, Role role) {
+        Events.SERVER.addRoleToMember(user, role).queue();
+    }
+
+    /**
+     * Removes a role from a user.
+     * @param user the given user.
+     * @param role the role to remove.
+     */
+    default void removeRole(Member user, Role role) {
+        Events.SERVER.removeRoleFromMember(user, role).queue();
+    }
 
     /**
      * Send a message to Discord in the channel the original

@@ -27,16 +27,6 @@ import java.security.GeneralSecurityException;
 public class Graduate implements Command {
 
     /**
-     * Adds graduate role to a user.
-     * @param user the given user.
-     */
-    private void addRole(Member user) {
-        Role role = Events.SERVER.getRolesByName(
-                "LaunchPoint Graduate", true).get(0);
-        Events.SERVER.addRoleToMember(user, role).queue();
-    }
-
-    /**
      * Graduates a user from LaunchPoint.
      * @param user the user to graduate.
      */
@@ -80,8 +70,14 @@ public class Graduate implements Command {
     @Override
     public void runCmd(MessageChannel outChannel, List<Member> users,
                        String[] args) {
+        Role gradRole = Events.SERVER.getRolesByName(
+                "LaunchPoint Graduate", true).get(0);
+        Role lpRole = Events.SERVER.getRolesByName(
+                "LaunchPoint", true).get(0);
+
         for (Member user : users) {
-            addRole(user);
+            addRole(user, gradRole);
+            removeRole(user, lpRole);
             graduateUser(user);
         }
     }

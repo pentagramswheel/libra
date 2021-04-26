@@ -1,5 +1,6 @@
 package bot;
 
+import bot.Engine.Add;
 import bot.Engine.CyclesLog;
 import bot.Engine.Graduate;
 
@@ -86,6 +87,7 @@ public class Events extends ListenerAdapter {
                 + "`lphelp` - Displays the list of commands.\n===\n"
                 + "`lpcycle [players] [games played] [score]` - Adds scores to up to four players.\n===\n"
                 + "`lpsub [players] [games played] [score]` - Adds scores to up to four players who subbed.\n===\n"
+                + "`lpadd [players]` - Adds players into LaunchPoint.\n===\n"
                 + "`lpgrad [players]` - Graduates players from LaunchPoint.\n===";
     }
 
@@ -97,6 +99,15 @@ public class Events extends ListenerAdapter {
     private void runCyclesCmd(List<Member> players, String[] args) {
         CyclesLog cycle = new CyclesLog();
         cycle.runCmd(null, players, args);
+    }
+
+    /**
+     * Runs the "lpadd" command.
+     * @param players the mentioned players.
+     */
+    private void runAddCmd(List<Member> players) {
+        Add newcomer = new Add();
+        newcomer.runCmd(null, players, null);
     }
 
     /**
@@ -130,6 +141,13 @@ public class Events extends ListenerAdapter {
 
                 if (cycleArgsValid(args, users)) {
                     runCyclesCmd(users, args);
+                }
+                break;
+            case "lpadd":
+                users = e.getMessage().getMentionedMembers();
+
+                if (users.size() == args.length - 1) {
+                    runAddCmd(users);
                 }
                 break;
             case "lpgrad":

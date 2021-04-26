@@ -37,12 +37,21 @@ Updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet.
 
 ----
 
+**lpadd**
+
+Adds players into LaunchPoint, so they can play in drafts.
+
+**Parameters**
+1. `users` - Discord users in the form of Discord pings.
+
+----
+
 **lpgrad**
 
 Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and giving them the "LaunchPoint Graduate" role on the Discord server.
 
 **Parameters**
-1. `users` - a Discord user in the form of a Discord ping.
+1. `users` - Discord users in the form of Discord pings.
 
 
 
@@ -115,10 +124,16 @@ A class which updates the LaunchPoint Cycles stats of a user, processing the com
 
 ----
 
+**Add (Engine)**
+
+A class which adds users to LaunchPoint, processing the command `lpadd`, granting the associated roles.
+
+----
+
 **Graduate (Engine)**
 
 
-A class which graduates a user from LaunchPoint, processing the command `lpgrad`.
+A class which graduates a user from LaunchPoint, processing the command `lpgrad`, granting the associated roles.
 
 
 
@@ -144,6 +159,10 @@ The `getHelpString` method retrieves the script for the `lphelp` command.
 **runCyclesCmd**
 
 The `runCyclesCmd` method formally runs the `lpcycle` or `lpsub` command, loading users `players` and user input `args`.
+
+**runAddCmd**
+
+The `runAddCmd` method formally runs the `lpadd` command, loading users `players`.
 
 **runGradCmd**
 
@@ -198,6 +217,14 @@ The `updateRow` method updates a section `section` of the spreadsheet's values `
 **runCmd**
 
 The `runCmd` method runs a command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+
+**addRole (DEFAULT)**
+
+The `addRole` method adds a role `role` to a user `user`.
+
+**removeRole (DEFAULT)**
+
+The `removeRole` method removes a role `role` to a user `user`.
 
 **sendToDiscord (DEFAULT)**
 
