@@ -146,19 +146,18 @@ public class Events extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e) {
         String input = e.getMessage().getContentRaw();
         String[] args = input.split("\\s+", 7);
-        String cmd = args[0];
-
         List<Member> users;
         SERVER = e.getGuild();
         ORIGIN = e.getChannel();
 
-        switch (cmd) {
+        switch (args[0]) {
             case "lphelp":
                 ORIGIN.sendMessage(getHelpString()).queue();
                 break;
             case "lpcycle":
             case "lpsub":
                 users = e.getMessage().getMentionedMembers();
+
                 if (cycleArgsValid(args, users)) {
                     runCyclesCmd(users, args);
                 }
@@ -166,6 +165,7 @@ public class Events extends ListenerAdapter {
             case "lpadd":
             case "lpcoach":
                 users = e.getMessage().getMentionedMembers();
+
                 if (argAmtValid(args, users)) {
                     runAddCmd(users, args);
                 }

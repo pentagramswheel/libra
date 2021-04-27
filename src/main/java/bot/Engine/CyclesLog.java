@@ -225,7 +225,8 @@ public class CyclesLog implements Command {
             TreeMap<Object, PlayerStats> table = link.readSection(
                     range, tableVals);
             if (table == null) {
-                throw new IOException("The spreadsheet was empty.");
+                sendToDiscord("The spreadsheet was empty.");
+                return;
             }
 
             for (Member user : users) {

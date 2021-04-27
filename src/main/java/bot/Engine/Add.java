@@ -17,31 +17,35 @@ import java.util.List;
 public class Add implements Command {
 
     /**
-     * Allows a user entry into LaunchPoint.
-     * @param user the user to add.
+     * Allows users entry into LaunchPoint.
+     * @param users the users to add.
      */
-    private void enter(Member user) {
+    private void enterUsers(List<Member> users) {
         Role role = Events.SERVER.getRolesByName(
                 "LaunchPoint", true).get(0);
 
-        addRole(user, role);
-        sendToDiscord(String.format(
-                "Welcome to LaunchPoint, %s.",
-                user.getUser().getAsTag()));
+        for (Member user : users) {
+            addRole(user, role);
+            sendToDiscord(String.format(
+                    "Welcome to LaunchPoint, %s.",
+                    user.getUser().getAsTag()));
+        }
     }
 
     /**
-     * Allows a user to be a coach within LaunchPoint.
-     * @param user the user to add.
+     * Allows users to be coaches within LaunchPoint.
+     * @param users the user to add.
      */
-    private void coach(Member user) {
+    private void coachUsers(List<Member> users) {
         Role role = Events.SERVER.getRolesByName(
                 "Coaches", true).get(0);
 
-        addRole(user, role);
-        sendToDiscord(String.format(
-                "Welcome to the LaunchPoint coaches, %s.",
-                user.getUser().getAsTag()));
+        for (Member user : users) {
+            addRole(user, role);
+            sendToDiscord(String.format(
+                    "Welcome to the LaunchPoint coaches, %s.",
+                    user.getUser().getAsTag()));
+        }
     }
 
     /**
@@ -54,16 +58,10 @@ public class Add implements Command {
     public void runCmd(MessageChannel outChannel, List<Member> users,
                        String[] args) {
         String cmd = args[0];
-
-        for (Member user : users) {
-            switch (cmd) {
-                case "lpadd":
-                    enter(user);
-                    break;
-                case "lpcoach":
-                    coach(user);
-                    break;
-            }
+        if (cmd.equals("lpadd")) {
+            enterUsers(users);
+        } else {
+            coachUsers(users);
         }
     }
 }

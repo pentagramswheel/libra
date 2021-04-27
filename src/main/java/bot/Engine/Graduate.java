@@ -39,7 +39,7 @@ public class Graduate implements Command {
                     range, tableVals);
 
             if (table == null) {
-                throw new IOException("The spreadsheet was empty.");
+                sendToDiscord("The retrieved data was empty.");
             } else if (table.containsKey(user.getId())) {
                 sendToDiscord(String.format(
                         "%s has already graduated from LaunchPoint.",

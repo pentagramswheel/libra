@@ -39,7 +39,7 @@ Updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet.
 
 **lpadd**
 
-Gives roles to players in LaunchPoint.
+Adds players into LaunchPoint, so they can play in drafts.
 
 **Parameters**
 1. `users` - Discord users in the form of Discord pings.
@@ -126,7 +126,7 @@ A class which updates the LaunchPoint Cycles stats of a user, processing the com
 
 **Add (Engine)**
 
-A class which gives roles to users in LaunchPoint, processing the command `lpadd`.
+A class which adds users to LaunchPoint, processing the command `lpadd`, granting the associated roles.
 
 ----
 
@@ -310,24 +310,24 @@ This `addUser` method calls its overloaded self with a parameter detecting if th
 
 **runCmd**
 
-The `runCmd` method runs the `lpcycle` or `lpsub` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs a command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
 
 ----
 
 **Add (Engine)**
 
-**enterUser**
+**enterUsers**
 
-The `enterUser` method adds the "LaunchPoint" role to a user `user`.
+The `enterUsers` method adds the "LaunchPoint" role to users `users`.
 
 **coachUsers**
 
-The `coachUsers` method adds the "Coaches" role to a user `user`.
+The `coachUsers` method adds the "Coaches" role to users `users`.
 
 **runCmd**
 
-The `runCmd` method runs the `lpadd` or `lpcoach` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs a command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
 
 ----
@@ -340,7 +340,7 @@ The `graduateUser` method adds a user `user` to a spreadsheet list of LaunchPoin
 
 **runCmd**
 
-The `runCmd` method runs the `lpgrad` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs a command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
 
 
