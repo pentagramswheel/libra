@@ -1,10 +1,9 @@
 target/
 .idea/
 .gradle/
+build/
 tokens/
 
-*.jar
-*.json
 *.class
 *.war
 *.ear
@@ -14,5 +13,4 @@ tokens/
 *.target
 .eclipse
 
-src/main/java/bot/Discord.java
 src/main/resources/*
