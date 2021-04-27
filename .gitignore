@@ -1,10 +1,12 @@
 target/
 .idea/
 .gradle/
+out/
 build/
 tokens/
 
 *.class
+*.jar
 *.war
 *.ear
 *.logs
