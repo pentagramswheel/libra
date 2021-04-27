@@ -13,5 +13,4 @@ tokens/
 *.target
 .eclipse
 
-src/main/java/bot/Discord.java
 src/main/resources/*
