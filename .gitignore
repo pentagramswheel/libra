@@ -1,6 +1,7 @@
 target/
 .idea/
 .gradle/
+gradle/
 out/
 build/
 tokens/

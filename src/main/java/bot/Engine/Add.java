@@ -57,10 +57,10 @@ public class Add implements Command {
 
         for (Member user : users) {
             switch (cmd) {
-                case "lpadd":
+                case "LPADD":
                     enter(user);
                     break;
-                case "lpcoach":
+                case "LPCOACH":
                     coach(user);
                     break;
             }

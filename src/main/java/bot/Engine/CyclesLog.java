@@ -31,7 +31,7 @@ public class CyclesLog implements Command {
      *         False if the lpcycle command was called.
      */
     private boolean checkForSub(String[] args) {
-        return args[0].equals("lpcycle");
+        return args[0].equals("LPCYCLE");
     }
 
     /**
