@@ -105,7 +105,7 @@ Gives roles to players in LaunchPoint.
 
 Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server.
 
-##### Parameters**
+##### Parameters
 1. `users` - Discord users in the form of Discord pings.
 
 
