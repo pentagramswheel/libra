@@ -3,7 +3,9 @@
 
 **Date:** February 17, 2021
 
-- [LaunchPoint Simp Design Documentation](#launchpoint-simp-design-documentation)
+**Last Updated:** June 3, 2021
+
+- [Table of Contents](#launchpoint-simp-design-documentation)
   * [Introduction](#introduction)
   * [Command Usage](#command-usage)
       - [lphelp](#lphelp)
@@ -14,20 +16,7 @@
       - [lpadd](#lpadd)
       - [lpgrad](#lpgrad)
   * [Classes and Data Structures](#classes-and-data-structures)
-      - [Main](#main)
-      - [Discord](#discord)
-      - [Events](#events)
-      - [GoogleAPI (Engine)](#googleapi--engine-)
-      - [Command (Engine)](#command--engine-)
-      - [PlayerStats (Engine)](#playerstats--engine-)
   * [Algorithms](#algorithms)
-      - [Events](#events-1)
-      - [GoogleAPI (Engine)](#googleapi--engine--1)
-      - [Command (Engine)](#command--engine--1)
-      - [PlayerStats (Engine)](#playerstats--engine--1)
-      - [CyclesLog (Engine)](#cycleslog--engine-)
-      - [Add (Engine)](#add--engine-)
-      - [Graduate (Engine)](#graduate--engine-)
   * [Persistence](#persistence)
 
 
@@ -158,21 +147,25 @@ A class for storing information about a Discord user.
 
 ----
 
-**CyclesLog (Engine)**
+#### CycleLog (Engine)
 
 A class which updates the LaunchPoint Cycles stats of a user, processing the command `lpcycle`.
 
+----
+
+#### CycleUndo (Engine)
+
+A class which reverts LaunchPoint Cycle commands, processing the command `lpundo`.
 
 ----
 
-**Add (Engine)**
+#### Add (Engine)
 
 A class which gives roles to users in LaunchPoint, processing the command `lpadd`.
 
 ----
 
-**Graduate (Engine)**
-
+#### Graduate (Engine)
 
 A class which graduates a user from LaunchPoint, processing the command `lpgrad`, granting the associated roles.
 
@@ -335,7 +328,7 @@ The `getGamesLost` method retrieves the user's amount of lost games.
 
 ----
 
-#### CyclesLog (Engine)
+#### CycleLog (Engine)
 
 ##### checkForSub
 
@@ -384,13 +377,13 @@ The `retrieveLastMessage` method retrieves the previous cycle logging command.
 
 ##### undoUser (overloaded)
 
-This `undoUser` method uses the GoogleAPI `link` to undo the stats of a user `user`, detecting if they were a sub or not via the flag `notSub`, at location `range` within the spreadsheet values `tableVals`, given the original user input `args`.
+This `undoUser` method uses the GoogleAPI `link` to revert the stats of a user `user` to its previous state, detecting if they were a sub or not via the flag `notSub`, at location `range` within the spreadsheet values `tableVals`, given the original user input `args`.
 
 ##### undoUser
 
 This `undoUser` method calls its overloaded self with a parameter detecting if the user was a sub or not.
 
-#### runCmd
+##### runCmd
 
 The `runCmd` method runs the `lpundo` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
