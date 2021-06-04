@@ -3,9 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** June 3, 2021
-
-- [Table of Contents](#launchpoint-simp-design-documentation)
+- [LaunchPoint Simp Design Documentation](#launchpoint-simp-design-documentation)
   * [Introduction](#introduction)
   * [Command Usage](#command-usage)
       - [lphelp](#lphelp)
@@ -16,7 +14,25 @@
       - [lpadd](#lpadd)
       - [lpgrad](#lpgrad)
   * [Classes and Data Structures](#classes-and-data-structures)
+      - [Main](#main)
+      - [Discord](#discord)
+      - [Events](#events)
+      - [GoogleAPI (Engine)](#googleapi-engine)
+      - [Command (Engine)](#command-engine)
+      - [PlayerStats (Engine)](#playerstats-engine)
+      - [CycleLog (Engine)](#cyclelog-engine)
+      - [CycleUndo (Engine)](#cycleundo-engine)
+      - [Add (Engine)](#add-engine)
+      - [Graduate (Engine)](#graduate-engine)
   * [Algorithms](#algorithms)
+      - [Events](#events-1)
+      - [GoogleAPI (Engine)](#googleapi-engine-1)
+      - [Command (Engine)](#command-engine-1)
+      - [PlayerStats (Engine)](#playerstats-engine-1)
+      - [CycleLog (Engine)](#cyclelog-engine-1)
+      - [CycleUndo (Engine)](#cycleundo-engine-1)
+      - [Add (Engine)](#add-engine-1)
+      - [Graduate (Engine)](#graduate-engine-1)
   * [Persistence](#persistence)
 
 
