@@ -44,6 +44,11 @@ LaunchPoint Simp is an official staff convenience bot for the Splatoon Discord s
 
 
 
+## How to Install
+After pulling this project, you can import it using the <medium><a href='https://www.jetbrains.com/help/idea/gradle.html'>JetBrains' official IntelliJ Gradle documentation</a></medium>. All dependencies will be imported upon starting up the project with Gradle. If another IDE is being used, the only installation needed to import the project is Gradle.
+
+
+
 ## Command Usage
 #### lphelp
 
@@ -444,3 +449,10 @@ The project saves and loads data from two Google Sheets spreadsheets, one each f
 These spreadsheets are connected and interacted with using the Google Sheets API, linked through the Gradle components of this project. Feature summary updates are also sent, through the channel the user originally typed commands in, by the bot using the Discord JDA API, also linked through Gradle.
 
 Additionally, the `lpundo` command allows a user to revert a cycle command, by saving and loading the previous cycle command, logged into a text file `load.txt`.
+
+
+----
+
+#### License and Rights
+
+For more info on licensing and copyright, see the information listed under licensing file `LICENSE`.
