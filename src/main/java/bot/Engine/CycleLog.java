@@ -19,10 +19,10 @@ import java.security.GeneralSecurityException;
  * @author  Wil Aquino
  * Date:    February 17, 2021
  * Project: LaunchPoint Bot
- * Module:  Events.java
+ * Module:  CycleLog.java
  * Purpose: Logs cycle information via command.
  */
-public class CyclesLog implements Command {
+public class CycleLog implements Command {
 
     /**
      * Checks if this it the lpcycle or lpsub command.
@@ -30,7 +30,7 @@ public class CyclesLog implements Command {
      * @return True if the lpsub command was called.
      *         False if the lpcycle command was called.
      */
-    private boolean checkForSub(String[] args) {
+    public static boolean checkForSub(String[] args) {
         return args[0].equals("LPCYCLE");
     }
 
@@ -39,7 +39,7 @@ public class CyclesLog implements Command {
      * @param args the user input.
      * @return said amount.
      */
-    private int getGamesPlayed(String[] args) {
+    public static int getGamesPlayed(String[] args) {
         return Integer.parseInt(args[args.length - 2]);
     }
 
@@ -48,7 +48,7 @@ public class CyclesLog implements Command {
      * @param args the user input
      * @return said amount.
      */
-    private int getGamesWon(String[] args) {
+    public static int getGamesWon(String[] args) {
         return Integer.parseInt(args[args.length - 1]);
     }
 
@@ -59,7 +59,7 @@ public class CyclesLog implements Command {
      * @return True if the set was won.
      *         False if the set was lost.
      */
-    private boolean cycleSetWon(int won, int played) {
+    public static boolean cycleSetWon(int won, int played) {
         double halfPlayed = (double) played / 2;
         return won >= halfPlayed;
     }

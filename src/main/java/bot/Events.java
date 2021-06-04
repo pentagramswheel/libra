@@ -1,9 +1,11 @@
 package bot;
 
 import bot.Engine.Add;
-import bot.Engine.CyclesLog;
+import bot.Engine.CycleLog;
+import bot.Engine.CycleUndo;
 import bot.Engine.Graduate;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -11,6 +13,10 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -30,6 +36,28 @@ public class Events extends ListenerAdapter {
 
     /** The original channel a command was sent in. */
     public static MessageChannel ORIGIN;
+
+    /**
+     * Prints the error message when a command has the incorrect arguments.
+     */
+    private void printArgsError() {
+        ORIGIN.sendMessage("Invalid argument input. "
+                + "See `lphelp` for more info.").queue();
+    }
+
+    /**
+     * Checks if a command has the correct amount of arguments.
+     * @param args the list of arguments to check.
+     * @param n the number of arguments to have.
+     */
+    private boolean argsValid(String[] args, int n) {
+        if (args.length > n) {
+            printArgsError();
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * Checks if lpcycle command was typed correctly.
@@ -66,8 +94,7 @@ public class Events extends ListenerAdapter {
      */
     private boolean cycleArgsValid(String[] args, List<Member> users) {
         if (cycleFormatInvalid(args.length, users.size())) {
-            ORIGIN.sendMessage("Invalid cycle argument input. "
-                    + "See `lphelp` for more info.").queue();
+            printArgsError();
             return false;
         } else if (gamesPlayedInvalid(args)) {
             ORIGIN.sendMessage("Incorrect amount of games played detected. "
@@ -85,10 +112,9 @@ public class Events extends ListenerAdapter {
      * @return True if it does.
      *         False if not.
      */
-    private boolean argAmtValid(String[] args, List<Member> users) {
+    private boolean pingArgsValid(String[] args, List<Member> users) {
         if (users.size() != args.length - 1) {
-            ORIGIN.sendMessage("Invalid argument input. "
-                    + "See `lphelp` for more info.").queue();
+            printArgsError();
             return false;
         }
 
@@ -96,17 +122,53 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Retrieves the full list of commands.
-     * @return the help string.
+     * Prints the full list of commands.
      */
-    private String getHelpString() {
-        return "=== __**LaunchPoint Simp Commands**__ ===\n"
-                + "`lphelp` - Displays the list of commands.\n===\n"
-                + "`lpcycle [players] [games played] [score]` - Adds scores to up to four players.\n===\n"
-                + "`lpsub [players] [games played] [score]` - Adds scores to up to four players who subbed.\n===\n"
-                + "`lpadd [players]` - Adds players into LaunchPoint.\n===\n"
-                + "`lpcoach [players]` - Adds players to the LaunchPoint coaches.\n===\n"
-                + "`lpgrad [players]` - Graduates players from LaunchPoint.\n===";
+    private void printHelpString() {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("LaunchPoint Simp Commands");
+        eb.setColor(Color.GREEN);
+        eb.addField("lphelp", "Displays the list of commands.", false);
+        eb.addField("lpstatus", "Checks if the bot is online.", false);
+        eb.addField("lpcycle [players] [games played] [score]", "Reports scores for up to four players.", false);
+        eb.addField("lpsub [players] [games played] [score]", "Reports scores for up to four players who subbed.", false);
+        eb.addField("lpundo", "Reverts the previous cycle command, once and only once.", false);
+        eb.addField("lpadd [players]", "Adds players into LaunchPoint.", false);
+        eb.addField("lpcoach [players]", "Adds players to the LaunchPoint coaches.", false);
+        eb.addField("lpgrad [players]", "Graduates players from LaunchPoint.", false);
+
+        ORIGIN.sendMessage(eb.build()).queue();
+    }
+
+    /**
+     * Saves a string to the undo file.
+     * @param args the contents to save.
+     */
+    private void saveContents(String[] args) {
+        File save = new File("load.txt");
+        try {
+            save.createNewFile();
+            FileWriter fw = new FileWriter(save);
+
+            if (args.length == 1) {
+                fw.write(args[0]);
+            } else {
+                StringBuilder contents = new StringBuilder();
+                contents.append(args[0].toUpperCase()).append(" ");
+                for (int i = 1; i < args.length - 1; i++) {
+                    contents.append(args[i]).append(" ");
+                }
+                contents.append(args[args.length - 1]);
+
+                fw.write(contents.toString());
+            }
+
+            fw.close();
+        } catch (IOException ioe) {
+            ORIGIN.sendMessage(
+                    "The undo file could not be loaded.").queue();
+            ioe.printStackTrace();
+        }
     }
 
     /**
@@ -115,8 +177,20 @@ public class Events extends ListenerAdapter {
      * @param args the arguments of the command.
      */
     private void runCyclesCmd(List<Member> players, String[] args) {
-        CyclesLog cycle = new CyclesLog();
+        CycleLog cycle = new CycleLog();
         cycle.runCmd(null, players, args);
+
+        saveContents(args);
+    }
+
+    /**
+     * Runs the `lpundo` command.
+     */
+    private void runUndoCmd() {
+        CycleUndo undo = new CycleUndo();
+        undo.runCmd(null, null, null);
+
+        saveContents(new String[]{"REDACTED"});
     }
 
     /**
@@ -156,7 +230,17 @@ public class Events extends ListenerAdapter {
 
         switch (cmd) {
             case "LPHELP":
-                ORIGIN.sendMessage(getHelpString()).queue();
+                if (argsValid(args, 1)) {
+                    printHelpString();
+                }
+                break;
+            case "LPSTATUS":
+                if (argsValid(args, 1)) {
+                    String status = String.format(
+                            "The bot is online. Welcome, %s.",
+                            e.getMember().getEffectiveName());
+                    ORIGIN.sendMessage(status).queue();
+                }
                 break;
             case "LPCYCLE":
             case "LPSUB":
@@ -165,16 +249,21 @@ public class Events extends ListenerAdapter {
                     runCyclesCmd(users, args);
                 }
                 break;
+            case "LPUNDO":
+                if (argsValid(args, 1)) {
+                    runUndoCmd();
+                }
+                break;
             case "LPADD":
             case "LPCOACH":
                 users = e.getMessage().getMentionedMembers();
-                if (argAmtValid(args, users)) {
+                if (pingArgsValid(args, users)) {
                     runAddCmd(users, args);
                 }
                 break;
             case "LPGRAD":
                 users = e.getMessage().getMentionedMembers();
-                if (argAmtValid(args, users)) {
+                if (pingArgsValid(args, users)) {
                     runGradCmd(users);
                 }
                 break;

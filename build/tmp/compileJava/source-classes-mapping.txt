@@ -2,12 +2,14 @@ bot/Discord.java
  bot.Discord
 bot/Engine/PlayerStats.java
  bot.Engine.PlayerStats
+bot/Engine/CycleLog.java
+ bot.Engine.CycleLog
 bot/Engine/Command.java
  bot.Engine.Command
 bot/Events.java
  bot.Events
-bot/Engine/CyclesLog.java
- bot.Engine.CyclesLog
+bot/Engine/CycleUndo.java
+ bot.Engine.CycleUndo
 bot/Engine/GoogleAPI.java
  bot.Engine.GoogleAPI
 bot/Engine/Graduate.java

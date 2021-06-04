@@ -6,7 +6,7 @@ import java.util.List;
  * @author  Wil Aquino
  * Date:    April 13, 2021
  * Project: LaunchPoint Bot
- * Module:  Events.java
+ * Module:  PlayersStats.java
  * Purpose: Stores player stats.
  */
 public class PlayerStats {
