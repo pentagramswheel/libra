@@ -1,6 +1,7 @@
 package bot.Engine;
 
 import bot.Events;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
@@ -23,6 +24,15 @@ public interface Command {
      * @param args the arguments of the command, if they exist.
      */
     void runCmd(MessageChannel outChannel, List<Member> users, String[] args);
+
+    /**
+     * Retrieves a role given its name.
+     * @param role the name of the role.
+     */
+    default Role getRole(String role) {
+        return Events.SERVER.getRolesByName(
+                role, true).get(0);
+    }
 
     /**
      * Adds a role to a user.

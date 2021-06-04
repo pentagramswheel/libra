@@ -70,10 +70,8 @@ public class Graduate implements Command {
     @Override
     public void runCmd(MessageChannel outChannel, List<Member> users,
                        String[] args) {
-        Role gradRole = Events.SERVER.getRolesByName(
-                "LaunchPoint Graduate", true).get(0);
-        Role lpRole = Events.SERVER.getRolesByName(
-                "LaunchPoint", true).get(0);
+        Role gradRole = getRole("LaunchPoint Graduate");
+        Role lpRole = getRole("LaunchPoint");
 
         for (Member user : users) {
             addRole(user, gradRole);

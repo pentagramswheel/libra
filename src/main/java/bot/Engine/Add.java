@@ -1,6 +1,5 @@
 package bot.Engine;
 
-import bot.Events;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
@@ -19,29 +18,23 @@ public class Add implements Command {
     /**
      * Allows a user entry into LaunchPoint.
      * @param user the user to add.
+     * @return the entrance welcome message.
      */
-    private void enter(Member user) {
-        Role role = Events.SERVER.getRolesByName(
-                "LaunchPoint", true).get(0);
-
+    private String enter(Member user) {
+        Role role = getRole("LaunchPoint");
         addRole(user, role);
-        sendToDiscord(String.format(
-                "Welcome to LaunchPoint, %s.",
-                user.getUser().getAsTag()));
+        return "Welcome to LaunchPoint!";
     }
 
     /**
      * Allows a user to be a coach within LaunchPoint.
      * @param user the user to add.
+     * @return the coach welcome message.
      */
-    private void coach(Member user) {
-        Role role = Events.SERVER.getRolesByName(
-                "Coaches", true).get(0);
-
+    private String coach(Member user) {
+        Role role = getRole("Coaches");
         addRole(user, role);
-        sendToDiscord(String.format(
-                "Welcome to the LaunchPoint coaches, %s.",
-                user.getUser().getAsTag()));
+        return "Welcome to the LaunchPoint coaches!";
     }
 
     /**
@@ -54,16 +47,28 @@ public class Add implements Command {
     public void runCmd(MessageChannel outChannel, List<Member> users,
                        String[] args) {
         String cmd = args[0];
+        StringBuilder listOfUsers = new StringBuilder();
 
         for (Member user : users) {
+            String welcomeMessage = "";
             switch (cmd) {
                 case "LPADD":
-                    enter(user);
+                    welcomeMessage = enter(user);
                     break;
                 case "LPCOACH":
-                    coach(user);
+                    welcomeMessage = coach(user);
                     break;
             }
+
+            if (user.equals(users.get(users.size() - 1))) {
+                listOfUsers.append(user.getUser().getAsTag())
+                        .append("\n")
+                        .append(welcomeMessage);
+            } else {
+                listOfUsers.append(user.getUser().getAsTag()).append(", ");
+            }
         }
+
+        sendToDiscord(listOfUsers.toString());
     }
 }

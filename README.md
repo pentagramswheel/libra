@@ -15,6 +15,12 @@ Outputs a list of the bot's commands.
 
 ----
 
+**lpstats**
+
+Checks to see if the bot is online.
+
+----
+
 **lpcycle**
 
 Updates players' LaunchPoint Cycles stats through an affiliated spreadsheet.
@@ -37,6 +43,12 @@ Updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet.
 
 ----
 
+**lpundo**
+
+Reverts the previous draft command, once and only once.
+
+----
+
 **lpadd**
 
 Gives roles to players in LaunchPoint.
@@ -48,7 +60,7 @@ Gives roles to players in LaunchPoint.
 
 **lpgrad**
 
-Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and giving them the "LaunchPoint Graduate" role on the Discord server.
+Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server.
 
 **Parameters**
 1. `users` - Discord users in the form of Discord pings.
@@ -140,29 +152,45 @@ A class which graduates a user from LaunchPoint, processing the command `lpgrad`
 ## Algorithms
 **Events**
 
+**printArgsError**
+
+The `printArgsError` method prints an error message when a command has the incorrect arguments.
+
+**argsValid**
+
+The `argsValid` method checks whether a command has the incorrect amount of arguments.
+
 **cycleFormatInvalid**
 
-The `cycleFormatInavlid` method ensures the `lpcycle` or `lpsub` command has the correct amount of total parameters `totalArgs` and correct amount of total users `userArgs`.
+The `cycleFormatInavlid` method checks whether the `lpcycle` or `lpsub` command has the correct amount of total parameters `totalArgs` and correct amount of total users `userArgs`.
 
 **gamesPlayedInvalid**
 
-The `gamesPlayersInvalid` method ensures the parameter `games played` was not switched with the `score` parameter.
+The `gamesPlayersInvalid` method checks whether the parameter `games played` was not switched with the `score` parameter, of the `lpcycle` or `lpsub` commands, , specified as the first item of `args`.
 
 **cycleArgsValid**
 
-The `cycleArgsValid` method ensures the `lpcycle` or `lpsub` command, specified as the first item of `args`, was called with the correct format, given `users`.
+The `cycleArgsValid` method checks whether the `lpcycle` or `lpsub` command, specified as the first item of `args`, was called with the correct format, given `users`.
 
 **argAmtValid**
 
-The `argAmtValid` method ensures commands with only pings have the correct amount of parameters.
+The `argAmtValid` method checks whether ping commands have the correct amount of parameters, given the original `args` and its `users`.
 
-**getHelpString**
+**printHelpString**
 
-The `getHelpString` method retrieves the script for the `lphelp` command.
+The `printHelpString` method prints the script for the `lphelp` command.
+
+**saveContents**
+
+The `saveContents` method saves the user input `args` to the `load.txt` file.
 
 **runCyclesCmd**
 
 The `runCyclesCmd` method formally runs the `lpcycle` or `lpsub` command, loading users `players` and user input `args`.
+
+**runUndoCmd**
+
+The `runUndoCmd` method formally runs the `lpundo` command, saving the user input to a file.
 
 **runAddCmd**
 
@@ -221,6 +249,10 @@ The `updateRow` method updates a section `section` of the spreadsheet's values `
 **runCmd**
 
 The `runCmd` method runs a command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+
+**getRole (DEFAULT)**
+
+The `retrieveRole` method retrieves the role `role` from the server.
 
 **addRole (DEFAULT)**
 
@@ -319,11 +351,11 @@ The `runCmd` method runs the `lpcycle` or `lpsub` command and outputs the result
 
 **enterUser**
 
-The `enterUser` method adds the "LaunchPoint" role to a user `user`.
+The `enterUser` method adds the "LaunchPoint" role to a user `user`, and retrieves a welcome message.
 
 **coachUsers**
 
-The `coachUsers` method adds the "Coaches" role to a user `user`.
+The `coachUsers` method adds the "Coaches" role to a user `user`, and retrieves a welcome message.
 
 **runCmd**
 
@@ -336,7 +368,7 @@ The `runCmd` method runs the `lpadd` or `lpcoach` command and outputs the result
 
 **graduateUser**
 
-The `graduateUser` method adds a user `user` to a spreadsheet list of LaunchPoint graduates.
+The `graduateUser` method adds a user `user` to a spreadsheet list of LaunchPoint graduates and gives them the "LaunchPoint Graduate" role.
 
 **runCmd**
 
@@ -349,3 +381,5 @@ The `runCmd` method runs the `lpgrad` command and outputs the result in a channe
 The project saves and loads data from two Google Sheets spreadsheets, one each for the `CyclesLog` and `Graduate` classes.
 
 These spreadsheets are connected and interacted with using the Google Sheets API, linked through the Gradle components of this project. Feature summary updates are also sent, through the channel the user originally typed commands in, by the bot using the Discord JDA API, also linked through Gradle.
+
+Additionally, the `lpundo` command allows a user to revert a cycle command, by saving and loading the previous cycle command, logged into a text file `load.txt`.
