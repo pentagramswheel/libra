@@ -5,7 +5,7 @@
 
 **Last Updated:** June 3, 2021
 
-- [LaunchPoint Simp Design Documentation](#launchpoint-simp-design-documentation)
+- [Table of Contents](#launchpoint-simp-design-documentation)
   * [Introduction](#introduction)
   * [Command Usage](#command-usage)
       - [lphelp](#lphelp)
