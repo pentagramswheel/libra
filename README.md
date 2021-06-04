@@ -7,6 +7,7 @@
 
 - [Table of Contents](#launchpoint-simp-design-documentation)
   * [Introduction](#introduction)
+  * [How to Install](#how-to-install)
   * [Command Usage](#command-usage)
       - [lphelp](#lphelp)
       - [lpstatus](#lpstatus)
@@ -36,6 +37,7 @@
       - [Add (Engine)](#add-engine-1)
       - [Graduate (Engine)](#graduate-engine-1)
   * [Persistence](#persistence)
+  * [Licensing and Rights](#licensing-and-rights)
 
 
 
@@ -453,6 +455,6 @@ Additionally, the `lpundo` command allows a user to revert a cycle command, by s
 
 ----
 
-#### License and Rights
+## Licensing and Rights
 
 For more info on licensing and copyright, see the information listed under licensing file `LICENSE`.
