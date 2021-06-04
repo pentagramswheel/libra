@@ -3,6 +3,8 @@
 
 **Date:** February 17, 2021
 
+**Last Updated:** June 3, 2021
+
 - [LaunchPoint Simp Design Documentation](#launchpoint-simp-design-documentation)
   * [Introduction](#introduction)
   * [Command Usage](#command-usage)
