@@ -118,7 +118,7 @@ The entry point of the bot's implementation. It constructs the bot and prepares 
 
 #### Discord
 
-A class consisting of credential-specific information, pertaining to Discord and the bot's persistence.
+A class consisting of credential-specific information, pertaining to Discord and the bot's persistence. Due to the credentials of this class, the secrets have been redacted. See DiscordExample.java for a template.
 
 
 ----
