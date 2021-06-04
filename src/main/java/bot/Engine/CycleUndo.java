@@ -5,14 +5,18 @@ import bot.Discord;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
-import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
 import java.io.File;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Collections;
+import java.util.Arrays;
+import java.util.TreeMap;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.*;
 
 /**
  * @author  Wil Aquino
@@ -53,8 +57,8 @@ public class CycleUndo implements Command {
      * @param notSub a flag to check if the user is a sub or not.
      */
     private void undoUser(GoogleAPI link, String user, String range,
-                            Sheets.Spreadsheets.Values tableVals, TreeMap<Object, PlayerStats> table,
-                            String[] args, boolean notSub) {
+                          Values tableVals, TreeMap<Object, PlayerStats> table,
+                          String[] args, boolean notSub) {
         try {
             String userID = user.substring(3, user.length() - 1);
             System.out.println(userID);
@@ -114,12 +118,18 @@ public class CycleUndo implements Command {
      * @param args the user input.
      */
     private void undoUser(GoogleAPI link, String user, String range,
-                            Sheets.Spreadsheets.Values tableVals, TreeMap<Object, PlayerStats> table,
+                            Values tableVals, TreeMap<Object, PlayerStats> table,
                             String[] args) {
         undoUser(link, user, range, tableVals, table, args,
                 CycleLog.checkForSub(args));
     }
 
+    /**
+     * Runs the cycle undoing command.
+     * @param outChannel the channel to output to, if it exists.
+     * @param users the users to attach to the command output, if they exist.
+     * @param args the arguments of the command, if they exist.
+     */
     @Override
     public void runCmd(MessageChannel outChannel, List<Member> users, String[] args) {
         try {
@@ -128,7 +138,7 @@ public class CycleUndo implements Command {
             // tab name of the spreadsheet
             String range = "'Current Leaderboard'";
 
-            Sheets.Spreadsheets.Values tableVals = link.getSheet().spreadsheets().values();
+            Values tableVals = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> table = link.readSection(
                     range, tableVals);
             if (table == null) {

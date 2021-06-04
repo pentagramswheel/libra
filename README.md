@@ -3,12 +3,33 @@
 
 **Date:** February 17, 2021
 
-[LaunchPoint Simp Design Documentation](#launchpoint-simp-design-documentation)
+- [LaunchPoint Simp Design Documentation](#launchpoint-simp-design-documentation)
   * [Introduction](#introduction)
   * [Command Usage](#command-usage)
+      - [lphelp](#lphelp)
+      - [lpstatus](#lpstatus)
+      - [lpcycle](#lpcycle)
+      - [lpsub](#lpsub)
+      - [lpundo](#lpundo)
+      - [lpadd](#lpadd)
+      - [lpgrad](#lpgrad)
   * [Classes and Data Structures](#classes-and-data-structures)
+      - [Main](#main)
+      - [Discord](#discord)
+      - [Events](#events)
+      - [GoogleAPI (Engine)](#googleapi--engine-)
+      - [Command (Engine)](#command--engine-)
+      - [PlayerStats (Engine)](#playerstats--engine-)
   * [Algorithms](#algorithms)
+      - [Events](#events-1)
+      - [GoogleAPI (Engine)](#googleapi--engine--1)
+      - [Command (Engine)](#command--engine--1)
+      - [PlayerStats (Engine)](#playerstats--engine--1)
+      - [CyclesLog (Engine)](#cycleslog--engine-)
+      - [Add (Engine)](#add--engine-)
+      - [Graduate (Engine)](#graduate--engine-)
   * [Persistence](#persistence)
+
 
 
 ## Introduction
@@ -17,84 +38,84 @@ LaunchPoint Simp is an official staff convenience bot for the Splatoon Discord s
 
 
 ## Command Usage
-**lphelp**
+#### lphelp
 
 Outputs a list of the bot's commands.
 
 ----
 
-**lpstats**
+#### lpstatus
 
 Checks to see if the bot is online.
 
 ----
 
-**lpcycle**
+#### lpcycle
 
 Updates players' LaunchPoint Cycles stats through an affiliated spreadsheet.
 
-**Parameters**
+##### Parameters
 1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.
 2. `games played` - the amount of games played in a set.
 3. `score` - the amount of winning games of the set.
 
 ----
 
-**lpsub**
+#### lpsub
 
 Updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet.
 
-**Parameters**
+##### Parameters
 1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.
 2. `games played` - the amount of games played in a set.
 3. `score` - the amount of winning games of the set.
 
 ----
 
-**lpundo**
+#### lpundo
 
-Reverts the previous draft command, once and only once.
+Reverts the previous draft command, *once and only once*.
 
 ----
 
-**lpadd**
+#### lpadd
 
 Gives roles to players in LaunchPoint.
 
-**Parameters**
+##### Parameters
 1. `users` - Discord users in the form of Discord pings.
 
 ----
 
-**lpgrad**
+#### lpgrad
 
 Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server.
 
-**Parameters**
+##### Parameters**
 1. `users` - Discord users in the form of Discord pings.
 
 
 
 ## Classes and Data Structures
-**Main**
+#### Main
 
 The entry point of the bot's implementation. It constructs the bot and prepares it for processing commands.
 
 
 ----
 
-**Discord**
+#### Discord
 
 A class consisting of credential-specific information, pertaining to Discord and the bot's persistence.
 
 
 ----
 
-**Events**
+#### Events
 
 The class which parses through user-inputted commands, as referenced in `Usage`.
 
-**Instance Variables**
+##### Instance Variables
 1. `JDABuilder BOT` - an object representation of the bot.
 2. `Guild SERVER` - an object representation of the Discord server.
 3. `MessageChannel ORIGIN` - the original channel the user-inputted command was sent in.
@@ -102,11 +123,11 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 
 ----
 
-**GoogleAPI (Engine)**
+#### GoogleAPI (Engine)
 
 A class which navigates a Google Sheet (spreadsheet).
 
-**Instance Variables**
+##### Instance Variables
 1. `Sheets sheetsService` - an object representation for the Google Sheets SDK.
 2. `String APPLICATION_NAME` - the name of the application.
 3. `String spreadsheetID` - the credential ID of the spreadsheet.
@@ -114,18 +135,18 @@ A class which navigates a Google Sheet (spreadsheet).
 
 ----
 
-**Command (Engine)**
+#### Command (Engine)
 
 An interface outlining the format of the bot's command implementations.
 
 
 ----
 
-**PlayerStats (Engine)**
+#### PlayerStats (Engine)
 
 A class for storing information about a Discord user.
 
-**Instance Variables**
+##### Instance Variables
 1. `String position` - the row position of the user's data.
 2. `String name` - the user's Discord tag.
 3. `String nickname` - the user's nickname on the server.
@@ -158,227 +179,248 @@ A class which graduates a user from LaunchPoint, processing the command `lpgrad`
 
 
 ## Algorithms
-**Events**
+#### Events
 
-**printArgsError**
+##### printArgsError
 
 The `printArgsError` method prints an error message when a command has the incorrect arguments.
 
-**argsValid**
+##### argsValid
 
 The `argsValid` method checks whether a command has the incorrect amount of arguments.
 
-**cycleFormatInvalid**
+##### cycleFormatInvalid
 
 The `cycleFormatInavlid` method checks whether the `lpcycle` or `lpsub` command has the correct amount of total parameters `totalArgs` and correct amount of total users `userArgs`.
 
-**gamesPlayedInvalid**
+##### gamesPlayedInvalid
 
 The `gamesPlayersInvalid` method checks whether the parameter `games played` was not switched with the `score` parameter, of the `lpcycle` or `lpsub` commands, , specified as the first item of `args`.
 
-**cycleArgsValid**
+##### cycleArgsValid
 
 The `cycleArgsValid` method checks whether the `lpcycle` or `lpsub` command, specified as the first item of `args`, was called with the correct format, given `users`.
 
-**argAmtValid**
+##### argAmtValid
 
 The `argAmtValid` method checks whether ping commands have the correct amount of parameters, given the original `args` and its `users`.
 
-**printHelpString**
+##### printHelpString
 
 The `printHelpString` method prints the script for the `lphelp` command.
 
-**saveContents**
+##### saveContents
 
 The `saveContents` method saves the user input `args` to the `load.txt` file.
 
-**runCyclesCmd**
+##### runCyclesCmd
 
 The `runCyclesCmd` method formally runs the `lpcycle` or `lpsub` command, loading users `players` and user input `args`.
 
-**runUndoCmd**
+##### runUndoCmd
 
 The `runUndoCmd` method formally runs the `lpundo` command, saving the user input to a file.
 
-**runAddCmd**
+##### runAddCmd
 
 The `runAddCmd` method formally runs the `lpadd` or `lpcoach` command, loading users `players` and user input `args`.
 
-**runGradCmd**
+##### runGradCmd
 
 The `runGradCmd` method formally runs the `lpgrad` command, loading users `players`.
 
-**onMessageReceived**
+##### onMessageReceived
 
 The `onMessageReceieved` method parses through user input `e`, checking if a command was used, and executing based on the command, if any.
 
 
 ----
 
-**GoogleAPI (Engine)**
+#### GoogleAPI (Engine)
 
-**GoogleAPI**
+##### GoogleAPI
 
 The `GoogleAPI` method, the class's constructor, initializes the class's instance variables.
 
-**authorize**
+##### authorize
 
 The `authorize` method produces an OAuth exchange with Google for proper user access.
 
-**getSheetsService**
+##### getSheetsService
 
 The `getSheetsService` method processes an OAuth exchange and establishes a link with the spreadsheet, via the Google Sheets SDK.
 
-**getSheet**
+##### getSheet
 
 The `getSheet` method retrieves the object representation of the spreadsheet.
 
-**getSpreadsheetID**
+##### getSpreadsheetID
 
 The `getSpreadSheetID` method retrieves the spreadsheet's affiliated ID.
 
-**readSection**
+##### readSection
 
 The `readSection` method reads a section `section` of values `vals` from the spreadsheet and organizes it into a map, in the form of a red-black tree, indexing by Discord user ID.
 
-**appendRow**
+##### appendRow
 
 The `appendRow` method appends a row `row` to at the end of the values `vals` of a section `section` of the spreadsheet.
 
-**updateRow**
+##### updateRow
 
 The `updateRow` method updates a section `section` of the spreadsheet's values `vals` to be the given row `row`.
 
 
 ----
 
-**Command (Engine)**
+#### Command (Engine)
 
-**runCmd**
+##### runCmd
 
 The `runCmd` method runs a command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
-**getRole (DEFAULT)**
+##### getRole (DEFAULT)
 
 The `retrieveRole` method retrieves the role `role` from the server.
 
-**addRole (DEFAULT)**
+##### addRole (DEFAULT)
 
 The `addRole` method adds a role `role` to a user `user`.
 
-**removeRole (DEFAULT)**
+##### removeRole (DEFAULT)
 
 The `removeRole` method removes a role `role` to a user `user`.
 
-**sendToDiscord (DEFAULT)**
+##### sendToDiscord (DEFAULT)
 
 The `sendToDiscord` method sends a message `msg` to the origin channel.
 
 
 ----
 
-**PlayerStats (Engine)**
+#### PlayerStats (Engine)
 
-**PlayerStats**
+##### PlayerStats
 
 The `PlayerStats` method, the class's constructor, initializes the class's instance variables.
 
-**getPosition**
+##### getPosition
 
 The `getPosition` method retrieves the row number the player is located at within the spreadsheet.
 
-**getName**
+##### getName
 
 The `getName` method retrieves the user's Discord tag.
 
-**getNickname**
+##### getNickname
 
 The `getNickname` method retrieves the user's Discord nickname on the server.
 
-**getSetWins**
+##### getSetWins
 
 The `getSetWins` method retrieves the user's amount of won sets.
 
-**getSetLosses**
+##### getSetLosses
 
 The `getSetLosses` method retrieves the user's amount of lost sets.
 
-**getGamesWon**
+##### getGamesWon
 
 The `getGamesWon` method retrieves the user's amount of won games.
 
-**getGamesLost**
+##### getGamesLost
 
 The `getGamesLost` method retrieves the user's amount of lost games.
 
 
 ----
 
-**CyclesLog (Engine)**
+#### CyclesLog (Engine)
 
-**checkForSub**
+##### checkForSub
 
 The `checkForSub` method checks if the included players, given in `args` were subs.
 
-**getGamesPlayed**
+##### getGamesPlayed
 
 The `getGamesPlayed` method retrieves the amount of games played, given `args`.
 
-**getGamesWon**
+##### getGamesWon
 
 The `getGamesWon` method retrieves the amount of games won, given `args`.
 
-**cycleSetWon**
+##### cycleSetWon
 
 The `cycleSetWon` method checks if a cycle set was won, given the amount of won games `won` and the total amount of games played `played`.
 
-**updateUser (overloaded)**
+##### updateUser (overloaded)
 
-This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, detecting if they were a sub or not via a flag `notSub`, at location `range` within the spreadsheet values `tableVals`, using a map `table`, given the original user input `args`.
+This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, detecting if they were a sub or not via the flag `notSub`, at location `range` within the spreadsheet values `tableVals`, using a map `table`, given the original user input `args`.
 
-**updateUser**
+##### updateUser
 
 This `updateUser` method calls its overloaded self with a parameter detecting if the user was a sub or not.
 
-**addUser (overloaded)**
+##### addUser (overloaded)
 
-This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, detecting if they were a sub or not via a flag `notSub`, at location `range` within the spreadsheet values `tableVals`, given the original user input `args`.
+This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, detecting if they were a sub or not via the flag `notSub`, at location `range` within the spreadsheet values `tableVals`, given the original user input `args`.
 
-**addUser**
+##### addUser
 
 This `addUser` method calls its overloaded self with a parameter detecting if the user was a sub or not.
 
-**runCmd**
+##### runCmd
 
 The `runCmd` method runs the `lpcycle` or `lpsub` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
 
 ----
 
-**Add (Engine)**
+#### CycleUndo (Engine)
 
-**enterUser**
+##### retrieveLastMessage
+
+The `retrieveLastMessage` method retrieves the previous cycle logging command.
+
+##### undoUser (overloaded)
+
+This `undoUser` method uses the GoogleAPI `link` to undo the stats of a user `user`, detecting if they were a sub or not via the flag `notSub`, at location `range` within the spreadsheet values `tableVals`, given the original user input `args`.
+
+##### undoUser
+
+This `undoUser` method calls its overloaded self with a parameter detecting if the user was a sub or not.
+
+#### runCmd
+
+The `runCmd` method runs the `lpundo` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+
+
+----
+
+#### Add (Engine)
+
+##### enterUser
 
 The `enterUser` method adds the "LaunchPoint" role to a user `user`, and retrieves a welcome message.
 
-**coachUsers**
+##### coachUsers
 
 The `coachUsers` method adds the "Coaches" role to a user `user`, and retrieves a welcome message.
 
-**runCmd**
+##### runCmd
 
 The `runCmd` method runs the `lpadd` or `lpcoach` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
 
 ----
 
-**Graduate (Engine)**
+#### Graduate (Engine)
 
-**graduateUser**
+##### graduateUser
 
 The `graduateUser` method adds a user `user` to a spreadsheet list of LaunchPoint graduates and gives them the "LaunchPoint Graduate" role.
 
-**runCmd**
+##### runCmd
 
 The `runCmd` method runs the `lpgrad` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
