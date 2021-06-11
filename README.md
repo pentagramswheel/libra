@@ -42,12 +42,17 @@
 
 
 ## Introduction
-LaunchPoint Simp is an official staff convenience bot for the Splatoon Discord server: LaunchPoint. As its official simp, not only will it simp for everyone, but it will also help everyone to as much of its capacity.
+LaunchPoint Simp is an official staff convenience bot (written in Java) for the Splatoon Discord server: LaunchPoint. As its official simp, not only will it simp for everyone, but it will also help everyone to as much of its capacity.
 
 
 
 ## How to Install
 After pulling this project, you can import it using the <medium><a href='https://www.jetbrains.com/help/idea/gradle.html'>JetBrains' official IntelliJ Gradle documentation</a></medium>. All dependencies will be imported upon starting up the project with Gradle. If another IDE is being used, the only installation needed to import the project is Gradle.
+
+To start the bot from the console, run the following code. Remember Gradle is the only Java dependency needed to run it.
+```
+java src/main/java/bot/Main.java
+```
 
 
 

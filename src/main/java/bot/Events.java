@@ -219,7 +219,7 @@ public class Events extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         String input = e.getMessage().getContentRaw();
-        String[] args = input.split("\\s+", 7);
+        String[] args = input.split("\\s+", 100);
 
         args[0] = args[0].toUpperCase();
         String cmd = args[0];

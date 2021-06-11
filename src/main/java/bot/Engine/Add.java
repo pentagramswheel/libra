@@ -48,6 +48,7 @@ public class Add implements Command {
                        String[] args) {
         String cmd = args[0];
         StringBuilder listOfUsers = new StringBuilder();
+        listOfUsers.append("```\n");
 
         for (Member user : users) {
             String welcomeMessage = "";
@@ -62,7 +63,7 @@ public class Add implements Command {
 
             if (user.equals(users.get(users.size() - 1))) {
                 listOfUsers.append(user.getUser().getAsTag())
-                        .append("\n")
+                        .append("\n```")
                         .append(welcomeMessage);
             } else {
                 listOfUsers.append(user.getUser().getAsTag()).append(", ");
