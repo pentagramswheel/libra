@@ -93,5 +93,7 @@ public class Add extends bot.Events implements Command {
         }
 
         sendToDiscord(listOfUsers.toString());
+        System.out.println(users.size()
+                + " new user(s)/coach(es) were processed.");
     }
 }

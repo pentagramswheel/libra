@@ -240,5 +240,7 @@ public class CycleLog implements Command {
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The spreadsheet could not load.");
         }
+
+        System.out.println(users.size() + " cycle match(es) were processed.");
     }
 }

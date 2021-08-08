@@ -165,5 +165,7 @@ public class CycleUndo implements Command {
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The save could not load.");
         }
+
+        System.out.println("Cycle undo was processed.");
     }
 }

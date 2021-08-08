@@ -18,12 +18,10 @@ import javax.security.auth.login.LoginException;
 public class Main {
     public static void main(String[] args) {
         Events.BOT = JDABuilder.createDefault(Discord.getToken())
-//                .enableCache(CacheFlag.ROLE_TAGS)
                 .enableIntents(GatewayIntent.GUILD_PRESENCES)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS);
 
         Events.BOT.addEventListeners(new Events());
-//        Events.BOT.setRelativeRateLimit(true);
 
         try {
             JDA jda = Events.BOT.build();
@@ -31,8 +29,13 @@ public class Main {
             String funMessage = "lphelp | simping for @everyone";
             jda.getPresence().setActivity(Activity.playing(
                     funMessage));
+
+            Thread.sleep(3000);
+            System.out.println("\nUSAGE LOG:\n==========");
         } catch (LoginException le) {
             le.printStackTrace();
+        } catch(InterruptedException ie) {
+            Thread.currentThread().interrupt();
         }
     }
 }

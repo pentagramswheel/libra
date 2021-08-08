@@ -66,12 +66,9 @@ public interface Command {
      * @param ms the time to pause in milliseconds.
      */
     default void wait(int ms) {
-        try
-        {
+        try {
             Thread.sleep(ms);
-        }
-        catch(InterruptedException ex)
-        {
+        } catch(InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
     }

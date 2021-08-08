@@ -99,5 +99,6 @@ public class Graduate extends bot.Events implements Command {
         }
 
         sendToDiscord(listOfUsers.toString());
+        System.out.println(users.size() + " graduates were processed.");
     }
 }

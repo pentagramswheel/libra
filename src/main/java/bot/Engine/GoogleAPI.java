@@ -63,6 +63,11 @@ public class GoogleAPI {
      */
     private Credential authorize()
             throws IOException, GeneralSecurityException {
+        // disable Google API warning
+        final java.util.logging.Logger buggyLogger =
+                java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
+        buggyLogger.setLevel(java.util.logging.Level.SEVERE);
+
         InputStream in = Graduate.class.getResourceAsStream(
                 "/credentials.json");
         GoogleClientSecrets clientSecrets = GoogleClientSecrets
