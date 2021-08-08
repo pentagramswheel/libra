@@ -6,17 +6,19 @@ bot/Engine/PlayerStats.java
  bot.Engine.PlayerStats
 bot/Engine/GoogleAPI.java
  bot.Engine.GoogleAPI
-bot/Events.java
- bot.Events
+bot/Main.java
+ bot.Main
 bot/Engine/Command.java
  bot.Engine.Command
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
+bot/Events.java
+ bot.Events
 bot/Engine/CycleUndo.java
  bot.Engine.CycleUndo
 bot/Engine/CycleLog.java
  bot.Engine.CycleLog
-bot/Engine/Graduate.java
- bot.Engine.Graduate
 bot/Engine/Add.java
  bot.Engine.Add
-bot/Main.java
- bot.Main
+bot/Tools/Time.java
+ bot.Tools.Time

@@ -1,6 +1,7 @@
 package bot.Engine;
 
 import bot.Events;
+import bot.Tools.Time;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -71,5 +72,13 @@ public interface Command {
         } catch(InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    /**
+     * Log the processed command's actions to the console.
+     * @param msg the message to to attach to the log.
+     */
+    default void log(String msg) {
+        System.out.println(msg + "(" + Time.currentTime() + ")");
     }
 }

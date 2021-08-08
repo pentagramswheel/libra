@@ -1,5 +1,7 @@
-package bot.Engine;
+package bot.Tools;
 
+import bot.Engine.Graduate;
+import bot.Engine.PlayerStats;
 import bot.Events;
 
 import com.google.api.client.auth.oauth2.Credential;

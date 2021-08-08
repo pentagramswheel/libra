@@ -1,6 +1,5 @@
 package bot.Engine;
 
-import bot.Events;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
@@ -47,12 +46,15 @@ public class Add extends bot.Events implements Command {
      * @return the coach welcome message.
      */
     private String coach(Member user) {
-        addRole(user, coachRole);
+        while (!user.getRoles().contains(coachRole)) {
+            addRole(user, coachRole);
 
-        System.out.println("Coached User: " + user.getEffectiveName());
-        for (Role r : user.getRoles()) {
-            System.out.println(r.getName());
+            // prevent Discord rate limiting
+            wait (2000);
+            user = SERVER.retrieveMemberById(user.getId()).complete();
+            System.out.println("incomplete");               // remove eventually
         }
+        System.out.println("Successful!\n");                // remove eventually
 
         return "Welcome to the LaunchPoint coaches!";
     }
@@ -93,7 +95,6 @@ public class Add extends bot.Events implements Command {
         }
 
         sendToDiscord(listOfUsers.toString());
-        System.out.println(users.size()
-                + " new user(s)/coach(es) were processed.");
+        log(users.size() + " new user(s)/coach(es) were processed.");
     }
 }

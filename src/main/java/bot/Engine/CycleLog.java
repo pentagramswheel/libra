@@ -1,6 +1,7 @@
 package bot.Engine;
 
 import bot.Discord;
+import bot.Tools.GoogleAPI;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -241,6 +242,6 @@ public class CycleLog implements Command {
             sendToDiscord("The spreadsheet could not load.");
         }
 
-        System.out.println(users.size() + " cycle match(es) were processed.");
+        log(users.size() + " cycle match(es) were processed.");
     }
 }

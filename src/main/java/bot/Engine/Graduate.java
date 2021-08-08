@@ -1,6 +1,7 @@
 package bot.Engine;
 
 import bot.Discord;
+import bot.Tools.GoogleAPI;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -99,6 +100,6 @@ public class Graduate extends bot.Events implements Command {
         }
 
         sendToDiscord(listOfUsers.toString());
-        System.out.println(users.size() + " graduates were processed.");
+        log(users.size() + " graduates were processed.");
     }
 }

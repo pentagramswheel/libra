@@ -1,6 +1,7 @@
 package bot.Engine;
 
 import bot.Discord;
+import bot.Tools.GoogleAPI;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -166,6 +167,6 @@ public class CycleUndo implements Command {
             sendToDiscord("The save could not load.");
         }
 
-        System.out.println("Cycle undo was processed.");
+        log("Cycle undo was processed.");
     }
 }
