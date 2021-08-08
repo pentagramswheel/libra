@@ -36,7 +36,7 @@ public class Graduate extends bot.Events implements Command {
      * Graduates a user from LaunchPoint.
      * @param user the user to graduate.
      */
-    private void graduateUser(Member user) {
+    private void graduate(Member user) {
         while (user.getRoles().contains(lpRole)
                 || !user.getRoles().contains(gradRole)) {
             removeRole(user, lpRole);
@@ -86,7 +86,7 @@ public class Graduate extends bot.Events implements Command {
 
         sendToDiscord("Processing users...");
         for (Member user : users) {
-            graduateUser(user);
+            graduate(user);
 
             if (user.equals(users.get(users.size() - 1))) {
                 String welcomeMessage = "Congratulations. We look forward to "

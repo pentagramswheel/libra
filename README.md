@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** June 3, 2021
+**Last Updated:** August 8, 2021
 
 - [Table of Contents](#launchpoint-simp-design-documentation)
   * [Introduction](#introduction)
@@ -20,7 +20,8 @@
       - [Main](#main)
       - [Discord](#discord)
       - [Events](#events)
-      - [GoogleAPI (Engine)](#googleapi-engine)
+      - [GoogleAPI (Tools)](#googleapi-tools)
+      - [Time (Tools)](#time-tools)
       - [Command (Engine)](#command-engine)
       - [PlayerStats (Engine)](#playerstats-engine)
       - [CycleLog (Engine)](#cyclelog-engine)
@@ -142,7 +143,7 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 
 ----
 
-#### GoogleAPI (Engine)
+#### GoogleAPI (Tools)
 
 A class which navigates a Google Sheet (spreadsheet).
 
@@ -150,6 +151,13 @@ A class which navigates a Google Sheet (spreadsheet).
 1. `Sheets sheetsService` - an object representation for the Google Sheets SDK.
 2. `String APPLICATION_NAME` - the name of the application.
 3. `String spreadsheetID` - the credential ID of the spreadsheet.
+
+
+----
+
+#### Time (Tools)
+
+A class which retrieves the system's time.
 
 
 ----
@@ -193,11 +201,19 @@ A class which reverts LaunchPoint Cycle commands, processing the command `lpundo
 
 A class which gives roles to users in LaunchPoint, processing the command `lpadd`.
 
+##### Instance Variables
+1. `Role lpRole` - an object representation of the 'LaunchPoint' role.
+2. `Role coachRole` - an object representation of the 'Coaches' role.
+
 ----
 
 #### Graduate (Engine)
 
 A class which graduates a user from LaunchPoint, processing the command `lpgrad`, granting the associated roles.
+
+##### Instance Variables
+1. `Role lpRole` - an object representation of the 'LaunchPoint' role.
+2. `Role gradRole` - an object representation of the 'LaunchPoint Graduate' role.
 
 
 
@@ -259,7 +275,7 @@ The `onMessageReceieved` method parses through user input `e`, checking if a com
 
 ----
 
-#### GoogleAPI (Engine)
+#### GoogleAPI (Tools)
 
 ##### GoogleAPI
 
@@ -296,6 +312,15 @@ The `updateRow` method updates a section `section` of the spreadsheet's values `
 
 ----
 
+#### Time (Tools)
+
+#### currentTime
+
+The `currentTime` method retrieves the current time of the running machine.
+
+
+----
+
 #### Command (Engine)
 
 ##### runCmd
@@ -317,6 +342,14 @@ The `removeRole` method removes a role `role` to a user `user`.
 ##### sendToDiscord (DEFAULT)
 
 The `sendToDiscord` method sends a message `msg` to the origin channel.
+
+#### wait (DEFAULT)
+
+The `wait` method pauses the program for `ms` milliseconds.
+
+#### log (DEFAULT)
+
+The `log` method logs a processed command message `msg` onto the console.
 
 
 ----
@@ -422,13 +455,13 @@ The `runCmd` method runs the `lpundo` command and outputs the result in a channe
 
 #### Add (Engine)
 
-##### enterUser
+##### enter
 
-The `enterUser` method adds the "LaunchPoint" role to a user `user`, and retrieves a welcome message.
+The `enter` method adds the "LaunchPoint" role to a user `user` and retrieves a welcome message.
 
-##### coachUsers
+##### coach
 
-The `coachUsers` method adds the "Coaches" role to a user `user`, and retrieves a welcome message.
+The `coach` method adds the "Coaches" role to a user `user`, and retrieves a welcome message.
 
 ##### runCmd
 
@@ -439,9 +472,9 @@ The `runCmd` method runs the `lpadd` or `lpcoach` command and outputs the result
 
 #### Graduate (Engine)
 
-##### graduateUser
+##### graduate
 
-The `graduateUser` method adds a user `user` to a spreadsheet list of LaunchPoint graduates and gives them the "LaunchPoint Graduate" role.
+The `graduate` method adds a user `user` to a spreadsheet list of LaunchPoint graduates and gives them the "LaunchPoint Graduate" role.
 
 ##### runCmd
 
