@@ -40,7 +40,7 @@ public interface Command {
      * @param role the role to add.
      */
     default void addRole(Member user, Role role) {
-        Events.SERVER.addRoleToMember(user, role).queue();
+        Events.SERVER.addRoleToMember(user.getId(), role).queue();
     }
 
     /**
@@ -49,7 +49,7 @@ public interface Command {
      * @param role the role to remove.
      */
     default void removeRole(Member user, Role role) {
-        Events.SERVER.removeRoleFromMember(user, role).queue();
+        Events.SERVER.removeRoleFromMember(user.getId(), role).queue();
     }
 
     /**
@@ -59,5 +59,20 @@ public interface Command {
      */
     default void sendToDiscord(String msg) {
         Events.ORIGIN.sendMessage(msg).queue();
+    }
+
+    /**
+     * Pause the program for a certain amount of time.
+     * @param ms the time to pause in milliseconds.
+     */
+    default void wait(int ms) {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch(InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
 }

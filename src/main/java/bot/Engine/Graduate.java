@@ -23,13 +23,29 @@ import java.security.GeneralSecurityException;
  * Module:  Graduate.java
  * Purpose: Graduates users from LaunchPoint.
  */
-public class Graduate implements Command {
+public class Graduate extends bot.Events implements Command {
+
+    /** The Discord LaunchPoint role. */
+    private final Role lpRole = getRole("LaunchPoint");
+
+    /** The Discord LP Graduate role. */
+    private final Role gradRole = getRole("LaunchPoint Graduate");
 
     /**
      * Graduates a user from LaunchPoint.
      * @param user the user to graduate.
      */
     private void graduateUser(Member user) {
+        while (user.getRoles().contains(lpRole)
+                || !user.getRoles().contains(gradRole)) {
+            removeRole(user, lpRole);
+            addRole(user, gradRole);
+
+            // prevent Discord rate limiting
+            wait (2000);
+            user = SERVER.retrieveMemberById(user.getId()).complete();
+        }
+
         try {
             GoogleAPI link = new GoogleAPI(Discord.getGradSheetID());
             String range = "'Graduates'";
@@ -49,11 +65,6 @@ public class Graduate implements Command {
                             user.getId(), user.getUser().getAsTag(),
                             user.getEffectiveName())));
                 link.appendRow(range, tableVals, appendName);
-
-                sendToDiscord(String.format(
-                        "Congratulations %s. We look forward to seeing you "
-                                + "outside of LaunchPoint.",
-                        user.getUser().getAsTag()));
             }
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The spreadsheet could not load.");
@@ -69,13 +80,24 @@ public class Graduate implements Command {
     @Override
     public void runCmd(MessageChannel outChannel, List<Member> users,
                        String[] args) {
-        Role gradRole = getRole("LaunchPoint Graduate");
-        Role lpRole = getRole("LaunchPoint");
+        StringBuilder listOfUsers = new StringBuilder();
+        listOfUsers.append("```\n");
 
+        sendToDiscord("Processing users...");
         for (Member user : users) {
-            addRole(user, gradRole);
-            removeRole(user, lpRole);
             graduateUser(user);
+
+            if (user.equals(users.get(users.size() - 1))) {
+                String welcomeMessage = "Congratulations. We look forward to "
+                        + "seeing you outside of LaunchPoint.";
+                listOfUsers.append(user.getUser().getAsTag())
+                        .append("\n```")
+                        .append(welcomeMessage);
+            } else {
+                listOfUsers.append(user.getUser().getAsTag()).append(", ");
+            }
         }
+
+        sendToDiscord(listOfUsers.toString());
     }
 }

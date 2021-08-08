@@ -1,5 +1,6 @@
 package bot.Engine;
 
+import bot.Events;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
@@ -13,7 +14,13 @@ import java.util.List;
  * Module:  Add.java
  * Purpose: Adds roles to users in LaunchPoint.
  */
-public class Add implements Command {
+public class Add extends bot.Events implements Command {
+
+    /** The Discord LaunchPoint role. */
+    private final Role lpRole = getRole("LaunchPoint");
+
+    /** The Discord LP Coach role. */
+    private final Role coachRole = getRole("Coaches");
 
     /**
      * Allows a user entry into LaunchPoint.
@@ -21,8 +28,16 @@ public class Add implements Command {
      * @return the entrance welcome message.
      */
     private String enter(Member user) {
-        Role role = getRole("LaunchPoint");
-        addRole(user, role);
+        while (!user.getRoles().contains(lpRole)) {
+            addRole(user, lpRole);
+
+            // prevent Discord rate limiting
+            wait (2000);
+            user = SERVER.retrieveMemberById(user.getId()).complete();
+            System.out.println("incomplete");               // remove eventually
+        }
+        System.out.println("Successful!\n");                // remove eventually
+
         return "Welcome to LaunchPoint!";
     }
 
@@ -32,8 +47,13 @@ public class Add implements Command {
      * @return the coach welcome message.
      */
     private String coach(Member user) {
-        Role role = getRole("Coaches");
-        addRole(user, role);
+        addRole(user, coachRole);
+
+        System.out.println("Coached User: " + user.getEffectiveName());
+        for (Role r : user.getRoles()) {
+            System.out.println(r.getName());
+        }
+
         return "Welcome to the LaunchPoint coaches!";
     }
 
@@ -50,8 +70,10 @@ public class Add implements Command {
         StringBuilder listOfUsers = new StringBuilder();
         listOfUsers.append("```\n");
 
+        sendToDiscord("Processing users...");
         for (Member user : users) {
             String welcomeMessage = "";
+
             switch (cmd) {
                 case "LPADD":
                     welcomeMessage = enter(user);
