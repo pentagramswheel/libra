@@ -410,9 +410,21 @@ The `getGamesWon` method retrieves the amount of games won, given `args`.
 
 The `cycleSetWon` method checks if a cycle set was won, given the amount of won games `won` and the total amount of games played `played`.
 
+##### sum
+
+The `sum` method returns the sum of all values within an array `arr`, by using recursion on each index `i`.
+
+##### errorReport
+
+The `errorReport` method retrieves a summary of all errors during the match report, given the players `players`, whether they were new or existing players `playerTypes`, and which players resulted in an error `errorsFound`.
+
+##### sendReport
+
+The `sendReport` method sends a summary of all errors during the match report, given the wins/losses `wins`/`losses`, players `players`, whether they were new or existing players `playerTypes`, and which players resulted in an error `errorsFound`.
+
 ##### updateUser (overloaded)
 
-This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, detecting if they were a sub or not via the flag `notSub`, at location `range` within the spreadsheet values `sheetVals`, using a map `table`, given the original user input `args`.
+This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, detecting if they were a sub or not via the flag `notSub`, at location `range` within the spreadsheet values `sheetVals`, using a map `table`, given the original user input `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
 
 ##### updateUser
 
@@ -420,7 +432,7 @@ This `updateUser` method calls its overloaded self with a parameter detecting if
 
 ##### addUser (overloaded)
 
-This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, detecting if they were a sub or not via the flag `notSub`, at location `range` within the spreadsheet values `sheetVals`, given the original user input `args`.
+This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, detecting if they were a sub or not via the flag `notSub`, at location `range` within the spreadsheet values `sheetVals`, given the original user input `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
 
 ##### addUser
 

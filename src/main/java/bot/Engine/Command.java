@@ -79,6 +79,6 @@ public interface Command {
      * @param msg the message to to attach to the log.
      */
     default void log(String msg) {
-        System.out.println(msg + "(" + Time.currentTime() + ")");
+        System.out.println(msg + " (" + Time.currentTime() + ")");
     }
 }

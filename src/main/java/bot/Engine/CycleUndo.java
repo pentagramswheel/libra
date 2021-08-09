@@ -26,7 +26,7 @@ import java.security.GeneralSecurityException;
  * Module:  CycleUndo.java
  * Purpose: Reverts the Cycle spreadsheet to the previous state.
  */
-public class CycleUndo implements Command {
+public class CycleUndo extends CycleLog implements Command {
 
     /**
      * Retrieves the previous "lpcycle" or "lpsub" command.
@@ -49,24 +49,23 @@ public class CycleUndo implements Command {
 
     /**
      * Updates a user's stats within a spreadsheet.
+     * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
      * @param range the name of the spreadsheet section
      * @param sheetVals the values of the spreadsheet section.
      * @param table a map of all rows of the spreadsheet.
-     * @param args the user input.
      * @param notSub a flag to check if the user is a sub or not.
      */
-    private void undoUser(GoogleAPI link, String user, String range,
-                          Values sheetVals, TreeMap<Object, PlayerStats> table,
-                          String[] args, boolean notSub) {
+    private void undoUser(String[] args, GoogleAPI link, String user,
+                          String range, Values sheetVals,
+                          TreeMap<Object, PlayerStats> table, boolean notSub) {
         try {
             String userID = user.substring(3, user.length() - 1);
-            System.out.println(userID);
             PlayerStats player = table.get(userID);
 
-            int cycleGamesPlayed = CycleLog.getGamesPlayed(args);
-            int cycleGamesWon = CycleLog.getGamesWon(args);
+            int cycleGamesPlayed = getGamesPlayed(args);
+            int cycleGamesWon = getGamesWon(args);
 
             int setWins = player.getSetWins();
             int setLosses = player.getSetLosses();
@@ -74,7 +73,7 @@ public class CycleUndo implements Command {
             int gamesLost = player.getGamesLost();
 
             if (notSub) {
-                if (CycleLog.cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
+                if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
                     setWins--;
                 } else {
                     setLosses--;
@@ -111,18 +110,17 @@ public class CycleUndo implements Command {
     /**
      * Checks if the user is a sub, then reverts a user's stats
      * within a spreadsheet.
+     * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
      * @param range the name of the spreadsheet section
      * @param sheetVals the values of the spreadsheet section.
      * @param table a map of all rows of the spreadsheet.
-     * @param args the user input.
      */
-    private void undoUser(GoogleAPI link, String user, String range,
-                            Values sheetVals, TreeMap<Object, PlayerStats> table,
-                            String[] args) {
-        undoUser(link, user, range, sheetVals, table, args,
-                CycleLog.checkForSub(args));
+    private void undoUser(String[] args, GoogleAPI link, String user,
+                          String range, Values sheetVals,
+                          TreeMap<Object, PlayerStats> table) {
+        undoUser(args, link, user, range, sheetVals, table, checkForSub(args));
     }
 
     /**
@@ -132,7 +130,8 @@ public class CycleUndo implements Command {
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel, List<Member> users, String[] args) {
+    public void runCmd(MessageChannel outChannel,
+                       List<Member> users, String[] args) {
         try {
             GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
 
@@ -158,8 +157,8 @@ public class CycleUndo implements Command {
             int userArgs = messageArgs.length - 3;
 
             for (int i = 1; i < 1 + userArgs; i++) {
-                undoUser(link, messageArgs[i], range, sheetVals, table,
-                        messageArgs);
+                undoUser(messageArgs, link, messageArgs[i], range, sheetVals,
+                        table);
             }
 
             sendToDiscord("The previous match report was reverted.");

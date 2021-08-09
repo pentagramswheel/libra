@@ -33,7 +33,7 @@ public class CycleLog extends bot.Events implements Command {
      * @return True if the lpsub command was called.
      *         False if the lpcycle command was called.
      */
-    public static boolean checkForSub(String[] args) {
+    public boolean checkForSub(String[] args) {
         return args[0].equals("LPCYCLE");
     }
 
@@ -42,7 +42,7 @@ public class CycleLog extends bot.Events implements Command {
      * @param args the user input.
      * @return said amount.
      */
-    public static int getGamesPlayed(String[] args) {
+    public int getGamesPlayed(String[] args) {
         return Integer.parseInt(args[args.length - 2]);
     }
 
@@ -51,7 +51,7 @@ public class CycleLog extends bot.Events implements Command {
      * @param args the user input
      * @return said amount.
      */
-    public static int getGamesWon(String[] args) {
+    public int getGamesWon(String[] args) {
         return Integer.parseInt(args[args.length - 1]);
     }
 
@@ -62,9 +62,55 @@ public class CycleLog extends bot.Events implements Command {
      * @return True if the set was won.
      *         False if the set was lost.
      */
-    public static boolean cycleSetWon(int won, int played) {
+    public boolean cycleSetWon(int won, int played) {
         double halfPlayed = (double) played / 2;
         return won >= halfPlayed;
+    }
+
+    /**
+     * Sums the values of an array.
+     * @param arr the array to find the sum of.
+     * @param i the index of the array to add.
+     * @return the sum of the values within the array.
+     */
+    private int sum(int[] arr, int i) {
+        if (i == 0) {
+            return arr[i];
+        } else {
+            return arr[i] + sum(arr, i - 1);
+        }
+    }
+
+    /**
+     * Returns a summary of the errors within the report.
+     * @param players the players within the set.
+     * @param playerTypes array of types for each player
+     *                    (0 if an existing player, 1 if a new player).
+     * @param errorsFound array of errors found for each player, if any
+     *                    (0 if no errors occurred, 1 otherwise).
+     * @return the summary of errors.
+     */
+    private String errorReport(List<Member> players, int[] playerTypes,
+                               int[] errorsFound) {
+        StringBuilder errorList = new StringBuilder();
+
+        for (int i = 0; i < players.size(); i++) {
+            Member player = players.get(i);
+
+            if (errorsFound[i] == 1 && playerTypes[i] == 0) {
+                String error = String.format(
+                        "%s could not be updated.",
+                        player.getUser().getAsMention());
+                errorList.append(error).append("\n");
+            } else if (errorsFound[i] == 1 && playerTypes[i] == 1) {
+                String error = String.format(
+                        "%s could not be added.",
+                        player.getUser().getAsMention());
+                errorList.append(error).append("\n");
+            }
+        }
+
+        return errorList.toString();
     }
 
     /**
@@ -72,37 +118,59 @@ public class CycleLog extends bot.Events implements Command {
      * @param wins the amount of games won by the players.
      * @param losses the amount of games lost by the players.
      * @param players the players within the set.
+     * @param playerTypes array of types for each player
+     *                    (0 if an existing player, 1 if a new player).
+     * @param errorsFound array of errors found for each player, if any
+     *                    (0 if no errors occurred, 1 otherwise).
      */
-    private void sendReport(int wins, int losses, List<Member> players) {
+    private void sendReport(int wins, int losses, List<Member> players,
+                            int[] playerTypes, int[] errorsFound) {
         EmbedBuilder eb = new EmbedBuilder();
         StringBuilder playerList = new StringBuilder();
-        for (Member player : players) {
-            playerList.append(player.getUser().getAsTag()).append("\n");
+
+        for (int i = 0 ; i < players.size(); i++) {
+            Member player = players.get(i);
+
+            if (playerTypes[i] == 0) {
+                playerList.append(player.getUser().getAsMention()).append("\n");
+            } else {
+                playerList.append(player.getUser().getAsMention())
+                        .append(" (new)\n");
+            }
         }
 
         eb.setTitle("Summary of Report");
-        eb.setColor(Color.MAGENTA);
+        eb.setColor(Color.GREEN);
         eb.addField("Score", wins + " - " + losses, false);
-        eb.addField("Players", playerList.toString(), false);
-        eb.addField("Reminder", "Don't forget to extend the column formulas "
-                + "(if needed).", false);
+        eb.addField("Players Updated", playerList.toString(), false);
+
+        if (sum(errorsFound, errorsFound.length - 1) == 0) {
+            eb.addField("Status", "COMPLETE", false);
+        } else {
+            eb.addField("Status", "INCOMPLETE", false);
+            eb.addField("Errors",
+                    errorReport(players, playerTypes, errorsFound), true);
+        }
 
         ORIGIN.sendMessage(eb.build()).queue();
     }
 
     /**
      * Updates a user's stats within a spreadsheet.
+     * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param range the name of the spreadsheet section
      * @param sheetVals the values of the spreadsheet section.
      * @param table a map of all rows of the spreadsheet.
-     * @param args the user input.
      * @param notSub a flag to check if the user is a sub or not.
+     * @return 0 if the player could be found in the spreadsheet.
+     *         1 otherwise.
      */
-    private void updateUser(GoogleAPI link, Member user, String range,
-                            Values sheetVals, TreeMap<Object, PlayerStats> table,
-                            String[] args, boolean notSub) {
+    private int updateUser(String[] args, GoogleAPI link, Member user,
+                           String range, Values sheetVals,
+                           TreeMap<Object, PlayerStats> table,
+                           boolean notSub) {
         try {
             PlayerStats player = table.get(user.getId());
 
@@ -139,46 +207,52 @@ public class CycleLog extends bot.Events implements Command {
                             totalGamesWon, totalGamesLost)));
             link.updateRow(updateRange, sheetVals, newRow);
 
-            sendToDiscord(String.format(
-                    "%s's leaderboard stats were updated...",
-                    player.getName()));
+//            sendToDiscord(String.format(
+//                    "%s's leaderboard stats were updated...",
+//                    player.getName()));
+            return 0;
         } catch (IOException e) {
-            sendToDiscord(String.format(
-                    "User %s could not be updated...",
-                    user.getUser().getAsTag()));
+//            sendToDiscord(String.format(
+//                    "User %s could not be updated...",
+//                    user.getUser().getAsTag()));
+            return 1;
         }
     }
 
     /**
      * Checks if the user is a sub, then updates a user's stats
      * within a spreadsheet.
+     * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param range the name of the spreadsheet section
      * @param sheetVals the values of the spreadsheet section.
      * @param table a map of all rows of the spreadsheet.
-     * @param args the user input.
+     * @return 0 if the player could be found in the spreadsheet.
+     *         1 otherwise.
      */
-    private void updateUser(GoogleAPI link, Member user, String range,
-                            Values sheetVals, TreeMap<Object, PlayerStats> table,
-                            String[] args) {
-        updateUser(link, user, range, sheetVals, table, args,
+    private int updateUser(String[] args, GoogleAPI link, Member user,
+                           String range, Values sheetVals,
+                           TreeMap<Object, PlayerStats> table) {
+        return updateUser(args, link, user, range, sheetVals, table,
                 checkForSub(args));
     }
 
     /**
      * Adds a user's stats within a spreadsheet.
+     * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param range the name of the spreadsheet section
      * @param sheetVals the values of the spreadsheet section.
-     * @param args the user input.
      * @param notSub a flag to check if the user is a sub or not.
+     * @return 0 if the player could be found in the spreadsheet.
+     *         1 otherwise.
      *
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
-    private void addUser(GoogleAPI link, Member user, String range,
-                         Values sheetVals, String[] args, boolean notSub) {
+    private int addUser(String[] args, GoogleAPI link, Member user,
+                        String range, Values sheetVals, boolean notSub) {
         String userTag = user.getUser().getAsTag();
 
         try {
@@ -204,32 +278,36 @@ public class CycleLog extends bot.Events implements Command {
                             cycleGamesLost, 0, 0)));
             link.appendRow(range, sheetVals, newRow);
 
-            sendToDiscord(String.format(
-                    "%s was added to the leaderboard. Be sure to"
-                            + " extend the column formulas accordingly"
-                            + " (They're set to zero right now)...",
-                    userTag));
+//            sendToDiscord(String.format(
+//                    "%s was added to the leaderboard. Be sure to"
+//                            + " extend the column formulas accordingly"
+//                            + " (They're set to zero right now)...",
+//                    userTag));
+            return 0;
         } catch (IOException e) {
-            sendToDiscord(String.format(
-                    "New user %s could not be added...",
-                    userTag));
+//            sendToDiscord(String.format(
+//                    "New user %s could not be added...",
+//                    userTag));
+            return 1;
         }
     }
 
     /**
      * Checks if the user is a sub, then adds a user's stats within
      * a spreadsheet.
+     * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param range the name of the spreadsheet section
      * @param sheetVals the values of the spreadsheet section.
-     * @param args the user input.
+     * @return 0 if the player could be found in the spreadsheet.
+     *         1 otherwise.
      *
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
-    private void addUser(GoogleAPI link, Member user, String range,
-                         Values sheetVals, String[] args) {
-        addUser(link, user, range, sheetVals, args, checkForSub(args));
+    private int addUser(String[] args, GoogleAPI link, Member user,
+                        String range, Values sheetVals) {
+        return addUser(args, link, user, range, sheetVals, checkForSub(args));
     }
 
     /**
@@ -254,15 +332,34 @@ public class CycleLog extends bot.Events implements Command {
                 throw new IOException("The spreadsheet was empty.");
             }
 
-            for (Member user : users) {
+//            for (Member user : users) {
+//                if (table.containsKey(user.getId())) {
+//                    updateUser(link, user, range, sheetVals, table, args);
+//                } else {
+//                    addUser(link, user, range, sheetVals, args);
+//                }
+//            }
+//
+//            sendToDiscord("The match report was processed.");
+
+            int[] playerTypes = new int[users.size()];
+            int[] errorsFound = new int[users.size()];
+            for (int i = 0; i < users.size(); i++) {
+                Member user = users.get(i);
                 if (table.containsKey(user.getId())) {
-                    updateUser(link, user, range, sheetVals, table, args);
+                    errorsFound[i] =
+                            updateUser(args, link, user, range, sheetVals, table);
+                    playerTypes[i] = 0;
                 } else {
-                    addUser(link, user, range, sheetVals, args);
+                    errorsFound[i] =
+                            addUser(args, link, user, range, sheetVals);
+                    playerTypes[i] = 1;
                 }
             }
 
-            sendToDiscord("The match report was processed.");
+            int gamesWon = getGamesWon(args);
+            int gamesLost = getGamesPlayed(args) - gamesWon;
+            sendReport(gamesWon, gamesLost, users, playerTypes, errorsFound);
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The spreadsheet could not load.");
         }
