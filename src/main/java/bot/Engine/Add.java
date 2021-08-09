@@ -33,9 +33,7 @@ public class Add extends bot.Events implements Command {
             // prevent Discord rate limiting
             wait (2000);
             user = SERVER.retrieveMemberById(user.getId()).complete();
-            System.out.println("incomplete");               // remove eventually
         }
-        System.out.println("Successful!\n");                // remove eventually
 
         return "Welcome to LaunchPoint!";
     }
@@ -52,9 +50,7 @@ public class Add extends bot.Events implements Command {
             // prevent Discord rate limiting
             wait (2000);
             user = SERVER.retrieveMemberById(user.getId()).complete();
-            System.out.println("incomplete");               // remove eventually
         }
-        System.out.println("Successful!\n");                // remove eventually
 
         return "Welcome to the LaunchPoint coaches!";
     }

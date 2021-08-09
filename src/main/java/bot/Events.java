@@ -128,14 +128,60 @@ public class Events extends ListenerAdapter {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("LaunchPoint Simp Commands");
         eb.setColor(Color.GREEN);
-        eb.addField("lphelp", "Displays the list of commands.", false);
-        eb.addField("lpstatus", "Checks if the bot is online.", false);
-        eb.addField("lpcycle [players] [games played] [score]", "Reports scores for up to four players.", false);
-        eb.addField("lpsub [players] [games played] [score]", "Reports scores for up to four players who subbed.", false);
-        eb.addField("lpundo", "Reverts the previous cycle command, once and only once.", false);
-        eb.addField("lpadd [players]", "Adds players into LaunchPoint.", false);
-        eb.addField("lpcoach [players]", "Adds players to the LaunchPoint coaches.", false);
-        eb.addField("lpgrad [players]", "Graduates players from LaunchPoint.", false);
+        eb.addField("lphelp",
+                "Displays the list of commands.",
+                false);
+        eb.addField("lphelp?",
+                "Displays troubleshooting information for the commands.",
+                false);
+        eb.addField("lpstatus",
+                "Checks if the bot is online.",
+                false);
+        eb.addField("lpcycle [players] [games played] [score]",
+                "Reports scores for up to four players.",
+                false);
+        eb.addField("lpsub [players] [games played] [score]",
+                "Reports scores for up to four players who subbed.",
+                false);
+        eb.addField("lpundo",
+                "Reverts the previous cycle command, once and only once.",
+                false);
+        eb.addField("lpadd [players]",
+                "Adds players into LaunchPoint.",
+                false);
+        eb.addField("lpcoach [players]",
+                "Adds players to the LaunchPoint coaches.",
+                false);
+        eb.addField("lpgrad [players]",
+                "Graduates players from LaunchPoint.",
+                false);
+
+        ORIGIN.sendMessage(eb.build()).queue();
+    }
+
+    /**
+     * Print the command troubleshooting information.
+     */
+    private void printTroubleshootString() {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("Command Troubleshooting");
+        eb.setColor(Color.GREEN);
+        eb.addField("lpcycle, lpsub",
+                "If the match report isn't giving you feedback, it \n"
+                        + "is most likely due to the latest/bottommost row \n"
+                        + "in the spreadsheet missing information. For \n"
+                        + "example, one common problem is presetting or \n"
+                        + "overextending the formulas past the latest row.",
+                false);
+        eb.addField("lpadd, lpcoach, lpgrad",
+                "If the role for a player isn't showing up or seemingly \n"
+                        + "isn't being added, try *refreshing the roles* by \n"
+                        + "going to `Server Settings > User Management > Members`. \n"
+                        + "A second layer of refreshing can be done by \n"
+                        + "searching for a player's name in `... > Members`. \n"
+                        + "The roles should exist; this is currently a Discord"
+                        + "bug.",
+                false);
 
         ORIGIN.sendMessage(eb.build()).queue();
     }
@@ -232,6 +278,11 @@ public class Events extends ListenerAdapter {
             case "LPHELP":
                 if (argsValid(args, 1)) {
                     printHelpString();
+                }
+                break;
+            case "LPHELP?":
+                if (argsValid(args, 1)) {
+                    printTroubleshootString();
                 }
                 break;
             case "LPSTATUS":

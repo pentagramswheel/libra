@@ -10,6 +10,7 @@
   * [How to Install](#how-to-install)
   * [Command Usage](#command-usage)
       - [lphelp](#lphelp)
+      - [lphelp?](#lphelp?)
       - [lpstatus](#lpstatus)
       - [lpcycle](#lpcycle)
       - [lpsub](#lpsub)
@@ -62,6 +63,12 @@ java src/main/java/bot/Main.java
 #### lphelp
 
 Outputs a list of the bot's commands.
+
+----
+
+#### lphelp?
+
+Output troubleshooting information for the bot's commands.
 
 ----
 
