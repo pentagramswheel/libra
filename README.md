@@ -48,6 +48,9 @@
 LaunchPoint Simp is an official staff convenience bot (written in Java) for the Splatoon Discord server: LaunchPoint. As its official simp, not only will it simp for everyone, but it will also help everyone to as much of its capacity.
 
 
+----
+
+
 
 ## How to Install
 After pulling this project, you can import it using the <medium><a href='https://www.jetbrains.com/help/idea/gradle.html'>JetBrains' official IntelliJ Gradle documentation</a></medium>. All dependencies will be imported upon starting up the project with Gradle. If another IDE is being used, the only installation needed to import the project is Gradle.
@@ -56,6 +59,8 @@ To start the bot from the console, run the following code. Remember Gradle is th
 ```
 java src/main/java/bot/Main.java
 ```
+
+----
 
 
 
@@ -122,6 +127,8 @@ Graduates players from LaunchPoint, logging their status on an affiliated spread
 ##### Parameters
 1. `users` - Discord users in the form of Discord pings.
 
+----
+
 
 
 ## Classes and Data Structures
@@ -129,13 +136,11 @@ Graduates players from LaunchPoint, logging their status on an affiliated spread
 
 The entry point of the bot's implementation. It constructs the bot and prepares it for processing commands.
 
-
 ----
 
 #### Discord
 
 A class consisting of credential-specific information, pertaining to Discord and the bot's persistence. Due to the credentials of this class, the secrets have been redacted. See DiscordExample.java for a template.
-
 
 ----
 
@@ -148,7 +153,6 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 2. `Guild SERVER` - an object representation of the Discord server.
 3. `MessageChannel ORIGIN` - the original channel the user-inputted command was sent in.
 
-
 ----
 
 #### GoogleAPI (Tools)
@@ -160,20 +164,17 @@ A class which navigates a Google Sheet (spreadsheet).
 2. `String APPLICATION_NAME` - the name of the application.
 3. `String spreadsheetID` - the credential ID of the spreadsheet.
 
-
 ----
 
 #### Time (Tools)
 
 A class which retrieves the system's time.
 
-
 ----
 
 #### Command (Engine)
 
 An interface outlining the format of the bot's command implementations.
-
 
 ----
 
@@ -189,7 +190,6 @@ A class for storing information about a Discord user.
 5. `int setLosses` - the user's amount of lost sets.
 6. `int gamesWon` - the user's amount of won games.
 7. `int gamesLost` - the user's amount of lost games.
-
 
 ----
 
@@ -222,6 +222,8 @@ A class which graduates a user from LaunchPoint, processing the command `lpgrad`
 ##### Instance Variables
 1. `Role lpRole` - an object representation of the 'LaunchPoint' role.
 2. `Role gradRole` - an object representation of the 'LaunchPoint Graduate' role.
+
+----
 
 
 
@@ -284,7 +286,6 @@ The `runGradCmd` method formally runs the `lpgrad` command, loading users `playe
 
 The `onMessageReceieved` method parses through user input `e`, checking if a command was used, and executing based on the command, if any.
 
-
 ----
 
 #### GoogleAPI (Tools)
@@ -321,7 +322,6 @@ The `appendRow` method appends a row `row` to at the end of the values `vals` of
 
 The `updateRow` method updates a section `section` of the spreadsheet's values `vals` to be the given row `row`.
 
-
 ----
 
 #### Time (Tools)
@@ -329,7 +329,6 @@ The `updateRow` method updates a section `section` of the spreadsheet's values `
 #### currentTime
 
 The `currentTime` method retrieves the current time of the running machine.
-
 
 ----
 
@@ -362,7 +361,6 @@ The `wait` method pauses the program for `ms` milliseconds.
 #### log (DEFAULT)
 
 The `log` method logs a processed command message `msg` onto the console.
-
 
 ----
 
@@ -399,7 +397,6 @@ The `getGamesWon` method retrieves the user's amount of won games.
 ##### getGamesLost
 
 The `getGamesLost` method retrieves the user's amount of lost games.
-
 
 ----
 
@@ -453,7 +450,6 @@ This `addUser` method calls its overloaded self with a parameter detecting if th
 
 The `runCmd` method runs the `lpcycle` or `lpsub` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
-
 ----
 
 #### CycleUndo (Engine)
@@ -474,7 +470,6 @@ This `undoUser` method calls its overloaded self with a parameter detecting if t
 
 The `runCmd` method runs the `lpundo` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
-
 ----
 
 #### Add (Engine)
@@ -491,7 +486,6 @@ The `coach` method adds the "Coaches" role to a user `user`, and retrieves a wel
 
 The `runCmd` method runs the `lpadd` or `lpcoach` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
-
 ----
 
 #### Graduate (Engine)
@@ -504,6 +498,8 @@ The `graduate` method adds a user `user` to a spreadsheet list of LaunchPoint gr
 
 The `runCmd` method runs the `lpgrad` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
+----
+
 
 
 ## Persistence
@@ -514,8 +510,9 @@ These spreadsheets are connected and interacted with using the Google Sheets API
 
 Additionally, the `lpundo` command allows a user to revert a cycle command, by saving and loading the previous cycle command, logged into a text file `load.txt`.
 
-
 ----
+
+
 
 ## Licensing and Rights
 
