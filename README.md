@@ -49,7 +49,8 @@
 LaunchPoint Simp is an official staff convenience bot (written in Java) for the Splatoon Discord server: LaunchPoint. As its official simp, not only will it simp for everyone, but it will also help everyone to as much of its capacity.
 
 
-----
+
+
 
 
 
@@ -62,7 +63,9 @@ To start the bot from the console, run the following code. Remember Gradle is th
 java src/main/java/bot/Main.java
 ```
 
-----
+
+
+
 
 
 
@@ -131,6 +134,10 @@ Graduates players from LaunchPoint, logging their status on an affiliated spread
 1. `users` - Discord users in the form of Discord pings.
 
 ----
+
+
+
+
 
 
 
@@ -228,6 +235,10 @@ A class which graduates a user from LaunchPoint, processing the command `lpgrad`
 2. `Role gradRole` - an object representation of the 'LaunchPoint Graduate' role.
 
 ----
+
+
+
+
 
 
 
@@ -508,6 +519,10 @@ The `runCmd` method runs the `lpgrad` command and outputs the result in a channe
 
 
 
+
+
+
+
 ## Persistence
 
 The project saves and loads data from two Google Sheets spreadsheets, one each for the `CyclesLog` and `Graduate` classes.
@@ -517,6 +532,10 @@ These spreadsheets are connected and interacted with using the Google Sheets API
 Additionally, the `lpundo` command allows a user to revert a cycle command, by saving and loading the previous cycle command, logged into a text file `load.txt`.
 
 ----
+
+
+
+
 
 
 
