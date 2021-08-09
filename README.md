@@ -10,7 +10,7 @@
   * [How to Install](#how-to-install)
   * [Command Usage](#command-usage)
       - [lphelp](#lphelp)
-      - [lphelp?](#lphelp?)
+      - [lphelp?](#lphelp-)
       - [lpstatus](#lpstatus)
       - [lpcycle](#lpcycle)
       - [lpsub](#lpsub)
