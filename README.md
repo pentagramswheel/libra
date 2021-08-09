@@ -256,6 +256,12 @@ The `argAmtValid` method checks whether ping commands have the correct amount of
 
 The `printHelpString` method prints the script for the `lphelp` command.
 
+##### printTroubleshootString
+
+The `printTroubleshootString` method prints the script for the `lphelp?` command.
+
+The `printHelpString` method prints the script for the `lphelp` command.
+
 ##### saveContents
 
 The `saveContents` method saves the user input `args` to the `load.txt` file.
