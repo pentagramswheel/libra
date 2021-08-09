@@ -260,8 +260,6 @@ The `printHelpString` method prints the script for the `lphelp` command.
 
 The `printTroubleshootString` method prints the script for the `lphelp?` command.
 
-The `printHelpString` method prints the script for the `lphelp` command.
-
 ##### saveContents
 
 The `saveContents` method saves the user input `args` to the `load.txt` file.
