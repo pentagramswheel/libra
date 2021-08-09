@@ -51,10 +51,6 @@ LaunchPoint Simp is an official staff convenience bot (written in Java) for the 
 
 
 
-
-
-
-
 ## How to Install
 After pulling this project, you can import it using the <medium><a href='https://www.jetbrains.com/help/idea/gradle.html'>JetBrains' official IntelliJ Gradle documentation</a></medium>. All dependencies will be imported upon starting up the project with Gradle. If another IDE is being used, the only installation needed to import the project is Gradle.
 
@@ -66,78 +62,19 @@ java src/main/java/bot/Main.java
 
 
 
-
-
-
-
 ## Command Usage
-#### lphelp
-
-Outputs a list of the bot's commands.
-
-----
-
-#### lphelp?
-
-Output troubleshooting information for the bot's commands.
-
-----
-
-#### lpstatus
-
-Checks to see if the bot is online.
+| Commands | Usage | Parameters |
+| :-------: | ------- | ------- |
+| lphelp | Outputs a list of the bot's commands. |
+| lphelp? | Output troubleshooting information for the bot's commands. |
+| lpstatus | Checks to see if the bot is online. |
+| lpcycle | Updates players' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br />2. `games played` - the amount of games played in a set.<br />3. `score` - the amount of winning games of the set.
+| lpsub | Updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br />2. `games played` - the amount of games played in a set.<br />3. `score` - the amount of winning games of the set. |
+| lpundo | Reverts the previous draft command, *once and only once*. |
+| lpadd | Gives roles to players in LaunchPoint. | 1. `users` - Discord users in the form of Discord pings. |
+| lpgrad | Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
 
 ----
-
-#### lpcycle
-
-Updates players' LaunchPoint Cycles stats through an affiliated spreadsheet.
-
-##### Parameters
-1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.
-2. `games played` - the amount of games played in a set.
-3. `score` - the amount of winning games of the set.
-
-----
-
-#### lpsub
-
-Updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet.
-
-##### Parameters
-1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.
-2. `games played` - the amount of games played in a set.
-3. `score` - the amount of winning games of the set.
-
-----
-
-#### lpundo
-
-Reverts the previous draft command, *once and only once*.
-
-----
-
-#### lpadd
-
-Gives roles to players in LaunchPoint.
-
-##### Parameters
-1. `users` - Discord users in the form of Discord pings.
-
-----
-
-#### lpgrad
-
-Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server.
-
-##### Parameters
-1. `users` - Discord users in the form of Discord pings.
-
-----
-
-
-
-
 
 
 
@@ -235,10 +172,6 @@ A class which graduates a user from LaunchPoint, processing the command `lpgrad`
 2. `Role gradRole` - an object representation of the 'LaunchPoint Graduate' role.
 
 ----
-
-
-
-
 
 
 
@@ -519,10 +452,6 @@ The `runCmd` method runs the `lpgrad` command and outputs the result in a channe
 
 
 
-
-
-
-
 ## Persistence
 
 The project saves and loads data from two Google Sheets spreadsheets, one each for the `CyclesLog` and `Graduate` classes.
@@ -532,10 +461,6 @@ These spreadsheets are connected and interacted with using the Google Sheets API
 Additionally, the `lpundo` command allows a user to revert a cycle command, by saving and loading the previous cycle command, logged into a text file `load.txt`.
 
 ----
-
-
-
-
 
 
 
