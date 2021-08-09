@@ -3,12 +3,14 @@ package bot.Engine;
 import bot.Discord;
 import bot.Tools.GoogleAPI;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.Collections;
 import java.util.Arrays;
@@ -23,7 +25,7 @@ import java.security.GeneralSecurityException;
  * Module:  CycleLog.java
  * Purpose: Logs cycle information via command.
  */
-public class CycleLog implements Command {
+public class CycleLog extends bot.Events implements Command {
 
     /**
      * Checks if this it the lpcycle or lpsub command.
@@ -66,17 +68,40 @@ public class CycleLog implements Command {
     }
 
     /**
+     * Print the summary of the cycle match report.
+     * @param wins the amount of games won by the players.
+     * @param losses the amount of games lost by the players.
+     * @param players the players within the set.
+     */
+    private void sendReport(int wins, int losses, List<Member> players) {
+        EmbedBuilder eb = new EmbedBuilder();
+        StringBuilder playerList = new StringBuilder();
+        for (Member player : players) {
+            playerList.append(player.getUser().getAsTag()).append("\n");
+        }
+
+        eb.setTitle("Summary of Report");
+        eb.setColor(Color.MAGENTA);
+        eb.addField("Score", wins + " - " + losses, false);
+        eb.addField("Players", playerList.toString(), false);
+        eb.addField("Reminder", "Don't forget to extend the column formulas "
+                + "(if needed).", false);
+
+        ORIGIN.sendMessage(eb.build()).queue();
+    }
+
+    /**
      * Updates a user's stats within a spreadsheet.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param range the name of the spreadsheet section
-     * @param tableVals the values of the spreadsheet section.
+     * @param sheetVals the values of the spreadsheet section.
      * @param table a map of all rows of the spreadsheet.
      * @param args the user input.
      * @param notSub a flag to check if the user is a sub or not.
      */
     private void updateUser(GoogleAPI link, Member user, String range,
-                            Values tableVals, TreeMap<Object, PlayerStats> table,
+                            Values sheetVals, TreeMap<Object, PlayerStats> table,
                             String[] args, boolean notSub) {
         try {
             PlayerStats player = table.get(user.getId());
@@ -86,8 +111,8 @@ public class CycleLog implements Command {
 
             int setWins = player.getSetWins();
             int setLosses = player.getSetLosses();
-            int gamesWon = player.getGamesWon();
-            int gamesLost = player.getGamesLost();
+            int totalGamesWon = player.getGamesWon();
+            int totalGamesLost = player.getGamesLost();
 
             if (notSub) {
                 if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
@@ -96,8 +121,8 @@ public class CycleLog implements Command {
                     setLosses++;
                 }
             }
-            gamesWon += cycleGamesWon;
-            gamesLost += cycleGamesPlayed - cycleGamesWon;
+            totalGamesWon += cycleGamesWon;
+            totalGamesLost += cycleGamesPlayed - cycleGamesWon;
 
             String updateRange = range + "!B" + player.getPosition()
                     + ":E" + player.getPosition();
@@ -105,14 +130,14 @@ public class CycleLog implements Command {
                     Collections.singletonList(Arrays.asList(
                             player.getName(), player.getNickname(),
                             setWins, setLosses)));
-            link.updateRow(updateRange, tableVals, newRow);
+            link.updateRow(updateRange, sheetVals, newRow);
 
             updateRange = range + "!H" + player.getPosition()
                     + ":I" + player.getPosition();
             newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
-                            gamesWon, gamesLost)));
-            link.updateRow(updateRange, tableVals, newRow);
+                            totalGamesWon, totalGamesLost)));
+            link.updateRow(updateRange, sheetVals, newRow);
 
             sendToDiscord(String.format(
                     "%s's leaderboard stats were updated...",
@@ -130,14 +155,14 @@ public class CycleLog implements Command {
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param range the name of the spreadsheet section
-     * @param tableVals the values of the spreadsheet section.
+     * @param sheetVals the values of the spreadsheet section.
      * @param table a map of all rows of the spreadsheet.
      * @param args the user input.
      */
     private void updateUser(GoogleAPI link, Member user, String range,
-                            Values tableVals, TreeMap<Object, PlayerStats> table,
+                            Values sheetVals, TreeMap<Object, PlayerStats> table,
                             String[] args) {
-        updateUser(link, user, range, tableVals, table, args,
+        updateUser(link, user, range, sheetVals, table, args,
                 checkForSub(args));
     }
 
@@ -146,14 +171,14 @@ public class CycleLog implements Command {
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param range the name of the spreadsheet section
-     * @param tableVals the values of the spreadsheet section.
+     * @param sheetVals the values of the spreadsheet section.
      * @param args the user input.
      * @param notSub a flag to check if the user is a sub or not.
      *
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
     private void addUser(GoogleAPI link, Member user, String range,
-                         Values tableVals, String[] args, boolean notSub) {
+                         Values sheetVals, String[] args, boolean notSub) {
         String userTag = user.getUser().getAsTag();
 
         try {
@@ -177,7 +202,7 @@ public class CycleLog implements Command {
                             user.getId(), userTag, user.getEffectiveName(),
                             setWins, setLosses, 0, 0, cycleGamesWon,
                             cycleGamesLost, 0, 0)));
-            link.appendRow(range, tableVals, newRow);
+            link.appendRow(range, sheetVals, newRow);
 
             sendToDiscord(String.format(
                     "%s was added to the leaderboard. Be sure to"
@@ -197,14 +222,14 @@ public class CycleLog implements Command {
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param range the name of the spreadsheet section
-     * @param tableVals the values of the spreadsheet section.
+     * @param sheetVals the values of the spreadsheet section.
      * @param args the user input.
      *
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
     private void addUser(GoogleAPI link, Member user, String range,
-                         Values tableVals, String[] args) {
-        addUser(link, user, range, tableVals, args, checkForSub(args));
+                         Values sheetVals, String[] args) {
+        addUser(link, user, range, sheetVals, args, checkForSub(args));
     }
 
     /**
@@ -222,18 +247,18 @@ public class CycleLog implements Command {
             // tab name of the spreadsheet
             String range = "'Current Leaderboard'";
 
-            Values tableVals = link.getSheet().spreadsheets().values();
+            Values sheetVals = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> table = link.readSection(
-                    range, tableVals);
+                    range, sheetVals);
             if (table == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
 
             for (Member user : users) {
                 if (table.containsKey(user.getId())) {
-                    updateUser(link, user, range, tableVals, table, args);
+                    updateUser(link, user, range, sheetVals, table, args);
                 } else {
-                    addUser(link, user, range, tableVals, args);
+                    addUser(link, user, range, sheetVals, args);
                 }
             }
 

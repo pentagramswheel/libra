@@ -8,17 +8,17 @@ bot/Main.java
  bot.Main
 bot/Engine/Command.java
  bot.Engine.Command
-bot/Events.java
- bot.Events
-bot/Engine/CycleUndo.java
- bot.Engine.CycleUndo
-bot/Engine/CycleLog.java
- bot.Engine.CycleLog
+bot/Tools/Time.java
+ bot.Tools.Time
 bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Engine/Graduate.java
  bot.Engine.Graduate
 bot/Engine/Add.java
  bot.Engine.Add
-bot/Tools/Time.java
- bot.Tools.Time
+bot/Events.java
+ bot.Events
+bot/Engine/CycleUndo.java
+ bot.Engine.CycleUndo
+bot/Engine/CycleLog.java
+ bot.Engine.CycleLog

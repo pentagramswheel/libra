@@ -52,13 +52,13 @@ public class CycleUndo implements Command {
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
      * @param range the name of the spreadsheet section
-     * @param tableVals the values of the spreadsheet section.
+     * @param sheetVals the values of the spreadsheet section.
      * @param table a map of all rows of the spreadsheet.
      * @param args the user input.
      * @param notSub a flag to check if the user is a sub or not.
      */
     private void undoUser(GoogleAPI link, String user, String range,
-                          Values tableVals, TreeMap<Object, PlayerStats> table,
+                          Values sheetVals, TreeMap<Object, PlayerStats> table,
                           String[] args, boolean notSub) {
         try {
             String userID = user.substring(3, user.length() - 1);
@@ -89,14 +89,14 @@ public class CycleUndo implements Command {
                     Collections.singletonList(Arrays.asList(
                             player.getName(), player.getNickname(),
                             setWins, setLosses)));
-            link.updateRow(updateRange, tableVals, newRow);
+            link.updateRow(updateRange, sheetVals, newRow);
 
             updateRange = range + "!H" + player.getPosition()
                     + ":I" + player.getPosition();
             newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
                             gamesWon, gamesLost)));
-            link.updateRow(updateRange, tableVals, newRow);
+            link.updateRow(updateRange, sheetVals, newRow);
 
             sendToDiscord(String.format(
                     "%s's leaderboard stats were reverted...",
@@ -114,14 +114,14 @@ public class CycleUndo implements Command {
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
      * @param range the name of the spreadsheet section
-     * @param tableVals the values of the spreadsheet section.
+     * @param sheetVals the values of the spreadsheet section.
      * @param table a map of all rows of the spreadsheet.
      * @param args the user input.
      */
     private void undoUser(GoogleAPI link, String user, String range,
-                            Values tableVals, TreeMap<Object, PlayerStats> table,
+                            Values sheetVals, TreeMap<Object, PlayerStats> table,
                             String[] args) {
-        undoUser(link, user, range, tableVals, table, args,
+        undoUser(link, user, range, sheetVals, table, args,
                 CycleLog.checkForSub(args));
     }
 
@@ -139,9 +139,9 @@ public class CycleUndo implements Command {
             // tab name of the spreadsheet
             String range = "'Current Leaderboard'";
 
-            Values tableVals = link.getSheet().spreadsheets().values();
+            Values sheetVals = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> table = link.readSection(
-                    range, tableVals);
+                    range, sheetVals);
             if (table == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
@@ -158,7 +158,7 @@ public class CycleUndo implements Command {
             int userArgs = messageArgs.length - 3;
 
             for (int i = 1; i < 1 + userArgs; i++) {
-                undoUser(link, messageArgs[i], range, tableVals, table,
+                undoUser(link, messageArgs[i], range, sheetVals, table,
                         messageArgs);
             }
 
