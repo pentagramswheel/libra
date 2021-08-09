@@ -63,7 +63,7 @@ java src/main/java/bot/Main.java
 
 
 ## Command Usage
-| Commands | Usage | Parameters |
+| Command | Usage | Parameters |
 | :-------: | ------- | ------- |
 | lphelp | Outputs a list of the bot's commands. |
 | lphelp? | Output troubleshooting information for the bot's commands. |
