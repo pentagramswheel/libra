@@ -132,7 +132,8 @@ public class Events extends ListenerAdapter {
                 "Displays the list of commands.",
                 false);
         eb.addField("lphelp?",
-                "Displays troubleshooting information for the commands.",
+                "Displays troubleshooting information for the \n"
+                        + "commands.",
                 false);
         eb.addField("lpstatus",
                 "Checks if the bot is online.",
@@ -144,7 +145,8 @@ public class Events extends ListenerAdapter {
                 "Reports scores for up to four players who subbed.",
                 false);
         eb.addField("lpundo",
-                "Reverts the previous cycle command, once and only once.",
+                "Reverts the previous cycle command, once and \n"
+                        + "only once.",
                 false);
         eb.addField("lpadd [players]",
                 "Adds players into LaunchPoint.",
@@ -175,11 +177,11 @@ public class Events extends ListenerAdapter {
                 false);
         eb.addField("lpadd, lpcoach, lpgrad",
                 "If the role for a player isn't showing up or seemingly \n"
-                        + "isn't being added, try *refreshing the roles* by \n"
-                        + "going to `Server Settings > User Management > Members`. \n"
+                        + "isn't being added, try *refreshing the roles* by going \n"
+                        + "to `Server Settings > User Management > Members`. \n"
                         + "A second layer of refreshing can be done by \n"
                         + "searching for a player's name in `... > Members`. \n"
-                        + "The roles should exist; this is currently a Discord"
+                        + "The roles should exist; this is currently a Discord \n"
                         + "bug.",
                 false);
 
