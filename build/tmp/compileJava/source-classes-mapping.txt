@@ -1,9 +1,7 @@
-bot/Discord.java
- bot.Discord
 bot/Tools/Time.java
  bot.Tools.Time
-bot/Engine/PlayerStats.java
- bot.Engine.PlayerStats
+bot/Discord.java
+ bot.Discord
 bot/DiscordExample.java
  bot.DiscordExample
 bot/Engine/Command.java
@@ -16,6 +14,8 @@ bot/Engine/CycleLog.java
  bot.Engine.CycleLog
 bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
+bot/Engine/PlayerStats.java
+ bot.Engine.PlayerStats
 bot/Engine/Graduate.java
  bot.Engine.Graduate
 bot/Engine/Add.java

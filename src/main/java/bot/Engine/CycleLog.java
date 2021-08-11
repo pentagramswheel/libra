@@ -82,38 +82,6 @@ public class CycleLog extends bot.Events implements Command {
     }
 
     /**
-     * Returns a summary of the errors within the report.
-     * @param players the players within the set.
-     * @param playerTypes array of types for each player
-     *                    (0 if an existing player, 1 if a new player).
-     * @param errorsFound array of errors found for each player, if any
-     *                    (0 if no errors occurred, 1 otherwise).
-     * @return the summary of errors.
-     */
-    private String errorReport(List<Member> players, int[] playerTypes,
-                               int[] errorsFound) {
-        StringBuilder errorList = new StringBuilder();
-
-        for (int i = 0; i < players.size(); i++) {
-            Member player = players.get(i);
-
-            if (errorsFound[i] == 1 && playerTypes[i] == 0) {
-                String error = String.format(
-                        "%s could not be updated.",
-                        player.getUser().getAsMention());
-                errorList.append(error).append("\n");
-            } else if (errorsFound[i] == 1 && playerTypes[i] == 1) {
-                String error = String.format(
-                        "%s could not be added.",
-                        player.getUser().getAsMention());
-                errorList.append(error).append("\n");
-            }
-        }
-
-        return errorList.toString();
-    }
-
-    /**
      * Print the summary of the cycle match report.
      * @param wins the amount of games won by the players.
      * @param losses the amount of games lost by the players.
@@ -130,29 +98,34 @@ public class CycleLog extends bot.Events implements Command {
 
         for (int i = 0 ; i < players.size(); i++) {
             Member player = players.get(i);
+            String completionSymbol = ":white_check_mark: ";
+            if (errorsFound[i] == 1) {
+                completionSymbol = ":no_entry: ";
+            }
 
             if (playerTypes[i] == 0) {
-                playerList.append(player.getUser().getAsMention()).append("\n");
+                playerList.append(completionSymbol)
+                        .append(player.getUser().getAsMention())
+                        .append("\n");
             } else {
-                playerList.append(player.getUser().getAsMention())
+                playerList.append(completionSymbol)
+                        .append(player.getUser().getAsMention())
                         .append(" (new)\n");
             }
         }
 
         eb.setTitle("Summary of Report");
         eb.setColor(Color.GREEN);
-        eb.addField("Score", wins + " - " + losses, false);
-        eb.addField("Players Updated", playerList.toString(), false);
+        eb.addField("Score:", wins + " - " + losses, false);
+        eb.addField("Players Updated:", playerList.toString(), false);
 
         if (sum(errorsFound, errorsFound.length - 1) == 0) {
-            eb.addField("Status", "COMPLETE", false);
+            eb.addField("Status:", "COMPLETE", false);
         } else {
-            eb.addField("Status", "INCOMPLETE", false);
-            eb.addField("Errors",
-                    errorReport(players, playerTypes, errorsFound), true);
+            eb.addField("Status:", "INCOMPLETE", false);
         }
 
-        ORIGIN.sendMessage(eb.build()).queue();
+        ORIGIN.sendMessageEmbeds(eb.build()).queue();
     }
 
     /**
@@ -207,14 +180,8 @@ public class CycleLog extends bot.Events implements Command {
                             totalGamesWon, totalGamesLost)));
             link.updateRow(updateRange, sheetVals, newRow);
 
-//            sendToDiscord(String.format(
-//                    "%s's leaderboard stats were updated...",
-//                    player.getName()));
             return 0;
         } catch (IOException e) {
-//            sendToDiscord(String.format(
-//                    "User %s could not be updated...",
-//                    user.getUser().getAsTag()));
             return 1;
         }
     }
@@ -253,9 +220,9 @@ public class CycleLog extends bot.Events implements Command {
      */
     private int addUser(String[] args, GoogleAPI link, Member user,
                         String range, Values sheetVals, boolean notSub) {
-        String userTag = user.getUser().getAsTag();
-
         try {
+            String userTag = user.getUser().getAsTag();
+
             int cycleGamesPlayed = getGamesPlayed(args);
             int cycleGamesWon = getGamesWon(args);
 
@@ -278,16 +245,8 @@ public class CycleLog extends bot.Events implements Command {
                             cycleGamesLost, 0, 0)));
             link.appendRow(range, sheetVals, newRow);
 
-//            sendToDiscord(String.format(
-//                    "%s was added to the leaderboard. Be sure to"
-//                            + " extend the column formulas accordingly"
-//                            + " (They're set to zero right now)...",
-//                    userTag));
             return 0;
         } catch (IOException e) {
-//            sendToDiscord(String.format(
-//                    "New user %s could not be added...",
-//                    userTag));
             return 1;
         }
     }
@@ -331,16 +290,6 @@ public class CycleLog extends bot.Events implements Command {
             if (table == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
-
-//            for (Member user : users) {
-//                if (table.containsKey(user.getId())) {
-//                    updateUser(link, user, range, sheetVals, table, args);
-//                } else {
-//                    addUser(link, user, range, sheetVals, args);
-//                }
-//            }
-//
-//            sendToDiscord("The match report was processed.");
 
             int[] playerTypes = new int[users.size()];
             int[] errorsFound = new int[users.size()];

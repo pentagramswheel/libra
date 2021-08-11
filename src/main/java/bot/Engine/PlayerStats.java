@@ -1,5 +1,7 @@
 package bot.Engine;
 
+import bot.Events;
+
 import java.util.List;
 
 /**
@@ -12,13 +14,13 @@ import java.util.List;
 public class PlayerStats {
 
     /** Row position within the player's affiliated spreadsheet. */
-    private final String position;
+    private String position;
 
     /** The formal name of the player. */
-    private final String name;
+    private String name;
 
     /** The nickname of the player within the server. */
-    private final String nickname;
+    private String nickname;
 
     /** The amount of won sets the player has attained. */
     private int setWins;
@@ -34,14 +36,21 @@ public class PlayerStats {
 
     /** Construct the object by storing row stats. */
     public PlayerStats(String pos, List<Object> vals) {
-        position = pos;
-        name = vals.get(0).toString();
-        nickname = vals.get(1).toString();
-        if (vals.size() > 2) {
-            setWins = Integer.parseInt(vals.get(2).toString());
-            setLosses = Integer.parseInt(vals.get(3).toString());
-            gamesWon = Integer.parseInt(vals.get(6).toString());
-            gamesLost = Integer.parseInt(vals.get(7).toString());
+        try {
+            position = pos;
+            name = vals.get(0).toString();
+            nickname = vals.get(1).toString();
+            if (vals.size() > 2) {
+                setWins = Integer.parseInt(vals.get(2).toString());
+                setLosses = Integer.parseInt(vals.get(3).toString());
+                gamesWon = Integer.parseInt(vals.get(6).toString());
+                gamesLost = Integer.parseInt(vals.get(7).toString());
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Spreadsheet formatting problem detected.");
+            Events.ORIGIN.sendMessage(
+                    "***There seems to be a formatting problem within the "
+                            + "spreadsheet.*** Please fix it.").queue();
         }
     }
 

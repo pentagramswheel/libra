@@ -317,7 +317,7 @@ The `log` method logs a processed command message `msg` onto the console.
 
 ##### PlayerStats
 
-The `PlayerStats` method, the class's constructor, initializes the class's instance variables.
+The `PlayerStats` method, the class's constructor, initializes the class's instance variables. An error may be caught here if a formatting problem is found within the spreadsheet.
 
 ##### getPosition
 
@@ -370,10 +370,6 @@ The `cycleSetWon` method checks if a cycle set was won, given the amount of won 
 ##### sum
 
 The `sum` method returns the sum of all values within an array `arr`, by using recursion on each index `i`.
-
-##### errorReport
-
-The `errorReport` method retrieves a summary of all errors during the match report, given the players `players`, whether they were new or existing players `playerTypes`, and which players resulted in an error `errorsFound`.
 
 ##### sendReport
 

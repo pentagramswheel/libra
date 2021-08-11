@@ -31,8 +31,7 @@ public interface Command {
      * @param role the name of the role.
      */
     default Role getRole(String role) {
-        return Events.SERVER.getRolesByName(
-                role, true).get(0);
+        return Events.SERVER.getRolesByName(role, true).get(0);
     }
 
     /**

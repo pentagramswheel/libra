@@ -158,7 +158,7 @@ public class Events extends ListenerAdapter {
                 "Graduates players from LaunchPoint.",
                 false);
 
-        ORIGIN.sendMessage(eb.build()).queue();
+        ORIGIN.sendMessageEmbeds(eb.build()).queue();
     }
 
     /**
@@ -169,23 +169,23 @@ public class Events extends ListenerAdapter {
         eb.setTitle("Command Troubleshooting");
         eb.setColor(Color.GREEN);
         eb.addField("lpcycle, lpsub",
-                "If the match report isn't giving you feedback, it \n"
-                        + "is most likely due to the latest/bottommost row \n"
-                        + "in the spreadsheet missing information. For \n"
-                        + "example, one common problem is presetting or \n"
-                        + "overextending the formulas past the latest row.",
+                "If a match report is giving you an error message, \n"
+                        + "it is most likely due to a row in the spreadsheet \n"
+                        + "missing information. For example, one common \n"
+                        + "problem is presetting or overextending the \n"
+                        + "formulas past the bottommost row.",
                 false);
         eb.addField("lpadd, lpcoach, lpgrad",
                 "If the role for a player isn't showing up or seemingly \n"
-                        + "isn't being added, try *refreshing the roles* by going \n"
-                        + "to `Server Settings > User Management > Members`. \n"
+                        + "isn't being added, try *refreshing the roles* by opening \n"
+                        + "`Server Settings > User Management > Members`. \n"
                         + "A second layer of refreshing can be done by \n"
                         + "searching for a player's name in `... > Members`. \n"
-                        + "The roles should exist; this is currently a Discord \n"
-                        + "bug.",
+                        + "The roles should exist; this is currently a bug within \n"
+                        + "Discord.",
                 false);
 
-        ORIGIN.sendMessage(eb.build()).queue();
+        ORIGIN.sendMessageEmbeds(eb.build()).queue();
     }
 
     /**
