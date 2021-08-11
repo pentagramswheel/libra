@@ -8,6 +8,12 @@ bot/Engine/Command.java
  bot.Engine.Command
 bot/Events.java
  bot.Events
+bot/Main.java
+ bot.Main
+bot/Engine/Add.java
+ bot.Engine.Add
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
 bot/Engine/CycleUndo.java
  bot.Engine.CycleUndo
 bot/Engine/CycleLog.java
@@ -16,9 +22,3 @@ bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Engine/PlayerStats.java
  bot.Engine.PlayerStats
-bot/Engine/Graduate.java
- bot.Engine.Graduate
-bot/Engine/Add.java
- bot.Engine.Add
-bot/Main.java
- bot.Main

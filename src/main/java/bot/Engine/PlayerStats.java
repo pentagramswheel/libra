@@ -50,7 +50,7 @@ public class PlayerStats {
             System.out.println("Spreadsheet formatting problem detected.");
             Events.ORIGIN.sendMessage(
                     "***There seems to be a formatting problem within the "
-                            + "spreadsheet.*** Please fix it.").queue();
+                            + "spreadsheet.*** Please fix it!").queue();
         }
     }
 
