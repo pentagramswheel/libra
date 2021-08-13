@@ -122,6 +122,7 @@ public class CycleLog extends bot.Events implements Command {
         if (sum(errorsFound, errorsFound.length - 1) == 0) {
             eb.addField("Status:", "COMPLETE", false);
         } else {
+            eb.setColor(Color.RED);
             eb.addField("Status:", "INCOMPLETE", false);
         }
 
