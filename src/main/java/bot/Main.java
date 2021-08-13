@@ -26,9 +26,9 @@ public class Main {
         try {
             JDA jda = Events.BOT.build();
 
-            String funMessage = "lphelp | simping for @everyone";
+            String status = "lphelp | simping for @everyone";
             jda.getPresence().setActivity(Activity.playing(
-                    funMessage));
+                    status));
 
             Thread.sleep(3000);
             System.out.println("\nUSAGE LOG:\n==========");
