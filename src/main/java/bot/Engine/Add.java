@@ -35,7 +35,10 @@ public class Add extends bot.Events implements Command {
             user = SERVER.retrieveMemberById(user.getId()).complete();
         }
 
-        return "Welcome to LaunchPoint!";
+        String rulesChannel = SERVER.getTextChannelsByName(
+                        "lp-draft-rules", true).get(0).getAsMention();
+        return "Welcome to LaunchPoint! Make sure to read "
+                + rulesChannel + "!";
     }
 
     /**

@@ -6,19 +6,19 @@ bot/DiscordExample.java
  bot.DiscordExample
 bot/Engine/Command.java
  bot.Engine.Command
-bot/Engine/PlayerStats.java
- bot.Engine.PlayerStats
-bot/Engine/CycleLog.java
- bot.Engine.CycleLog
-bot/Engine/Add.java
- bot.Engine.Add
-bot/Engine/Graduate.java
- bot.Engine.Graduate
-bot/Tools/GoogleAPI.java
- bot.Tools.GoogleAPI
-bot/Events.java
- bot.Events
-bot/Engine/CycleUndo.java
- bot.Engine.CycleUndo
 bot/Main.java
  bot.Main
+bot/Engine/CycleUndo.java
+ bot.Engine.CycleUndo
+bot/Engine/CycleLog.java
+ bot.Engine.CycleLog
+bot/Tools/GoogleAPI.java
+ bot.Tools.GoogleAPI
+bot/Engine/PlayerStats.java
+ bot.Engine.PlayerStats
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
+bot/Events.java
+ bot.Events
+bot/Engine/Add.java
+ bot.Engine.Add

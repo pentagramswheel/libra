@@ -183,6 +183,8 @@ public class CycleLog extends bot.Events implements Command {
 
             return 0;
         } catch (IOException e) {
+            log("Existing cycle user error occurred with "
+                    + user.getUser().getAsTag());
             return 1;
         }
     }
@@ -248,6 +250,8 @@ public class CycleLog extends bot.Events implements Command {
 
             return 0;
         } catch (IOException e) {
+            log("New cycle user error occurred with "
+                    + user.getUser().getAsTag());
             return 1;
         }
     }
