@@ -90,7 +90,8 @@ public class Graduate extends bot.Events implements Command {
 
             if (user.equals(users.get(users.size() - 1))) {
                 String welcomeMessage = "Congratulations. We look forward to "
-                        + "seeing you outside of LaunchPoint.";
+                        + "seeing you in Maiden Voyage and outside of "
+                        + "LaunchPoint.";
                 listOfUsers.append(user.getUser().getAsTag())
                         .append("\n```")
                         .append(welcomeMessage);
