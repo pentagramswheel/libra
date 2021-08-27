@@ -157,6 +157,9 @@ public class Events extends ListenerAdapter {
         eb.addField("lpgrad [players]",
                 "Graduates players from LaunchPoint.",
                 false);
+        eb.addField("lpexit",
+                "Remotely shuts down the bot.",
+                false);
 
         ORIGIN.sendMessageEmbeds(eb.build()).queue();
     }
@@ -318,6 +321,15 @@ public class Events extends ListenerAdapter {
                 users = e.getMessage().getMentionedMembers();
                 if (pingArgsValid(args, users)) {
                     runGradCmd(users);
+                }
+                break;
+            case "LPEXIT":
+                try {
+                    ORIGIN.sendMessage("The bot has been terminated.").queue();
+                    Thread.sleep(3000);
+                    System.exit(0);
+                } catch(InterruptedException ie) {
+                    Thread.currentThread().interrupt();
                 }
                 break;
         }

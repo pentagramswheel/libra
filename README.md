@@ -17,6 +17,7 @@
   - [lpundo](#lpundo)
   - [lpadd](#lpadd)
   - [lpgrad](#lpgrad)
+  - [lpexit](#lpexit)
 * [Classes and Data Structures](#classes-and-data-structures)
   - [Main](#main)
   - [Discord](#discord)
@@ -73,6 +74,7 @@ java src/main/java/bot/Main.java
 | lpundo | Reverts the previous draft command, *once and only once*. |
 | lpadd | Gives roles to players in LaunchPoint. | 1. `users` - Discord users in the form of Discord pings. |
 | lpgrad | Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
+| lpexit | Remotely shuts down the bot, by terminating its program. |
 
 ----
 
