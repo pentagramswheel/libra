@@ -69,6 +69,7 @@ public class Graduate extends bot.Events implements Command {
             }
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The spreadsheet could not load.");
+            log("The spreadsheet could not load.");
         }
     }
 

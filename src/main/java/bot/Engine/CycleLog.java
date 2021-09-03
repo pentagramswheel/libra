@@ -316,6 +316,8 @@ public class CycleLog extends bot.Events implements Command {
             sendReport(gamesWon, gamesLost, users, playerTypes, errorsFound);
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The spreadsheet could not load.");
+            log("The spreadsheet could not load.");
+            return;
         }
 
         log(users.size() + " cycle match(es) were processed.");
