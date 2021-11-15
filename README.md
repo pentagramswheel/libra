@@ -192,10 +192,6 @@ The `gamesPlayersInvalid` method checks whether the parameter `games played` was
 
 The `cycleArgsValid` method checks whether the `lpcycle` or `lpsub` command, specified as the first item of `args`, was called with the correct format, given `users`.
 
-##### argAmtValid
-
-The `argAmtValid` method checks whether ping commands have the correct amount of parameters, given the original `args` and its `users`.
-
 ##### printHelpString
 
 The `printHelpString` method prints the script for the `lphelp` command.
@@ -268,7 +264,7 @@ The `updateRow` method updates a section `section` of the spreadsheet's values `
 
 #### Time (Tools)
 
-#### currentTime
+###### currentTime
 
 The `currentTime` method retrieves the current time of the running machine.
 
@@ -296,11 +292,11 @@ The `removeRole` method removes a role `role` to a user `user`.
 
 The `sendToDiscord` method sends a message `msg` to the origin channel.
 
-#### wait (DEFAULT)
+##### wait (DEFAULT)
 
 The `wait` method pauses the program for `ms` milliseconds.
 
-#### log (DEFAULT)
+##### log (DEFAULT)
 
 The `log` method logs a processed command message `msg` onto the console.
 
