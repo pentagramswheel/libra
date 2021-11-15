@@ -1,9 +1,9 @@
-bot/Tools/Time.java
- bot.Tools.Time
-bot/Main.java
- bot.Main
-bot/DiscordExample.java
- bot.DiscordExample
+bot/Events.java
+ bot.Events
+bot/Engine/CycleUndo.java
+ bot.Engine.CycleUndo
+bot/Engine/CycleLog.java
+ bot.Engine.CycleLog
 bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Tools/Command.java
@@ -16,9 +16,9 @@ bot/Discord.java
  bot.Discord
 bot/Engine/Add.java
  bot.Engine.Add
-bot/Engine/CycleLog.java
- bot.Engine.CycleLog
-bot/Events.java
- bot.Events
-bot/Engine/CycleUndo.java
- bot.Engine.CycleUndo
+bot/DiscordExample.java
+ bot.DiscordExample
+bot/Main.java
+ bot.Main
+bot/Tools/Time.java
+ bot.Tools.Time
