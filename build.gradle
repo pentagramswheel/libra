@@ -15,18 +15,15 @@ repositories {
 
 dependencies {
     /** Java Discord API (JDA) */
-    implementation 'net.dv8tion:JDA:4.3.0_307'
+    implementation 'net.dv8tion:JDA:4.3.0_346'
 
-    /** Update outdated reference to JDA WebSocket's SLF4J binding */
-    implementation 'org.slf4j:slf4j-simple:1.7.32'
+    /** Update outdated reference to JDA's SLF4J binding to a better message logger */
+    implementation("ch.qos.logback:logback-classic:1.2.3")
 
     /** Google Sheets API */
     implementation 'com.google.api-client:google-api-client:1.30.4'
     implementation 'com.google.oauth-client:google-oauth-client-jetty:1.30.6'
     implementation 'com.google.apis:google-api-services-sheets:v4-rev581-1.25.0'
-
-    /** Spring Boot Framework */
-//    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 /** Google Sheets API information */

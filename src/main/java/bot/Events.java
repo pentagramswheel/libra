@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -81,8 +82,10 @@ public class Events extends ListenerAdapter {
      */
     private boolean gamesPlayedInvalid(String[] args) {
         int totalArgs = args.length;
-        return Integer.parseInt(args[totalArgs - 2])
-                < Integer.parseInt(args[totalArgs - 1]);
+        int gamesPlayed = Integer.parseInt(args[totalArgs - 2]);
+        int gamesWon = Integer.parseInt(args[totalArgs - 1]);
+
+        return gamesPlayed < gamesWon;
     }
 
     /**
@@ -99,22 +102,6 @@ public class Events extends ListenerAdapter {
         } else if (gamesPlayedInvalid(args)) {
             ORIGIN.sendMessage("Incorrect amount of games played detected. "
                     + "See `lphelp` for more info.").queue();
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks if there are enough arguments for a, strictly, ping command.
-     * @param args the list of arguments to check.
-     * @param users the mentioned users.
-     * @return True if it does.
-     *         False if not.
-     */
-    private boolean pingArgsValid(String[] args, List<Member> users) {
-        if (users.size() != args.length - 1) {
-            printArgsError();
             return false;
         }
 
@@ -275,9 +262,9 @@ public class Events extends ListenerAdapter {
         args[0] = args[0].toUpperCase();
         String cmd = args[0];
 
-        List<Member> users;
         SERVER = e.getGuild();
         ORIGIN = e.getChannel();
+        List<Member> users = e.getMessage().getMentionedMembers();
 
         switch (cmd) {
             case "LPHELP":
@@ -298,9 +285,19 @@ public class Events extends ListenerAdapter {
                     ORIGIN.sendMessage(status).queue();
                 }
                 break;
+            case "LPADD":
+            case "LPCOACH":
+                if (argsValid(args, users.size() + 1)) {
+                    runAddCmd(users, args);
+                }
+                break;
+            case "LPGRAD":
+                if (argsValid(args, users.size() + 1)) {
+                    runGradCmd(users);
+                }
+                break;
             case "LPCYCLE":
             case "LPSUB":
-                users = e.getMessage().getMentionedMembers();
                 if (cycleArgsValid(args, users)) {
                     runCyclesCmd(users, args);
                 }
@@ -308,19 +305,6 @@ public class Events extends ListenerAdapter {
             case "LPUNDO":
                 if (argsValid(args, 1)) {
                     runUndoCmd();
-                }
-                break;
-            case "LPADD":
-            case "LPCOACH":
-                users = e.getMessage().getMentionedMembers();
-                if (pingArgsValid(args, users)) {
-                    runAddCmd(users, args);
-                }
-                break;
-            case "LPGRAD":
-                users = e.getMessage().getMentionedMembers();
-                if (pingArgsValid(args, users)) {
-                    runGradCmd(users);
                 }
                 break;
             case "LPEXIT":

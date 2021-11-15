@@ -1,6 +1,7 @@
 package bot.Engine;
 
 import bot.Discord;
+import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -73,7 +74,7 @@ public class CycleLog extends bot.Events implements Command {
      * @param i the index of the array to add.
      * @return the sum of the values within the array.
      */
-    private int sum(int[] arr, int i) {
+    public int sum(int[] arr, int i) {
         if (i == 0) {
             return arr[i];
         } else {
@@ -96,7 +97,7 @@ public class CycleLog extends bot.Events implements Command {
         EmbedBuilder eb = new EmbedBuilder();
         StringBuilder playerList = new StringBuilder();
 
-        for (int i = 0 ; i < players.size(); i++) {
+        for (int i = 0; i < players.size(); i++) {
             Member player = players.get(i);
             String completionSymbol = ":white_check_mark: ";
             if (errorsFound[i] == 1) {
@@ -134,52 +135,55 @@ public class CycleLog extends bot.Events implements Command {
      * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
-     * @param range the name of the spreadsheet section
-     * @param sheetVals the values of the spreadsheet section.
-     * @param table a map of all rows of the spreadsheet.
+     * @param tab the name of the spreadsheet section.
+     * @param spreadsheet the values of the spreadsheet section.
+     * @param data a map of all rows of the spreadsheet.
      * @param notSub a flag to check if the user is a sub or not.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
     private int updateUser(String[] args, GoogleAPI link, Member user,
-                           String range, Values sheetVals,
-                           TreeMap<Object, PlayerStats> table,
-                           boolean notSub) {
+                           String tab, Values spreadsheet,
+                           TreeMap<Object, PlayerStats> data, boolean notSub) {
         try {
-            PlayerStats player = table.get(user.getId());
+            String userTag = user.getUser().getAsTag();
+            PlayerStats player = data.get(user.getId());
 
-            int cycleGamesPlayed = getGamesPlayed(args);
-            int cycleGamesWon = getGamesWon(args);
+            int gamesPlayed = getGamesPlayed(args);
+            int gameWins = getGamesWon(args);
+            int gameLosses = gamesPlayed - gameWins;
 
             int setWins = player.getSetWins();
             int setLosses = player.getSetLosses();
-            int totalGamesWon = player.getGamesWon();
-            int totalGamesLost = player.getGamesLost();
+            int setsPlayed = setWins + setLosses;
+            double setWinrate = 0.0;
 
             if (notSub) {
-                if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
+                if (cycleSetWon(gameWins, gamesPlayed)) {
                     setWins++;
                 } else {
                     setLosses++;
                 }
-            }
-            totalGamesWon += cycleGamesWon;
-            totalGamesLost += cycleGamesPlayed - cycleGamesWon;
 
-            String updateRange = range + "!B" + player.getPosition()
-                    + ":E" + player.getPosition();
+                setsPlayed++;
+            }
+            if (setsPlayed > 0) {
+                setWinrate = (double) setWins / setsPlayed;
+            }
+
+            gameWins += player.getGamesWon();
+            gameLosses += player.getGamesLost();
+            gamesPlayed = gameWins + gameLosses;
+            double gameWinrate = (double) gameWins / gamesPlayed;
+
+            String updateRange = tab + "!B" + player.getPosition()
+                    + ":K" + player.getPosition();
             ValueRange newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
-                            player.getName(), player.getNickname(),
-                            setWins, setLosses)));
-            link.updateRow(updateRange, sheetVals, newRow);
-
-            updateRange = range + "!H" + player.getPosition()
-                    + ":I" + player.getPosition();
-            newRow = new ValueRange().setValues(
-                    Collections.singletonList(Arrays.asList(
-                            totalGamesWon, totalGamesLost)));
-            link.updateRow(updateRange, sheetVals, newRow);
+                            userTag, user.getEffectiveName(),
+                            setWins, setLosses, setsPlayed, setWinrate,
+                            gameWins, gameLosses, gamesPlayed, gameWinrate)));
+            link.updateRow(updateRange, spreadsheet, newRow);
 
             return 0;
         } catch (IOException e) {
@@ -195,16 +199,16 @@ public class CycleLog extends bot.Events implements Command {
      * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
-     * @param range the name of the spreadsheet section
-     * @param sheetVals the values of the spreadsheet section.
-     * @param table a map of all rows of the spreadsheet.
+     * @param tab the name of the spreadsheet section.
+     * @param spreadsheet the values of the spreadsheet section.
+     * @param data a map of all rows of the spreadsheet.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
     private int updateUser(String[] args, GoogleAPI link, Member user,
-                           String range, Values sheetVals,
-                           TreeMap<Object, PlayerStats> table) {
-        return updateUser(args, link, user, range, sheetVals, table,
+                           String tab, Values spreadsheet,
+                           TreeMap<Object, PlayerStats> data) {
+        return updateUser(args, link, user, tab, spreadsheet, data,
                 checkForSub(args));
     }
 
@@ -213,8 +217,8 @@ public class CycleLog extends bot.Events implements Command {
      * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
-     * @param range the name of the spreadsheet section
-     * @param sheetVals the values of the spreadsheet section.
+     * @param tab the name of the spreadsheet section.
+     * @param spreadsheet the values of the spreadsheet section.
      * @param notSub a flag to check if the user is a sub or not.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
@@ -222,31 +226,36 @@ public class CycleLog extends bot.Events implements Command {
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
     private int addUser(String[] args, GoogleAPI link, Member user,
-                        String range, Values sheetVals, boolean notSub) {
+                        String tab, Values spreadsheet, boolean notSub) {
         try {
             String userTag = user.getUser().getAsTag();
 
-            int cycleGamesPlayed = getGamesPlayed(args);
-            int cycleGamesWon = getGamesWon(args);
+            int gamesPlayed = getGamesPlayed(args);
+            int gameWins = getGamesWon(args);
+            int gameLosses = gamesPlayed - gameWins;
+            double gameWinrate = (double) gameWins / gamesPlayed;
 
             int setWins = 0;
             int setLosses = 0;
-
+            int setsPlayed = 0;
+            double setWinrate = 0.0;
             if (notSub) {
-                if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
+                if (cycleSetWon(gameWins, gamesPlayed)) {
                     setWins++;
                 } else {
                     setLosses++;
                 }
+
+                setsPlayed = 1;
+                setWinrate = (double) setWins / setsPlayed;
             }
-            int cycleGamesLost = cycleGamesPlayed - cycleGamesWon;
 
             ValueRange newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
                             user.getId(), userTag, user.getEffectiveName(),
-                            setWins, setLosses, 0, 0, cycleGamesWon,
-                            cycleGamesLost, 0, 0)));
-            link.appendRow(range, sheetVals, newRow);
+                            setWins, setLosses, setsPlayed, setWinrate,
+                            gameWins, gameLosses, gamesPlayed, gameWinrate)));
+            link.appendRow(tab, spreadsheet, newRow);
 
             return 0;
         } catch (IOException e) {
@@ -262,16 +271,17 @@ public class CycleLog extends bot.Events implements Command {
      * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
-     * @param range the name of the spreadsheet section
-     * @param sheetVals the values of the spreadsheet section.
+     * @param tab the name of the spreadsheet section.
+     * @param spreadsheet the values of the spreadsheet section.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      *
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
     private int addUser(String[] args, GoogleAPI link, Member user,
-                        String range, Values sheetVals) {
-        return addUser(args, link, user, range, sheetVals, checkForSub(args));
+                        String tab, Values spreadsheet) {
+        return addUser(args, link, user, tab, spreadsheet,
+                checkForSub(args));
     }
 
     /**
@@ -287,12 +297,12 @@ public class CycleLog extends bot.Events implements Command {
             GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
 
             // tab name of the spreadsheet
-            String range = "'Current Leaderboard'";
+            String tab = "'Current Leaderboard'";
 
-            Values sheetVals = link.getSheet().spreadsheets().values();
-            TreeMap<Object, PlayerStats> table = link.readSection(
-                    range, sheetVals);
-            if (table == null) {
+            Values spreadsheet = link.getSheet().spreadsheets().values();
+            TreeMap<Object, PlayerStats> data = link.readSection(
+                    tab, spreadsheet);
+            if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
 
@@ -300,13 +310,13 @@ public class CycleLog extends bot.Events implements Command {
             int[] errorsFound = new int[users.size()];
             for (int i = 0; i < users.size(); i++) {
                 Member user = users.get(i);
-                if (table.containsKey(user.getId())) {
+                if (data.containsKey(user.getId())) {
                     errorsFound[i] =
-                            updateUser(args, link, user, range, sheetVals, table);
+                            updateUser(args, link, user, tab, spreadsheet, data);
                     playerTypes[i] = 0;
                 } else {
                     errorsFound[i] =
-                            addUser(args, link, user, range, sheetVals);
+                            addUser(args, link, user, tab, spreadsheet);
                     playerTypes[i] = 1;
                 }
             }

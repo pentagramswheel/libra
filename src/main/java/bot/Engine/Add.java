@@ -1,5 +1,6 @@
 package bot.Engine;
 
+import bot.Tools.Command;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
@@ -27,13 +28,7 @@ public class Add extends bot.Events implements Command {
      * @return the entrance welcome message.
      */
     private String enter(Member user) {
-        while (!user.getRoles().contains(lpRole)) {
-            addRole(user, lpRole);
-
-            // prevent Discord rate limiting
-            wait (2000);
-            user = SERVER.retrieveMemberById(user.getId()).complete();
-        }
+        addRole(user, lpRole);
 
         String rulesChannel = SERVER.getTextChannelsByName(
                         "lp-draft-rules", true).get(0).getAsMention();
@@ -47,14 +42,7 @@ public class Add extends bot.Events implements Command {
      * @return the coach welcome message.
      */
     private String coach(Member user) {
-        while (!user.getRoles().contains(coachRole)) {
-            addRole(user, coachRole);
-
-            // prevent Discord rate limiting
-            wait (2000);
-            user = SERVER.retrieveMemberById(user.getId()).complete();
-        }
-
+        addRole(user, coachRole);
         return "Welcome to the LaunchPoint coaches!";
     }
 
@@ -84,7 +72,8 @@ public class Add extends bot.Events implements Command {
                     break;
             }
 
-            if (user.equals(users.get(users.size() - 1))) {
+            Member finalUser = users.get(users.size() - 1);
+            if (user.equals(finalUser)) {
                 listOfUsers.append(user.getUser().getAsTag())
                         .append("\n```")
                         .append(welcomeMessage);

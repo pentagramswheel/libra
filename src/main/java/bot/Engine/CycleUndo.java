@@ -1,23 +1,23 @@
 package bot.Engine;
 
 import bot.Discord;
+import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
+import java.awt.*;
 import java.io.File;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Collections;
-import java.util.Arrays;
-import java.util.TreeMap;
+import java.util.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.List;
 
 /**
  * @author  Wil Aquino
@@ -48,62 +48,108 @@ public class CycleUndo extends CycleLog implements Command {
     }
 
     /**
+     * Print the summary of the cycle revert.
+     * @param lastInput the previously inputted command.
+     * @param userArgs the amount of user arguments within the input.
+     * @param errorsFound array of errors found for each player, if any
+     *                    (0 if no errors occurred, 1 otherwise).
+     */
+    private void sendReport(String[] lastInput, int userArgs, int[] errorsFound) {
+        EmbedBuilder eb = new EmbedBuilder();
+        StringBuilder input = new StringBuilder();
+        StringBuilder playerList = new StringBuilder();
+
+        lastInput[0] = lastInput[0].toLowerCase();
+        for (int i = 0; i < lastInput.length; i++) {
+            String currentArg = lastInput[i];
+            input.append(currentArg).append(" ");
+
+            if (i > 0 && i < userArgs + 1) {
+                String completionSymbol = ":white_check_mark: ";
+                if (errorsFound[i - 1] == 1) {
+                    completionSymbol = ":no_entry: ";
+                }
+
+                playerList.append(completionSymbol)
+                        .append(currentArg).append("\n");
+            }
+        }
+
+        eb.setTitle("Summary of Revert");
+        eb.setColor(Color.WHITE);
+        eb.addField("Previous Input:", input.toString(), false);
+        eb.addField("Players Updated:", playerList.toString(), false);
+        if (sum(errorsFound, errorsFound.length - 1) == 0) {
+            eb.addField("Status:", "COMPLETE", false);
+        } else {
+            eb.setColor(Color.RED);
+            eb.addField("Status:", "INCOMPLETE", false);
+        }
+
+        ORIGIN.sendMessageEmbeds(eb.build()).queue();
+    }
+
+    /**
      * Updates a user's stats within a spreadsheet.
      * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
-     * @param range the name of the spreadsheet section
-     * @param sheetVals the values of the spreadsheet section.
-     * @param table a map of all rows of the spreadsheet.
+     * @param tab the name of the spreadsheet section
+     * @param spreadsheet the values of the spreadsheet section.
+     * @param data a map of all rows of the spreadsheet.
      * @param notSub a flag to check if the user is a sub or not.
+     * @return 0 if the player could be found in the spreadsheet.
+     *         1 otherwise.
      */
-    private void undoUser(String[] args, GoogleAPI link, String user,
-                          String range, Values sheetVals,
-                          TreeMap<Object, PlayerStats> table, boolean notSub) {
+    private int undoUser(String[] args, GoogleAPI link, String user,
+                          String tab, Values spreadsheet,
+                          TreeMap<Object, PlayerStats> data, boolean notSub) {
         try {
             String userID = user.substring(3, user.length() - 1);
-            PlayerStats player = table.get(userID);
+            PlayerStats player = data.get(userID);
 
-            int cycleGamesPlayed = getGamesPlayed(args);
-            int cycleGamesWon = getGamesWon(args);
+            int gamesPlayed = getGamesPlayed(args);
+            int gameWins = getGamesWon(args);
+            int gameLosses = gamesPlayed - gameWins;
+            double gameWinrate = 0.0;
 
             int setWins = player.getSetWins();
             int setLosses = player.getSetLosses();
-            int gamesWon = player.getGamesWon();
-            int gamesLost = player.getGamesLost();
+            int setsPlayed = setWins + setLosses;
+            double setWinrate = 0.0;
 
             if (notSub) {
-                if (cycleSetWon(cycleGamesWon, cycleGamesPlayed)) {
+                if (cycleSetWon(gameWins, gamesPlayed)) {
                     setWins--;
                 } else {
                     setLosses--;
                 }
-            }
-            gamesWon -= cycleGamesWon;
-            gamesLost -= cycleGamesPlayed - cycleGamesWon;
 
-            String updateRange = range + "!B" + player.getPosition()
-                    + ":E" + player.getPosition();
+                setsPlayed--;
+            }
+            if (setsPlayed > 0) {
+                setWinrate = (double) setWins / setsPlayed;
+            }
+
+            gameWins = player.getGamesWon() - gameWins;
+            gameLosses = player.getGamesLost() - gameLosses;
+            gamesPlayed = gameWins + gameLosses;
+            if (gamesPlayed > 0) {
+                gameWinrate = (double) gameWins / gamesPlayed;
+            }
+
+            String updateRange = tab + "!B" + player.getPosition()
+                    + ":K" + player.getPosition();
             ValueRange newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
                             player.getName(), player.getNickname(),
-                            setWins, setLosses)));
-            link.updateRow(updateRange, sheetVals, newRow);
+                            setWins, setLosses, setsPlayed, setWinrate,
+                            gameWins, gameLosses, gamesPlayed, gameWinrate)));
+            link.updateRow(updateRange, spreadsheet, newRow);
 
-            updateRange = range + "!H" + player.getPosition()
-                    + ":I" + player.getPosition();
-            newRow = new ValueRange().setValues(
-                    Collections.singletonList(Arrays.asList(
-                            gamesWon, gamesLost)));
-            link.updateRow(updateRange, sheetVals, newRow);
-
-            sendToDiscord(String.format(
-                    "%s's leaderboard stats were reverted...",
-                    player.getName()));
+            return 0;
         } catch (IOException e) {
-            sendToDiscord(String.format(
-                    "User %s could not be reverted...",
-                    user));
+            return 1;
         }
     }
 
@@ -113,14 +159,17 @@ public class CycleUndo extends CycleLog implements Command {
      * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
-     * @param range the name of the spreadsheet section
-     * @param sheetVals the values of the spreadsheet section.
-     * @param table a map of all rows of the spreadsheet.
+     * @param tab the name of the spreadsheet section
+     * @param spreadsheet the values of the spreadsheet section.
+     * @param data a map of all rows of the spreadsheet.
+     * @return 0 if the player could be found in the spreadsheet.
+     *         1 otherwise.
      */
-    private void undoUser(String[] args, GoogleAPI link, String user,
-                          String range, Values sheetVals,
-                          TreeMap<Object, PlayerStats> table) {
-        undoUser(args, link, user, range, sheetVals, table, checkForSub(args));
+    private int undoUser(String[] args, GoogleAPI link, String user,
+                          String tab, Values spreadsheet,
+                          TreeMap<Object, PlayerStats> data) {
+        return undoUser(args, link, user, tab, spreadsheet, data,
+                checkForSub(args));
     }
 
     /**
@@ -136,12 +185,12 @@ public class CycleUndo extends CycleLog implements Command {
             GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
 
             // tab name of the spreadsheet
-            String range = "'Current Leaderboard'";
+            String tab = "'Current Leaderboard'";
 
-            Values sheetVals = link.getSheet().spreadsheets().values();
-            TreeMap<Object, PlayerStats> table = link.readSection(
-                    range, sheetVals);
-            if (table == null) {
+            Values spreadsheet = link.getSheet().spreadsheets().values();
+            TreeMap<Object, PlayerStats> data = link.readSection(
+                    tab, spreadsheet);
+            if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
 
@@ -156,12 +205,14 @@ public class CycleUndo extends CycleLog implements Command {
             String[] messageArgs = lastMessage.split("\\s+", 7);
             int userArgs = messageArgs.length - 3;
 
-            for (int i = 1; i < 1 + userArgs; i++) {
-                undoUser(messageArgs, link, messageArgs[i], range, sheetVals,
-                        table);
+            int[] errorsFound = new int[userArgs];
+            for (int i = 1; i < userArgs + 1; i++) {
+                errorsFound[i - 1] = undoUser(messageArgs, link,
+                        messageArgs[i], tab, spreadsheet, data);
             }
 
-            sendToDiscord("The previous match report was reverted.");
+//            sendToDiscord("The revert was processed.");
+            sendReport(messageArgs, userArgs, errorsFound);
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The save could not load.");
         }

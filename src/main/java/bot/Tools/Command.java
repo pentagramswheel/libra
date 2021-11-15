@@ -1,4 +1,4 @@
-package bot.Engine;
+package bot.Tools;
 
 import bot.Events;
 import bot.Tools.Time;
@@ -40,7 +40,13 @@ public interface Command {
      * @param role the role to add.
      */
     default void addRole(Member user, Role role) {
-        Events.SERVER.addRoleToMember(user.getId(), role).queue();
+        while (!user.getRoles().contains(role)) {
+            Events.SERVER.addRoleToMember(user.getId(), role).queue();
+
+            // prevent Discord rate limiting
+            wait(2000);
+            user = Events.SERVER.retrieveMemberById(user.getId()).complete();
+        }
     }
 
     /**
@@ -49,7 +55,13 @@ public interface Command {
      * @param role the role to remove.
      */
     default void removeRole(Member user, Role role) {
-        Events.SERVER.removeRoleFromMember(user.getId(), role).queue();
+        while (user.getRoles().contains(role)) {
+            Events.SERVER.removeRoleFromMember(user.getId(), role).queue();
+
+            // prevent Discord rate limiting
+            wait(2000);
+            user = Events.SERVER.retrieveMemberById(user.getId()).complete();
+        }
     }
 
     /**

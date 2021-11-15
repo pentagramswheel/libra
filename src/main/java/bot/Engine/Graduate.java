@@ -1,6 +1,7 @@
 package bot.Engine;
 
 import bot.Discord;
+import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
 
 import net.dv8tion.jda.api.entities.Member;
@@ -37,35 +38,28 @@ public class Graduate extends bot.Events implements Command {
      * @param user the user to graduate.
      */
     private void graduate(Member user) {
-        while (user.getRoles().contains(lpRole)
-                || !user.getRoles().contains(gradRole)) {
-            removeRole(user, lpRole);
-            addRole(user, gradRole);
-
-            // prevent Discord rate limiting
-            wait (2000);
-            user = SERVER.retrieveMemberById(user.getId()).complete();
-        }
+        removeRole(user, lpRole);
+        addRole(user, gradRole);
 
         try {
             GoogleAPI link = new GoogleAPI(Discord.getGradSheetID());
-            String range = "'Graduates'";
-            Values tableVals = link.getSheet().spreadsheets().values();
-            TreeMap<Object, PlayerStats> table = link.readSection(
-                    range, tableVals);
+            String tab = "'Graduates'";
+            Values spreadsheet = link.getSheet().spreadsheets().values();
+            TreeMap<Object, PlayerStats> data = link.readSection(
+                    tab, spreadsheet);
 
-            if (table == null) {
+            if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
-            } else if (table.containsKey(user.getId())) {
+            } else if (data.containsKey(user.getId())) {
                 sendToDiscord(String.format(
                         "%s has already graduated from LaunchPoint.",
                         user.getUser().getAsTag()));
             } else {
-                ValueRange appendName = new ValueRange().setValues(
+                ValueRange newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
                             user.getId(), user.getUser().getAsTag(),
                             user.getEffectiveName())));
-                link.appendRow(range, tableVals, appendName);
+                link.appendRow(tab, spreadsheet, newRow);
             }
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The spreadsheet could not load.");
@@ -89,7 +83,8 @@ public class Graduate extends bot.Events implements Command {
         for (Member user : users) {
             graduate(user);
 
-            if (user.equals(users.get(users.size() - 1))) {
+            Member finalUser = users.get(users.size() - 1);
+            if (user.equals(finalUser)) {
                 String welcomeMessage = "Congratulations. We look forward to "
                         + "seeing you in Maiden Voyage and outside of "
                         + "LaunchPoint.";
