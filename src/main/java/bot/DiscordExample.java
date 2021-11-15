@@ -7,16 +7,16 @@ package bot;
  * Module:  DiscordExample.java
  * Purpose: A template for the class Discord.java.
  */
-public class DiscordExample {
+public final class DiscordExample {
 
     /** LaunchPoint bot token. */
-    private final static String botToken = "token";
+    private final static String botToken = "TOKEN";
 
     /** LaunchPoint graduates Google Sheets ID. */
-    private final static String gradSheetID = "id";
+    private final static String gradSheetID = "ID";
 
     /** LaunchPoint Cycles Google Sheets ID. */
-    private final static String cyclesSheetID = "id";
+    private final static String cyclesSheetID = "ID";
 
     /**
      * Retrieves the bot's token.
