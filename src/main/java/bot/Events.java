@@ -311,6 +311,7 @@ public class Events extends ListenerAdapter {
                 try {
                     ORIGIN.sendMessage("The bot has been terminated.").queue();
                     Thread.sleep(3000);
+                    System.out.println("----------");
                     System.exit(0);
                 } catch(InterruptedException ie) {
                     Thread.currentThread().interrupt();

@@ -32,7 +32,7 @@ public class Main {
             jda.getPresence().setActivity(Activity.playing(
                     status));
 
-            Thread.sleep(3000);
+            Thread.sleep(4000);
             System.out.println("\nUSAGE LOG:\n==========");
         } catch (LoginException le) {
             le.printStackTrace();
