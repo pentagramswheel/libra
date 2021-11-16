@@ -1,6 +1,7 @@
-package bot.Engine;
+package bot.Engine.Drafts;
 
 import bot.Discord;
+import bot.Engine.PlayerStats;
 import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
 
@@ -23,10 +24,10 @@ import java.util.List;
  * @author  Wil Aquino
  * Date:    June 1, 2021
  * Project: LaunchPoint Bot
- * Module:  CycleUndo.java
+ * Module:  Undo.java
  * Purpose: Reverts the Cycle spreadsheet to the previous state.
  */
-public class CycleUndo extends CycleLog implements Command {
+public class Undo extends Log implements Command {
 
     /**
      * Retrieves the previous "lpcycle" or "lpsub" command.
@@ -102,8 +103,8 @@ public class CycleUndo extends CycleLog implements Command {
      *         1 otherwise.
      */
     private int undoUser(String[] args, GoogleAPI link, String user,
-                          String tab, Values spreadsheet,
-                          TreeMap<Object, PlayerStats> data, boolean notSub) {
+                         String tab, Values spreadsheet,
+                         TreeMap<Object, PlayerStats> data, boolean notSub) {
         try {
             String userID = user.substring(3, user.length() - 1);
             PlayerStats player = data.get(userID);
@@ -138,8 +139,9 @@ public class CycleUndo extends CycleLog implements Command {
                 gameWinrate = (double) gameWins / gamesPlayed;
             }
 
-            String updateRange = tab + "!B" + player.getPosition()
-                    + ":K" + player.getPosition();
+            String updateRange = tab + "!B" + player.getPositionLP()
+                    + ":K" + player.getPositionLP();
+
             ValueRange newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
                             player.getName(), player.getNickname(),
@@ -179,8 +181,8 @@ public class CycleUndo extends CycleLog implements Command {
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel,
-                       List<Member> users, String[] args) {
+    public void runCmd(MessageChannel outChannel, List<Member> users,
+                       String[] args) {
         try {
             GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
 
@@ -211,7 +213,6 @@ public class CycleUndo extends CycleLog implements Command {
                         messageArgs[i], tab, spreadsheet, data);
             }
 
-//            sendToDiscord("The revert was processed.");
             sendReport(messageArgs, userArgs, errorsFound);
         } catch (IOException | GeneralSecurityException e) {
             sendToDiscord("The save could not load.");

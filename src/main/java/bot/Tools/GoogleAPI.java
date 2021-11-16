@@ -1,5 +1,6 @@
 package bot.Tools;
 
+import bot.Main;
 import bot.Engine.Graduate;
 import bot.Engine.PlayerStats;
 import bot.Events;
@@ -38,9 +39,6 @@ public class GoogleAPI {
     /** Field for Google Sheets SDK. */
     private final Sheets sheetsService;
 
-    /** Name of the application. */
-    private static final String APPLICATION_NAME = "LaunchPoint Simp";
-
     /** ID of the Google Sheet being used. */
     private final String spreadsheetID;
 
@@ -48,8 +46,6 @@ public class GoogleAPI {
      * Constructs a connection with a spreadsheet based on a provided
      * Google Sheet's ID.
      * @param id the ID of the Google Sheet.
-     * @throws IOException ...
-     * @throws GeneralSecurityException ...
      */
     public GoogleAPI(String id) throws IOException, GeneralSecurityException {
         sheetsService = getSheetsService();
@@ -59,9 +55,6 @@ public class GoogleAPI {
     /**
      * Creates an OAuth exchange to grant application access to Google Sheets.
      * @return the authorization credential.
-     * @throws IOException ...
-     * @throws GeneralSecurityException ...
-     * @source Twilio on YouTube.
      */
     private Credential authorize()
             throws IOException, GeneralSecurityException {
@@ -72,6 +65,8 @@ public class GoogleAPI {
 
         InputStream in = Graduate.class.getResourceAsStream(
                 "/credentials.json");
+
+        assert in != null;
         GoogleClientSecrets clientSecrets = GoogleClientSecrets
                 .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(in));
 
@@ -93,8 +88,6 @@ public class GoogleAPI {
     /**
      * Constructs the Google Sheets service link.
      * @return the service link.
-     * @throws IOException ...
-     * @throws GeneralSecurityException ...
      */
     private Sheets getSheetsService()
             throws IOException, GeneralSecurityException {
@@ -103,7 +96,7 @@ public class GoogleAPI {
                 GoogleNetHttpTransport.newTrustedTransport(),
                 JacksonFactory.getDefaultInstance(),
                 credential).setApplicationName(
-                APPLICATION_NAME).build();
+                Main.NAME).build();
     }
 
     /**
@@ -124,19 +117,19 @@ public class GoogleAPI {
 
     /**
      * Retrieves a table section of the spreadsheet.
-     * @param section the table section of the spreadsheet to get.
-     * @param vals the values represenatation of the spreadsheet.
+     * @param tab the name of the spreadsheet section.
+     * @param spreadsheet the values of the spreadsheet section.
      * @return said section as a map, indexed by Discord ID.
      *         null otherwise.
      */
     public TreeMap<Object, PlayerStats> readSection(
-            String section, Values vals) {
+            String tab, Values spreadsheet) {
         try {
-            ValueRange response = vals.get(
-                    getSpreadsheetID(), section).execute();
-            List<List<Object>> values = response.getValues();
+            ValueRange spreadSheetTable = spreadsheet.get(
+                    getSpreadsheetID(), tab).execute();
+            List<List<Object>> values = spreadSheetTable.getValues();
 
-            TreeMap<Object, PlayerStats> table = new TreeMap<>();
+            TreeMap<Object, PlayerStats> data = new TreeMap<>();
             if (values != null && !values.isEmpty()) {
                 for (int i = 1; i < values.size(); i++) {
                     List<Object> row = values.get(i);
@@ -144,9 +137,10 @@ public class GoogleAPI {
                     PlayerStats rowStats = new PlayerStats(
                             Integer.toString(i + 1), row);
 
-                    table.put(id, rowStats);
+                    data.put(id, rowStats);
                 }
-                return table;
+
+                return data;
             }
         } catch (IOException e) {
             Events.ORIGIN.sendMessage(
@@ -158,14 +152,13 @@ public class GoogleAPI {
 
     /**
      * Appends a row to the end of the spreadsheet section.
-     * @param section the table section of the spreadsheet to get.
-     * @param vals the values represenatation of the spreadsheet.
+     * @param tab the name of the spreadsheet section.
+     * @param spreadsheet the values of the spreadsheet section.
      * @param row the row of values to append.
-     * @source Twilio on YouTube.
      */
-    public void appendRow(String section, Values vals, ValueRange row)
+    public void appendRow(String tab, Values spreadsheet, ValueRange row)
         throws IOException {
-        vals.append(getSpreadsheetID(), section, row)
+        spreadsheet.append(getSpreadsheetID(), tab, row)
                 .setValueInputOption("USER_ENTERED")
                 .setInsertDataOption("INSERT_ROWS")
                 .setIncludeValuesInResponse(true).execute();
@@ -173,14 +166,13 @@ public class GoogleAPI {
 
     /**
      * Updates a row to the end of the spreadsheet section.
-     * @param section the table section of the spreadsheet to get.
-     * @param vals the values represenatation of the spreadsheet.
+     * @param tab the name of the spreadsheet section.
+     * @param spreadsheet the values of the spreadsheet section.
      * @param row the row of values to update to.
-     * @source Twilio on YouTube.
      */
-    public void updateRow(String section, Values vals, ValueRange row)
+    public void updateRow(String tab, Values spreadsheet, ValueRange row)
             throws IOException {
-        vals.update(getSpreadsheetID(), section, row)
+        spreadsheet.update(getSpreadsheetID(), tab, row)
                 .setValueInputOption("USER_ENTERED")
                 .setIncludeValuesInResponse(true).execute();
     }

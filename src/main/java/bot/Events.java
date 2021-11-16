@@ -1,23 +1,14 @@
 package bot;
 
-import bot.Engine.Add;
-import bot.Engine.CycleLog;
-import bot.Engine.CycleUndo;
-import bot.Engine.Graduate;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.awt.Color;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -179,78 +170,6 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Saves a string to the undo file.
-     * @param args the contents to save.
-     */
-    private void saveContents(String[] args) {
-        File save = new File("load.txt");
-        try {
-            save.createNewFile();
-            FileWriter fw = new FileWriter(save);
-
-            if (args.length == 1) {
-                fw.write(args[0]);
-            } else {
-                StringBuilder contents = new StringBuilder();
-                contents.append(args[0].toUpperCase()).append(" ");
-                for (int i = 1; i < args.length - 1; i++) {
-                    contents.append(args[i]).append(" ");
-                }
-                contents.append(args[args.length - 1]);
-
-                fw.write(contents.toString());
-            }
-
-            fw.close();
-        } catch (IOException ioe) {
-            ORIGIN.sendMessage(
-                    "The undo file could not be loaded.").queue();
-            ioe.printStackTrace();
-        }
-    }
-
-    /**
-     * Runs the "lpwin" or "lplose" command.
-     * @param players the mentioned players.
-     * @param args the arguments of the command.
-     */
-    private void runCyclesCmd(List<Member> players, String[] args) {
-        CycleLog cycle = new CycleLog();
-        cycle.runCmd(null, players, args);
-
-        saveContents(args);
-    }
-
-    /**
-     * Runs the `lpundo` command.
-     */
-    private void runUndoCmd() {
-        CycleUndo undo = new CycleUndo();
-        undo.runCmd(null, null, null);
-
-        saveContents(new String[]{"REDACTED"});
-    }
-
-    /**
-     * Runs the "lpadd" or "lpcoach" command.
-     * @param players the mentioned players.
-     * @param args the arguments of the command.
-     */
-    private void runAddCmd(List<Member> players, String[] args) {
-        Add newcomer = new Add();
-        newcomer.runCmd(null, players, args);
-    }
-
-    /**
-     * Runs the "lpgrad" command.
-     * @param players the mentioned players.
-     */
-    private void runGradCmd(List<Member> players) {
-        Graduate grad = new Graduate();
-        grad.runCmd(null, players, null);
-    }
-
-    /**
      * Runs one of the bot's commands.
      * @param e the command to analyze.
      */
@@ -288,34 +207,27 @@ public class Events extends ListenerAdapter {
             case "LPADD":
             case "LPCOACH":
                 if (argsValid(args, users.size() + 1)) {
-                    runAddCmd(users, args);
+                    Commands.runAddCmd(users, args);
                 }
                 break;
             case "LPGRAD":
                 if (argsValid(args, users.size() + 1)) {
-                    runGradCmd(users);
+                    Commands.runGradCmd(users);
                 }
                 break;
             case "LPCYCLE":
             case "LPSUB":
                 if (cycleArgsValid(args, users)) {
-                    runCyclesCmd(users, args);
+                    Commands.runCyclesCmd(users, args);
                 }
                 break;
             case "LPUNDO":
                 if (argsValid(args, 1)) {
-                    runUndoCmd();
+                    Commands.runUndoCmd();
                 }
                 break;
             case "LPEXIT":
-                try {
-                    ORIGIN.sendMessage("The bot has been terminated.").queue();
-                    Thread.sleep(3000);
-                    System.out.println("----------");
-                    System.exit(0);
-                } catch(InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                }
+                Commands.runExitCmd();
                 break;
         }
     }

@@ -1,6 +1,7 @@
-package bot.Engine;
+package bot.Engine.Drafts;
 
 import bot.Discord;
+import bot.Engine.PlayerStats;
 import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
 
@@ -23,10 +24,10 @@ import java.security.GeneralSecurityException;
  * @author  Wil Aquino
  * Date:    February 17, 2021
  * Project: LaunchPoint Bot
- * Module:  CycleLog.java
+ * Module:  Log.java
  * Purpose: Logs cycle information via command.
  */
-public class CycleLog extends bot.Events implements Command {
+public class Log extends bot.Events implements Command {
 
     /**
      * Checks if this it the lpcycle or lpsub command.
@@ -176,8 +177,9 @@ public class CycleLog extends bot.Events implements Command {
             gamesPlayed = gameWins + gameLosses;
             double gameWinrate = (double) gameWins / gamesPlayed;
 
-            String updateRange = tab + "!B" + player.getPosition()
-                    + ":K" + player.getPosition();
+            String updateRange = tab + "!B" + player.getPositionLP()
+                    + ":K" + player.getPositionLP();
+
             ValueRange newRow = new ValueRange().setValues(
                     Collections.singletonList(Arrays.asList(
                             userTag, user.getEffectiveName(),
@@ -291,8 +293,8 @@ public class CycleLog extends bot.Events implements Command {
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel,
-                       List<Member> users, String[] args) {
+    public void runCmd(MessageChannel outChannel, List<Member> users,
+                       String[] args) {
         try {
             GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
 

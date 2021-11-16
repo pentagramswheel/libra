@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class PlayerStats {
 
-    /** Row position within the player's affiliated spreadsheet. */
-    private String position;
+    /** Row position within the LaunchPoint spreadsheet. */
+    private String positionLP;
 
     /** The formal name of the player. */
     private String name;
@@ -37,7 +37,7 @@ public class PlayerStats {
     /** Construct the object by storing row stats. */
     public PlayerStats(String pos, List<Object> vals) {
         try {
-            position = pos;
+            positionLP = pos;
             name = vals.get(0).toString();
             nickname = vals.get(1).toString();
             if (vals.size() > 2) {
@@ -55,11 +55,12 @@ public class PlayerStats {
     }
 
     /**
-     * Retrieve the row number of the player's stats.
+     * Retrieve the row number of the player's stats
+     * in the LaunchPoint spreadsheet.
      * @return said row.
      */
-    public String getPosition() {
-        return position;
+    public String getPositionLP() {
+        return positionLP;
     }
 
     /**

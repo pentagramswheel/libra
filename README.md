@@ -13,24 +13,32 @@
   - [Main](#main)
   - [Discord](#discord)
   - [Events](#events)
-  - [GoogleAPI (Tools)](#googleapi-tools)
-  - [Time (Tools)](#time-tools)
-  - [Command (Engine)](#command-engine)
-  - [Add (Engine)](#add-engine)
-  - [Graduate (Engine)](#graduate-engine)
-  - [PlayerStats (Engine)](#playerstats-engine)
-  - [CycleLog (Engine)](#cyclelog-engine)
-  - [CycleUndo (Engine)](#cycleundo-engine)
+  - [Commands](#commands)
+  + [Tools](#tools)
+    - [Command](#command)
+    - [GoogleAPI](#googleapi)
+    - [Time](#time)
+  + [Engine](#engine)
+    - [Add](#add)
+    - [Graduate](#graduate)
+    - [PlayerStats](#playerstats)
+  + [Drafts (Engine)](#drafts-engine)
+    - [Log](#log)
+    - [Undo](#undo)
 * [Algorithms](#algorithms)
   - [Events](#events-1)
-  - [GoogleAPI (Tools)](#googleapi-tools-1)
-  - [Time (Tools)](#time-tools-1)
-  - [Command (Engine)](#command-engine-1)
-  - [Add (Engine)](#add-engine-1)
-  - [Graduate (Engine)](#graduate-engine-1)
-  - [PlayerStats (Engine)](#playerstats-engine-1)
-  - [CycleLog (Engine)](#cyclelog-engine-1)
-  - [CycleUndo (Engine)](#cycleundo-engine-1)
+  - [Commands](#commands-1)
+  + [Tools](#tools-1)
+    - [Command](#command-1)
+    - [GoogleAPI](#googleapi-1)
+    - [Time](#time-1)
+  + [Engine](#engine-1)
+    - [Add](#add-1)
+    - [Graduate](#graduate-1)
+    - [PlayerStats](#playerstats-1)
+  + [Drafts (Engine)](#drafts-engine-1)
+    - [Log](#log-1)
+    - [Undo](#undo-1)
 * [Persistence](#persistence)
 * [Licensing and Rights](#licensing-and-rights)
 
@@ -96,7 +104,21 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 
 ----
 
-#### GoogleAPI (Tools)
+#### Commands
+
+The class which formally runs the commands.
+
+----
+
+### Tools
+
+#### Command
+
+An interface outlining the format of the bot's command implementations.
+
+----
+
+#### GoogleAPI
 
 A class which navigates a Google Sheet (spreadsheet).
 
@@ -107,19 +129,15 @@ A class which navigates a Google Sheet (spreadsheet).
 
 ----
 
-#### Time (Tools)
+#### Time
 
 A class which retrieves the system's time.
 
 ----
 
-#### Command (Engine)
+### Engine
 
-An interface outlining the format of the bot's command implementations.
-
-----
-
-#### Add (Engine)
+#### Add
 
 A class which gives roles to users in LaunchPoint, processing the command `lpadd`.
 
@@ -129,7 +147,7 @@ A class which gives roles to users in LaunchPoint, processing the command `lpadd
 
 ----
 
-#### Graduate (Engine)
+#### Graduate
 
 A class which graduates a user from LaunchPoint, processing the command `lpgrad`, granting the associated roles.
 
@@ -139,12 +157,12 @@ A class which graduates a user from LaunchPoint, processing the command `lpgrad`
 
 ----
 
-#### PlayerStats (Engine)
+#### PlayerStats
 
 A class for storing information about a Discord user.
 
 ###### Instance Variables
-1. `String position` - the row position of the user's data.
+1. `String positionLP` - the row position of the user's data within the LaunchPoint spreadsheet.
 2. `String name` - the user's Discord tag.
 3. `String nickname` - the user's nickname on the server.
 4. `int setWins` - the user's amount of won sets.
@@ -154,13 +172,15 @@ A class for storing information about a Discord user.
 
 ----
 
-#### CycleLog (Engine)
+### Drafts (Engine)
+
+#### Log
 
 A class which updates the LaunchPoint Cycles stats of a user, processing the command `lpcycle`.
 
 ----
 
-#### CycleUndo (Engine)
+#### Undo
 
 A class which reverts LaunchPoint Cycle commands, processing the command `lpundo`.
 
@@ -200,6 +220,14 @@ The `printHelpString` method prints the script for the `lphelp` command.
 
 The `printTroubleshootString` method prints the script for the `lphelp?` command.
 
+###### onMessageReceived
+
+The `onMessageReceieved` method parses through user input `e`, checking if a command was used, and executing based on the command, if any.
+
+----
+
+#### Commands
+
 ###### saveContents
 
 The `saveContents` method saves the user input `args` to the `load.txt` file.
@@ -220,13 +248,15 @@ The `runAddCmd` method formally runs the `lpadd` or `lpcoach` command, loading u
 
 The `runGradCmd` method formally runs the `lpgrad` command, loading users `players`.
 
-###### onMessageReceived
+###### runExitCmd
 
-The `onMessageReceieved` method parses through user input `e`, checking if a command was used, and executing based on the command, if any.
+The `runExitCmd` method shuts down the bot.
 
 ----
 
-#### GoogleAPI (Tools)
+### Tools
+
+#### GoogleAPI
 
 ###### GoogleAPI
 
@@ -250,19 +280,19 @@ The `getSpreadSheetID` method retrieves the spreadsheet's affiliated ID.
 
 ###### readSection
 
-The `readSection` method reads a section `section` of values `vals` from the spreadsheet and organizes it into a map, in the form of a red-black tree, indexing by Discord user ID.
+The `readSection` method reads a section `tab` of the spreadsheet `spreadsheet` and organizes it into a map, in the form of a red-black tree, indexing by Discord user ID.
 
 ###### appendRow
 
-The `appendRow` method appends a row `row` to at the end of the values `vals` of a section `section` of the spreadsheet.
+The `appendRow` method appends a row `row` to at the end of the spreadsheet `spreadsheet` of its section `tab`.
 
 ###### updateRow
 
-The `updateRow` method updates a section `section` of the spreadsheet's values `vals` to be the given row `row`.
+The `updateRow` method updates a section `tab` of the spreadsheet `spreadsheet` to be the given row `row`.
 
 ----
 
-#### Time (Tools)
+#### Time
 
 ###### currentTime
 
@@ -270,7 +300,9 @@ The `currentTime` method retrieves the current time of the running machine.
 
 ----
 
-#### Command (Engine)
+### Engine
+
+#### Command
 
 ###### runCmd
 
@@ -302,7 +334,7 @@ The `log` method logs a processed command message `msg` onto the console.
 
 ----
 
-#### Add (Engine)
+#### Add
 
 ###### enter
 
@@ -318,7 +350,7 @@ The `runCmd` method runs the `lpadd` or `lpcoach` command and outputs the result
 
 ----
 
-#### Graduate (Engine)
+#### Graduate
 
 ###### graduate
 
@@ -330,15 +362,15 @@ The `runCmd` method runs the `lpgrad` command and outputs the result in a channe
 
 ----
 
-#### PlayerStats (Engine)
+#### PlayerStats
 
 ###### PlayerStats
 
 The `PlayerStats` method, the class's constructor, initializes the class's instance variables. An error may be caught here if a formatting problem is found within the spreadsheet.
 
-###### getPosition
+###### getPositionLP
 
-The `getPosition` method retrieves the row number the player is located at within the spreadsheet.
+The `getPositionLP` method retrieves the row number the player is located at within the LaunchPoint spreadsheet.
 
 ###### getName
 
@@ -366,7 +398,9 @@ The `getGamesLost` method retrieves the user's amount of lost games.
 
 ----
 
-#### CycleLog (Engine)
+### Drafts (Engine)
+
+#### Log
 
 ###### checkForSub
 
@@ -414,7 +448,7 @@ The `runCmd` method runs the `lpcycle` or `lpsub` command and outputs the result
 
 ----
 
-#### CycleUndo (Engine)
+#### Undo
 
 ##### retrieveLastMessage
 
@@ -443,7 +477,7 @@ The `runCmd` method runs the `lpundo` command and outputs the result in a channe
 
 ## Persistence
 
-The project saves and loads data from two Google Sheets spreadsheets, one each for the `CyclesLog` and `Graduate` classes.
+The project saves and loads data from two Google Sheets spreadsheets, one each for the `Log` and `Graduate` classes.
 
 These spreadsheets are connected and interacted with using the Google Sheets API, linked through the Gradle components of this project. Feature summary updates are also sent, through the channel the user originally typed commands in, by the bot using the Discord JDA API, also linked through Gradle.
 
