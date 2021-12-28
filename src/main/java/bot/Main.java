@@ -28,7 +28,9 @@ public class Main {
 
         try {
             JDA jda = Events.BOT.build();
-            Commands.implementSlashCommands(jda);
+
+            // run only if slash commands are not implemented yet
+//            Commands.implementSlashCommands(jda);
 
             String status = "lphelp | simping for @everyone";
             jda.getPresence().setActivity(Activity.playing(

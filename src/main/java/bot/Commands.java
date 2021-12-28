@@ -1,5 +1,6 @@
 package bot;
 
+import bot.Tools.FileHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
 
@@ -33,13 +34,13 @@ public class Commands {
     public static void implementSlashCommands(JDA jda) {
         String playerString = "Tag of a player";
         ArrayList<OptionData> pList = new ArrayList<>();
-        int numPlayers = 100;
+        int numPlayers = 25;
 
-        OptionData matches = new OptionData(OptionType.INTEGER, "matches", "Total games played", true),
-                won = new OptionData(OptionType.INTEGER, "won", "Total games won", true);
-        pList.add(new OptionData(OptionType.MENTIONABLE, "player" + 1, playerString, true));
+        OptionData matches = new OptionData(OptionType.STRING, "matches", "Total games played", true),
+                won = new OptionData(OptionType.STRING, "won", "Total games won", true);
+        pList.add(new OptionData(OptionType.MENTIONABLE, String.format("player%s", 1), playerString, true));
         for (int i = 2; i <= numPlayers; i++) {
-            OptionData newPlayer = new OptionData(OptionType.MENTIONABLE, "player" + i, playerString);
+            OptionData newPlayer = new OptionData(OptionType.MENTIONABLE, String.format("player%s", i), playerString);
             pList.add(newPlayer);
         }
 
@@ -84,30 +85,20 @@ public class Commands {
      * @param args the contents to save.
      */
     private static void saveContents(String[] args) {
-        File save = new File("load.txt");
-        try {
-            save.createNewFile();
-            FileWriter fw = new FileWriter(save);
-
-            if (args.length == 1) {
-                fw.write(args[0]);
-            } else {
-                StringBuilder contents = new StringBuilder();
-                contents.append(args[0].toUpperCase()).append(" ");
-                for (int i = 1; i < args.length - 1; i++) {
-                    contents.append(args[i]).append(" ");
-                }
-                contents.append(args[args.length - 1]);
-
-                fw.write(contents.toString());
+        FileHandler save = new FileHandler("load.txt");
+        String newContents;
+        if (args.length == 1) {
+            newContents = args[0];
+        } else {
+            StringBuilder contents = new StringBuilder();
+            for (int i = 0; i < args.length - 1; i++) {
+                contents.append(args[i]).append(" ");
             }
-
-            fw.close();
-        } catch (IOException ioe) {
-            Events.ORIGIN.sendMessage(
-                    "The undo file could not be loaded.").queue();
-            ioe.printStackTrace();
+            contents.append(args[args.length - 1]);
+            newContents = contents.toString();
         }
+
+        save.writeContents(newContents);
     }
 
     /**
@@ -149,17 +140,5 @@ public class Commands {
     public static void runGradCmd(List<Member> players) {
         Graduate grad = new Graduate();
         grad.runCmd(null, players, null);
-    }
-
-    /** Runs the "lpexit" command. */
-    public static void runExitCmd() {
-        try {
-            Events.ORIGIN.sendMessage("The bot has been terminated.").queue();
-            Thread.sleep(3000);
-            System.out.println("----------");
-            System.exit(0);
-        } catch(InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
     }
 }

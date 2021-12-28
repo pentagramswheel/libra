@@ -8,8 +8,11 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -230,8 +233,12 @@ public class Events extends ListenerAdapter {
         }
     }
 
-//    @Override
-//    public void onSlashCommand(SlashCommandEvent event) {
+    /**
+     * Runs one of the bot's commands.
+     * @param e the command to analyze.
+     */
+    @Override
+    public void onSlashCommand(SlashCommandEvent e) {
 //        if (event.getName().equals("tag")) {
 //            event.deferReply().queue(); // Tell discord we received the command, send a thinking... message to the user
 //            String tagName = event.getOption("name").getAsString();
@@ -239,5 +246,55 @@ public class Events extends ListenerAdapter {
 //                    (tag) -> event.getHook().sendMessage(tag).queue() // delayed response updates our inital "thinking..." message with the tag value
 //            );
 //        }
-//    }
+
+        String cmd = e.getName();
+
+        SERVER = e.getGuild();
+        ORIGIN = e.getChannel();
+        List<OptionMapping> cmdArgs = e.getOptions();
+
+        ArrayList<String> args = new ArrayList<>();
+        args.add(cmd);
+        for (OptionMapping o : cmdArgs) {
+            args.add(o.getName());
+        }
+
+//        switch (cmd) {
+//            case "lpstatus":
+//                if (argsValid(args, 1)) {
+//                    String status = String.format(
+//                            "The bot is online. Welcome, %s.",
+//                            e.getMember().getEffectiveName());
+//                    ORIGIN.sendMessage(status).queue();
+//                }
+//                break;
+//            case "lphelp":
+//                if (argsValid(args, 1)) {
+//                    printTroubleshootString();
+//                }
+//                break;
+//            case "lpadd":
+//            case "lpcoach":
+//                if (argsValid(args, users.size() + 1)) {
+//                    Commands.runAddCmd(users, args);
+//                }
+//                break;
+//            case "lpgrad":
+//                if (argsValid(args, users.size() + 1)) {
+//                    Commands.runGradCmd(users);
+//                }
+//                break;
+//            case "lpdraft":
+//            case "lpsub":
+//                if (cycleArgsValid(args, users)) {
+//                    Commands.runCyclesCmd(users, args);
+//                }
+//                break;
+//            case "lpundo":
+//                if (argsValid(args, 1)) {
+//                    Commands.runUndoCmd();
+//                }
+//                break;
+//        }
+    }
 }
