@@ -95,16 +95,15 @@ public class Undo extends Log implements Command {
      * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
-     * @param tab the name of the spreadsheet section
+     * @param tab the name of the spreadsheet section.
      * @param spreadsheet the values of the spreadsheet section.
      * @param data a map of all rows of the spreadsheet.
-     * @param notSub a flag to check if the user is a sub or not.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
     private int undoUser(String[] args, GoogleAPI link, String user,
                          String tab, Values spreadsheet,
-                         TreeMap<Object, PlayerStats> data, boolean notSub) {
+                         TreeMap<Object, PlayerStats> data) {
         try {
             String userID = user.substring(3, user.length() - 1);
             PlayerStats player = data.get(userID);
@@ -118,8 +117,7 @@ public class Undo extends Log implements Command {
             int setLosses = player.getSetLosses();
             int setsPlayed = setWins + setLosses;
             double setWinrate = 0.0;
-
-            if (notSub) {
+            if (notSub(args)) {
                 if (cycleSetWon(gameWins, gamesPlayed)) {
                     setWins--;
                 } else {
@@ -139,39 +137,19 @@ public class Undo extends Log implements Command {
                 gameWinrate = (double) gameWins / gamesPlayed;
             }
 
-            String updateRange = tab + "!B" + player.getPositionLP()
-                    + ":K" + player.getPositionLP();
-
-            ValueRange newRow = new ValueRange().setValues(
-                    Collections.singletonList(Arrays.asList(
-                            player.getName(), player.getNickname(),
-                            setWins, setLosses, setsPlayed, setWinrate,
-                            gameWins, gameLosses, gamesPlayed, gameWinrate)));
+            String updateRange = link.buildRange(tab,
+                    "B", player.getPositionLP(),
+                    "K", player.getPositionLP());
+            ValueRange newRow = link.buildRow(Arrays.asList(
+                    player.getName(), player.getNickname(),
+                    setWins, setLosses, setsPlayed, setWinrate,
+                    gameWins, gameLosses, gamesPlayed, gameWinrate));
             link.updateRow(updateRange, spreadsheet, newRow);
 
             return 0;
         } catch (IOException e) {
             return 1;
         }
-    }
-
-    /**
-     * Checks if the user is a sub, then reverts a user's stats
-     * within a spreadsheet.
-     * @param args the user input.
-     * @param link a connection to the spreadsheet.
-     * @param user the user to revert the stats of.
-     * @param tab the name of the spreadsheet section
-     * @param spreadsheet the values of the spreadsheet section.
-     * @param data a map of all rows of the spreadsheet.
-     * @return 0 if the player could be found in the spreadsheet.
-     *         1 otherwise.
-     */
-    private int undoUser(String[] args, GoogleAPI link, String user,
-                          String tab, Values spreadsheet,
-                          TreeMap<Object, PlayerStats> data) {
-        return undoUser(args, link, user, tab, spreadsheet, data,
-                checkForSub(args));
     }
 
     /**

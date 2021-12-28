@@ -65,15 +65,13 @@ java src/main/java/bot/Main.java
 ## Command Usage
 | Command | Usage | Parameters |
 | :-------: | ------- | ------- |
-| lphelp | Outputs a list of the bot's commands. |
-| lphelp? | Output troubleshooting information for the bot's commands. |
-| lpstatus | Checks to see if the bot is online. |
-| lpcycle | Updates players' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br />2. `games played` - the amount of games played in a set.<br />3. `score` - the amount of winning games of the set.
+| status | Checks to see if the bot is online. |
+| help | Outputs a list of the bot's commands. |
+| lpdraft | Updates players' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br />2. `games played` - the amount of games played in a set.<br />3. `score` - the amount of winning games of the set.
 | lpsub | Updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br />2. `games played` - the amount of games played in a set.<br />3. `score` - the amount of winning games of the set. |
 | lpundo | Reverts the previous draft command, *once and only once*. |
 | lpadd | Gives roles to players in LaunchPoint. | 1. `users` - Discord users in the form of Discord pings. |
 | lpgrad | Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
-| lpexit | Remotely shuts down the bot, by terminating its program. |
 
 ----
 
@@ -106,7 +104,7 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 
 #### Commands
 
-The class which formally runs the commands.
+The class which formally holds and runs the commands.
 
 ----
 
@@ -280,7 +278,15 @@ The `getSpreadSheetID` method retrieves the spreadsheet's affiliated ID.
 
 ###### readSection
 
-The `readSection` method reads a section `tab` of the spreadsheet `spreadsheet` and organizes it into a map, in the form of a red-black tree, indexing by Discord user ID.
+The `readSection` method reads a tab `tab` of the spreadsheet `spreadsheet` and organizes it into a map, in the form of a red-black tree, indexing by Discord user ID.
+
+###### buildRange
+
+The `buildRange` method builds a string detailing a spreadsheet range to analyze, given the tab `tab` of the spreadsheet, the column to begin at `startColumn`, the row to begin at `startRow`, the column to end at `endColumn`, and the row to end at `endRow`.
+
+###### buildRow
+
+The `buildRow` method builds a spreadsheet row consisting of the objects within `lst`, in the same order.
 
 ###### appendRow
 
@@ -288,7 +294,7 @@ The `appendRow` method appends a row `row` to at the end of the spreadsheet `spr
 
 ###### updateRow
 
-The `updateRow` method updates a section `tab` of the spreadsheet `spreadsheet` to be the given row `row`.
+The `updateRow` method updates a tab `tab` of the spreadsheet `spreadsheet` to be the given row `row`.
 
 ----
 
@@ -426,21 +432,13 @@ The `sum` method returns the sum of all values within an array `arr`, by using r
 
 The `sendReport` method sends a summary of all errors during the match report, given the wins/losses `wins`/`losses`, players `players`, whether they were new or existing players `playerTypes`, and which players `errorsFound` resulted in an error.
 
-###### updateUser (overloaded)
-
-This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, detecting if they were a sub or not via the flag `notSub`, within the spreadsheet tab `tab` with values `spreadsheet`, using a map `data`, and given the original user input `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
-
 ###### updateUser
 
-This `updateUser` method calls its overloaded self with a parameter detecting if the user was a sub or not.
-
-###### addUser (overloaded)
-
-This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, detecting if they were a sub or not via the flag `notSub`, within the spreadsheet tab `tab` with values `spreadsheet`, and given the original user input `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
+This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, within the spreadsheet tab `tab` with values `spreadsheet`, using a map `data`, and given the original user input `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
 
 ###### addUser
 
-This `addUser` method calls its overloaded self with a parameter detecting if the user was a sub or not.
+This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, within the spreadsheet tab `tab` with values `spreadsheet`, and given the original user input `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
 
 ###### runCmd
 
@@ -458,13 +456,9 @@ The `retrieveLastMessage` method retrieves the previous cycle logging command.
 
 The `sendReport` method sends a revert summary of the previous report, given the last command input `lastInput`, the amount of user args `userArgs` within the input, and which players `errorsFound` resulted in an error.
 
-###### undoUser (overloaded)
-
-This `undoUser` method uses the GoogleAPI `link` to revert the stats of a user `user` to its previous state, detecting if they were a sub or not via the flag `notSub`, within the spreadsheet tab `tab` with values `spreadsheet`, using a map `data`, and given the original user input `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
-
 ###### undoUser
 
-This `undoUser` method calls its overloaded self with a parameter detecting if the user was a sub or not.
+This `undoUser` method uses the GoogleAPI `link` to revert the stats of a user `user` to its previous state, within the spreadsheet tab `tab` with values `spreadsheet`, using a map `data`, and given the original user input `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
 
 ###### runCmd
 

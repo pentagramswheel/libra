@@ -28,9 +28,7 @@ public class Main {
 
         try {
             JDA jda = Events.BOT.build();
-
-            // slash command testing
-//            jda.upsertCommand("ping", "Calculate ping of the bot").queue();
+            Commands.implementSlashCommands(jda);
 
             String status = "lphelp | simping for @everyone";
             jda.getPresence().setActivity(Activity.playing(

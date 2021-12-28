@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -226,9 +227,17 @@ public class Events extends ListenerAdapter {
                     Commands.runUndoCmd();
                 }
                 break;
-            case "LPEXIT":
-                Commands.runExitCmd();
-                break;
         }
     }
+
+//    @Override
+//    public void onSlashCommand(SlashCommandEvent event) {
+//        if (event.getName().equals("tag")) {
+//            event.deferReply().queue(); // Tell discord we received the command, send a thinking... message to the user
+//            String tagName = event.getOption("name").getAsString();
+//            TagDatabase.fingTag(tagName,
+//                    (tag) -> event.getHook().sendMessage(tag).queue() // delayed response updates our inital "thinking..." message with the tag value
+//            );
+//        }
+//    }
 }

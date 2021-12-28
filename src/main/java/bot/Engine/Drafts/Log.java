@@ -30,12 +30,12 @@ import java.security.GeneralSecurityException;
 public class Log extends bot.Events implements Command {
 
     /**
-     * Checks if this it the lpcycle or lpsub command.
+     * Checks if this is the lpcycle or lpsub command.
      * @param args the user input.
      * @return True if the lpsub command was called.
      *         False if the lpcycle command was called.
      */
-    public boolean checkForSub(String[] args) {
+    public boolean notSub(String[] args) {
         return args[0].equals("LPCYCLE");
     }
 
@@ -139,13 +139,12 @@ public class Log extends bot.Events implements Command {
      * @param tab the name of the spreadsheet section.
      * @param spreadsheet the values of the spreadsheet section.
      * @param data a map of all rows of the spreadsheet.
-     * @param notSub a flag to check if the user is a sub or not.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
     private int updateUser(String[] args, GoogleAPI link, Member user,
                            String tab, Values spreadsheet,
-                           TreeMap<Object, PlayerStats> data, boolean notSub) {
+                           TreeMap<Object, PlayerStats> data) {
         try {
             String userTag = user.getUser().getAsTag();
             PlayerStats player = data.get(user.getId());
@@ -158,8 +157,7 @@ public class Log extends bot.Events implements Command {
             int setLosses = player.getSetLosses();
             int setsPlayed = setWins + setLosses;
             double setWinrate = 0.0;
-
-            if (notSub) {
+            if (notSub(args)) {
                 if (cycleSetWon(gameWins, gamesPlayed)) {
                     setWins++;
                 } else {
@@ -177,14 +175,13 @@ public class Log extends bot.Events implements Command {
             gamesPlayed = gameWins + gameLosses;
             double gameWinrate = (double) gameWins / gamesPlayed;
 
-            String updateRange = tab + "!B" + player.getPositionLP()
-                    + ":K" + player.getPositionLP();
-
-            ValueRange newRow = new ValueRange().setValues(
-                    Collections.singletonList(Arrays.asList(
+            String updateRange = link.buildRange(tab,
+                    "B", player.getPositionLP(),
+                    "K", player.getPositionLP());
+            ValueRange newRow = link.buildRow(Arrays.asList(
                             userTag, user.getEffectiveName(),
                             setWins, setLosses, setsPlayed, setWinrate,
-                            gameWins, gameLosses, gamesPlayed, gameWinrate)));
+                            gameWins, gameLosses, gamesPlayed, gameWinrate));
             link.updateRow(updateRange, spreadsheet, newRow);
 
             return 0;
@@ -196,80 +193,7 @@ public class Log extends bot.Events implements Command {
     }
 
     /**
-     * Checks if the user is a sub, then updates a user's stats
-     * within a spreadsheet.
-     * @param args the user input.
-     * @param link a connection to the spreadsheet.
-     * @param user the user to update the stats of.
-     * @param tab the name of the spreadsheet section.
-     * @param spreadsheet the values of the spreadsheet section.
-     * @param data a map of all rows of the spreadsheet.
-     * @return 0 if the player could be found in the spreadsheet.
-     *         1 otherwise.
-     */
-    private int updateUser(String[] args, GoogleAPI link, Member user,
-                           String tab, Values spreadsheet,
-                           TreeMap<Object, PlayerStats> data) {
-        return updateUser(args, link, user, tab, spreadsheet, data,
-                checkForSub(args));
-    }
-
-    /**
      * Adds a user's stats within a spreadsheet.
-     * @param args the user input.
-     * @param link a connection to the spreadsheet.
-     * @param user the user to update the stats of.
-     * @param tab the name of the spreadsheet section.
-     * @param spreadsheet the values of the spreadsheet section.
-     * @param notSub a flag to check if the user is a sub or not.
-     * @return 0 if the player could be found in the spreadsheet.
-     *         1 otherwise.
-     *
-     * Note: Users will be added at the next EMPTY row in the spreadsheet.
-     */
-    private int addUser(String[] args, GoogleAPI link, Member user,
-                        String tab, Values spreadsheet, boolean notSub) {
-        try {
-            String userTag = user.getUser().getAsTag();
-
-            int gamesPlayed = getGamesPlayed(args);
-            int gameWins = getGamesWon(args);
-            int gameLosses = gamesPlayed - gameWins;
-            double gameWinrate = (double) gameWins / gamesPlayed;
-
-            int setWins = 0;
-            int setLosses = 0;
-            int setsPlayed = 0;
-            double setWinrate = 0.0;
-            if (notSub) {
-                if (cycleSetWon(gameWins, gamesPlayed)) {
-                    setWins++;
-                } else {
-                    setLosses++;
-                }
-
-                setsPlayed = 1;
-                setWinrate = (double) setWins / setsPlayed;
-            }
-
-            ValueRange newRow = new ValueRange().setValues(
-                    Collections.singletonList(Arrays.asList(
-                            user.getId(), userTag, user.getEffectiveName(),
-                            setWins, setLosses, setsPlayed, setWinrate,
-                            gameWins, gameLosses, gamesPlayed, gameWinrate)));
-            link.appendRow(tab, spreadsheet, newRow);
-
-            return 0;
-        } catch (IOException e) {
-            log("New cycle user error occurred with "
-                    + user.getUser().getAsTag());
-            return 1;
-        }
-    }
-
-    /**
-     * Checks if the user is a sub, then adds a user's stats within
-     * a spreadsheet.
      * @param args the user input.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
@@ -282,8 +206,41 @@ public class Log extends bot.Events implements Command {
      */
     private int addUser(String[] args, GoogleAPI link, Member user,
                         String tab, Values spreadsheet) {
-        return addUser(args, link, user, tab, spreadsheet,
-                checkForSub(args));
+        try {
+            String userTag = user.getUser().getAsTag();
+
+            int gamesPlayed = getGamesPlayed(args);
+            int gameWins = getGamesWon(args);
+            int gameLosses = gamesPlayed - gameWins;
+            double gameWinrate = (double) gameWins / gamesPlayed;
+
+            int setWins = 0;
+            int setLosses = 0;
+            int setsPlayed = 0;
+            double setWinrate = 0.0;
+            if (notSub(args)) {
+                if (cycleSetWon(gameWins, gamesPlayed)) {
+                    setWins++;
+                } else {
+                    setLosses++;
+                }
+
+                setsPlayed = 1;
+                setWinrate = (double) setWins / setsPlayed;
+            }
+
+            ValueRange newRow = link.buildRow(Arrays.asList(
+                    user.getId(), userTag, user.getEffectiveName(),
+                    setWins, setLosses, setsPlayed, setWinrate,
+                    gameWins, gameLosses, gamesPlayed, gameWinrate));
+            link.appendRow(tab, spreadsheet, newRow);
+
+            return 0;
+        } catch (IOException e) {
+            log("New cycle user error occurred with "
+                    + user.getUser().getAsTag());
+            return 1;
+        }
     }
 
     /**

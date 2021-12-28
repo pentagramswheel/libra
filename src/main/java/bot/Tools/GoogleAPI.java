@@ -18,9 +18,7 @@ import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
-import java.util.List;
-import java.util.Collections;
-import java.util.TreeMap;
+import java.util.*;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -148,6 +146,31 @@ public class GoogleAPI {
         }
 
         return null;
+    }
+
+    /**
+     * Builds a formatted range to edit values at within a spreadsheet.
+     * @param tab the name of the spreadsheet section.
+     * @param startColumn the column to start the edit range at.
+     * @param startRow the row to start the edit range at.
+     * @param endColumn the column to end the edit range at.
+     * @param endRow the row to end the edit range at.
+     * @return the formatted range.
+     */
+    public String buildRange(String tab, String startColumn, String startRow,
+                      String endColumn, String endRow) {
+        String updateFormat = "%s" + "!%s%s" + ":%s%s";
+        return String.format(updateFormat,
+                tab, startColumn, startRow, endColumn, endRow);
+    }
+
+    /**
+     * Builds the row consisting of items from a list.
+     * @param lst the list of items to build the row with.
+     * @return the built row.
+     */
+    public ValueRange buildRow(List<Object> lst) {
+        return new ValueRange().setValues(Collections.singletonList(lst));
     }
 
     /**
