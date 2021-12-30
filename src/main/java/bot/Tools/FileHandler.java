@@ -16,19 +16,25 @@ public class FileHandler {
     /** Text file that contains all file data. */
     private File file;
 
+    /**
+     * Constructs the handler's file, if one does not already exist.
+     * @param name the name and extension of the file.
+     */
     public FileHandler(String name) {
         try {
-            File file = new File(name);
+            file = new File(name);
             if (file.createNewFile()) {
                 System.out.println("File created: " + name);
-            } else {
-                System.out.println(name + " already exists.");
             }
         } catch (IOException ioe) {
             System.out.println("An error occurred with loading " + name);
         }
     }
 
+    /**
+     * Writes to the created file.
+     * @param contents the contents to write to the file.
+     */
     public void writeContents(String contents) {
         try {
             FileWriter fw = new FileWriter(file);

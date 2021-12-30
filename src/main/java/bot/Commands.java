@@ -2,21 +2,18 @@ package bot;
 
 import bot.Tools.FileHandler;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Member;
-
 import bot.Engine.Add;
 import bot.Engine.Drafts.Undo;
 import bot.Engine.Drafts.Log;
 import bot.Engine.Graduate;
+
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.IOException;
 
 /**
  * @author  Wil Aquino
@@ -36,6 +33,7 @@ public class Commands {
         ArrayList<OptionData> pList = new ArrayList<>();
         int numPlayers = 25;
 
+        // construct parameters
         OptionData matches = new OptionData(OptionType.STRING, "matches", "Total games played", true),
                 won = new OptionData(OptionType.STRING, "won", "Total games won", true);
         pList.add(new OptionData(OptionType.MENTIONABLE, String.format("player%s", 1), playerString, true));
@@ -44,6 +42,7 @@ public class Commands {
             pList.add(newPlayer);
         }
 
+        // construct slash commands
         CommandData status = new CommandData("status",
                 "Checks whether the bot is online or not.");
         CommandData help = new CommandData("help",
@@ -63,6 +62,7 @@ public class Commands {
         CommandData lpgrad = new CommandData("lpgrad",
                 "Graduates players from LaunchPoint.");
 
+        // add on player parameters to slash commands
         for (int i = 0; i < numPlayers; i++) {
             OptionData currentPlayer = pList.get(i);
 
@@ -75,6 +75,7 @@ public class Commands {
             lpgrad.addOptions(currentPlayer);
         }
 
+        // implement slash commands
         jda.updateCommands().addCommands(
                 status, help,
                 lpdraft, lpsub, lpundo, lpadd, lpcoach, lpgrad).queue();

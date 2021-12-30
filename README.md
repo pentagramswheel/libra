@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** November 15, 2021
+**Last Updated:** December 29, 2021
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -113,6 +113,15 @@ The class which formally holds and runs the commands.
 #### Command
 
 An interface outlining the format of the bot's command implementations.
+
+----
+
+#### FileHandler
+
+A class which handles files (currently only for saving text).
+
+###### Instance Variables
+1. `File file` - an object representation for a text file.
 
 ----
 
@@ -226,6 +235,10 @@ The `onMessageReceieved` method parses through user input `e`, checking if a com
 
 #### Commands
 
+###### implementSlashCommands
+
+The `implementSlashCommands` method implements the bot's slash commands, given its built object representation `jda`.
+
 ###### saveContents
 
 The `saveContents` method saves the user input `args` to the `load.txt` file.
@@ -295,6 +308,18 @@ The `appendRow` method appends a row `row` to at the end of the spreadsheet `spr
 ###### updateRow
 
 The `updateRow` method updates a tab `tab` of the spreadsheet `spreadsheet` to be the given row `row`.
+
+----
+
+#### FileHandler
+
+###### FileHandler
+
+The `FileHandler` method, the class's constructor, creates a file for the handler if it does not already exist.
+
+###### writeContents
+
+The `writeContents` method replaces the handler's file content with the new data `contents`.
 
 ----
 
