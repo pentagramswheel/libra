@@ -18,4 +18,4 @@ tokens/
 src/main/java/bot/Discord.java
 src/main/resources/*
 
-load.txt
+loadLP.txt

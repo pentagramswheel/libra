@@ -1,18 +1,22 @@
 package bot;
 
+import bot.Engine.Add;
+import bot.Engine.Drafts.Log;
+import bot.Engine.Drafts.Undo;
+import bot.Engine.Graduate;
+
+import bot.Tools.FileHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,73 +34,21 @@ public class Events extends ListenerAdapter {
     /** The Discord server's current state. */
     public static Guild SERVER;
 
-    /** The original channel a command was sent in. */
-    public static MessageChannel ORIGIN;
+    /** The original place a command was sent in. */
+    public static InteractionHook ORIGIN;
 
     /**
-     * Prints the error message when a command has the incorrect arguments.
-     */
-    private void printArgsError() {
-        ORIGIN.sendMessage("Invalid argument input. "
-                + "See `lphelp` for more info.").queue();
-    }
-
-    /**
-     * Checks if a command has the correct amount of arguments.
-     * @param args the list of arguments to check.
-     * @param n the number of arguments to have.
-     */
-    private boolean argsValid(String[] args, int n) {
-        if (args.length > n) {
-            printArgsError();
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks if lpcycle command was typed correctly.
-     * @param totalArgs the total amount of keywords typed for the command.
-     * @param userArgs the amount of users typed with the command.
-     * @return True if the format was correct.
-     *         False otherwise.
-     */
-    private boolean cycleFormatInvalid(int totalArgs, int userArgs) {
-        boolean outsideArgRange = totalArgs < 4 || totalArgs > 7;
-        boolean notEnoughPlayers = userArgs != totalArgs - 3;
-
-        return outsideArgRange || notEnoughPlayers;
-    }
-
-    /**
-     * Checks if the game set parameters don't make sense.
+     * Checks if the game set parameters make sense.
      * @param args the parameters to analyze.
-     * @return True if there were more wins than total games.
+     * @return True if there were less wins than total games.
      *         False otherwise.
      */
-    private boolean gamesPlayedInvalid(String[] args) {
-        int totalArgs = args.length;
-        int gamesPlayed = Integer.parseInt(args[totalArgs - 2]);
-        int gamesWon = Integer.parseInt(args[totalArgs - 1]);
-
-        return gamesPlayed < gamesWon;
-    }
-
-    /**
-     * Checks if lpcycle has the correct arguments.
-     * @param args the list of arguments to check.
-     * @param users the mentioned users.
-     * @return True if it does.
-     *         False if not.
-     */
-    private boolean cycleArgsValid(String[] args, List<Member> users) {
-        if (cycleFormatInvalid(args.length, users.size())) {
-            printArgsError();
-            return false;
-        } else if (gamesPlayedInvalid(args)) {
-            ORIGIN.sendMessage("Incorrect amount of games played detected. "
-                    + "See `lphelp` for more info.").queue();
+    private boolean gamesPlayedValid(List<OptionMapping> args) {
+        int gamesPlayed = (int) args.get(0).getAsLong();
+        int gamesWon = (int) args.get(1).getAsLong();
+        if (gamesPlayed < gamesWon) {
+            ORIGIN.sendMessage("Total games won cannot go beyond the set. "
+                    + "Try again.").queue();
             return false;
         }
 
@@ -104,63 +56,38 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Prints the full list of commands.
+     * Checks whether the command user has permission to use the
+     * command or not.
+     * @param author the command user.
+     * @return True if they have the 'Staff' role.
+     *         False otherwise.
      */
-    private void printHelpString() {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("LaunchPoint Simp Commands");
-        eb.setColor(Color.GREEN);
-        eb.addField("lphelp",
-                "Displays the list of commands.",
-                false);
-        eb.addField("lphelp?",
-                "Displays troubleshooting information for the \n"
-                        + "commands.",
-                false);
-        eb.addField("lpstatus",
-                "Checks if the bot is online.",
-                false);
-        eb.addField("lpcycle [players] [games played] [score]",
-                "Reports scores for up to four players.",
-                false);
-        eb.addField("lpsub [players] [games played] [score]",
-                "Reports scores for up to four players who subbed.",
-                false);
-        eb.addField("lpundo",
-                "Reverts the previous cycle command, once and \n"
-                        + "only once.",
-                false);
-        eb.addField("lpadd [players]",
-                "Adds players into LaunchPoint.",
-                false);
-        eb.addField("lpcoach [players]",
-                "Adds players to the LaunchPoint coaches.",
-                false);
-        eb.addField("lpgrad [players]",
-                "Graduates players from LaunchPoint.",
-                false);
-        eb.addField("lpexit",
-                "Remotely shuts down the bot.",
-                false);
+    private boolean permissionGranted(Member author) {
+        Role staffRole = SERVER.getRolesByName("Staff", true).get(0);
+        if (!author.getRoles().contains(staffRole)) {
+            ORIGIN.sendMessage(
+                    "You do not have permission to use this command.").queue();
+            return false;
+        }
 
-        ORIGIN.sendMessageEmbeds(eb.build()).queue();
+        return true;
     }
 
     /**
-     * Print the command troubleshooting information.
+     * Prints troubleshooting information.
      */
     private void printTroubleshootString() {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Command Troubleshooting");
-        eb.setColor(Color.GREEN);
-        eb.addField("lpcycle, lpsub",
+        eb.setColor(Color.BLUE);
+        eb.addField("Manual Draft Reporting",
                 "If a match report is giving you an error message, \n"
                         + "it is most likely due to a row in the spreadsheet \n"
                         + "missing information. For example, one common \n"
                         + "problem is presetting or overextending the \n"
                         + "formulas past the bottommost row.",
                 false);
-        eb.addField("lpadd, lpcoach, lpgrad",
+        eb.addField("Entering and Graduating Players",
                 "If the role for a player isn't showing up or seemingly \n"
                         + "isn't being added, try *refreshing the roles* by opening \n"
                         + "`Server Settings > User Management > Members`. \n"
@@ -174,127 +101,98 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Runs one of the bot's commands.
-     * @param e the command to analyze.
+     * Find the undo file to load.
+     * @param cmd the formal name of the command.
+     * @return said file.
      */
-    @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        String input = e.getMessage().getContentRaw();
-        String[] args = input.split("\\s+", 100);
-
-        args[0] = args[0].toUpperCase();
-        String cmd = args[0];
-
-        SERVER = e.getGuild();
-        ORIGIN = e.getChannel();
-        List<Member> users = e.getMessage().getMentionedMembers();
-
-        switch (cmd) {
-            case "LPHELP":
-                if (argsValid(args, 1)) {
-                    printHelpString();
-                }
-                break;
-            case "LPHELP?":
-                if (argsValid(args, 1)) {
-                    printTroubleshootString();
-                }
-                break;
-            case "LPSTATUS":
-                if (argsValid(args, 1)) {
-                    String status = String.format(
-                            "The bot is online. Welcome, %s.",
-                            e.getMember().getEffectiveName());
-                    ORIGIN.sendMessage(status).queue();
-                }
-                break;
-            case "LPADD":
-            case "LPCOACH":
-                if (argsValid(args, users.size() + 1)) {
-                    Commands.runAddCmd(users, args);
-                }
-                break;
-            case "LPGRAD":
-                if (argsValid(args, users.size() + 1)) {
-                    Commands.runGradCmd(users);
-                }
-                break;
-            case "LPCYCLE":
-            case "LPSUB":
-                if (cycleArgsValid(args, users)) {
-                    Commands.runCyclesCmd(users, args);
-                }
-                break;
-            case "LPUNDO":
-                if (argsValid(args, 1)) {
-                    Commands.runUndoCmd();
-                }
-                break;
+    private FileHandler findSave(String cmd) {
+        if (cmd.startsWith("lp")) {
+            return new FileHandler("loadLP.txt");
+        } else {
+            return new FileHandler("loadIO.txt");
         }
     }
 
     /**
+     * Saves a string to an undo file.
+     * @param cmd the formal name of the command.
+     * @param args the arguments of the command, if they exist.
+     */
+    private void saveContents(String cmd, List<OptionMapping> args) {
+        List<OptionMapping> userArgs = args.subList(2, args.size());
+        StringBuilder contents = new StringBuilder();
+        int lastIndex = userArgs.size() - 1;
+
+        contents.append(cmd).append(" ")
+                .append((int) args.get(0).getAsLong()).append(" ")
+                .append((int) args.get(1).getAsLong()).append(" ");
+        for (int i = 0; i < lastIndex; i++) {
+            contents.append(userArgs.get(i).getAsMember().getAsMention()).append(" ");
+        }
+        contents.append(userArgs.get(lastIndex).getAsMember().getAsMention());
+
+        FileHandler save = findSave(cmd);
+        save.writeContents(contents.toString());
+    }
+
+    /**
      * Runs one of the bot's commands.
-     * @param e the command to analyze.
+     * @param sc the command to analyze.
      */
     @Override
-    public void onSlashCommand(SlashCommandEvent e) {
-//        if (event.getName().equals("tag")) {
-//            event.deferReply().queue(); // Tell discord we received the command, send a thinking... message to the user
-//            String tagName = event.getOption("name").getAsString();
-//            TagDatabase.fingTag(tagName,
-//                    (tag) -> event.getHook().sendMessage(tag).queue() // delayed response updates our inital "thinking..." message with the tag value
-//            );
-//        }
+    public void onSlashCommand(SlashCommandEvent sc) {
+        String cmd = sc.getName();
+        Member author = sc.getMember();
+        List<OptionMapping> args = sc.getOptions();
 
-        String cmd = e.getName();
+        SERVER = sc.getGuild();
+        ORIGIN = sc.getHook();
 
-        SERVER = e.getGuild();
-        ORIGIN = e.getChannel();
-        List<OptionMapping> cmdArgs = e.getOptions();
+        sc.deferReply().queue();
+        switch (cmd) {
+            case "status":
+                ORIGIN.sendMessageFormat(
+                        "The bot is online. Welcome, %s.",
+                        author.getEffectiveName()).queue();
+                break;
+            case "help":
+                printTroubleshootString();
+                break;
+            case "lpadd":
+            case "ioadd":
+                if (permissionGranted(author)) {
+                    Add newcomer = new Add();
+                    newcomer.runCmd(null, cmd, args);
+                }
+                break;
+            case "lpgrad":
+            case "iograd":
+                if (permissionGranted(author)) {
+                    Graduate grad = new Graduate();
+                    grad.runCmd(null, cmd, args);
+                }
+                break;
+            case "lpcycle":
+            case "lpsub":
+            case "iocycle":
+            case "iosub":
+                if (permissionGranted(author) && gamesPlayedValid(args)) {
+                    Log log = new Log();
+                    log.runCmd(null, cmd, args);
 
-        ArrayList<String> args = new ArrayList<>();
-        args.add(cmd);
-        for (OptionMapping o : cmdArgs) {
-            args.add(o.getName());
+                    saveContents(cmd, args);
+                }
+                break;
+            case "lpundo":
+            case "ioundo":
+                if (permissionGranted(author)) {
+                    Undo undo = new Undo();
+                    undo.runCmd(null, cmd, null);
+
+                    FileHandler save = findSave(cmd);
+                    save.writeContents("REDACTED");
+                }
+                break;
         }
-
-//        switch (cmd) {
-//            case "lpstatus":
-//                if (argsValid(args, 1)) {
-//                    String status = String.format(
-//                            "The bot is online. Welcome, %s.",
-//                            e.getMember().getEffectiveName());
-//                    ORIGIN.sendMessage(status).queue();
-//                }
-//                break;
-//            case "lphelp":
-//                if (argsValid(args, 1)) {
-//                    printTroubleshootString();
-//                }
-//                break;
-//            case "lpadd":
-//            case "lpcoach":
-//                if (argsValid(args, users.size() + 1)) {
-//                    Commands.runAddCmd(users, args);
-//                }
-//                break;
-//            case "lpgrad":
-//                if (argsValid(args, users.size() + 1)) {
-//                    Commands.runGradCmd(users);
-//                }
-//                break;
-//            case "lpdraft":
-//            case "lpsub":
-//                if (cycleArgsValid(args, users)) {
-//                    Commands.runCyclesCmd(users, args);
-//                }
-//                break;
-//            case "lpundo":
-//                if (argsValid(args, 1)) {
-//                    Commands.runUndoCmd();
-//                }
-//                break;
-//        }
     }
 }

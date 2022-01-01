@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Role;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.List;
 import java.util.Collections;
@@ -31,18 +32,41 @@ public class Graduate extends bot.Events implements Command {
     private final Role lpRole = getRole("LaunchPoint");
 
     /** The Discord LP Graduate role. */
-    private final Role gradRole = getRole("LaunchPoint Graduate");
+    private final Role lpGradRole = getRole("LaunchPoint Graduate");
+
+    /** The Discord Ink Odyssey role. */
+    private final Role ioRole = getRole("Ink Odyssey");
+
+    /** The Discord Ink Odyssey role. */
+    private final Role ioGradRole = getRole("Ink Odyssey Graduate");
 
     /**
      * Graduates a user from LaunchPoint.
+     * @param cmd the formal name of the command.
      * @param user the user to graduate.
+     * @return a graduation congratulation message.
      */
-    private void graduate(Member user) {
-        removeRole(user, lpRole);
-        addRole(user, gradRole);
-
+    private String graduate(String cmd, Member user) {
+        String exitMessage = "";
         try {
-            GoogleAPI link = new GoogleAPI(Discord.getGradSheetID());
+            GoogleAPI link;
+            if (cmd.equals("lpgrad")) {
+                removeRole(user, lpRole);
+                addRole(user, lpGradRole);
+
+                link = new GoogleAPI(Discord.getLPGradSheetID());
+                exitMessage = "Congratulations! We look forward to "
+                        + "seeing you in Maiden Voyage, Ink Odyssey, and "
+                        + "outside of MIT.";
+            } else {
+                removeRole(user, ioRole);
+                addRole(user, ioGradRole);
+
+                link = new GoogleAPI(Discord.getIOGradSheetID());
+                exitMessage = "Congratulations! We look forward to "
+                        + "seeing you beyond MIT.";
+            }
+
             String tab = "'Graduates'";
             Values spreadsheet = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> data = link.readSection(
@@ -51,7 +75,7 @@ public class Graduate extends bot.Events implements Command {
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             } else if (data.containsKey(user.getId())) {
-                sendToDiscord(String.format(
+                sendReply(String.format(
                         "%s has already graduated from LaunchPoint.",
                         user.getUser().getAsTag()));
             } else {
@@ -62,41 +86,39 @@ public class Graduate extends bot.Events implements Command {
                 link.appendRow(tab, spreadsheet, newRow);
             }
         } catch (IOException | GeneralSecurityException e) {
-            sendToDiscord("The spreadsheet could not load.");
+            sendReply("The spreadsheet could not load.");
             log("The spreadsheet could not load.");
         }
+
+        return exitMessage;
     }
 
     /**
      * Runs the graduation command.
-     * @param outChannel the channel to output to, if it exists.
-     * @param users the users to attach to the command output, if they exist.
+     * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel, List<Member> users,
-                       String[] args) {
+    public void runCmd(MessageChannel outChannel, String cmd,
+                       List<OptionMapping> args) {
         StringBuilder listOfUsers = new StringBuilder();
         listOfUsers.append("```\n");
 
-        sendToDiscord("Processing users...");
-        for (Member user : users) {
-            graduate(user);
+        for (OptionMapping om : args) {
+            Member user = om.getAsMember();
+            String exitMessage = graduate(cmd, user);
 
-            Member finalUser = users.get(users.size() - 1);
+            Member finalUser = args.get(args.size() - 1).getAsMember();
             if (user.equals(finalUser)) {
-                String welcomeMessage = "Congratulations. We look forward to "
-                        + "seeing you in Maiden Voyage and outside of "
-                        + "LaunchPoint.";
                 listOfUsers.append(user.getUser().getAsTag())
                         .append("\n```")
-                        .append(welcomeMessage);
+                        .append(exitMessage);
             } else {
                 listOfUsers.append(user.getUser().getAsTag()).append(", ");
             }
         }
 
-        sendToDiscord(listOfUsers.toString());
-        log(users.size() + " graduates were processed.");
+        sendReply(listOfUsers.toString());
+        log(args.size() + " graduates were processed.");
     }
 }

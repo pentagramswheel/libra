@@ -4,6 +4,7 @@ import bot.Tools.Command;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.List;
 
@@ -19,15 +20,15 @@ public class Add extends bot.Events implements Command {
     /** The Discord LaunchPoint role. */
     private final Role lpRole = getRole("LaunchPoint");
 
-    /** The Discord LP Coach role. */
-    private final Role coachRole = getRole("Coaches");
+    /** The Discord Ink Odyssey role. */
+    private final Role ioRole = getRole("Ink Odyssey");
 
     /**
      * Allows a user entry into LaunchPoint.
      * @param user the user to add.
      * @return the entrance welcome message.
      */
-    private String enter(Member user) {
+    private String enterLP(Member user) {
         addRole(user, lpRole);
 
         String rulesChannel = SERVER.getTextChannelsByName(
@@ -37,42 +38,45 @@ public class Add extends bot.Events implements Command {
     }
 
     /**
-     * Allows a user to be a coach within LaunchPoint.
+     * Allows a user entry into Ink Odyssey.
      * @param user the user to add.
-     * @return the coach welcome message.
+     * @return the entrance welcome message.
      */
-    private String coach(Member user) {
-        addRole(user, coachRole);
-        return "Welcome to the LaunchPoint coaches!";
+    private String enterIO(Member user) {
+        addRole(user, ioRole);
+
+        String rulesChannel = SERVER.getTextChannelsByName(
+                "io-draft-rules", true).get(0).getAsMention();
+        return "Welcome to Ink Odyssey! Make sure to read "
+                + rulesChannel + "!";
     }
 
     /**
-     * Runs the add or coach command.
+     * Runs any role commands.
      * @param outChannel the channel to output to, if it exists.
-     * @param users the users to attach to the command output, if they exist.
+     * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel, List<Member> users,
-                       String[] args) {
-        String cmd = args[0];
+    public void runCmd(MessageChannel outChannel, String cmd,
+                       List<OptionMapping> args) {
         StringBuilder listOfUsers = new StringBuilder();
         listOfUsers.append("```\n");
 
-        sendToDiscord("Processing users...");
-        for (Member user : users) {
+        for (OptionMapping om : args) {
+            Member user = om.getAsMember();
             String welcomeMessage = "";
 
+            // parse different role commands
             switch (cmd) {
-                case "LPADD":
-                    welcomeMessage = enter(user);
+                case "lpadd":
+                    welcomeMessage = enterLP(user);
                     break;
-                case "LPCOACH":
-                    welcomeMessage = coach(user);
-                    break;
+                case "ioadd":
+                    welcomeMessage = enterIO(user);
             }
 
-            Member finalUser = users.get(users.size() - 1);
+            Member finalUser = args.get(args.size() - 1).getAsMember();
             if (user.equals(finalUser)) {
                 listOfUsers.append(user.getUser().getAsTag())
                         .append("\n```")
@@ -82,7 +86,7 @@ public class Add extends bot.Events implements Command {
             }
         }
 
-        sendToDiscord(listOfUsers.toString());
-        log(users.size() + " new user(s)/coach(es) were processed.");
+        sendReply(listOfUsers.toString());
+        log(args.size() + " new user(s) processed.");
     }
 }

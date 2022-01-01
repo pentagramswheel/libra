@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** December 29, 2021
+**Last Updated:** December 31, 2021
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -26,6 +26,7 @@
     - [Log](#log)
     - [Undo](#undo)
 * [Algorithms](#algorithms)
+  - [Main] (#main-1)
   - [Events](#events-1)
   - [Commands](#commands-1)
   + [Tools](#tools-1)
@@ -56,6 +57,7 @@ After pulling this project, you can import it using the <medium><a href='https:/
 
 To start the bot from the console, run the following:
 ```
+javac *
 java src/main/java/bot/Main.java
 ```
 
@@ -66,12 +68,17 @@ java src/main/java/bot/Main.java
 | Command | Usage | Parameters |
 | :-------: | ------- | ------- |
 | status | Checks to see if the bot is online. |
-| help | Outputs a list of the bot's commands. |
-| lpdraft | Updates players' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br />2. `games played` - the amount of games played in a set.<br />3. `score` - the amount of winning games of the set.
-| lpsub | Updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br />2. `games played` - the amount of games played in a set.<br />3. `score` - the amount of winning games of the set. |
-| lpundo | Reverts the previous draft command, *once and only once*. |
-| lpadd | Gives roles to players in LaunchPoint. | 1. `users` - Discord users in the form of Discord pings. |
+| help | Outputs troubleshooting information for the bot. |
+| lpcycle | Manually updates players' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| lpsub | Manually updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| lpundo | Reverts the previous LP cycle command, *once and only once*. |
+| lpadd | Gives players the LaunchPoint role. | 1. `users` - Discord users in the form of Discord pings. |
 | lpgrad | Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
+| iocycle | Manually updates players' Ink Odyssey Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| iosub | Manually updates subs' Ink Odyssey stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| ioundo | Reverts the previous IO cycle command, *once and only once*. |
+| ioadd | Gives players the Ink Odyssey role. | 1. `users` - Discord users in the form of Discord pings. |
+| iograd | Graduates players from Ink Odyssey, logging their status on an affiliated spreadsheet and replacing their "Ink Odyssey" role with the "Ink Odyssey Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
 
 ----
 
@@ -81,7 +88,10 @@ java src/main/java/bot/Main.java
 ## Classes and Data Structures
 #### Main
 
-The entry point of the bot's implementation. It constructs the bot and prepares it for processing commands.
+The entry point of the bot. It constructs the bot and prepares it for processing commands.
+
+###### Instance Variables
+1. `String NAME` - the name of the bot.
 
 ----
 
@@ -98,7 +108,7 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 ###### Instance Variables
 1. `JDABuilder BOT` - an object representation of the bot.
 2. `Guild SERVER` - an object representation of the Discord server.
-3. `MessageChannel ORIGIN` - the original channel the user-inputted command was sent in.
+3. `InteractionHook ORIGIN` - the original place the user-inputted command was sent in.
 
 ----
 
@@ -150,7 +160,7 @@ A class which gives roles to users in LaunchPoint, processing the command `lpadd
 
 ###### Instance Variables
 1. `Role lpRole` - an object representation of the 'LaunchPoint' role.
-2. `Role coachRole` - an object representation of the 'Coaches' role.
+2. `Role ioRole` - an object representation of the 'Ink Odyssey' role.
 
 ----
 
@@ -160,7 +170,9 @@ A class which graduates a user from LaunchPoint, processing the command `lpgrad`
 
 ###### Instance Variables
 1. `Role lpRole` - an object representation of the 'LaunchPoint' role.
-2. `Role gradRole` - an object representation of the 'LaunchPoint Graduate' role.
+2. `Role lpGradRole` - an object representation of the 'LaunchPoint Graduate' role.
+3. `Role ioRole` - an object representation of the 'Ink Odyssey' role.
+4. `Role ioGradRole` - an object representation of the 'Ink Odyssey Graduate' role.
 
 ----
 
@@ -197,75 +209,99 @@ A class which reverts LaunchPoint Cycle commands, processing the command `lpundo
 
 
 ## Algorithms
-#### Events
-
-###### printArgsError
-
-The `printArgsError` method prints an error message when a command has the incorrect arguments.
-
-###### argsValid
-
-The `argsValid` method checks whether a command has the incorrect amount of arguments.
-
-###### cycleFormatInvalid
-
-The `cycleFormatInavlid` method checks whether the `lpcycle` or `lpsub` command has the correct amount of total parameters `totalArgs` and correct amount of total users `userArgs`.
-
-###### gamesPlayedInvalid
-
-The `gamesPlayersInvalid` method checks whether the parameter `games played` was not switched with the `score` parameter, of the `lpcycle` or `lpsub` commands, , specified as the first item of `args`.
-
-###### cycleArgsValid
-
-The `cycleArgsValid` method checks whether the `lpcycle` or `lpsub` command, specified as the first item of `args`, was called with the correct format, given `users`.
-
-###### printHelpString
-
-The `printHelpString` method prints the script for the `lphelp` command.
-
-###### printTroubleshootString
-
-The `printTroubleshootString` method prints the script for the `lphelp?` command.
-
-###### onMessageReceived
-
-The `onMessageReceieved` method parses through user input `e`, checking if a command was used, and executing based on the command, if any.
-
-----
-
-#### Commands
+#### Main
 
 ###### implementSlashCommands
 
 The `implementSlashCommands` method implements the bot's slash commands, given its built object representation `jda`.
 
+###### main
+
+The `main` method is the entry point of the bot's backend.
+
+----
+
+#### Events
+
+###### gamesPlayedValid
+
+The `gamesPlayersValid` method checks whether there were more games won than games played (which makes no sense), of the cycle commands, given the command parameters `args`.
+
+###### permissionGranted
+
+The `permissionGranted` method checks if a staff command can be used or not, by checking the roles of the command input's author `author`.
+
+###### printTroubleshootString
+
+The `printTroubleshootString` method prints the script for the `help` command.
+
+###### findSave
+
+The `findSave` method locates a specific undo file based on the inputted command `cmd`.
+
 ###### saveContents
 
-The `saveContents` method saves the user input `args` to the `load.txt` file.
+The `saveContents` method saves the user input `cmd` and `args` to the one of the undo files.
 
-###### runCyclesCmd
+###### onSlashCommand
 
-The `runCyclesCmd` method formally runs the `lpcycle` or `lpsub` command, loading users `players` and user input `args`.
-
-###### runUndoCmd
-
-The `runUndoCmd` method formally runs the `lpundo` command, saving the user input to a file.
-
-###### runAddCmd
-
-The `runAddCmd` method formally runs the `lpadd` or `lpcoach` command, loading users `players` and user input `args`.
-
-###### runGradCmd
-
-The `runGradCmd` method formally runs the `lpgrad` command, loading users `players`.
-
-###### runExitCmd
-
-The `runExitCmd` method shuts down the bot.
+The `onSlashCommand` method parses through user input `sc`, checking if a command was used, and executing based on the command and its parameters/options.
 
 ----
 
 ### Tools
+
+#### Command
+
+###### runCmd
+
+The `runCmd` method runs a command and outputs the result in a channel `outChannel`, the origin channel otherwise, given the command `cmd` and its parameters/options `args`.
+
+###### getRole (DEFAULT)
+
+The `retrieveRole` method retrieves the role `role` from the server.
+
+###### addRole (DEFAULT)
+
+The `addRole` method adds a role `role` to a user `user`.
+
+###### removeRole (DEFAULT)
+
+The `removeRole` method removes a role `role` to a user `user`.
+
+###### sendReply (DEFAULT)
+
+The `sendReply` method sends a message `msg` to the channel a command was sent in.
+
+###### sendFormat (DEFAULT)
+
+The `sendFormat` method sends a message `msg`, formatted with some parameters `args`, to the channel a command was sent in.
+
+###### sendEmbed (DEFAULT)
+
+The `sendEmbed` method sends an embed `eb` to the channel a command was sent in.
+
+###### wait (DEFAULT)
+
+The `wait` method pauses the program for `ms` milliseconds.
+
+###### log (DEFAULT)
+
+The `log` method logs a processed command message `msg` onto the console.
+
+----
+
+#### FileHandler
+
+###### FileHandler
+
+The `FileHandler` method, the class's constructor, creates a file for the handler if it does not already exist.
+
+###### writeContents
+
+The `writeContents` method replaces the handler's file content with the new data `contents`.
+
+----
 
 #### GoogleAPI
 
@@ -311,18 +347,6 @@ The `updateRow` method updates a tab `tab` of the spreadsheet `spreadsheet` to b
 
 ----
 
-#### FileHandler
-
-###### FileHandler
-
-The `FileHandler` method, the class's constructor, creates a file for the handler if it does not already exist.
-
-###### writeContents
-
-The `writeContents` method replaces the handler's file content with the new data `contents`.
-
-----
-
 #### Time
 
 ###### currentTime
@@ -333,51 +357,19 @@ The `currentTime` method retrieves the current time of the running machine.
 
 ### Engine
 
-#### Command
-
-###### runCmd
-
-The `runCmd` method runs a command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
-
-###### getRole (DEFAULT)
-
-The `retrieveRole` method retrieves the role `role` from the server.
-
-###### addRole (DEFAULT)
-
-The `addRole` method adds a role `role` to a user `user`.
-
-###### removeRole (DEFAULT)
-
-The `removeRole` method removes a role `role` to a user `user`.
-
-###### sendToDiscord (DEFAULT)
-
-The `sendToDiscord` method sends a message `msg` to the origin channel.
-
-###### wait (DEFAULT)
-
-The `wait` method pauses the program for `ms` milliseconds.
-
-###### log (DEFAULT)
-
-The `log` method logs a processed command message `msg` onto the console.
-
-----
-
 #### Add
 
-###### enter
+###### enterLP
 
-The `enter` method adds the "LaunchPoint" role to a user `user` and retrieves a welcome message.
+The `enterLP` method adds the "LaunchPoint" role to a user `user` and retrieves a welcome message.
 
-###### coach
+###### enterIO
 
-The `coach` method adds the "Coaches" role to a user `user`, and retrieves a welcome message.
+The `enterIO` method adds the "Ink Odyssey" role to a user `user`, and retrieves a welcome message.
 
 ###### runCmd
 
-The `runCmd` method runs the `lpadd` or `lpcoach` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs the `lpadd`/`ioadd` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given the command `cmd` and its parameters/options `args`.
 
 ----
 
@@ -389,7 +381,7 @@ The `graduate` method adds a user `user` to a spreadsheet list of LaunchPoint gr
 
 ###### runCmd
 
-The `runCmd` method runs the `lpgrad` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs the `lpgrad`/`iograd` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given the command `cmd` and its parameters/options `args`.
 
 ----
 
@@ -433,6 +425,50 @@ The `getGamesLost` method retrieves the user's amount of lost games.
 
 #### Log
 
+###### notSub
+
+The `notSub` method checks if the command `cmd` was a sub command.
+
+###### getGamesPlayed
+
+The `getGamesPlayed` method retrieves the amount of games played, given `args`.
+
+###### getGamesWon
+
+The `getGamesWon` method retrieves the amount of games won, given `args`.
+
+###### cycleSetWon
+
+The `cycleSetWon` method checks if a cycle set was won, given the amount of games won `won` and the total amount of games played `played`.
+
+###### sum
+
+The `sum` method returns the sum of all values within an array `arr`, by using recursion on each index `i`.
+
+###### sendReport
+
+The `sendReport` method sends a summary of all errors during the match report, given the wins/losses `wins`/`losses`, color label `color`, players `players`, whether they were new or existing players `playerTypes`, and which players `errorsFound` resulted in an error.
+
+###### updateUser
+
+This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, within the spreadsheet tab `tab` with values `spreadsheet`, using a map `data`, and given the original user input command `cmd` and parameters/options `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
+
+###### addUser
+
+This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, within the spreadsheet tab `tab` with values `spreadsheet`, and given the original user input command `cmd` and parameters/options `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
+
+###### runCmd
+
+The `runCmd` method runs the `lpcycle`/`lpsub`/`iocycle`/`iosub` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+
+----
+
+#### Undo
+
+##### retrieveLastMessage
+
+The `retrieveLastMessage` method retrieves the previous cycle logging command from the undo file `save`.
+
 ###### checkForSub
 
 The `checkForSub` method checks if the included players, given in `args` were subs.
@@ -445,38 +481,6 @@ The `getGamesPlayed` method retrieves the amount of games played, given `args`.
 
 The `getGamesWon` method retrieves the amount of games won, given `args`.
 
-###### cycleSetWon
-
-The `cycleSetWon` method checks if a cycle set was won, given the amount of won games `won` and the total amount of games played `played`.
-
-###### sum
-
-The `sum` method returns the sum of all values within an array `arr`, by using recursion on each index `i`.
-
-###### sendReport
-
-The `sendReport` method sends a summary of all errors during the match report, given the wins/losses `wins`/`losses`, players `players`, whether they were new or existing players `playerTypes`, and which players `errorsFound` resulted in an error.
-
-###### updateUser
-
-This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, within the spreadsheet tab `tab` with values `spreadsheet`, using a map `data`, and given the original user input `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
-
-###### addUser
-
-This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, within the spreadsheet tab `tab` with values `spreadsheet`, and given the original user input `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
-
-###### runCmd
-
-The `runCmd` method runs the `lpcycle` or `lpsub` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
-
-----
-
-#### Undo
-
-##### retrieveLastMessage
-
-The `retrieveLastMessage` method retrieves the previous cycle logging command.
-
 ###### sendReport
 
 The `sendReport` method sends a revert summary of the previous report, given the last command input `lastInput`, the amount of user args `userArgs` within the input, and which players `errorsFound` resulted in an error.
@@ -487,7 +491,7 @@ This `undoUser` method uses the GoogleAPI `link` to revert the stats of a user `
 
 ###### runCmd
 
-The `runCmd` method runs the `lpundo` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs the `lpundo`/`ioundo` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
 ----
 
@@ -496,11 +500,11 @@ The `runCmd` method runs the `lpundo` command and outputs the result in a channe
 
 ## Persistence
 
-The project saves and loads data from two Google Sheets spreadsheets, one each for the `Log` and `Graduate` classes.
+The project saves and loads data from four Google Sheets spreadsheets, two each for the `Log` and `Graduate` classes.
 
 These spreadsheets are connected and interacted with using the Google Sheets API, linked through the Gradle components of this project. Feature summary updates are also sent, through the channel the user originally typed commands in, by the bot using the Discord JDA API, also linked through Gradle.
 
-Additionally, the `lpundo` command allows a user to revert a cycle command, by saving and loading the previous cycle command, logged into a text file `load.txt`.
+Additionally, the `lpundo` and `ioundo` commands allows a user to revert a cycle command, by saving and loading the previous cycle command, saved in text files.
 
 ----
 

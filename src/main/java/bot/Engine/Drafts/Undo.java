@@ -6,15 +6,17 @@ import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.File;
-import java.util.*;
+import java.util.Scanner;
+import java.util.Arrays;
+import java.util.TreeMap;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -30,11 +32,11 @@ import java.util.List;
 public class Undo extends Log implements Command {
 
     /**
-     * Retrieves the previous "lpcycle" or "lpsub" command.
-     * @return said comand.
+     * Retrieves the previous cycle command.
+     * @param save the undo file to analyze.
+     * @return said command.
      */
-    private String retrieveLastMessage() {
-        File save = new File("load.txt");
+    private String retrieveLastMessage(File save) {
         try {
             Scanner load = new Scanner(save);
             String message = load.nextLine();
@@ -42,10 +44,38 @@ public class Undo extends Log implements Command {
 
             return message;
         } catch (FileNotFoundException ioe) {
-            sendToDiscord("Something went wrong with the undo file.");
+            sendReply("Something went wrong with the undo file.");
             ioe.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Checks if this is a draft or sub command.
+     * @param args the user input.
+     * @return True if a draft command was called.
+     *         False if a sub command was called.
+     */
+    public boolean notSub(String[] args) {
+        return args[0].contains("cycle");
+    }
+
+    /**
+     * Retrieve the amount of set games were played.
+     * @param args the user input.
+     * @return said amount.
+     */
+    public int getGamesPlayed(String[] args) {
+        return Integer.parseInt(args[1]);
+    }
+
+    /**
+     * Retrieve the amount of won set games.
+     * @param args the user input.
+     * @return said amount.
+     */
+    public int getGamesWon(String[] args) {
+        return Integer.parseInt(args[2]);
     }
 
     /**
@@ -60,14 +90,13 @@ public class Undo extends Log implements Command {
         StringBuilder input = new StringBuilder();
         StringBuilder playerList = new StringBuilder();
 
-        lastInput[0] = lastInput[0].toLowerCase();
         for (int i = 0; i < lastInput.length; i++) {
             String currentArg = lastInput[i];
             input.append(currentArg).append(" ");
 
-            if (i > 0 && i < userArgs + 1) {
+            if (i > 2 && i < userArgs + 3) {
                 String completionSymbol = ":white_check_mark: ";
-                if (errorsFound[i - 1] == 1) {
+                if (errorsFound[i - 3] == 1) {
                     completionSymbol = ":no_entry: ";
                 }
 
@@ -87,12 +116,12 @@ public class Undo extends Log implements Command {
             eb.addField("Status:", "INCOMPLETE", false);
         }
 
-        ORIGIN.sendMessageEmbeds(eb.build()).queue();
+        sendEmbed(eb);
     }
 
     /**
      * Updates a user's stats within a spreadsheet.
-     * @param args the user input.
+     * @param args the arguments of the command.
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
      * @param tab the name of the spreadsheet section.
@@ -101,8 +130,8 @@ public class Undo extends Log implements Command {
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
-    private int undoUser(String[] args, GoogleAPI link, String user,
-                         String tab, Values spreadsheet,
+    private int undoUser(String[] args, GoogleAPI link,
+                         String user, String tab, Values spreadsheet,
                          TreeMap<Object, PlayerStats> data) {
         try {
             String userID = user.substring(3, user.length() - 1);
@@ -153,16 +182,24 @@ public class Undo extends Log implements Command {
     }
 
     /**
-     * Runs the cycle undoing command.
+     * Runs a cycle undoing command.
      * @param outChannel the channel to output to, if it exists.
-     * @param users the users to attach to the command output, if they exist.
+     * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel, List<Member> users,
-                       String[] args) {
+    public void runCmd(MessageChannel outChannel, String cmd,
+                       List<OptionMapping> args) {
         try {
-            GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
+            GoogleAPI link;
+            File undoFile;
+            if (cmd.equals("lpundo")) {
+                link = new GoogleAPI(Discord.getLPCyclesSheetID());
+                undoFile = new File("loadLP.txt");
+            } else {
+                link = new GoogleAPI(Discord.getIOCyclesSheetID());
+                undoFile = new File("loadIO.txt");
+            }
 
             // tab name of the spreadsheet
             String tab = "'Current Leaderboard'";
@@ -174,11 +211,11 @@ public class Undo extends Log implements Command {
                 throw new IOException("The spreadsheet was empty.");
             }
 
-            String lastMessage = retrieveLastMessage();
+            String lastMessage = retrieveLastMessage(undoFile);
             if (lastMessage == null) {
                 throw new IOException();
             } else if (lastMessage.equals("REDACTED")) {
-                sendToDiscord("There is nothing to revert.");
+                sendReply("There is nothing to revert.");
                 return;
             }
 
@@ -186,14 +223,14 @@ public class Undo extends Log implements Command {
             int userArgs = messageArgs.length - 3;
 
             int[] errorsFound = new int[userArgs];
-            for (int i = 1; i < userArgs + 1; i++) {
-                errorsFound[i - 1] = undoUser(messageArgs, link,
+            for (int i = 3; i < userArgs + 3; i++) {
+                errorsFound[i - 3] = undoUser(messageArgs, link,
                         messageArgs[i], tab, spreadsheet, data);
             }
 
             sendReport(messageArgs, userArgs, errorsFound);
         } catch (IOException | GeneralSecurityException e) {
-            sendToDiscord("The save could not load.");
+            sendReply("The save could not load.");
         }
 
         log("Cycle undo was processed.");

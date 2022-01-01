@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.awt.Color;
 import java.util.List;
@@ -26,34 +27,34 @@ import java.security.GeneralSecurityException;
  * Module:  Log.java
  * Purpose: Logs cycle information via command.
  */
-public class Log extends bot.Events implements Command {
+public class Log implements Command {
 
     /**
-     * Checks if this is the lpcycle or lpsub command.
-     * @param args the user input.
-     * @return True if the lpsub command was called.
-     *         False if the lpcycle command was called.
+     * Checks if this is a draft or sub command.
+     * @param cmd the formal name of the command.
+     * @return True if a draft command was called.
+     *         False if a sub command was called.
      */
-    public boolean notSub(String[] args) {
-        return args[0].equals("LPCYCLE");
+    public boolean notSub(String cmd) {
+        return cmd.contains("cycle");
     }
 
     /**
      * Retrieve the amount of set games were played.
-     * @param args the user input.
+     * @param args the arguments of the command.
      * @return said amount.
      */
-    public int getGamesPlayed(String[] args) {
-        return Integer.parseInt(args[args.length - 2]);
+    public int getGamesPlayed(List<OptionMapping> args) {
+        return (int) args.get(0).getAsLong();
     }
 
     /**
      * Retrieve the amount of won set games.
-     * @param args the user input
+     * @param args the arguments of the command.
      * @return said amount.
      */
-    public int getGamesWon(String[] args) {
-        return Integer.parseInt(args[args.length - 1]);
+    public int getGamesWon(List<OptionMapping> args) {
+        return (int) args.get(1).getAsLong();
     }
 
     /**
@@ -86,19 +87,21 @@ public class Log extends bot.Events implements Command {
      * Print the summary of the cycle match report.
      * @param wins the amount of games won by the players.
      * @param losses the amount of games lost by the players.
+     * @param color the color of the summary embed.
      * @param players the players within the set.
      * @param playerTypes array of types for each player
      *                    (0 if an existing player, 1 if a new player).
      * @param errorsFound array of errors found for each player, if any
      *                    (0 if no errors occurred, 1 otherwise).
      */
-    private void sendReport(int wins, int losses, List<Member> players,
-                            int[] playerTypes, int[] errorsFound) {
+    private void sendReport(int wins, int losses, Color color,
+                            List<OptionMapping> players, int[] playerTypes,
+                            int[] errorsFound) {
         EmbedBuilder eb = new EmbedBuilder();
         StringBuilder playerList = new StringBuilder();
 
         for (int i = 0; i < players.size(); i++) {
-            Member player = players.get(i);
+            Member player = players.get(i).getAsMember();
             String completionSymbol = ":white_check_mark: ";
             if (errorsFound[i] == 1) {
                 completionSymbol = ":no_entry: ";
@@ -116,7 +119,7 @@ public class Log extends bot.Events implements Command {
         }
 
         eb.setTitle("Summary of Report");
-        eb.setColor(Color.GREEN);
+        eb.setColor(color);
         eb.addField("Score:", wins + " - " + losses, false);
         eb.addField("Players Updated:", playerList.toString(), false);
 
@@ -127,12 +130,13 @@ public class Log extends bot.Events implements Command {
             eb.addField("Status:", "INCOMPLETE", false);
         }
 
-        ORIGIN.sendMessageEmbeds(eb.build()).queue();
+        sendEmbed(eb);
     }
 
     /**
      * Updates a user's stats within a spreadsheet.
-     * @param args the user input.
+     * @param cmd the formal name of the command.
+     * @param args the arguments of the command.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param tab the name of the spreadsheet section.
@@ -141,8 +145,8 @@ public class Log extends bot.Events implements Command {
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
-    private int updateUser(String[] args, GoogleAPI link, Member user,
-                           String tab, Values spreadsheet,
+    private int updateUser(String cmd, List<OptionMapping> args, GoogleAPI link,
+                           Member user, String tab, Values spreadsheet,
                            TreeMap<Object, PlayerStats> data) {
         try {
             String userTag = user.getUser().getAsTag();
@@ -156,7 +160,7 @@ public class Log extends bot.Events implements Command {
             int setLosses = player.getSetLosses();
             int setsPlayed = setWins + setLosses;
             double setWinrate = 0.0;
-            if (notSub(args)) {
+            if (notSub(cmd)) {
                 if (cycleSetWon(gameWins, gamesPlayed)) {
                     setWins++;
                 } else {
@@ -193,7 +197,8 @@ public class Log extends bot.Events implements Command {
 
     /**
      * Adds a user's stats within a spreadsheet.
-     * @param args the user input.
+     * @param cmd the formal name of the command.
+     * @param args the arguments of the command.
      * @param link a connection to the spreadsheet.
      * @param user the user to update the stats of.
      * @param tab the name of the spreadsheet section.
@@ -203,8 +208,8 @@ public class Log extends bot.Events implements Command {
      *
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
-    private int addUser(String[] args, GoogleAPI link, Member user,
-                        String tab, Values spreadsheet) {
+    private int addUser(String cmd, List<OptionMapping> args, GoogleAPI link,
+                        Member user, String tab, Values spreadsheet) {
         try {
             String userTag = user.getUser().getAsTag();
 
@@ -217,7 +222,7 @@ public class Log extends bot.Events implements Command {
             int setLosses = 0;
             int setsPlayed = 0;
             double setWinrate = 0.0;
-            if (notSub(args)) {
+            if (notSub(cmd)) {
                 if (cycleSetWon(gameWins, gamesPlayed)) {
                     setWins++;
                 } else {
@@ -244,15 +249,22 @@ public class Log extends bot.Events implements Command {
 
     /**
      * Runs the cycle logging command.
-     * @param outChannel the channel to output to, if it exists.
-     * @param users the users to attach to the command output, if they exist.
+     * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel, List<Member> users,
-                       String[] args) {
+    public void runCmd(MessageChannel outChannel, String cmd,
+                       List<OptionMapping> args) {
         try {
-            GoogleAPI link = new GoogleAPI(Discord.getCyclesSheetID());
+            GoogleAPI link;
+            Color replyColor;
+            if (cmd.startsWith("lp")) {
+                link = new GoogleAPI(Discord.getLPCyclesSheetID());
+                replyColor = Color.GREEN;
+            } else {
+                link = new GoogleAPI(Discord.getIOCyclesSheetID());
+                replyColor = Color.MAGENTA;
+            }
 
             // tab name of the spreadsheet
             String tab = "'Current Leaderboard'";
@@ -264,30 +276,30 @@ public class Log extends bot.Events implements Command {
                 throw new IOException("The spreadsheet was empty.");
             }
 
-            int[] playerTypes = new int[users.size()];
-            int[] errorsFound = new int[users.size()];
-            for (int i = 0; i < users.size(); i++) {
-                Member user = users.get(i);
+            List<OptionMapping> userArgs = args.subList(2, args.size());
+            int numUsers = userArgs.size();
+            int[] playerTypes = new int[numUsers];
+            int[] errorsFound = new int[numUsers];
+            for (int i = 0; i < numUsers; i++) {
+                Member user = userArgs.get(i).getAsMember();
                 if (data.containsKey(user.getId())) {
                     errorsFound[i] =
-                            updateUser(args, link, user, tab, spreadsheet, data);
+                            updateUser(cmd, args, link, user, tab, spreadsheet, data);
                     playerTypes[i] = 0;
                 } else {
                     errorsFound[i] =
-                            addUser(args, link, user, tab, spreadsheet);
+                            addUser(cmd, args, link, user, tab, spreadsheet);
                     playerTypes[i] = 1;
                 }
             }
 
             int gamesWon = getGamesWon(args);
             int gamesLost = getGamesPlayed(args) - gamesWon;
-            sendReport(gamesWon, gamesLost, users, playerTypes, errorsFound);
+            sendReport(gamesWon, gamesLost, replyColor, userArgs, playerTypes, errorsFound);
+            log(userArgs.size() + " cycle match(es) were processed.");
         } catch (IOException | GeneralSecurityException e) {
-            sendToDiscord("The spreadsheet could not load.");
+            sendReply("The spreadsheet could not load.");
             log("The spreadsheet could not load.");
-            return;
         }
-
-        log(users.size() + " cycle match(es) were processed.");
     }
 }

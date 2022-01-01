@@ -39,6 +39,7 @@ public class FileHandler {
         try {
             FileWriter fw = new FileWriter(file);
             fw.write(contents);
+            fw.close();
         } catch (IOException ioe) {
             System.out.println(
                     "An error occurred with writing to " + file.getName());

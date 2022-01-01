@@ -2,9 +2,11 @@ package bot.Tools;
 
 import bot.Events;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.List;
 
@@ -19,11 +21,11 @@ public interface Command {
 
     /**
      * Runs the command.
-     * @param outChannel the channel to output to, if it exists.
-     * @param users the users to attach to the command output, if they exist.
+     * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
-    void runCmd(MessageChannel outChannel, List<Member> users, String[] args);
+    void runCmd(MessageChannel outChannel, String cmd,
+                List<OptionMapping> args);
 
     /**
      * Retrieves a role given its name.
@@ -39,12 +41,14 @@ public interface Command {
      * @param role the role to add.
      */
     default void addRole(Member user, Role role) {
-        while (!user.getRoles().contains(role)) {
+        List<Role> roleList = user.getRoles();
+        while (!roleList.contains(role)) {
             Events.SERVER.addRoleToMember(user.getId(), role).queue();
 
             // prevent Discord rate limiting
             wait(2000);
             user = Events.SERVER.retrieveMemberById(user.getId()).complete();
+            roleList = user.getRoles();
         }
     }
 
@@ -64,12 +68,30 @@ public interface Command {
     }
 
     /**
-     * Send a message to Discord in the channel the original
+     * Send a message to Discord in the place the original
      * command was sent.
      * @param msg the message to send.
      */
-    default void sendToDiscord(String msg) {
+    default void sendReply(String msg) {
         Events.ORIGIN.sendMessage(msg).queue();
+    }
+
+    /**
+     * Send a formatted message to Discord in the place the
+     * original command was sent.
+     * @param msg the message to send.
+     */
+    default void sendFormat(String msg, Object... args) {
+        Events.ORIGIN.sendMessageFormat(msg, args).queue();
+    }
+
+    /**
+     * Send an embedded message to Discord in the place the
+     * original command was sent.
+     * @param eb the embed to send.
+     */
+    default void sendEmbed(EmbedBuilder eb) {
+        Events.ORIGIN.sendMessageEmbeds(eb.build()).queue();
     }
 
     /**
