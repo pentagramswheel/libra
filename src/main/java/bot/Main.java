@@ -103,7 +103,7 @@ public class Main {
             JDA jda = Events.BOT.build();
 
             // run only if slash commands are not implemented yet
-            Main.implementSlashCommands(jda);
+//            Main.implementSlashCommands(jda);
 
             String status = "lphelp | simping for @everyone";
             jda.getPresence().setActivity(Activity.playing(

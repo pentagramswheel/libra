@@ -231,7 +231,7 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Runs one of the bot's commands.
+     * Checks any button clicks.
      * @param bc the button click to analyze.
      */
     @Override
