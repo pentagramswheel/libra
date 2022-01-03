@@ -1,15 +1,15 @@
-bot/DiscordExample.java
- bot.DiscordExample
 bot/Tools/Time.java
  bot.Tools.Time
+bot/Engine/Drafts/Log.java
+ bot.Engine.Drafts.Log
 bot/Tools/FileHandler.java
  bot.Tools.FileHandler
 bot/Discord.java
  bot.Discord
+bot/DiscordExample.java
+ bot.DiscordExample
 bot/Events.java
  bot.Events
-bot/Engine/Drafts/Log.java
- bot.Engine.Drafts.Log
 bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Tools/Command.java

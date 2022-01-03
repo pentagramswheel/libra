@@ -229,7 +229,7 @@ The `gamesPlayersValid` method checks whether there were more games won than gam
 
 ###### isStaffCommand
 
-The `isStaffCommand` method checks whether a command `cmd` is a staff command or not.
+The `isStaffCommand` method checks whether a user `author`'s command `cmd` is a staff command or not.
 
 ###### printTroubleshootString
 

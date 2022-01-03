@@ -233,6 +233,6 @@ public class Undo extends Log implements Command {
             sendReply("The save could not load.");
         }
 
-        log("Cycle undo was processed.");
+        log("Draft undo was processed.");
     }
 }

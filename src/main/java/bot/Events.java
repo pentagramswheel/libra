@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -60,18 +61,24 @@ public class Events extends ListenerAdapter {
      * Checks whether the command user has permission to use the
      * command or not.
      * @param cmd the formal name of the command.
+     * @param author the user of the command.
      * @return True if the command is not a staff command.
      *         False otherwise.
      */
-    private boolean isStaffCommand(String cmd) {
+    private boolean isStaffCommand(String cmd, Member author) {
         String[] staffCommands = {"cycle", "sub", "undo", "add", "grad"};
-        for (String staffCmd : staffCommands) {
-            if (cmd.equals(staffCmd)) {
-                return false;
-            }
+        Role staffRole = SERVER.getRolesByName("Staff", true).get(0);
+
+        if (cmd.isEmpty()) {
+            return false;
+        } else if (!author.getRoles().contains(staffRole))
+            for (String staffCmd : staffCommands) {
+                if (cmd.contains(staffCmd)) {
+                    return true;
+                }
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -152,41 +159,50 @@ public class Events extends ListenerAdapter {
      */
     @Override
     public void onSlashCommand(SlashCommandEvent sc) {
+        Member author = sc.getMember();
         String cmd = sc.getName();
         String subCmd = sc.getSubcommandName();
-        Member author = sc.getMember();
         List<OptionMapping> args = sc.getOptions();
+        if (subCmd == null) {
+            subCmd = "";
+        }
+        String formalCmd = cmd + subCmd;
 
         SERVER = sc.getGuild();
         ORIGIN = sc.getHook();
 
         sc.deferReply().queue();
-        if (isStaffCommand(subCmd)) {
+        if (isStaffCommand(formalCmd, author)) {
             ORIGIN.sendMessage(
                     "You do not have permission to use this command.").queue();
             return;
         }
 
-        switch (cmd + subCmd) {
-            case "status":
+        switch (formalCmd) {
+            case "mitstatus":
                 ORIGIN.sendMessageFormat(
                         "The bot is online. Welcome, %s.",
                         author.getEffectiveName()).queue();
                 break;
-            case "help":
+            case "mithelp":
                 printTroubleshootString();
+                break;
+            case "mitprofile":
+                ORIGIN.sendMessage(
+                        "This command has not been implemented yet.").queue();
                 break;
             case "lpadd":
             case "ioadd":
                 Add newcomer = new Add();
-                newcomer.runCmd(null, cmd, args);
+                newcomer.runCmd(null, formalCmd, args);
                 break;
             case "lpgrad":
             case "iograd":
                 Graduate grad = new Graduate();
-                grad.runCmd(null, cmd, args);
+                grad.runCmd(null, formalCmd, args);
                 break;
             case "startdraft":
+                System.out.println("A draft has been started.");
                 List<Member> players = new ArrayList<>();
                 players.add(sc.getMember());
 
@@ -198,17 +214,17 @@ public class Events extends ListenerAdapter {
             case "iosub":
                 if (gamesPlayedValid(args)) {
                     Log log = new Log();
-                    log.runCmd(null, cmd, args);
+                    log.runCmd(null, formalCmd, args);
 
-                    saveCycleCall(cmd + subCmd, args);
+                    saveCycleCall(formalCmd, args);
                 }
                 break;
             case "lpundo":
             case "ioundo":
                 Undo undo = new Undo();
-                undo.runCmd(null, cmd, null);
+                undo.runCmd(null, formalCmd, null);
 
-                FileHandler save = findSave(cmd);
+                FileHandler save = findSave(formalCmd);
                 save.writeContents("REDACTED");
                 break;
         }

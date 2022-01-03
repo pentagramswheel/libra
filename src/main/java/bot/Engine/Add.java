@@ -62,6 +62,7 @@ public class Add extends bot.Events implements Command {
                        List<OptionMapping> args) {
         StringBuilder listOfUsers = new StringBuilder();
         listOfUsers.append("```\n");
+        System.out.println(cmd);
 
         for (OptionMapping om : args) {
             Member user = om.getAsMember();

@@ -55,8 +55,6 @@ public class Graduate extends bot.Events implements Command {
                 addRole(user, lpGradRole);
                 addRole(user, ioRole);
 
-                System.out.println(user.getAsMention());
-
                 link = new GoogleAPI(Discord.getLPGradSheetID());
                 exitMessage = "Congratulations! We look forward to "
                         + "seeing you in Ink Odyssey and outside "
