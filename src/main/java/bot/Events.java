@@ -201,7 +201,8 @@ public class Events extends ListenerAdapter {
                 Graduate grad = new Graduate();
                 grad.runCmd(null, formalCmd, args);
                 break;
-            case "startdraft":
+            case "lpstartdraft":
+            case "iostartdraft":
                 System.out.println("A draft has been started.");
                 List<Member> players = new ArrayList<>();
                 players.add(sc.getMember());
