@@ -114,22 +114,32 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Saves a string to an undo file.
+     * Structures a user into a mentionable ping.
+     * @param om an argument from a command.
+     * @return the formatted ping.
+     */
+    private String mentionableFor(OptionMapping om) {
+        String id = om.getAsMember().getId();
+        return String.format("<@%s>", id);
+    }
+
+    /**
+     * Saves a cycle command to an undo file.
      * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
-    private void saveContents(String cmd, List<OptionMapping> args) {
+    private void saveCycleCall(String cmd, List<OptionMapping> args) {
         List<OptionMapping> userArgs = args.subList(2, args.size());
         StringBuilder contents = new StringBuilder();
         int lastIndex = userArgs.size() - 1;
 
         contents.append(cmd).append(" ")
-                .append((int) args.get(0).getAsLong()).append(" ")
-                .append((int) args.get(1).getAsLong()).append(" ");
+                .append(args.get(0).getAsString()).append(" ")
+                .append(args.get(1).getAsString()).append(" ");
         for (int i = 0; i < lastIndex; i++) {
-            contents.append(userArgs.get(i).getAsMember().getAsMention()).append(" ");
+            contents.append(mentionableFor(userArgs.get(i))).append(" ");
         }
-        contents.append(userArgs.get(lastIndex).getAsMember().getAsMention());
+        contents.append(mentionableFor(userArgs.get(lastIndex)));
 
         FileHandler save = findSave(cmd);
         save.writeContents(contents.toString());
@@ -180,7 +190,7 @@ public class Events extends ListenerAdapter {
                     Log log = new Log();
                     log.runCmd(null, cmd, args);
 
-                    saveContents(cmd, args);
+                    saveCycleCall(cmd, args);
                 }
                 break;
             case "lpundo":

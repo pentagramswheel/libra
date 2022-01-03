@@ -53,11 +53,14 @@ public class Graduate extends bot.Events implements Command {
             if (cmd.equals("lpgrad")) {
                 removeRole(user, lpRole);
                 addRole(user, lpGradRole);
+                addRole(user, ioRole);
+
+                System.out.println(user.getAsMention());
 
                 link = new GoogleAPI(Discord.getLPGradSheetID());
                 exitMessage = "Congratulations! We look forward to "
-                        + "seeing you in Maiden Voyage, Ink Odyssey, and "
-                        + "outside of MIT.";
+                        + "seeing you in Ink Odyssey and outside "
+                        + "of MIT.";
             } else {
                 removeRole(user, ioRole);
                 addRole(user, ioGradRole);

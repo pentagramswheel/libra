@@ -239,9 +239,13 @@ The `printTroubleshootString` method prints the script for the `help` command.
 
 The `findSave` method locates a specific undo file based on the inputted command `cmd`.
 
-###### saveContents
+###### mentionableFor
 
-The `saveContents` method saves the user input `cmd` and `args` to the one of the undo files.
+The `mentionableFor` method formats a user `om` into a mentionable text ping.
+
+###### saveCycleCall
+
+The `saveCycleCall` method saves the user input `cmd` and `args` to the one of the cycle save files.
 
 ###### onSlashCommand
 

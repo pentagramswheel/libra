@@ -134,7 +134,7 @@ public class Undo extends Log implements Command {
                          String user, String tab, Values spreadsheet,
                          TreeMap<Object, PlayerStats> data) {
         try {
-            String userID = user.substring(3, user.length() - 1);
+            String userID = user.substring(2, user.length() - 1);
             PlayerStats player = data.get(userID);
 
             int gamesPlayed = getGamesPlayed(args);
