@@ -19,3 +19,4 @@ src/main/java/bot/Discord.java
 src/main/resources/*
 
 loadLP.txt
+loadIO.txt

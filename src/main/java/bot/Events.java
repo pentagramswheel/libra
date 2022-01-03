@@ -4,23 +4,24 @@ import bot.Engine.Add;
 import bot.Engine.Drafts.Log;
 import bot.Engine.Drafts.Undo;
 import bot.Engine.Graduate;
-
 import bot.Tools.FileHandler;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author  Wil Aquino
+ * @author  Wil Aquino, Turtle
  * Date:    February 17, 2021
  * Project: LaunchPoint Bot
  * Module:  Events.java
@@ -58,16 +59,16 @@ public class Events extends ListenerAdapter {
     /**
      * Checks whether the command user has permission to use the
      * command or not.
-     * @param author the command user.
-     * @return True if they have the 'Staff' role.
+     * @param cmd the formal name of the command.
+     * @return True if the command is not a staff command.
      *         False otherwise.
      */
-    private boolean permissionGranted(Member author) {
-        Role staffRole = SERVER.getRolesByName("Staff", true).get(0);
-        if (!author.getRoles().contains(staffRole)) {
-            ORIGIN.sendMessage(
-                    "You do not have permission to use this command.").queue();
-            return false;
+    private boolean isStaffCommand(String cmd) {
+        String[] staffCommands = {"cycle", "sub", "undo", "add", "grad"};
+        for (String staffCmd : staffCommands) {
+            if (cmd.equals(staffCmd)) {
+                return false;
+            }
         }
 
         return true;
@@ -147,11 +148,12 @@ public class Events extends ListenerAdapter {
 
     /**
      * Runs one of the bot's commands.
-     * @param sc the command to analyze.
+     * @param sc the slash command to analyze.
      */
     @Override
     public void onSlashCommand(SlashCommandEvent sc) {
         String cmd = sc.getName();
+        String subCmd = sc.getSubcommandName();
         Member author = sc.getMember();
         List<OptionMapping> args = sc.getOptions();
 
@@ -159,7 +161,13 @@ public class Events extends ListenerAdapter {
         ORIGIN = sc.getHook();
 
         sc.deferReply().queue();
-        switch (cmd) {
+        if (isStaffCommand(subCmd)) {
+            ORIGIN.sendMessage(
+                    "You do not have permission to use this command.").queue();
+            return;
+        }
+
+        switch (cmd + subCmd) {
             case "status":
                 ORIGIN.sendMessageFormat(
                         "The bot is online. Welcome, %s.",
@@ -170,39 +178,54 @@ public class Events extends ListenerAdapter {
                 break;
             case "lpadd":
             case "ioadd":
-                if (permissionGranted(author)) {
-                    Add newcomer = new Add();
-                    newcomer.runCmd(null, cmd, args);
-                }
+                Add newcomer = new Add();
+                newcomer.runCmd(null, cmd, args);
                 break;
             case "lpgrad":
             case "iograd":
-                if (permissionGranted(author)) {
-                    Graduate grad = new Graduate();
-                    grad.runCmd(null, cmd, args);
-                }
+                Graduate grad = new Graduate();
+                grad.runCmd(null, cmd, args);
                 break;
+            case "startdraft":
+                List<Member> players = new ArrayList<>();
+                players.add(sc.getMember());
+
+//                StartDraft sd = new StartDraft();
+//                sd.runCmd(null, author, null, e); // author - users to attach, e - slash command
             case "lpcycle":
             case "lpsub":
             case "iocycle":
             case "iosub":
-                if (permissionGranted(author) && gamesPlayedValid(args)) {
+                if (gamesPlayedValid(args)) {
                     Log log = new Log();
                     log.runCmd(null, cmd, args);
 
-                    saveCycleCall(cmd, args);
+                    saveCycleCall(cmd + subCmd, args);
                 }
                 break;
             case "lpundo":
             case "ioundo":
-                if (permissionGranted(author)) {
-                    Undo undo = new Undo();
-                    undo.runCmd(null, cmd, null);
+                Undo undo = new Undo();
+                undo.runCmd(null, cmd, null);
 
-                    FileHandler save = findSave(cmd);
-                    save.writeContents("REDACTED");
-                }
+                FileHandler save = findSave(cmd);
+                save.writeContents("REDACTED");
                 break;
+        }
+    }
+
+    /**
+     * Runs one of the bot's commands.
+     * @param bc the button click to analyze.
+     */
+    @Override
+    public void onButtonClick(ButtonClickEvent bc){
+        System.out.println("hi");
+        if (bc.getButton().getId().equals("Join")){
+            List<Member> author = new ArrayList<>();
+            author.add(bc.getMember());
+
+//            sd.runCmd2(null, author, e); // author - users to attach, e - slash command
         }
     }
 }

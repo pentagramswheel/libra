@@ -227,9 +227,9 @@ The `main` method is the entry point of the bot's backend.
 
 The `gamesPlayersValid` method checks whether there were more games won than games played (which makes no sense), of the cycle commands, given the command parameters `args`.
 
-###### permissionGranted
+###### isStaffCommand
 
-The `permissionGranted` method checks if a staff command can be used or not, by checking the roles of the command input's author `author`.
+The `isStaffCommand` method checks whether a command `cmd` is a staff command or not.
 
 ###### printTroubleshootString
 
@@ -249,7 +249,11 @@ The `saveCycleCall` method saves the user input `cmd` and `args` to the one of t
 
 ###### onSlashCommand
 
-The `onSlashCommand` method parses through user input `sc`, checking if a command was used, and executing based on the command and its parameters/options.
+The `onSlashCommand` method parses through user input `sc`, checking if a slash command was used, and executing based on the command and its parameters/options.
+
+###### onButtonClick
+
+The `onSlashCommand` method parses through clicked buttons `bc`, checking if a certain button was clicked.
 
 ----
 
