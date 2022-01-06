@@ -67,18 +67,20 @@ java src/main/java/bot/Main.java
 ## Command Usage
 | Command | Usage | Parameters |
 | :-------: | ------- | ------- |
-| status | Checks to see if the bot is online. |
-| help | Outputs troubleshooting information for the bot. |
-| lpcycle | Manually updates players' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
-| lpsub | Manually updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
-| lpundo | Reverts the previous LP cycle command, *once and only once*. |
-| lpadd | Gives players the LaunchPoint role. | 1. `users` - Discord users in the form of Discord pings. |
-| lpgrad | Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
-| iocycle | Manually updates players' Ink Odyssey Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
-| iosub | Manually updates subs' Ink Odyssey stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
-| ioundo | Reverts the previous IO cycle command, *once and only once*. |
-| ioadd | Gives players the Ink Odyssey role. | 1. `users` - Discord users in the form of Discord pings. |
-| iograd | Graduates players from Ink Odyssey, logging their status on an affiliated spreadsheet and replacing their "Ink Odyssey" role with the "Ink Odyssey Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
+| mit status | Checks to see if the bot is online. |
+| mit help | Outputs troubleshooting information for the bot. |
+| mit profile | Outputs a summary of a player's profile within MIT. |
+| mit genmaps | Generates a map list for a draft. | 1. `matches` - the amount of maps needed for the amount of matches going to be played. |
+| lp cycle | Manually updates players' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| lp sub | Manually updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| lp undo | Reverts the previous LP cycle command, *once and only once*. |
+| lp add | Gives players the LaunchPoint role. | 1. `users` - Discord users in the form of Discord pings. |
+| lp grad | Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
+| io cycle | Manually updates players' Ink Odyssey Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| io sub | Manually updates subs' Ink Odyssey stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| io undo | Reverts the previous IO cycle command, *once and only once*. |
+| io add | Gives players the Ink Odyssey role. | 1. `users` - Discord users in the form of Discord pings. |
+| io grad | Graduates players from Ink Odyssey, logging their status on an affiliated spreadsheet and replacing their "Ink Odyssey" role with the "Ink Odyssey Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
 
 ----
 
@@ -157,7 +159,7 @@ A class which retrieves the system's time.
 
 #### Add
 
-A class which gives roles to users in LaunchPoint, processing the command `lpadd`.
+A class which gives roles to users in MIT, processing the command `lp add`.
 
 ###### Instance Variables
 1. `Role lpRole` - an object representation of the 'LaunchPoint' role.
@@ -167,7 +169,7 @@ A class which gives roles to users in LaunchPoint, processing the command `lpadd
 
 #### Graduate
 
-A class which graduates a user from LaunchPoint, processing the command `lpgrad`, granting the associated roles.
+A class which graduates a user in an area within MIT, processing the command `lp/io grad`, granting the associated roles.
 
 ###### Instance Variables
 1. `Role lpRole` - an object representation of the 'LaunchPoint' role.
@@ -196,13 +198,19 @@ A class for storing information about a Discord user.
 
 #### Log
 
-A class which updates the LaunchPoint Cycles stats of a user, processing the command `lpcycle`.
+A class which updates the draft stats of a user, processing the `lp/io cycle` and `lp/io sub` commands.
+
+----
+
+#### MapGenerator
+
+A class which generates map lists for drafts.
 
 ----
 
 #### Undo
 
-A class which reverts LaunchPoint Cycle commands, processing the command `lpundo`.
+A class which reverts draft commands, processing the command `lp/io undo`.
 
 ----
 
@@ -386,7 +394,7 @@ The `enterIO` method adds the "Ink Odyssey" role to a user `user`, and retrieves
 
 ###### runCmd
 
-The `runCmd` method runs the `lpadd`/`ioadd` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs the `lp/io add` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given the command `cmd` and its parameters/options `args`.
 
 ----
 
@@ -394,11 +402,11 @@ The `runCmd` method runs the `lpadd`/`ioadd` commands and outputs the result in 
 
 ###### graduate
 
-The `graduate` method adds a user `user` to a spreadsheet list of LaunchPoint graduates and gives them the "LaunchPoint Graduate" role.
+The `graduate` method adds a user `user` to a spreadsheet list of MIT graduates and gives them a graduate role.
 
 ###### runCmd
 
-The `runCmd` method runs the `lpgrad`/`iograd` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs the `lp/io grad` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given the command `cmd` and its parameters/options `args`.
 
 ----
 
@@ -476,7 +484,35 @@ This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user
 
 ###### runCmd
 
-The `runCmd` method runs the `lpcycle`/`lpsub`/`iocycle`/`iosub` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs the `lp/io cycle` and `lp/io sub` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+
+----
+
+#### MapGenerator
+
+##### resetModes
+
+The `resetModes` method resets the modes which can be chosen within the generator.
+
+##### getListSize
+
+The `getListSize` retrieves how many map/mode combinations to generate, given the original user input `args`.
+
+##### getLegalMaps
+
+The `getLegalMaps` method retrieves a list of legal maps in each game mode.
+
+#### findMapURL
+
+The `findMapURL` method finds the URL to an online picture of a given map `map`.
+
+#### sendReport
+
+The `sendReport` method sends a map `map` and mode `mode` choice in the form of an embed, given a flag `first` to check whether this is the first match or not.
+
+#### runCmd
+
+The `runCmd` method runs the `mit genmaps` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
 ----
 
@@ -508,7 +544,7 @@ This `undoUser` method uses the GoogleAPI `link` to revert the stats of a user `
 
 ###### runCmd
 
-The `runCmd` method runs the `lpundo`/`ioundo` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs the `lp/io undo` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
 
 ----
 
@@ -521,7 +557,7 @@ The project saves and loads data from four Google Sheets spreadsheets, two each 
 
 These spreadsheets are connected and interacted with using the Google Sheets API, linked through the Gradle components of this project. Feature summary updates are also sent, through the channel the user originally typed commands in, by the bot using the Discord JDA API, also linked through Gradle.
 
-Additionally, the `lpundo` and `ioundo` commands allows a user to revert a cycle command, by saving and loading the previous cycle command, saved in text files.
+Additionally, the `lp/io undo` commands allows a user to revert a cycle command, by saving and loading the previous cycle command, saved in text files.
 
 ----
 

@@ -3,14 +3,15 @@ package bot.Engine.Drafts;
 import bot.Tools.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
-import java.awt.*;
-import java.io.File;
-import java.util.*;
+import java.awt.Color;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.TreeMap;
+import java.util.Arrays;
+import java.util.Random;
 
 /**
  * @author  Wil Aquino
@@ -22,7 +23,7 @@ import java.util.List;
 public class MapGenerator implements Command {
 
     /**
-     * Resets the generator's attributes.
+     * Resets the generator's available modes list.
      */
     private void resetModes(List<String> modes) {
         modes.add("Splat Zones");
@@ -77,7 +78,7 @@ public class MapGenerator implements Command {
      * @param map the map to search for.
      * @return the map URL.
      */
-    private String findMapUrl(String map) {
+    private String findMapURL(String map) {
         switch (map) {
             case "Humpback Pump Track":
                 return "https://static.wikia.nocookie.net/splatoon/images/a/a4/HumpbackPumpTrack.jpg";
@@ -137,7 +138,7 @@ public class MapGenerator implements Command {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(Color.BLUE)
                 .addField(mode, map, false)
-                .setThumbnail(findMapUrl(map));
+                .setThumbnail(findMapURL(map));
 
         sendEmbed(eb, !first);
     }
