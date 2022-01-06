@@ -118,11 +118,10 @@ public class Log implements Command {
             }
         }
 
-        eb.setTitle("Summary of Report");
-        eb.setColor(color);
-        eb.addField("Score:", wins + " - " + losses, false);
-        eb.addField("Players Updated:", playerList.toString(), false);
-
+        eb.setTitle("Summary of Report")
+                .setColor(color)
+                .addField("Score:", wins + " - " + losses, false)
+                .addField("Players Updated:", playerList.toString(), false);
         if (sum(errorsFound, errorsFound.length - 1) == 0) {
             eb.addField("Status:", "COMPLETE", false);
         } else {

@@ -105,10 +105,10 @@ public class Undo extends Log implements Command {
             }
         }
 
-        eb.setTitle("Summary of Revert");
-        eb.setColor(Color.WHITE);
-        eb.addField("Previous Input:", input.toString(), false);
-        eb.addField("Players Updated:", playerList.toString(), false);
+        eb.setTitle("Summary of Revert")
+                .setColor(Color.WHITE)
+                .addField("Previous Input:", input.toString(), false)
+                .addField("Players Updated:", playerList.toString(), false);
         if (sum(errorsFound, errorsFound.length - 1) == 0) {
             eb.addField("Status:", "COMPLETE", false);
         } else {

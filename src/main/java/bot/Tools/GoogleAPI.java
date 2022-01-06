@@ -143,7 +143,7 @@ public class GoogleAPI {
                 return data;
             }
         } catch (IOException e) {
-            Events.ORIGIN.sendMessage(
+            Events.INTERACTION.sendMessage(
                     "The data could not load.").queue();
         }
 

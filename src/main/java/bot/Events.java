@@ -1,6 +1,7 @@
 package bot;
 
 import bot.Engine.Add;
+import bot.Engine.Drafts.MapGenerator;
 import bot.Engine.Drafts.Log;
 import bot.Engine.Drafts.Undo;
 import bot.Engine.Graduate;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -36,8 +38,11 @@ public class Events extends ListenerAdapter {
     /** The Discord server's current state. */
     public static Guild SERVER;
 
+    /** The original interaction engaged by a user's command. */
+    public static InteractionHook INTERACTION;
+
     /** The original place a command was sent in. */
-    public static InteractionHook ORIGIN;
+    public static MessageChannel ORIGIN;
 
     /**
      * Checks if the game set parameters make sense.
@@ -49,7 +54,7 @@ public class Events extends ListenerAdapter {
         int gamesPlayed = (int) args.get(0).getAsLong();
         int gamesWon = (int) args.get(1).getAsLong();
         if (gamesPlayed < gamesWon) {
-            ORIGIN.sendMessage("Total games won cannot go beyond the set. "
+            INTERACTION.sendMessage("Total games won cannot go beyond the set. "
                     + "Try again.").queue();
             return false;
         }
@@ -105,7 +110,7 @@ public class Events extends ListenerAdapter {
                         + "Discord.",
                 false);
 
-        ORIGIN.sendMessageEmbeds(eb.build()).queue();
+        INTERACTION.sendMessageEmbeds(eb.build()).queue();
     }
 
     /**
@@ -154,33 +159,22 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Runs one of the bot's commands.
-     * @param sc the slash command to analyze.
+     * Parses through which of the bot's commands to run.
+     * @param author the user who ran the command.
+     * @param cmd the formal name of the command.
+     * @param args the arguments of the command, if they exist.
      */
-    @Override
-    public void onSlashCommand(SlashCommandEvent sc) {
-        Member author = sc.getMember();
-        String cmd = sc.getName();
-        String subCmd = sc.getSubcommandName();
-        List<OptionMapping> args = sc.getOptions();
-        if (subCmd == null) {
-            subCmd = "";
-        }
-        String formalCmd = cmd + subCmd;
-
-        SERVER = sc.getGuild();
-        ORIGIN = sc.getHook();
-
-        sc.deferReply().queue();
-        if (isStaffCommand(formalCmd, author)) {
-            ORIGIN.sendMessage(
+    private void parseCommands(SlashCommandEvent sc, Member author, String cmd,
+                               List<OptionMapping> args) {
+        if (isStaffCommand(cmd, author)) {
+            INTERACTION.sendMessage(
                     "You do not have permission to use this command.").queue();
             return;
         }
 
-        switch (formalCmd) {
+        switch (cmd) {
             case "mitstatus":
-                ORIGIN.sendMessageFormat(
+                INTERACTION.sendMessageFormat(
                         "The bot is online. Welcome, %s.",
                         author.getEffectiveName()).queue();
                 break;
@@ -188,18 +182,22 @@ public class Events extends ListenerAdapter {
                 printTroubleshootString();
                 break;
             case "mitprofile":
-                ORIGIN.sendMessage(
+                INTERACTION.sendMessage(
                         "This command has not been implemented yet.").queue();
+                break;
+            case "mitgenmaps":
+                MapGenerator maps = new MapGenerator();
+                maps.runCmd(null, cmd, args);
                 break;
             case "lpadd":
             case "ioadd":
                 Add newcomer = new Add();
-                newcomer.runCmd(null, formalCmd, args);
+                newcomer.runCmd(null, cmd, args);
                 break;
             case "lpgrad":
             case "iograd":
                 Graduate grad = new Graduate();
-                grad.runCmd(null, formalCmd, args);
+                grad.runCmd(null, cmd, args);
                 break;
             case "lpstartdraft":
             case "iostartdraft":
@@ -215,20 +213,47 @@ public class Events extends ListenerAdapter {
             case "iosub":
                 if (gamesPlayedValid(args)) {
                     Log log = new Log();
-                    log.runCmd(null, formalCmd, args);
+                    log.runCmd(null, cmd, args);
 
-                    saveCycleCall(formalCmd, args);
+                    saveCycleCall(cmd, args);
                 }
                 break;
             case "lpundo":
             case "ioundo":
                 Undo undo = new Undo();
-                undo.runCmd(null, formalCmd, null);
+                undo.runCmd(null, cmd, null);
 
-                FileHandler save = findSave(formalCmd);
+                FileHandler save = findSave(cmd);
                 save.writeContents("REDACTED");
                 break;
         }
+    }
+
+    /**
+     * Runs one of the bot's commands.
+     * @param sc the slash command to analyze.
+     */
+    @Override
+    public void onSlashCommand(SlashCommandEvent sc) {
+        Member author = sc.getMember();
+        String cmd = sc.getName();
+        String subGroup = sc.getSubcommandGroup();
+        String subCmd = sc.getSubcommandName();
+        List<OptionMapping> args = sc.getOptions();
+        if (subGroup == null) {
+            subGroup = "";
+        }
+        if (subCmd == null) {
+            subCmd = "";
+        }
+        String formalCmd = cmd + subGroup + subCmd;
+
+        SERVER = sc.getGuild();
+        INTERACTION = sc.getHook();
+        ORIGIN = sc.getChannel();
+
+        sc.deferReply().queue();
+        parseCommands(sc, author, formalCmd, args);
     }
 
     /**

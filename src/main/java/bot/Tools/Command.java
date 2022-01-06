@@ -69,20 +69,35 @@ public interface Command {
 
     /**
      * Send a message to Discord in the place the original
-     * command was sent.
+     * interaction was made.
      * @param msg the message to send.
      */
     default void sendReply(String msg) {
-        Events.ORIGIN.sendMessage(msg).queue();
+        Events.INTERACTION.sendMessage(msg).queue();
     }
 
     /**
      * Send a formatted message to Discord in the place the
-     * original command was sent.
+     * original interaction was made.
      * @param msg the message to send.
      */
     default void sendFormat(String msg, Object... args) {
-        Events.ORIGIN.sendMessageFormat(msg, args).queue();
+        Events.INTERACTION.sendMessageFormat(msg, args).queue();
+    }
+
+    /**
+     * Send an embedded message to Discord in the place the
+     * original interaction was made.
+     * @param eb the embed to send.
+     * @param spam a flag to check whether multiple embeds are
+     *             being sent or not.
+     */
+    default void sendEmbed(EmbedBuilder eb, boolean spam) {
+        if (spam) {
+            Events.ORIGIN.sendMessageEmbeds(eb.build()).queue();
+        } else {
+            Events.INTERACTION.sendMessageEmbeds(eb.build()).queue();
+        }
     }
 
     /**
@@ -91,7 +106,7 @@ public interface Command {
      * @param eb the embed to send.
      */
     default void sendEmbed(EmbedBuilder eb) {
-        Events.ORIGIN.sendMessageEmbeds(eb.build()).queue();
+        sendEmbed(eb, false);
     }
 
     /**

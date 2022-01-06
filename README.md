@@ -108,7 +108,8 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 ###### Instance Variables
 1. `JDABuilder BOT` - an object representation of the bot.
 2. `Guild SERVER` - an object representation of the Discord server.
-3. `InteractionHook ORIGIN` - the original place the user-inputted command was sent in.
+3. `InteractionHook INTERACTION` - the original interaction made by the user.
+4. `MessageChannel ORIGIN` - the original channel the user-inputted command was sent in.
 
 ----
 
@@ -247,6 +248,10 @@ The `mentionableFor` method formats a user `om` into a mentionable text ping.
 
 The `saveCycleCall` method saves the user input `cmd` and `args` to the one of the cycle save files.
 
+###### parseCommands
+
+The `parseCommands` method runs a command based on the full command `cmd` and its parameters/options `args`, given the user who inputted it `author` and the object representation of the command itself `sc`.
+
 ###### onSlashCommand
 
 The `onSlashCommand` method parses through user input `sc`, checking if a slash command was used, and executing based on the command and its parameters/options.
@@ -287,7 +292,11 @@ The `sendFormat` method sends a message `msg`, formatted with some parameters `a
 
 ###### sendEmbed (DEFAULT)
 
-The `sendEmbed` method sends an embed `eb` to the channel a command was sent in.
+The `sendEmbed` method sends an embed `eb` to the channel a command was sent in if it is `spam`, and replies with the embed to the user's interaction otherwise.
+
+###### sendEmbed (OVERLOADED DEFAULT)
+
+The `sendEmbed` method replies with an embed `eb` to the user's interaction.
 
 ###### wait (DEFAULT)
 

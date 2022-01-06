@@ -48,7 +48,7 @@ public class PlayerStats {
             }
         } catch (NumberFormatException e) {
             System.out.println("Spreadsheet formatting problem detected.");
-            Events.ORIGIN.sendMessage(
+            Events.INTERACTION.sendMessage(
                     "***There seems to be a formatting problem within the "
                             + "spreadsheet.*** Please fix it!").queue();
         }

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import javax.security.auth.login.LoginException;
@@ -29,15 +30,25 @@ public class Main {
      */
     public static void implementSlashCommands(JDA jda) {
         // general commands
-        CommandData status = new CommandData("mitstatus",
+        CommandData mit = new CommandData("mit",
+                "General commands to use within MIT.");
+        SubcommandData status = new SubcommandData("status",
                 "Checks whether the bot is online or not.");
-        CommandData help = new CommandData("mithelp",
+        SubcommandData help = new SubcommandData("help",
                 "Displays troubleshooting information for the commands.");
+        SubcommandData genmaps = new SubcommandData("genmaps",
+                "Generates a set map list.");
+
+        OptionData maps = new OptionData(
+                OptionType.INTEGER, "matches",
+                "Amount of maps to generate.", true);
+        genmaps.addOptions(maps);
 
         // profile commands
-        CommandData profile = new CommandData("mitprofile",
-                "Displays troubleshooting information for the commands.");
+        SubcommandGroupData profile = new SubcommandGroupData("profile",
+                "Finds profile information on a player within MIT.");
         // edit in subcommand data in here chaedr
+//        profile.addSubcommands(...)
 
         // draft commands
         CommandData lp = new CommandData("lp",
@@ -85,11 +96,11 @@ public class Main {
         }
 
         // implementing commands
-//        profile.addSubcommands(...);
+        mit.addSubcommands(status, help, genmaps);
+        mit.addSubcommandGroups(profile);
         lp.addSubcommands(startdraft, cycle, sub, undo, add, grad);
         io.addSubcommands(startdraft, cycle, sub, undo, add, grad);
-        jda.updateCommands().addCommands(
-                status, help, lp, io, profile).queue();
+        jda.updateCommands().addCommands(mit, lp, io).queue();
     }
 
     public static void main(String[] args) {
