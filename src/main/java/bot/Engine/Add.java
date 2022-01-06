@@ -61,8 +61,6 @@ public class Add extends bot.Events implements Command {
     public void runCmd(MessageChannel outChannel, String cmd,
                        List<OptionMapping> args) {
         StringBuilder listOfUsers = new StringBuilder();
-        listOfUsers.append("```\n");
-        System.out.println(cmd);
 
         for (OptionMapping om : args) {
             Member user = om.getAsMember();
@@ -79,11 +77,11 @@ public class Add extends bot.Events implements Command {
 
             Member finalUser = args.get(args.size() - 1).getAsMember();
             if (user.equals(finalUser)) {
-                listOfUsers.append(user.getUser().getAsTag())
-                        .append("\n```")
+                listOfUsers.append(user.getAsMention())
+                        .append("\n\n")
                         .append(welcomeMessage);
             } else {
-                listOfUsers.append(user.getUser().getAsTag()).append(", ");
+                listOfUsers.append(user.getAsMention()).append(" ");
             }
         }
 

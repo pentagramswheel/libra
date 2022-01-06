@@ -111,11 +111,11 @@ public class Graduate extends bot.Events implements Command {
 
             Member finalUser = args.get(args.size() - 1).getAsMember();
             if (user.equals(finalUser)) {
-                listOfUsers.append(user.getUser().getAsTag())
-                        .append("\n```")
+                listOfUsers.append(user.getAsMention())
+                        .append("\n\n")
                         .append(exitMessage);
             } else {
-                listOfUsers.append(user.getUser().getAsTag()).append(", ");
+                listOfUsers.append(user.getAsMention()).append(" ");
             }
         }
 

@@ -8,8 +8,8 @@ bot/Discord.java
  bot.Discord
 bot/DiscordExample.java
  bot.DiscordExample
-bot/Events.java
- bot.Events
+bot/Main.java
+ bot.Main
 bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Tools/Command.java
@@ -18,9 +18,9 @@ bot/Engine/PlayerStats.java
  bot.Engine.PlayerStats
 bot/Engine/Graduate.java
  bot.Engine.Graduate
-bot/Engine/Add.java
- bot.Engine.Add
 bot/Engine/Drafts/Undo.java
  bot.Engine.Drafts.Undo
-bot/Main.java
- bot.Main
+bot/Events.java
+ bot.Events
+bot/Engine/Add.java
+ bot.Engine.Add
