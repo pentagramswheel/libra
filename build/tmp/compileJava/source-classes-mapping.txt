@@ -6,23 +6,23 @@ bot/Tools/Time.java
  bot.Tools.Time
 bot/Tools/FileHandler.java
  bot.Tools.FileHandler
-bot/Engine/Drafts/Undo.java
- bot.Engine.Drafts.Undo
-bot/Engine/Drafts/Log.java
- bot.Engine.Drafts.Log
-bot/Engine/Drafts/MapGenerator.java
- bot.Engine.Drafts.MapGenerator
-bot/Events.java
- bot.Events
-bot/Tools/GoogleAPI.java
- bot.Tools.GoogleAPI
-bot/Tools/Command.java
- bot.Tools.Command
 bot/Engine/Graduate.java
  bot.Engine.Graduate
-bot/Engine/PlayerStats.java
- bot.Engine.PlayerStats
-bot/Engine/Add.java
- bot.Engine.Add
 bot/Main.java
  bot.Main
+bot/Tools/Command.java
+ bot.Tools.Command
+bot/Engine/Add.java
+ bot.Engine.Add
+bot/Engine/Drafts/Log.java
+ bot.Engine.Drafts.Log
+bot/Engine/Drafts/Undo.java
+ bot.Engine.Drafts.Undo
+bot/Engine/PlayerStats.java
+ bot.Engine.PlayerStats
+bot/Tools/GoogleAPI.java
+ bot.Tools.GoogleAPI
+bot/Events.java
+ bot.Events
+bot/Engine/Drafts/MapGenerator.java
+ bot.Engine.Drafts.MapGenerator

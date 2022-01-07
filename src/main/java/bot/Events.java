@@ -54,6 +54,14 @@ public class Events extends ListenerAdapter {
             INTERACTION.sendMessage("Total games won cannot go beyond the set. "
                     + "Try again.").queue();
             return false;
+        } else if (gamesPlayed < 0 || gamesWon < 0) {
+            INTERACTION.sendMessage(
+                    "The amount games played can't be negative?").queue();
+            return false;
+        } else if (gamesPlayed > 19) {
+            INTERACTION.sendMessage(
+                    "Are you sure that's how many games were played?").queue();
+            return false;
         }
 
         return true;

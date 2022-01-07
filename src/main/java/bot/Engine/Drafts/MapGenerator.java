@@ -4,7 +4,6 @@ import bot.Tools.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.awt.Color;
@@ -63,7 +62,7 @@ public class MapGenerator implements Command {
                 "Starfish Mainstage", "Sturgeon Shipyard", "The Reef"));
         ArrayList<String> cbMaps = new ArrayList<>(Arrays.asList(
                 "Ancho-V Games", "Humpback Pump Track", "Inkblot Art Academy",
-                "Mako Mart", "Manta Maria", "New Albacore Hotel",
+                "MakoMart", "Manta Maria", "New Albacore Hotel",
                 "Piranha Pit", "Snapper Canal", "The Reef"));
 
         legalMaps.put("Splat Zones", szMaps);
@@ -153,6 +152,12 @@ public class MapGenerator implements Command {
     public void runCmd(MessageChannel outChannel, String cmd,
                        List<OptionMapping> args) {
         int numGens = getListSize(args);
+        if (numGens > 9) {
+            sendReply("Too many maps requested. The set would be too long!");
+            log("A requested map list was too long.");
+            return;
+        }
+
         int numModes = 0;
         ArrayList<String> modes = new ArrayList<>();
         TreeMap<String, ArrayList<String>> legalMaps = getLegalMaps();
