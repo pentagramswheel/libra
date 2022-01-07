@@ -5,9 +5,11 @@ import bot.Events;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -86,18 +88,17 @@ public interface Command {
     }
 
     /**
-     * Send an embedded message to Discord in the place the
+     * Send a list of embedded messages to Discord in the place the
      * original interaction was made.
-     * @param eb the embed to send.
-     * @param spam a flag to check whether multiple embeds are
-     *             being sent or not.
+     * @param ebs the embeds to send.
      */
-    default void sendEmbed(EmbedBuilder eb, boolean spam) {
-        if (spam) {
-            Events.ORIGIN.sendMessageEmbeds(eb.build()).queue();
-        } else {
-            Events.INTERACTION.sendMessageEmbeds(eb.build()).queue();
+    default void sendEmbeds(List<EmbedBuilder> ebs) {
+        ArrayList<MessageEmbed> builtEmbeds = new ArrayList<>(ebs.size());
+        for (EmbedBuilder embed : ebs) {
+            builtEmbeds.add(embed.build());
         }
+
+        Events.INTERACTION.sendMessageEmbeds(builtEmbeds).queue();
     }
 
     /**
@@ -106,7 +107,7 @@ public interface Command {
      * @param eb the embed to send.
      */
     default void sendEmbed(EmbedBuilder eb) {
-        sendEmbed(eb, false);
+        Events.INTERACTION.sendMessageEmbeds(eb.build()).queue();
     }
 
     /**

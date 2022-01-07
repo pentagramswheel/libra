@@ -41,9 +41,6 @@ public class Events extends ListenerAdapter {
     /** The original interaction engaged by a user's command. */
     public static InteractionHook INTERACTION;
 
-    /** The original place a command was sent in. */
-    public static MessageChannel ORIGIN;
-
     /**
      * Checks if the game set parameters make sense.
      * @param args the parameters to analyze.
@@ -84,6 +81,37 @@ public class Events extends ListenerAdapter {
         }
 
         return false;
+    }
+
+    /**
+     * Checks whether a command can be used in the interaction's channel
+     * or not.
+     * @param cmd the formal name of the command.
+     * @return True if the command can be used in the channel.
+     *         False otherwise.
+     */
+    private boolean wrongChannelUsed(String cmd) {
+        String[] channelCmds = {"cycle", "sub", "undo", "add"};
+        boolean isChannelCmd = false;
+        for (String channelCmd : channelCmds) {
+            isChannelCmd = isChannelCmd || cmd.contains(channelCmd);
+        }
+
+
+        String channel = INTERACTION.getInteraction().getTextChannel().getName();
+        String entryChannel = SERVER.getTextChannelsByName(
+                "mit-entry-confirmation", false).get(0).getName();
+        String lpReportsChannel = SERVER.getTextChannelsByName(
+                "lp-staff-match-report", false).get(0).getName();
+//        String ioReportsChannel = SERVER.getTextChannelsByName(
+//                "io-staff-match-report", false).get(0).getName();
+        String testChannel = SERVER.getTextChannelsByName(
+                "bot-testing", false).get(0).getName();
+
+        return isChannelCmd && !(channel.equals(entryChannel)
+                || channel.equals(lpReportsChannel)
+//                || channel.equals(ioReportsChannel)
+                || channel.equals(testChannel));
     }
 
     /**
@@ -170,6 +198,10 @@ public class Events extends ListenerAdapter {
             INTERACTION.sendMessage(
                     "You do not have permission to use this command.").queue();
             return;
+        } else if (wrongChannelUsed(cmd)) {
+            INTERACTION.sendMessage(
+                    "You cannot use this command in this channel.").queue();
+            return;
         }
 
         switch (cmd) {
@@ -235,6 +267,8 @@ public class Events extends ListenerAdapter {
      */
     @Override
     public void onSlashCommand(SlashCommandEvent sc) {
+        sc.deferReply().queue();
+
         Member author = sc.getMember();
         String cmd = sc.getName();
         String subGroup = sc.getSubcommandGroup();
@@ -246,13 +280,11 @@ public class Events extends ListenerAdapter {
         if (subCmd == null) {
             subCmd = "";
         }
-        String formalCmd = cmd + subGroup + subCmd;
 
         SERVER = sc.getGuild();
         INTERACTION = sc.getHook();
-        ORIGIN = sc.getChannel();
 
-        sc.deferReply().queue();
+        String formalCmd = cmd + subGroup + subCmd;
         parseCommands(sc, author, formalCmd, args);
     }
 

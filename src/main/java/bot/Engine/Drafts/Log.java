@@ -178,8 +178,8 @@ public class Log implements Command {
             double gameWinrate = (double) gameWins / gamesPlayed;
 
             String updateRange = link.buildRange(tab,
-                    "B", player.getPositionLP(),
-                    "K", player.getPositionLP());
+                    "B", player.getDraftPosition(),
+                    "K", player.getDraftPosition());
             ValueRange newRow = link.buildRow(Arrays.asList(
                             userTag, user.getEffectiveName(),
                             setWins, setLosses, setsPlayed, setWinrate,

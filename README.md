@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** December 31, 2021
+**Last Updated:** January 6, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -16,6 +16,7 @@
   - [Commands](#commands)
   + [Tools](#tools)
     - [Command](#command)
+    - [FileHandler] (#filehandler)
     - [GoogleAPI](#googleapi)
     - [Time](#time)
   + [Engine](#engine)
@@ -24,6 +25,7 @@
     - [PlayerStats](#playerstats)
   + [Drafts (Engine)](#drafts-engine)
     - [Log](#log)
+    - [MapGenerator] (#mapgenerator)
     - [Undo](#undo)
 * [Algorithms](#algorithms)
   - [Main] (#main-1)
@@ -31,6 +33,7 @@
   - [Commands](#commands-1)
   + [Tools](#tools-1)
     - [Command](#command-1)
+    - [FileHandler] (#filehandler-1)
     - [GoogleAPI](#googleapi-1)
     - [Time](#time-1)
   + [Engine](#engine-1)
@@ -39,6 +42,7 @@
     - [PlayerStats](#playerstats-1)
   + [Drafts (Engine)](#drafts-engine-1)
     - [Log](#log-1)
+    - [MapGenerator] (#mapgenerator-1)
     - [Undo](#undo-1)
 * [Persistence](#persistence)
 * [Licensing and Rights](#licensing-and-rights)
@@ -111,7 +115,6 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 1. `JDABuilder BOT` - an object representation of the bot.
 2. `Guild SERVER` - an object representation of the Discord server.
 3. `InteractionHook INTERACTION` - the original interaction made by the user.
-4. `MessageChannel ORIGIN` - the original channel the user-inputted command was sent in.
 
 ----
 
@@ -184,7 +187,7 @@ A class which graduates a user in an area within MIT, processing the command `lp
 A class for storing information about a Discord user.
 
 ###### Instance Variables
-1. `String positionLP` - the row position of the user's data within the LaunchPoint spreadsheet.
+1. `String draftPosition` - the row position of the user's data within their associated draft spreadsheet.
 2. `String name` - the user's Discord tag.
 3. `String nickname` - the user's nickname on the server.
 4. `int setWins` - the user's amount of won sets.
@@ -239,6 +242,10 @@ The `gamesPlayersValid` method checks whether there were more games won than gam
 ###### isStaffCommand
 
 The `isStaffCommand` method checks whether a user `author`'s command `cmd` is a staff command or not.
+
+###### wrongChannelUsed
+
+The `wrongChannelUsed` method checks whether a command `cmd` can be used in the channel the original interaction was sent in or not.
 
 ###### printTroubleshootString
 
@@ -298,11 +305,11 @@ The `sendReply` method sends a message `msg` to the channel a command was sent i
 
 The `sendFormat` method sends a message `msg`, formatted with some parameters `args`, to the channel a command was sent in.
 
+###### sendEmbeds (DEFAULT)
+
+The `sendEmbed` method replies with a list of embeds `ebs` to the user's interaction.
+
 ###### sendEmbed (DEFAULT)
-
-The `sendEmbed` method sends an embed `eb` to the channel a command was sent in if it is `spam`, and replies with the embed to the user's interaction otherwise.
-
-###### sendEmbed (OVERLOADED DEFAULT)
 
 The `sendEmbed` method replies with an embed `eb` to the user's interaction.
 
@@ -416,9 +423,9 @@ The `runCmd` method runs the `lp/io grad` commands and outputs the result in a c
 
 The `PlayerStats` method, the class's constructor, initializes the class's instance variables. An error may be caught here if a formatting problem is found within the spreadsheet.
 
-###### getPositionLP
+###### getDraftPosition
 
-The `getPositionLP` method retrieves the row number the player is located at within the LaunchPoint spreadsheet.
+The `getDraftPosition` method retrieves the row number the player is located at within their associated draft spreadsheet.
 
 ###### getName
 
@@ -506,9 +513,9 @@ The `getLegalMaps` method retrieves a list of legal maps in each game mode.
 
 The `findMapURL` method finds the URL to an online picture of a given map `map`.
 
-#### sendReport
+#### buildMatch
 
-The `sendReport` method sends a map `map` and mode `mode` choice in the form of an embed, given a flag `first` to check whether this is the first match or not.
+The `buildMatch` method builds a match with a map `map` and mode `mode` in the form of an embed.
 
 #### runCmd
 

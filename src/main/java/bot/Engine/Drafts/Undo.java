@@ -167,8 +167,8 @@ public class Undo extends Log implements Command {
             }
 
             String updateRange = link.buildRange(tab,
-                    "B", player.getPositionLP(),
-                    "K", player.getPositionLP());
+                    "B", player.getDraftPosition(),
+                    "K", player.getDraftPosition());
             ValueRange newRow = link.buildRow(Arrays.asList(
                     player.getName(), player.getNickname(),
                     setWins, setLosses, setsPlayed, setWinrate,

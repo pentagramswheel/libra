@@ -4,6 +4,7 @@ import bot.Tools.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.awt.Color;
@@ -130,17 +131,17 @@ public class MapGenerator implements Command {
     }
 
     /**
-     * Print the summary of the cycle match report.
+     * Builds the match format in the form of an embed.
      * @param mode the mode of the match.
      * @param map the map of the match.
      */
-    private void sendReport(String mode, String map, boolean first) {
+    private EmbedBuilder buildMatch(String mode, String map) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(Color.BLUE)
                 .addField(mode, map, false)
                 .setThumbnail(findMapURL(map));
 
-        sendEmbed(eb, !first);
+        return eb;
     }
 
     /**
@@ -153,13 +154,13 @@ public class MapGenerator implements Command {
                        List<OptionMapping> args) {
         int numGens = getListSize(args);
         int numModes = 0;
-
         ArrayList<String> modes = new ArrayList<>();
         TreeMap<String, ArrayList<String>> legalMaps = getLegalMaps();
 
         String lastMode = "";
         ArrayList<String> pastMaps = new ArrayList<>();
 
+        ArrayList<EmbedBuilder> matches = new ArrayList<>();
         for (int i = 0; i < numGens; i++) {
             if (numModes == 0) {
                 resetModes(modes);
@@ -185,10 +186,10 @@ public class MapGenerator implements Command {
             }
             pastMaps.add(modeMaps.remove(rIndex));
 
-            boolean ifFirst = i == 0;
-            sendReport(currMode, currMap, ifFirst);
+            matches.add(buildMatch(currMode, currMap));
         }
 
+        sendEmbeds(matches);
         log("A map list was generated.");
     }
 }
