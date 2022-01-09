@@ -2,27 +2,28 @@ package bot;
 
 /**
  * @author  Wil Aquino
- * Date:    June 3, 2021
+ * Date:    April 6, 2021
  * Project: LaunchPoint Bot
- * Module:  DiscordExample.java
- * Purpose: A template for the class Discord.java.
+ * Module:  Discord.java
+ * Purpose: Info specific to the bot and private to everyone
+ *          but the local computer.
  */
 public final class DiscordExample {
 
     /** LaunchPoint bot token. */
     private final static String botToken = "TOKEN";
 
-    //** LaunchPoint graduates Google Sheets ID. */
-    private final static String lpGradSheet = "ID";
+    /** LaunchPoint graduates Google Sheets ID. */
+    private final static String lpGradSheetID ="ID";
 
     /** Ink Odyssey graduates Google Sheets ID. */
-    private final static String ioGradSheet = "ID";
+    private final static String ioGradSheetID = "ID";
 
     /** LaunchPoint Cycles Google Sheets ID. */
-    private final static String cyclesSheetID = "ID";
+    private final static String lpCyclesSheetID = "ID";
 
     /** Ink Odyssey Google Sheets ID */
-    private final static String ioSheetID = "ID";
+    private final static String ioCyclesSheetID ="ID";
 
     /**
      * Retrieves the bot's token.
@@ -37,7 +38,7 @@ public final class DiscordExample {
      * @return said ID.
      */
     public static String getLPGradSheetID() {
-        return lpGradSheet;
+        return lpGradSheetID;
     }
 
     /**
@@ -45,7 +46,7 @@ public final class DiscordExample {
      * @return said ID.
      */
     public static String getIOGradSheetID() {
-        return ioGradSheet;
+        return ioGradSheetID;
     }
 
     /**
@@ -53,14 +54,14 @@ public final class DiscordExample {
      * @return said ID.
      */
     public static String getLPCyclesSheetID() {
-        return cyclesSheetID;
+        return lpCyclesSheetID;
     }
 
     /**
-     * Retrieves the IO drafts sheet ID.
+     * Retrieves the IO cycles sheet ID.
      * @return said ID.
      */
-    public static String getIOSheetID() {
-        return ioSheetID;
+    public static String getIOCyclesSheetID() {
+        return ioCyclesSheetID;
     }
 }

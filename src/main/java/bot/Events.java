@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -105,20 +104,19 @@ public class Events extends ListenerAdapter {
             isChannelCmd = isChannelCmd || cmd.contains(channelCmd);
         }
 
-
         String channel = INTERACTION.getInteraction().getTextChannel().getName();
         String entryChannel = SERVER.getTextChannelsByName(
                 "mit-entry-confirmation", false).get(0).getName();
         String lpReportsChannel = SERVER.getTextChannelsByName(
                 "lp-staff-match-report", false).get(0).getName();
-//        String ioReportsChannel = SERVER.getTextChannelsByName(
-//                "io-staff-match-report", false).get(0).getName();
+        String ioReportsChannel = SERVER.getTextChannelsByName(
+                "io-staff-match-report", false).get(0).getName();
         String testChannel = SERVER.getTextChannelsByName(
                 "bot-testing", false).get(0).getName();
 
         return isChannelCmd && !(channel.equals(entryChannel)
                 || channel.equals(lpReportsChannel)
-//                || channel.equals(ioReportsChannel)
+                || channel.equals(ioReportsChannel)
                 || channel.equals(testChannel));
     }
 

@@ -266,7 +266,7 @@ public class Log implements Command {
             }
 
             // tab name of the spreadsheet
-            String tab = "'Current Leaderboard'";
+            String tab = "'Current Cycle'";
 
             Values spreadsheet = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> data = link.readSection(
@@ -297,7 +297,6 @@ public class Log implements Command {
             sendReport(gamesWon, gamesLost, replyColor, userArgs, playerTypes, errorsFound);
             log(userArgs.size() + " cycle match(es) were processed.");
         } catch (IOException | GeneralSecurityException e) {
-            sendReply("The spreadsheet could not load.");
             log("The spreadsheet could not load.");
         }
     }

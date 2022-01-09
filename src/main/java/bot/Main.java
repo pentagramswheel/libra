@@ -113,10 +113,10 @@ public class Main {
         try {
             JDA jda = Events.BOT.build();
 
-            // run only if slash commands are not implemented yet
+            // run only if all slash commands have not been implemented yet
 //            Main.implementSlashCommands(jda);
 
-            String status = "lphelp | simping for @everyone";
+            String status = "Splatoon 3";
             jda.getPresence().setActivity(Activity.playing(
                     status));
 

@@ -202,7 +202,7 @@ public class Undo extends Log implements Command {
             }
 
             // tab name of the spreadsheet
-            String tab = "'Current Leaderboard'";
+            String tab = "'Current Cycle'";
 
             Values spreadsheet = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> data = link.readSection(
@@ -230,6 +230,7 @@ public class Undo extends Log implements Command {
 
             sendReport(messageArgs, userArgs, errorsFound);
         } catch (IOException | GeneralSecurityException e) {
+            log("The save could not load.");
             sendReply("The save could not load.");
         }
 

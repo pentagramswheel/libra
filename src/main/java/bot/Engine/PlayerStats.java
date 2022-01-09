@@ -46,7 +46,7 @@ public class PlayerStats {
                 gamesWon = Integer.parseInt(vals.get(6).toString());
                 gamesLost = Integer.parseInt(vals.get(7).toString());
             }
-        } catch (NumberFormatException e) {
+        } catch (IndexOutOfBoundsException | NumberFormatException e) {
             System.out.println("Spreadsheet formatting problem detected.");
             Events.INTERACTION.sendMessage(
                     "***There seems to be a formatting problem within the "
