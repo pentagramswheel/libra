@@ -53,13 +53,11 @@ public class Add extends bot.Events implements Command {
 
     /**
      * Runs any role commands.
-     * @param outChannel the channel to output to, if it exists.
      * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel, String cmd,
-                       List<OptionMapping> args) {
+    public void runCmd(String cmd, List<OptionMapping> args) {
         StringBuilder listOfUsers = new StringBuilder();
 
         for (OptionMapping om : args) {

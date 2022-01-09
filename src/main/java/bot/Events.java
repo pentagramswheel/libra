@@ -225,17 +225,17 @@ public class Events extends ListenerAdapter {
                 break;
             case "mitgenmaps":
                 MapGenerator maps = new MapGenerator();
-                maps.runCmd(null, cmd, args);
+                maps.runCmd(cmd, args);
                 break;
             case "lpadd":
             case "ioadd":
                 Add newcomer = new Add();
-                newcomer.runCmd(null, cmd, args);
+                newcomer.runCmd(cmd, args);
                 break;
             case "lpgrad":
             case "iograd":
                 Graduate grad = new Graduate();
-                grad.runCmd(null, cmd, args);
+                grad.runCmd(cmd, args);
                 break;
             case "lpstartdraft":
             case "iostartdraft":
@@ -251,7 +251,7 @@ public class Events extends ListenerAdapter {
             case "iosub":
                 if (gamesPlayedValid(args)) {
                     Log log = new Log();
-                    log.runCmd(null, cmd, args);
+                    log.runCmd(cmd, args);
 
                     saveCycleCall(cmd, args);
                 }
@@ -259,7 +259,7 @@ public class Events extends ListenerAdapter {
             case "lpundo":
             case "ioundo":
                 Undo undo = new Undo();
-                undo.runCmd(null, cmd, null);
+                undo.runCmd(cmd, null);
 
                 FileHandler save = findSave(cmd);
                 save.writeContents("REDACTED");

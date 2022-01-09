@@ -183,13 +183,11 @@ public class Undo extends Log implements Command {
 
     /**
      * Runs a cycle undoing command.
-     * @param outChannel the channel to output to, if it exists.
      * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel, String cmd,
-                       List<OptionMapping> args) {
+    public void runCmd(String cmd, List<OptionMapping> args) {
         try {
             GoogleAPI link;
             File undoFile;

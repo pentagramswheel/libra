@@ -252,8 +252,7 @@ public class Log implements Command {
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel, String cmd,
-                       List<OptionMapping> args) {
+    public void runCmd(String cmd, List<OptionMapping> args) {
         try {
             GoogleAPI link;
             Color replyColor;

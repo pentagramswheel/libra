@@ -149,8 +149,7 @@ public class MapGenerator implements Command {
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel, String cmd,
-                       List<OptionMapping> args) {
+    public void runCmd(String cmd, List<OptionMapping> args) {
         int numGens = getListSize(args);
         if (numGens > 9) {
             sendReply("Too many maps requested. The set would be too long!");

@@ -26,8 +26,7 @@ public interface Command {
      * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
-    void runCmd(MessageChannel outChannel, String cmd,
-                List<OptionMapping> args);
+    void runCmd(String cmd, List<OptionMapping> args);
 
     /**
      * Retrieves a role given its name.

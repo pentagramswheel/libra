@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** January 6, 2022
+**Last Updated:** January 9, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -283,7 +283,7 @@ The `onSlashCommand` method parses through clicked buttons `bc`, checking if a c
 
 ###### runCmd
 
-The `runCmd` method runs a command and outputs the result in a channel `outChannel`, the origin channel otherwise, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs a command, given the command `cmd` and its parameters/options `args`.
 
 ###### getRole (DEFAULT)
 
@@ -401,7 +401,7 @@ The `enterIO` method adds the "Ink Odyssey" role to a user `user`, and retrieves
 
 ###### runCmd
 
-The `runCmd` method runs the `lp/io add` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs the `lp/io add` commands, given the command `cmd` and its parameters/options `args`.
 
 ----
 
@@ -413,7 +413,7 @@ The `graduate` method adds a user `user` to a spreadsheet list of MIT graduates 
 
 ###### runCmd
 
-The `runCmd` method runs the `lp/io grad` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs the `lp/io grad` commands, given the command `cmd` and its parameters/options `args`.
 
 ----
 
@@ -491,35 +491,35 @@ This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user
 
 ###### runCmd
 
-The `runCmd` method runs the `lp/io cycle` and `lp/io sub` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs the `lp/io cycle` and `lp/io sub` commands, given the command `cmd` and its parameters/options `args`.
 
 ----
 
 #### MapGenerator
 
-##### resetModes
+###### resetModes
 
 The `resetModes` method resets the modes which can be chosen within the generator.
 
-##### getListSize
+###### getListSize
 
 The `getListSize` retrieves how many map/mode combinations to generate, given the original user input `args`.
 
-##### getLegalMaps
+###### getLegalMaps
 
 The `getLegalMaps` method retrieves a list of legal maps in each game mode.
 
-#### findMapURL
+###### findMapURL
 
 The `findMapURL` method finds the URL to an online picture of a given map `map`.
 
-#### buildMatch
+###### buildMatch
 
 The `buildMatch` method builds a match with a map `map` and mode `mode` in the form of an embed.
 
-#### runCmd
+###### runCmd
 
-The `runCmd` method runs the `mit genmaps` command and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs the `mit genmaps` command, given the command `cmd` and its parameters/options `args`.
 
 ----
 
@@ -551,7 +551,7 @@ This `undoUser` method uses the GoogleAPI `link` to revert the stats of a user `
 
 ###### runCmd
 
-The `runCmd` method runs the `lp/io undo` commands and outputs the result in a channel `outChannel`, the origin channel otherwise, given a list of users `users` and the original user input `args`.
+The `runCmd` method runs the `lp/io undo` commands, given the command `cmd` and its parameters/options `args`.
 
 ----
 

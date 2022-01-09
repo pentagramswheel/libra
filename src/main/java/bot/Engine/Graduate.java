@@ -100,8 +100,7 @@ public class Graduate extends bot.Events implements Command {
      * @param args the arguments of the command, if they exist.
      */
     @Override
-    public void runCmd(MessageChannel outChannel, String cmd,
-                       List<OptionMapping> args) {
+    public void runCmd(String cmd, List<OptionMapping> args) {
         StringBuilder listOfUsers = new StringBuilder();
         listOfUsers.append("```\n");
 
