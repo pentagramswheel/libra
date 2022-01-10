@@ -164,21 +164,11 @@ A class which retrieves the system's time.
 
 A class which gives roles to users in MIT, processing the command `lp add`.
 
-###### Instance Variables
-1. `Role lpRole` - an object representation of the 'LaunchPoint' role.
-2. `Role ioRole` - an object representation of the 'Ink Odyssey' role.
-
 ----
 
 #### Graduate
 
 A class which graduates a user in an area within MIT, processing the command `lp/io grad`, granting the associated roles.
-
-###### Instance Variables
-1. `Role lpRole` - an object representation of the 'LaunchPoint' role.
-2. `Role lpGradRole` - an object representation of the 'LaunchPoint Graduate' role.
-3. `Role ioRole` - an object representation of the 'Ink Odyssey' role.
-4. `Role ioGradRole` - an object representation of the 'Ink Odyssey Graduate' role.
 
 ----
 
@@ -235,6 +225,10 @@ The `main` method is the entry point of the bot's backend.
 
 #### Events
 
+###### isSimilar
+
+The `isSimilar` method checks whether a portion of a string `input` can be found in a list of strings `lst` or not.
+
 ###### gamesPlayedValid
 
 The `gamesPlayersValid` method checks whether there were more games won than games played (which makes no sense), of the cycle commands, given the command parameters `args`.
@@ -273,7 +267,7 @@ The `onSlashCommand` method parses through user input `sc`, checking if a slash 
 
 ###### onButtonClick
 
-The `onSlashCommand` method parses through clicked buttons `bc`, checking if a certain button was clicked.
+The `onButtonClick` method parses through clicked buttons `bc`, checking if a specific button was clicked.
 
 ----
 
@@ -299,11 +293,7 @@ The `removeRole` method removes a role `role` to a user `user`.
 
 ###### sendReply (DEFAULT)
 
-The `sendReply` method sends a message `msg` to the channel a command was sent in.
-
-###### sendFormat (DEFAULT)
-
-The `sendFormat` method sends a message `msg`, formatted with some parameters `args`, to the channel a command was sent in.
+The `sendReply` method sends a message `msg` to the user's interaction.
 
 ###### sendEmbeds (DEFAULT)
 
@@ -312,6 +302,18 @@ The `sendEmbed` method replies with a list of embeds `ebs` to the user's interac
 ###### sendEmbed (DEFAULT)
 
 The `sendEmbed` method replies with an embed `eb` to the user's interaction.
+
+###### disableButton (DEFAULT)
+
+The `disableButton` method disables a button that was clicked `bc`, changing its label to a new one `newLabel`.
+
+###### sendButtons (DEFAULT)
+
+The `sendButtons` method constructs a group of buttons with reference names `ids`, labels `labels`, and types `types` and links them to the interaction which constructed those buttons, with caption `caption`.
+
+###### sendButton (DEFAULT)
+
+The `sendButton` method constructs a button with reference name `id`, label `label`, and type `type` and link them to the interaction which constructed the button, with caption `caption`.
 
 ###### wait (DEFAULT)
 

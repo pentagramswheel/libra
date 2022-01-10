@@ -3,6 +3,7 @@ package bot;
 import bot.Engine.Add;
 import bot.Engine.Drafts.MapGenerator;
 import bot.Engine.Drafts.Log;
+import bot.Engine.Drafts.StartDraft;
 import bot.Engine.Drafts.Undo;
 import bot.Engine.Graduate;
 import bot.Tools.FileHandler;
@@ -19,7 +20,6 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,6 +39,40 @@ public class Events extends ListenerAdapter {
 
     /** The original interaction engaged by a user's command. */
     public static InteractionHook INTERACTION;
+
+    private StartDraft draft;
+
+//    private List<StartDraft> lpDrafts;
+//    private List<StartDraft> ioDrafts;
+
+    /**
+     * Checks whether a part of an input string can be found
+     * in a list of strings.
+     * @param input the input string to compare.
+     * @param lst the list of strings to search.
+     * @return True if the input string was in the list.
+     *         False otherwise.
+     */
+    private boolean isSimilar(String input, String[] lst) {
+        for (String item : lst) {
+            if (item.contains(input)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Defers the reply of a slash command, if necessary.
+     * @param sc the slash command to analyze.
+     */
+    private void deferReplyIfNeeded(SlashCommandEvent sc) {
+        String[] nonDeferCmds = {"startdraft"};
+        if (!isSimilar(sc.getSubcommandName(), nonDeferCmds)) {
+            sc.deferReply().queue();
+        }
+    }
 
     /**
      * Checks if the game set parameters make sense.
@@ -75,16 +109,11 @@ public class Events extends ListenerAdapter {
      *         False otherwise.
      */
     private boolean isStaffCommand(String cmd, Member author) {
-        String[] staffCommands = {"cycle", "sub", "undo", "add", "grad"};
+        String[] staffCmds = {"cycle", "sub", "undo", "add", "grad"};
         Role staffRole = SERVER.getRolesByName("Staff", true).get(0);
 
-        if (cmd.isEmpty()) {
-            return false;
-        } else if (!author.getRoles().contains(staffRole))
-            for (String staffCmd : staffCommands) {
-                if (cmd.contains(staffCmd)) {
-                    return true;
-                }
+        if (!author.getRoles().contains(staffRole)) {
+            return isSimilar(cmd, staffCmds);
         }
 
         return false;
@@ -98,26 +127,28 @@ public class Events extends ListenerAdapter {
      *         False otherwise.
      */
     private boolean wrongChannelUsed(String cmd) {
-        String[] channelCmds = {"cycle", "sub", "undo", "add"};
-        boolean isChannelCmd = false;
-        for (String channelCmd : channelCmds) {
-            isChannelCmd = isChannelCmd || cmd.contains(channelCmd);
-        }
+        String[] channelCmds = {"startdraft", "cycle", "sub", "undo", "add"};
+        boolean isChannelCmd = isSimilar(cmd, channelCmds);
 
         String channel = INTERACTION.getInteraction().getTextChannel().getName();
         String entryChannel = SERVER.getTextChannelsByName(
                 "mit-entry-confirmation", false).get(0).getName();
+        String lpDraftChannel = SERVER.getTextChannelsByName(
+                "lp-looking-for-draft", false).get(0).getName();
         String lpReportsChannel = SERVER.getTextChannelsByName(
                 "lp-staff-match-report", false).get(0).getName();
+        String ioDraftChannel = SERVER.getTextChannelsByName(
+                "lp-looking-for-draft", false).get(0).getName();
         String ioReportsChannel = SERVER.getTextChannelsByName(
                 "io-staff-match-report", false).get(0).getName();
         String testChannel = SERVER.getTextChannelsByName(
                 "bot-testing", false).get(0).getName();
-
-        return isChannelCmd && !(channel.equals(entryChannel)
-                || channel.equals(lpReportsChannel)
-                || channel.equals(ioReportsChannel)
+        boolean inIncorrectChannel = !(channel.equals(entryChannel)
+                || channel.equals(lpDraftChannel) || channel.equals(lpReportsChannel)
+                || channel.equals(ioDraftChannel) || channel.equals(ioReportsChannel)
                 || channel.equals(testChannel));
+
+        return isChannelCmd && inIncorrectChannel;
     }
 
     /**
@@ -161,7 +192,7 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Structures a user into a mentionable ping.
+     * Structures a user into a mentionable ping, ignoring nicknames.
      * @param om an argument from a command.
      * @return the formatted ping.
      */
@@ -198,15 +229,14 @@ public class Events extends ListenerAdapter {
      * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
-    private void parseCommands(SlashCommandEvent sc, Member author, String cmd,
+    private void parseCommands(Member author, String cmd,
                                List<OptionMapping> args) {
-        if (isStaffCommand(cmd, author)) {
+        if (isStaffCommand(cmd, author) || wrongChannelUsed(cmd)) {
+            if (!INTERACTION.getInteraction().isAcknowledged()) {
+                INTERACTION.getInteraction().deferReply(true).queue();
+            }
             INTERACTION.sendMessage(
-                    "You do not have permission to use this command.").queue();
-            return;
-        } else if (wrongChannelUsed(cmd)) {
-            INTERACTION.sendMessage(
-                    "You cannot use this command in this channel.").queue();
+                    "You do not have permission to use this command here.").queue();
             return;
         }
 
@@ -239,12 +269,9 @@ public class Events extends ListenerAdapter {
                 break;
             case "lpstartdraft":
             case "iostartdraft":
-                System.out.println("A draft has been started.");
-                List<Member> players = new ArrayList<>();
-                players.add(sc.getMember());
-
-//                StartDraft sd = new StartDraft();
-//                sd.runCmd(null, author, null, e); // author - users to attach, e - slash command
+                draft = new StartDraft(author);
+                draft.runCmd(cmd, args);
+                break;
             case "lpcycle":
             case "lpsub":
             case "iocycle":
@@ -269,11 +296,11 @@ public class Events extends ListenerAdapter {
 
     /**
      * Runs one of the bot's commands.
-     * @param sc the slash command to analyze.
+     * @param sc a slash command to analyze.
      */
     @Override
     public void onSlashCommand(SlashCommandEvent sc) {
-        sc.deferReply().queue();
+        deferReplyIfNeeded(sc);
 
         Member author = sc.getMember();
         String cmd = sc.getName();
@@ -291,21 +318,21 @@ public class Events extends ListenerAdapter {
         INTERACTION = sc.getHook();
 
         String formalCmd = cmd + subGroup + subCmd;
-        parseCommands(sc, author, formalCmd, args);
+        parseCommands(author, formalCmd, args);
     }
 
     /**
      * Checks any button clicks.
-     * @param bc the button click to analyze.
+     * @param bc a button click to analyze.
      */
     @Override
     public void onButtonClick(ButtonClickEvent bc){
-        System.out.println("hi");
-        if (bc.getButton().getId().equals("Join")){
-            List<Member> author = new ArrayList<>();
-            author.add(bc.getMember());
-
-//            sd.runCmd2(null, author, e); // author - users to attach, e - slash command
+        String btnName = bc.getButton().getId();
+        switch (btnName) {
+            case "JoinLP":
+            case "JoinIO":
+                draft.attemptDraft(bc);
+                break;
         }
     }
 }

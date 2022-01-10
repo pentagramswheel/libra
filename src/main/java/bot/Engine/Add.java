@@ -2,7 +2,6 @@ package bot.Engine;
 
 import bot.Tools.Command;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
@@ -17,18 +16,13 @@ import java.util.List;
  */
 public class Add extends bot.Events implements Command {
 
-    /** The Discord LaunchPoint role. */
-    private final Role lpRole = getRole("LaunchPoint");
-
-    /** The Discord Ink Odyssey role. */
-    private final Role ioRole = getRole("Ink Odyssey");
-
     /**
      * Allows a user entry into LaunchPoint.
      * @param user the user to add.
      * @return the entrance welcome message.
      */
     private String enterLP(Member user) {
+        Role lpRole = getRole("LaunchPoint");
         addRole(user, lpRole);
 
         String rulesChannel = SERVER.getTextChannelsByName(
@@ -43,6 +37,7 @@ public class Add extends bot.Events implements Command {
      * @return the entrance welcome message.
      */
     private String enterIO(Member user) {
+        Role ioRole = getRole("Ink Odyssey");
         addRole(user, ioRole);
 
         String rulesChannel = SERVER.getTextChannelsByName(

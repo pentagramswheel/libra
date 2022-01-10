@@ -56,7 +56,7 @@ public class Main {
         CommandData io = new CommandData("io",
                 "Commands to use within Ink Odyssey.");
         SubcommandData startdraft = new SubcommandData("startdraft",
-                "Begins an automatic draft with up to 8 players.");
+                "Requests an automatic draft with up to 8 players.");
         SubcommandData cycle = new SubcommandData("cycle",
                 "Manually reports draft scores for up to four players.");
         SubcommandData sub = new SubcommandData("sub",
@@ -114,7 +114,7 @@ public class Main {
             JDA jda = Events.BOT.build();
 
             // run only if all slash commands have not been implemented yet
-//            Main.implementSlashCommands(jda);
+            Main.implementSlashCommands(jda);
 
             String status = "Splatoon 3";
             jda.getPresence().setActivity(Activity.playing(

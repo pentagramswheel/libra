@@ -3,7 +3,6 @@ package bot.Engine.Drafts;
 import bot.Tools.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.awt.Color;
@@ -48,9 +47,10 @@ public class MapGenerator implements Command {
     private TreeMap<String, ArrayList<String>> getLegalMaps() {
         TreeMap<String, ArrayList<String>> legalMaps = new TreeMap<>();
         ArrayList<String> szMaps = new ArrayList<>(Arrays.asList(
-                "Goby Arena", "Humpback Pump Track", "MakoMart",
-                "Musselforge Fitness", "New Albacore Hotel", "Piranha Pit",
-                "Skipper Pavilion", "Starfish Mainstage", "Sturgeon Shipyard",
+                "Ancho-V Games", "Goby Arena", "Humpback Pumptrack",
+                "MakoMart", "Manta Maria", "Musselforge Fitness",
+                "New Albacore Hotel", "Piranha Pit", "Skipper Pavilion",
+                "Starfish Mainstage", "Sturgeon Shipyard", "The Reef",
                 "Wahoo World"));
         ArrayList<String> tcMaps = new ArrayList<>(Arrays.asList(
                 "Ancho-V Games", "Inkblot Art Academy", "MakoMart",
@@ -58,12 +58,13 @@ public class MapGenerator implements Command {
                 "Starfish Mainstage", "Sturgeon Shipyard", "The Reef"));
         ArrayList<String> rmMaps = new ArrayList<>(Arrays.asList(
                 "Ancho-V Games", "Blackbelly Skatepark", "Humpback Pump Track",
-                "Inkblot Art Academy", "Manta Maria", "Snapper Canal",
-                "Starfish Mainstage", "Sturgeon Shipyard", "The Reef"));
+                "Inkblot Art Academy", "MakoMart", "Manta Maria",
+                "Musselforge Fitness", "Snapper Canal", "Starfish Mainstage",
+                "Sturgeon Shipyard"));
         ArrayList<String> cbMaps = new ArrayList<>(Arrays.asList(
-                "Ancho-V Games", "Humpback Pump Track", "Inkblot Art Academy",
-                "MakoMart", "Manta Maria", "New Albacore Hotel",
-                "Piranha Pit", "Snapper Canal", "The Reef"));
+                "Humpback Pump Track", "Inkblot Art Academy", "MakoMart",
+                "New Albacore Hotel", "Piranha Pit", "Snapper Canal",
+                "The Reef"));
 
         legalMaps.put("Splat Zones", szMaps);
         legalMaps.put("Tower Control", tcMaps);

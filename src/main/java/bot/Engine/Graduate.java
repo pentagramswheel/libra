@@ -5,7 +5,6 @@ import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
 
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
@@ -13,7 +12,6 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
 import java.util.List;
-import java.util.Collections;
 import java.util.Arrays;
 import java.util.TreeMap;
 import java.io.IOException;
@@ -28,18 +26,6 @@ import java.security.GeneralSecurityException;
  */
 public class Graduate extends bot.Events implements Command {
 
-    /** The Discord LaunchPoint role. */
-    private final Role lpRole = getRole("LaunchPoint");
-
-    /** The Discord LP Graduate role. */
-    private final Role lpGradRole = getRole("LaunchPoint Graduate");
-
-    /** The Discord Ink Odyssey role. */
-    private final Role ioRole = getRole("Ink Odyssey");
-
-    /** The Discord Ink Odyssey role. */
-    private final Role ioGradRole = getRole("Ink Odyssey Graduate");
-
     /**
      * Graduates a user from LaunchPoint.
      * @param cmd the formal name of the command.
@@ -47,7 +33,12 @@ public class Graduate extends bot.Events implements Command {
      * @return a graduation congratulation message.
      */
     private String graduate(String cmd, Member user) {
+        Role lpRole = getRole("LaunchPoint");
+        Role lpGradRole = getRole("LaunchPoint Graduate");
+        Role ioRole = getRole("Ink Odyssey");
+        Role ioGradRole = getRole("Ink Odyssey Graduate");
         String exitMessage = "";
+
         try {
             GoogleAPI link;
             if (cmd.equals("lpgrad")) {
@@ -80,10 +71,9 @@ public class Graduate extends bot.Events implements Command {
                         "%s has already graduated from LaunchPoint.",
                         user.getUser().getAsTag()));
             } else {
-                ValueRange newRow = new ValueRange().setValues(
-                    Collections.singletonList(Arrays.asList(
+                ValueRange newRow = link.buildRow(Arrays.asList(
                             user.getId(), user.getUser().getAsTag(),
-                            user.getEffectiveName())));
+                            user.getEffectiveName()));
                 link.appendRow(tab, spreadsheet, newRow);
             }
         } catch (IOException | GeneralSecurityException e) {
