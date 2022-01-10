@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** January 9, 2022
+**Last Updated:** January 10, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -115,12 +115,12 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 1. `JDABuilder BOT` - an object representation of the bot.
 2. `Guild SERVER` - an object representation of the Discord server.
 3. `InteractionHook INTERACTION` - the original interaction made by the user.
+4. `int MAX_LP_DRAFTS` - the maximum number of LaunchPoint drafts.
+5. `int MAX_IO_DRAFTS` - the maximum number of Ink Odyssey drafts.
+6. `List<StartDraft> lpDrafts` - a list of started LaunchPoint drafts.
+7. `List<StartDraft ioDrafts` - a list of started Ink Odyssey drafts.
 
 ----
-
-#### Commands
-
-The class which formally holds and runs the commands.
 
 ----
 
@@ -201,6 +201,18 @@ A class which generates map lists for drafts.
 
 ----
 
+#### StartDraft
+
+A class which starts a draft.
+
+###### Instance Variables
+1. `int numLPDrafts` - the number of active LaunchPoint drafts at any time.
+2. `int numIODrafts` - the number of active Ink Odyssey drafts at any time.
+3. `List<Member> players` - the list of players within the draft.
+4. `Role draftRole` - the role to ping for this draft.
+
+----
+
 #### Undo
 
 A class which reverts draft commands, processing the command `lp/io undo`.
@@ -244,6 +256,14 @@ The `wrongChannelUsed` method checks whether a command `cmd` can be used in the 
 ###### printTroubleshootString
 
 The `printTroubleshootString` method prints the script for the `help` command.
+
+###### processDraft
+
+The `processDraft` method starts a draft, if possible, given the user who requested it `author`, the inputted command `cmd`, and the maximum number of drafts `maxDrafts` for each draft within the running drafts `ongoingDrafts`.
+
+###### processDrafts
+
+The `processDrafts` method starts a draft, is possible, given the user who requested it `author` and the inputted command `cmd`.
 
 ###### findSave
 
@@ -290,6 +310,10 @@ The `addRole` method adds a role `role` to a user `user`.
 ###### removeRole (DEFAULT)
 
 The `removeRole` method removes a role `role` to a user `user`.
+
+###### getChannel (DEFAULT)
+
+The `getChannel` method retrieves a text channel `channel` from the server.
 
 ###### sendReply (DEFAULT)
 
@@ -522,6 +546,30 @@ The `buildMatch` method builds a match with a map `map` and mode `mode` in the f
 ###### runCmd
 
 The `runCmd` method runs the `mit genmaps` command, given the command `cmd` and its parameters/options `args`.
+
+----
+
+#### StartDraft
+
+###### StartDraft
+
+The `StartDraft` method, the class's constructor, builds the initialized draft using the player who called for it `initialPlayer`.
+
+###### getPlayers
+
+The `getPlayers` method retrieves the players of the draft.
+
+###### sendReport
+
+The `sendReport` method sends a summary of the started draft labeled with color `color` and leading the players to communicate through the draft channel `channel`.
+
+###### attemptDraft
+
+The `attemptDraft` method attempts to start the draft after a "join draft" button `bc` was clicked.
+
+###### runCmd
+
+The `runCmd` method runs the `lp/io startdraft` commands, given the command `cmd` and its parameters/options `args`.
 
 ----
 

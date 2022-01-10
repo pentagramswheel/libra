@@ -3,9 +3,7 @@ package bot.Tools;
 import bot.Events;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -34,6 +32,7 @@ public interface Command {
     /**
      * Retrieves a role given its name.
      * @param role the name of the role.
+     * @return the role.
      */
     default Role getRole(String role) {
         return Events.SERVER.getRolesByName(role, true).get(0);
@@ -69,6 +68,15 @@ public interface Command {
             wait(2000);
             user = Events.SERVER.retrieveMemberById(user.getId()).complete();
         }
+    }
+
+    /**
+     * Retrieves a channel given its name.
+     * @param channel the name of the channel.
+     * @return the channel.
+     */
+    default TextChannel getChannel(String channel) {
+        return Events.SERVER.getTextChannelsByName(channel, true).get(0);
     }
 
     /**

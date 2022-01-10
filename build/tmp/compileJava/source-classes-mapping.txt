@@ -1,30 +1,30 @@
-bot/Tools/Time.java
- bot.Tools.Time
-bot/DiscordExample.java
- bot.DiscordExample
-bot/Discord.java
- bot.Discord
 bot/Tools/FileHandler.java
  bot.Tools.FileHandler
-bot/Events.java
- bot.Events
-bot/Main.java
- bot.Main
-bot/Engine/PlayerStats.java
- bot.Engine.PlayerStats
-bot/Tools/GoogleAPI.java
- bot.Tools.GoogleAPI
 bot/Engine/Drafts/Log.java
  bot.Engine.Drafts.Log
 bot/Engine/Drafts/MapGenerator.java
  bot.Engine.Drafts.MapGenerator
+bot/Engine/Drafts/Undo.java
+ bot.Engine.Drafts.Undo
+bot/Discord.java
+ bot.Discord
+bot/DiscordExample.java
+ bot.DiscordExample
+bot/Tools/Time.java
+ bot.Tools.Time
+bot/Events.java
+ bot.Events
+bot/Tools/GoogleAPI.java
+ bot.Tools.GoogleAPI
 bot/Tools/Command.java
  bot.Tools.Command
 bot/Engine/Graduate.java
  bot.Engine.Graduate
+bot/Engine/PlayerStats.java
+ bot.Engine.PlayerStats
 bot/Engine/Add.java
  bot.Engine.Add
 bot/Engine/Drafts/StartDraft.java
  bot.Engine.Drafts.StartDraft
-bot/Engine/Drafts/Undo.java
- bot.Engine.Drafts.Undo
+bot/Main.java
+ bot.Main

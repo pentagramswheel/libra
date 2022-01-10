@@ -25,8 +25,7 @@ public class Add extends bot.Events implements Command {
         Role lpRole = getRole("LaunchPoint");
         addRole(user, lpRole);
 
-        String rulesChannel = SERVER.getTextChannelsByName(
-                        "lp-draft-rules", true).get(0).getAsMention();
+        String rulesChannel = getChannel("lp-draft-rules").getAsMention();
         return "Welcome to LaunchPoint! Make sure to read "
                 + rulesChannel + "!";
     }
@@ -40,8 +39,7 @@ public class Add extends bot.Events implements Command {
         Role ioRole = getRole("Ink Odyssey");
         addRole(user, ioRole);
 
-        String rulesChannel = SERVER.getTextChannelsByName(
-                "io-draft-rules", true).get(0).getAsMention();
+        String rulesChannel = getChannel("io-draft-rules").getAsMention();
         return "Welcome to Ink Odyssey! Make sure to read "
                 + rulesChannel + "!";
     }

@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,10 +41,13 @@ public class Events extends ListenerAdapter {
     /** The original interaction engaged by a user's command. */
     public static InteractionHook INTERACTION;
 
-    private StartDraft draft;
+    /** Fields which determine the maximum number of drafts.  */
+    private final static int MAX_LP_DRAFTS = 4;
+    private final static int MAX_IO_DRAFTS = 2;
 
-//    private List<StartDraft> lpDrafts;
-//    private List<StartDraft> ioDrafts;
+    /** Fields for storing started drafts. */
+    private List<StartDraft> lpDrafts;
+    private List<StartDraft> ioDrafts;
 
     /**
      * Checks whether a part of an input string can be found
@@ -179,6 +183,46 @@ public class Events extends ListenerAdapter {
     }
 
     /**
+     * Processes a draft, when possible.
+     * @param author the user who ran the command.
+     * @param cmd the formal name of the command.
+     * @param maxDrafts the maximum number of drafts that can occur.
+     * @param ongoingDrafts list of ongoing drafts.
+     */
+    private void processDraft(Member author, String cmd, int maxDrafts,
+                              List<StartDraft> ongoingDrafts) {
+        if (ongoingDrafts.size() == maxDrafts) {
+            INTERACTION.getInteraction().reply(
+                    "Wait until a draft has finished!").queue();
+        } else {
+            StartDraft newDraft = new StartDraft(author);
+
+            ongoingDrafts.add(newDraft);
+            newDraft.runCmd(cmd, null);
+        }
+    }
+
+    /**
+     * Processes drafts, when possible.
+     * @param author the user who ran the command.
+     * @param cmd the formal name of the command.
+     */
+    private void processDrafts(Member author, String cmd) {
+        if (cmd.startsWith("lp")) {
+            if (lpDrafts == null) {
+                lpDrafts = new ArrayList<>();
+            }
+            processDraft(author, cmd, MAX_LP_DRAFTS, lpDrafts);
+        } else {
+            if (ioDrafts == null) {
+                ioDrafts = new ArrayList<>();
+            }
+            processDraft(author, cmd, MAX_IO_DRAFTS, ioDrafts);
+        }
+    }
+
+
+    /**
      * Find the undo file to load.
      * @param cmd the formal name of the command.
      * @return said file.
@@ -269,8 +313,7 @@ public class Events extends ListenerAdapter {
                 break;
             case "lpstartdraft":
             case "iostartdraft":
-                draft = new StartDraft(author);
-                draft.runCmd(cmd, args);
+                processDrafts(author, cmd);
                 break;
             case "lpcycle":
             case "lpsub":
@@ -328,10 +371,19 @@ public class Events extends ListenerAdapter {
     @Override
     public void onButtonClick(ButtonClickEvent bc){
         String btnName = bc.getButton().getId();
+        int numButton = Integer.parseInt(btnName.substring(
+                btnName.length() - 1)) - 1;
+
         switch (btnName) {
-            case "JoinLP":
-            case "JoinIO":
-                draft.attemptDraft(bc);
+            case "JoinLP1":
+            case "JoinLP2":
+            case "JoinLP3":
+            case "JoinLP4":
+                lpDrafts.get(numButton).attemptDraft(bc);
+                break;
+            case "JoinIO1":
+            case "JoinIO2":
+                ioDrafts.get(numButton).attemptDraft(bc);
                 break;
         }
     }
