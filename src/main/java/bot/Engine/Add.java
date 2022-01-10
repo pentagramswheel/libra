@@ -2,7 +2,6 @@ package bot.Engine;
 
 import bot.Tools.Command;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.List;
@@ -14,33 +13,27 @@ import java.util.List;
  * Module:  Add.java
  * Purpose: Adds roles to users in LaunchPoint.
  */
-public class Add extends bot.Events implements Command {
+public class Add extends Section implements Command {
 
     /**
-     * Allows a user entry into LaunchPoint.
-     * @param user the user to add.
-     * @return the entrance welcome message.
+     * Constructs the add attributes.
+     * @param abbreviation the abbreviation of the section.
      */
-    private String enterLP(Member user) {
-        Role lpRole = getRole("LaunchPoint");
-        addRole(user, lpRole);
-
-        String rulesChannel = getChannel("lp-draft-rules").getAsMention();
-        return "Welcome to LaunchPoint! Make sure to read "
-                + rulesChannel + "!";
+    public Add(String abbreviation) {
+        super(abbreviation);
     }
 
     /**
-     * Allows a user entry into Ink Odyssey.
+     * Allows a user entry into a section.
      * @param user the user to add.
      * @return the entrance welcome message.
      */
-    private String enterIO(Member user) {
-        Role ioRole = getRole("Ink Odyssey");
-        addRole(user, ioRole);
+    private String enter(Member user) {
+        addRole(user, getRole(getSection()));
+        String rulesChannelName = getPrefix() + "-draft-rules";
 
-        String rulesChannel = getChannel("io-draft-rules").getAsMention();
-        return "Welcome to Ink Odyssey! Make sure to read "
+        String rulesChannel = getChannel(rulesChannelName).getAsMention();
+        return "Welcome to " + getSection() + "! Make sure to read "
                 + rulesChannel + "!";
     }
 
@@ -55,16 +48,7 @@ public class Add extends bot.Events implements Command {
 
         for (OptionMapping om : args) {
             Member user = om.getAsMember();
-            String welcomeMessage = "";
-
-            // parse different role commands
-            switch (cmd) {
-                case "lpadd":
-                    welcomeMessage = enterLP(user);
-                    break;
-                case "ioadd":
-                    welcomeMessage = enterIO(user);
-            }
+            String welcomeMessage = enter(user);
 
             Member finalUser = args.get(args.size() - 1).getAsMember();
             if (user.equals(finalUser)) {

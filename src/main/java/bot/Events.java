@@ -184,43 +184,42 @@ public class Events extends ListenerAdapter {
 
     /**
      * Processes a draft, when possible.
+     * @param prefix the prefix of the command.
      * @param author the user who ran the command.
-     * @param cmd the formal name of the command.
      * @param maxDrafts the maximum number of drafts that can occur.
      * @param ongoingDrafts list of ongoing drafts.
      */
-    private void processDraft(Member author, String cmd, int maxDrafts,
+    private void processDraft(String prefix, Member author, int maxDrafts,
                               List<StartDraft> ongoingDrafts) {
         if (ongoingDrafts.size() == maxDrafts) {
             INTERACTION.getInteraction().reply(
                     "Wait until a draft has finished!").queue();
         } else {
-            StartDraft newDraft = new StartDraft(author);
+            StartDraft newDraft = new StartDraft(prefix, author);
 
             ongoingDrafts.add(newDraft);
-            newDraft.runCmd(cmd, null);
+            newDraft.runCmd(null, null);
         }
     }
 
     /**
      * Processes drafts, when possible.
+     * @param prefix the prefix of the command.
      * @param author the user who ran the command.
-     * @param cmd the formal name of the command.
      */
-    private void processDrafts(Member author, String cmd) {
-        if (cmd.startsWith("lp")) {
+    private void processDrafts(String prefix, Member author) {
+        if (prefix.equals("lp")) {
             if (lpDrafts == null) {
                 lpDrafts = new ArrayList<>();
             }
-            processDraft(author, cmd, MAX_LP_DRAFTS, lpDrafts);
+            processDraft(prefix, author, MAX_LP_DRAFTS, lpDrafts);
         } else {
             if (ioDrafts == null) {
                 ioDrafts = new ArrayList<>();
             }
-            processDraft(author, cmd, MAX_IO_DRAFTS, ioDrafts);
+            processDraft(prefix, author, MAX_IO_DRAFTS, ioDrafts);
         }
     }
-
 
     /**
      * Find the undo file to load.
@@ -270,10 +269,11 @@ public class Events extends ListenerAdapter {
     /**
      * Parses through which of the bot's commands to run.
      * @param author the user who ran the command.
+     * @param prefix the prefix of the formal command name.
      * @param cmd the formal name of the command.
      * @param args the arguments of the command, if they exist.
      */
-    private void parseCommands(Member author, String cmd,
+    private void parseCommands(Member author, String prefix, String cmd,
                                List<OptionMapping> args) {
         if (isStaffCommand(cmd, author) || wrongChannelUsed(cmd)) {
             if (!INTERACTION.getInteraction().isAcknowledged()) {
@@ -303,24 +303,24 @@ public class Events extends ListenerAdapter {
                 break;
             case "lpadd":
             case "ioadd":
-                Add newcomer = new Add();
+                Add newcomer = new Add(prefix);
                 newcomer.runCmd(cmd, args);
                 break;
             case "lpgrad":
             case "iograd":
-                Graduate grad = new Graduate();
+                Graduate grad = new Graduate(prefix);
                 grad.runCmd(cmd, args);
                 break;
             case "lpstartdraft":
             case "iostartdraft":
-                processDrafts(author, cmd);
+                processDrafts(prefix, author);
                 break;
             case "lpcycle":
             case "lpsub":
             case "iocycle":
             case "iosub":
                 if (gamesPlayedValid(args)) {
-                    Log log = new Log();
+                    Log log = new Log(prefix);
                     log.runCmd(cmd, args);
 
                     saveCycleCall(cmd, args);
@@ -328,7 +328,7 @@ public class Events extends ListenerAdapter {
                 break;
             case "lpundo":
             case "ioundo":
-                Undo undo = new Undo();
+                Undo undo = new Undo(prefix);
                 undo.runCmd(cmd, null);
 
                 FileHandler save = findSave(cmd);
@@ -361,7 +361,7 @@ public class Events extends ListenerAdapter {
         INTERACTION = sc.getHook();
 
         String formalCmd = cmd + subGroup + subCmd;
-        parseCommands(author, formalCmd, args);
+        parseCommands(author, cmd, formalCmd, args);
     }
 
     /**

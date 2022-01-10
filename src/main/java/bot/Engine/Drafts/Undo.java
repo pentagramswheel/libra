@@ -1,6 +1,5 @@
 package bot.Engine.Drafts;
 
-import bot.Discord;
 import bot.Engine.PlayerStats;
 import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
@@ -29,6 +28,14 @@ import java.util.List;
  * Purpose: Reverts the Cycle spreadsheet to the previous state.
  */
 public class Undo extends Log implements Command {
+
+    /**
+     * Constructs the cycle undo attributes.
+     * @param abbreviation the abbreviation of the section.
+     */
+    public Undo(String abbreviation) {
+        super(abbreviation);
+    }
 
     /**
      * Retrieves the previous cycle command.
@@ -188,15 +195,8 @@ public class Undo extends Log implements Command {
     @Override
     public void runCmd(String cmd, List<OptionMapping> args) {
         try {
-            GoogleAPI link;
-            File undoFile;
-            if (cmd.startsWith("lp")) {
-                link = new GoogleAPI(Discord.getLPCyclesSheetID());
-                undoFile = new File("loadLP.txt");
-            } else {
-                link = new GoogleAPI(Discord.getIOCyclesSheetID());
-                undoFile = new File("loadIO.txt");
-            }
+            GoogleAPI link = new GoogleAPI(cyclesSheetID());
+            File undoFile = new File("load" + getPrefix().toUpperCase() + ".txt");
 
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";

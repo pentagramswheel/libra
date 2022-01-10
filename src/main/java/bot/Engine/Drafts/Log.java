@@ -1,7 +1,7 @@
 package bot.Engine.Drafts;
 
-import bot.Discord;
 import bot.Engine.PlayerStats;
+import bot.Engine.Section;
 import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
 
@@ -26,7 +26,15 @@ import java.security.GeneralSecurityException;
  * Module:  Log.java
  * Purpose: Logs cycle information via command.
  */
-public class Log implements Command {
+public class Log extends Section implements Command {
+
+    /**
+     * Constructs the cycle log attributes.
+     * @param abbreviation the abbreviation of the section.
+     */
+    public Log(String abbreviation) {
+        super(abbreviation);
+    }
 
     /**
      * Checks if this is a draft or sub command.
@@ -253,15 +261,8 @@ public class Log implements Command {
     @Override
     public void runCmd(String cmd, List<OptionMapping> args) {
         try {
-            GoogleAPI link;
-            Color replyColor;
-            if (cmd.startsWith("lp")) {
-                link = new GoogleAPI(Discord.getLPCyclesSheetID());
-                replyColor = Color.GREEN;
-            } else {
-                link = new GoogleAPI(Discord.getIOCyclesSheetID());
-                replyColor = Color.MAGENTA;
-            }
+            GoogleAPI link = new GoogleAPI(cyclesSheetID());
+            Color replyColor = getColor();
 
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";

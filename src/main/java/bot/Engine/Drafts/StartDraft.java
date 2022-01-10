@@ -1,5 +1,6 @@
 package bot.Engine.Drafts;
 
+import bot.Engine.Section;
 import bot.Tools.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -15,12 +16,12 @@ import java.util.Random;
 
 /**
  * @author  Wil Aquino, Turtle#1504
- * Date:    December 22, 2021
+ * Date:    December 6, 2021
  * Project: LaunchPoint Bot
  * Module:  StartDraft.java
  * Purpose: Starts a draft.
  */
-public class StartDraft implements Command {
+public class StartDraft extends Section implements Command {
 
     /** Fields for the number of active drafts. */
     public static int numLPDrafts = 0;
@@ -33,10 +34,13 @@ public class StartDraft implements Command {
     private Role draftRole;
 
     /**
-     * Constructs the initialized draft.
+     * Constructs the initialized draft and initializes
+     * the draft start attributes.
+     * @param abbreviation the abbreviation of the section.
      * @param initialPlayer the first player of the draft.
      */
-    public StartDraft(Member initialPlayer) {
+    public StartDraft(String abbreviation, Member initialPlayer) {
+        super(abbreviation);
         players = new ArrayList<>();
         players.add(initialPlayer);
     }
@@ -112,21 +116,12 @@ public class StartDraft implements Command {
             disableButton(bc, "Draft queue full.");
 
             String btnName = bc.getButton().getId();
-            String suffix = btnName.substring(
-                    btnName.length() - 3, btnName.length() - 1);
             int numButton = Integer.parseInt(
                     btnName.substring(btnName.length() - 1));
-            boolean isLPButton = suffix.equals("LP");
 
-            if (isLPButton) {
-                TextChannel draftChannel = getChannel(
-                        "lp-draft-chat-" + numButton);
-                sendReport(Color.GREEN, draftChannel);
-            } else {
-                TextChannel draftChannel = getChannel(
-                        "io-draft-chat-" + numButton);
-                sendReport(Color.MAGENTA, draftChannel);
-            }
+            TextChannel draftChannel = getChannel(
+                    getPrefix() + "-draft-chat-" + numButton);
+            sendReport(getColor(), draftChannel);
         }
     }
 
@@ -137,22 +132,20 @@ public class StartDraft implements Command {
      */
     @Override
     public void runCmd(String cmd, List<OptionMapping> args) {
-        String prefix = cmd.substring(0, 2);
         String id;
-        if (prefix.equals("lp")) {
+        if (getPrefix().equals("lp")) {
             numLPDrafts++;
-            id = "Join" + prefix.toUpperCase() + numLPDrafts;
-            draftRole = getRole("LaunchPoint");
+            id = "Join" + getPrefix().toUpperCase() + numLPDrafts;
         } else {
             numIODrafts++;
-            id = "Join" + prefix.toUpperCase() + numIODrafts;
-            draftRole = getRole("Ink Odyssey");
+            id = "Join" + getPrefix().toUpperCase() + numIODrafts;
         }
+        draftRole = getRole(getSection());
 
         String caption = draftRole.getAsMention() + " +7";
         String label = "Join Draft";
 
         sendButton(caption, id, label, 0);
-        log("A " + prefix.toUpperCase() + " draft has been requested.");
+        log("A " + getPrefix().toUpperCase() + " draft has been requested.");
     }
 }

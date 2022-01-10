@@ -75,11 +75,13 @@ java src/main/java/bot/Main.java
 | mit help | Outputs troubleshooting information for the bot. |
 | mit profile | Outputs a summary of a player's profile within MIT. |
 | mit genmaps | Generates a map list for a draft. | 1. `matches` - the amount of maps needed for the amount of matches going to be played. |
+| lp draftstart | Starts an automatic LaunchPoint draft. |
 | lp cycle | Manually updates players' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | lp sub | Manually updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | lp undo | Reverts the previous LP cycle command, *once and only once*. |
 | lp add | Gives players the LaunchPoint role. | 1. `users` - Discord users in the form of Discord pings. |
 | lp grad | Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
+| io draftstart | Starts an automatic Ink Odyssey draft. |
 | io cycle | Manually updates players' Ink Odyssey Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | io sub | Manually updates subs' Ink Odyssey stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | io undo | Reverts the previous IO cycle command, *once and only once*. |
@@ -168,7 +170,7 @@ A class which gives roles to users in MIT, processing the command `lp add`.
 
 #### Graduate
 
-A class which graduates a user in an area within MIT, processing the command `lp/io grad`, granting the associated roles.
+A class which graduates a user in a section within MIT, processing the command `lp/io grad`, granting the associated roles.
 
 ----
 
@@ -184,6 +186,19 @@ A class for storing information about a Discord user.
 5. `int setLosses` - the user's amount of lost sets.
 6. `int gamesWon` - the user's amount of won games.
 7. `int gamesLost` - the user's amount of lost games.
+
+----
+
+#### Section
+
+A class for parenting MIT section-specific commands.
+
+###### Instance Variables
+1. `String name` - the name of this section.
+2. `String prefix` - the prefix of this section. 
+3. `Color color` - the color of this section.
+4. `String gradSheetID` - the graduates spreadsheet ID for this section.
+5. `String cyclesSheetID` - the graduates spreadsheet ID for this section.
 
 ----
 
@@ -259,11 +274,11 @@ The `printTroubleshootString` method prints the script for the `help` command.
 
 ###### processDraft
 
-The `processDraft` method starts a draft, if possible, given the user who requested it `author`, the inputted command `cmd`, and the maximum number of drafts `maxDrafts` for each draft within the running drafts `ongoingDrafts`.
+The `processDraft` method starts a draft, if possible, given the inputted command's prefix `prefix`, the user who requested it `author`, and the maximum number of drafts `maxDrafts` for each draft within the running drafts `ongoingDrafts`.
 
 ###### processDrafts
 
-The `processDrafts` method starts a draft, is possible, given the user who requested it `author` and the inputted command `cmd`.
+The `processDrafts` method starts a draft, if possible, given the inputted command's prefix `prefix` and the user who requested it `author`.
 
 ###### findSave
 
@@ -279,7 +294,7 @@ The `saveCycleCall` method saves the user input `cmd` and `args` to the one of t
 
 ###### parseCommands
 
-The `parseCommands` method runs a command based on the full command `cmd` and its parameters/options `args`, given the user who inputted it `author` and the object representation of the command itself `sc`.
+The `parseCommands` method runs a command based on the full command `cmd`, its prefix `prefix`, and its parameters/options `args`, given the user who inputted it `author` and the object representation of the command itself `sc`.
 
 ###### onSlashCommand
 
@@ -417,13 +432,13 @@ The `currentTime` method retrieves the current time of the running machine.
 
 #### Add
 
-###### enterLP
+###### Add
 
-The `enterLP` method adds the "LaunchPoint" role to a user `user` and retrieves a welcome message.
+The `Add` method, the class's constructor, builds the assigned add attributes given its prefix `abbreviation`.
 
-###### enterIO
+###### enter
 
-The `enterIO` method adds the "Ink Odyssey" role to a user `user`, and retrieves a welcome message.
+The `enter` method adds the section role to a user `user` and retrieves a welcome message.
 
 ###### runCmd
 
@@ -432,6 +447,10 @@ The `runCmd` method runs the `lp/io add` commands, given the command `cmd` and i
 ----
 
 #### Graduate
+
+###### Graduate
+
+The `Graduate` method, the class's constructor, builds the assigned graduation attributes given its prefix `abbreviation`.
 
 ###### graduate
 
@@ -479,9 +498,41 @@ The `getGamesLost` method retrieves the user's amount of lost games.
 
 ----
 
+#### Section
+
+###### Section
+
+The `Section` method, the class's constructor, builds the section's attributes given its prefix `abbreviation`.
+
+###### getSection
+
+The `getSection` method retrieves the section's name.
+
+###### getPrefix
+
+The `getPrefix` method retrieves the section's designated prefix.
+
+###### getColor
+
+The `getColor` method retrieves the section's designated color.
+
+###### gradSheetID
+
+The `gradSheetID` method retrieves the graduates sheet ID.
+
+###### cyclesSheetID
+
+The `cyclesSheetID` method retrieves the section's cycle sheet ID.
+
+----
+
 ### Drafts (Engine)
 
 #### Log
+
+###### Log
+
+The `Log` method, the class's constructor, builds the assigned cycle log attributes given its prefix `abbreviation`.
 
 ###### notSub
 
@@ -553,7 +604,7 @@ The `runCmd` method runs the `mit genmaps` command, given the command `cmd` and 
 
 ###### StartDraft
 
-The `StartDraft` method, the class's constructor, builds the initialized draft using the player who called for it `initialPlayer`.
+The `StartDraft` method, the class's constructor, builds the initialized draft using the player who called for it `initialPlayer` and builds the assigned cycle log attributes given its prefix `abbreviation`.
 
 ###### getPlayers
 
@@ -574,6 +625,10 @@ The `runCmd` method runs the `lp/io startdraft` commands, given the command `cmd
 ----
 
 #### Undo
+
+###### Undo
+
+The `Undo` method, the class's constructor, builds the assigned cycle undo attributes given its prefix `abbreviation`.
 
 ##### retrieveLastMessage
 
