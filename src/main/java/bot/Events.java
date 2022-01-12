@@ -1,9 +1,9 @@
 package bot;
 
 import bot.Engine.Add;
+import bot.Engine.Drafts.Draft;
 import bot.Engine.Drafts.MapGenerator;
 import bot.Engine.Drafts.Log;
-import bot.Engine.Drafts.StartDraft;
 import bot.Engine.Drafts.Undo;
 import bot.Engine.Graduate;
 import bot.Tools.FileHandler;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author  Wil Aquino, Turtle
+ * @author  Wil Aquino
  * Date:    February 17, 2021
  * Project: LaunchPoint Bot
  * Module:  Events.java
@@ -46,8 +46,8 @@ public class Events extends ListenerAdapter {
     private final static int MAX_IO_DRAFTS = 2;
 
     /** Fields for storing started drafts. */
-    private List<StartDraft> lpDrafts;
-    private List<StartDraft> ioDrafts;
+    private List<Draft> lpDrafts;
+    private List<Draft> ioDrafts;
 
     /**
      * Checks whether a part of an input string can be found
@@ -59,7 +59,7 @@ public class Events extends ListenerAdapter {
      */
     private boolean isSimilar(String input, String[] lst) {
         for (String item : lst) {
-            if (item.contains(input)) {
+            if (input.contains(item)) {
                 return true;
             }
         }
@@ -131,10 +131,6 @@ public class Events extends ListenerAdapter {
      *         False otherwise.
      */
     private boolean wrongChannelUsed(String cmd) {
-        String[] channelCmds = {"startdraft", "cycle", "sub", "undo", "add"};
-        boolean isChannelCmd = isSimilar(cmd, channelCmds);
-
-        String channel = INTERACTION.getInteraction().getTextChannel().getName();
         String entryChannel = SERVER.getTextChannelsByName(
                 "mit-entry-confirmation", false).get(0).getName();
         String lpDraftChannel = SERVER.getTextChannelsByName(
@@ -147,12 +143,18 @@ public class Events extends ListenerAdapter {
                 "io-staff-match-report", false).get(0).getName();
         String testChannel = SERVER.getTextChannelsByName(
                 "bot-testing", false).get(0).getName();
-        boolean inIncorrectChannel = !(channel.equals(entryChannel)
-                || channel.equals(lpDraftChannel) || channel.equals(lpReportsChannel)
-                || channel.equals(ioDraftChannel) || channel.equals(ioReportsChannel)
-                || channel.equals(testChannel));
 
-        return isChannelCmd && inIncorrectChannel;
+        String channel = INTERACTION.getInteraction().getTextChannel().getName();
+        boolean isEntryChannel = cmd.contains("add")
+                && channel.equals(entryChannel);
+        boolean isDraftChannel = cmd.contains("startdraft")
+                && channel.equals(lpDraftChannel) || channel.equals(ioDraftChannel);
+        boolean isReportsChannel = (cmd.contains("cycle") || cmd.contains("sub"))
+                && channel.equals(lpReportsChannel) || channel.equals(ioReportsChannel);
+        boolean isTestChannel = channel.equals(testChannel);
+
+        return !(isEntryChannel || isDraftChannel || isReportsChannel
+                || isTestChannel);
     }
 
     /**
@@ -190,12 +192,14 @@ public class Events extends ListenerAdapter {
      * @param ongoingDrafts list of ongoing drafts.
      */
     private void processDraft(String prefix, Member author, int maxDrafts,
-                              List<StartDraft> ongoingDrafts) {
+                              List<Draft> ongoingDrafts) {
+        // need to fix this, maybe use a queue
         if (ongoingDrafts.size() == maxDrafts) {
             INTERACTION.getInteraction().reply(
                     "Wait until a draft has finished!").queue();
         } else {
-            StartDraft newDraft = new StartDraft(prefix, author);
+            Draft newDraft =
+                    new Draft(ongoingDrafts.size() + 1, prefix, author);
 
             ongoingDrafts.add(newDraft);
             newDraft.runCmd(null, null);
@@ -277,63 +281,59 @@ public class Events extends ListenerAdapter {
                                List<OptionMapping> args) {
         if (isStaffCommand(cmd, author) || wrongChannelUsed(cmd)) {
             if (!INTERACTION.getInteraction().isAcknowledged()) {
-                INTERACTION.getInteraction().deferReply(true).queue();
+                INTERACTION.getInteraction().deferReply().queue();
             }
             INTERACTION.sendMessage(
                     "You do not have permission to use this command here.").queue();
-            return;
-        }
+        } else if (prefix.equals("mit")) {
+            switch (cmd.substring(3)) {
+                case "status":
+                    INTERACTION.sendMessageFormat(
+                            "The bot is online. Welcome, %s.",
+                            author.getEffectiveName()).queue();
+                    break;
+                case "help":
+                    printTroubleshootString();
+                    break;
+                case "profile":
+                    INTERACTION.sendMessage(
+                            "This command has not been implemented yet.").queue();
+                    break;
+                case "genmaps":
+                    MapGenerator maps = new MapGenerator();
+                    maps.runCmd(cmd, args);
+                    break;
+            }
+        } else {
+            switch (cmd.substring(2)) {
+                case "add":
+                    Add newcomer = new Add(prefix);
+                    newcomer.runCmd(cmd, args);
+                    break;
+                case "grad":
+                    Graduate grad = new Graduate(prefix);
+                    grad.runCmd(cmd, args);
+                    break;
+                case "startdraft":
+                    processDrafts(prefix, author);
+                    break;
+                case "cycle":
+                case "sub":
+                    if (gamesPlayedValid(args)) {
+                        Log log = new Log(prefix);
+                        log.runCmd(cmd, args);
 
-        switch (cmd) {
-            case "mitstatus":
-                INTERACTION.sendMessageFormat(
-                        "The bot is online. Welcome, %s.",
-                        author.getEffectiveName()).queue();
-                break;
-            case "mithelp":
-                printTroubleshootString();
-                break;
-            case "mitprofile":
-                INTERACTION.sendMessage(
-                        "This command has not been implemented yet.").queue();
-                break;
-            case "mitgenmaps":
-                MapGenerator maps = new MapGenerator();
-                maps.runCmd(cmd, args);
-                break;
-            case "lpadd":
-            case "ioadd":
-                Add newcomer = new Add(prefix);
-                newcomer.runCmd(cmd, args);
-                break;
-            case "lpgrad":
-            case "iograd":
-                Graduate grad = new Graduate(prefix);
-                grad.runCmd(cmd, args);
-                break;
-            case "lpstartdraft":
-            case "iostartdraft":
-                processDrafts(prefix, author);
-                break;
-            case "lpcycle":
-            case "lpsub":
-            case "iocycle":
-            case "iosub":
-                if (gamesPlayedValid(args)) {
-                    Log log = new Log(prefix);
-                    log.runCmd(cmd, args);
+                        saveCycleCall(cmd, args);
+                    }
+                    break;
+                case "undo":
+                    Undo undo = new Undo(prefix);
+                    undo.runCmd(cmd, null);
 
-                    saveCycleCall(cmd, args);
-                }
-                break;
-            case "lpundo":
-            case "ioundo":
-                Undo undo = new Undo(prefix);
-                undo.runCmd(cmd, null);
-
-                FileHandler save = findSave(cmd);
-                save.writeContents("REDACTED");
-                break;
+                    FileHandler save = findSave(cmd);
+                    save.writeContents("REDACTED");
+                    break;
+            }
         }
     }
 
@@ -371,19 +371,33 @@ public class Events extends ListenerAdapter {
     @Override
     public void onButtonClick(ButtonClickEvent bc){
         String btnName = bc.getButton().getId();
-        int numButton = Integer.parseInt(btnName.substring(
-                btnName.length() - 1)) - 1;
+        int indexOfNum = btnName.length() - 1;
+        int numButton = Integer.parseInt(btnName.substring(indexOfNum)) - 1;
 
-        switch (btnName) {
-            case "JoinLP1":
-            case "JoinLP2":
-            case "JoinLP3":
-            case "JoinLP4":
+        switch (btnName.substring(0, indexOfNum)) {
+            case "joinLP":
                 lpDrafts.get(numButton).attemptDraft(bc);
                 break;
-            case "JoinIO1":
-            case "JoinIO2":
+            case "joinIO":
                 ioDrafts.get(numButton).attemptDraft(bc);
+                break;
+            case "requestSubLP":
+                lpDrafts.get(numButton).requestSub(bc);
+                break;
+            case "requestSubIO":
+                ioDrafts.get(numButton).requestSub(bc);
+                break;
+            case "subLP":
+                lpDrafts.get(numButton).addSub(bc);
+                break;
+            case "subIO":
+                ioDrafts.get(numButton).addSub(bc);
+                break;
+            case "leaveLP":
+                lpDrafts.get(numButton).removePlayer(bc);
+                break;
+            case "leaveIO":
+                ioDrafts.get(numButton).removePlayer(bc);
                 break;
         }
     }

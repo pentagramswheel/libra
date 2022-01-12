@@ -1,13 +1,15 @@
 bot/Engine/Drafts/Log.java
  bot.Engine.Drafts.Log
-bot/Events.java
- bot.Events
+bot/Tools/BuiltButton.java
+ bot.Tools.BuiltButton
 bot/Engine/Drafts/MapGenerator.java
  bot.Engine.Drafts.MapGenerator
 bot/Engine/Section.java
  bot.Engine.Section
-bot/Engine/PlayerStats.java
- bot.Engine.PlayerStats
+bot/Engine/Add.java
+ bot.Engine.Add
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
 bot/Discord.java
  bot.Discord
 bot/DiscordExample.java
@@ -18,15 +20,17 @@ bot/Tools/Time.java
  bot.Tools.Time
 bot/Tools/FileHandler.java
  bot.Tools.FileHandler
+bot/Main.java
+ bot.Main
+bot/Engine/PlayerStats.java
+ bot.Engine.PlayerStats
 bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Tools/Command.java
  bot.Tools.Command
-bot/Engine/Graduate.java
- bot.Engine.Graduate
-bot/Engine/Add.java
- bot.Engine.Add
-bot/Engine/Drafts/StartDraft.java
- bot.Engine.Drafts.StartDraft
-bot/Main.java
- bot.Main
+bot/Engine/Drafts/DraftPlayer.java
+ bot.Engine.Drafts.DraftPlayer
+bot/Engine/Drafts/FormatDraft.java
+ bot.Engine.Drafts.FormatDraft
+bot/Events.java
+ bot.Events

@@ -3,15 +3,18 @@ package bot.Tools;
 import bot.Events;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * @author  Wil Aquino
@@ -80,12 +83,22 @@ public interface Command {
     }
 
     /**
-     * Send a message to Discord in the place the original
-     * interaction was made.
+     * Send a reply to the original interaction made
+     * in Discord.
      * @param msg the message to send.
      */
     default void sendReply(String msg) {
         Events.INTERACTION.sendMessage(msg).queue();
+    }
+
+    /**
+     * Send a message to Discord in the place the original
+     * interaction was made.
+     * @param msg the message to send.
+     */
+    default void sendMessage(String msg) {
+        Events.INTERACTION.getInteraction().getMessageChannel().sendMessage(
+                msg).queue();
     }
 
     /**
@@ -118,59 +131,31 @@ public interface Command {
      */
     default void disableButton(ButtonClickEvent bc, String newLabel) {
         String id = bc.getId();
+        if (newLabel == null) {
+            newLabel = bc.getButton().getLabel();
+        }
+
         bc.getInteraction().editButton(
                 Button.secondary(id, newLabel).asDisabled()).queue();
     }
 
     /**
-     * Links a group of buttons to an interaction.
+     * Links a line of buttons to an interaction.
      * @param caption the caption of the button group.
-     * @param ids the reference names of the buttons.
-     * @param labels the labels for the buttons.
-     * @param types the types of the buttons.
+     * @param buttons the group of buttons to link.
      */
-    default void sendButtons(String caption, List<String> ids,
-                             List<String> labels, List<Integer> types) {
+    default void sendButtons(String caption, List<Button> buttons) {
         ReplyAction reply = Events.INTERACTION.getInteraction().reply(caption);
-        for (int i = 0; i < ids.size(); i++) {
-            String currID = ids.get(i);
-            String currLabel = labels.get(i);
-            int currType = types.get(i);
-            Button button;
-
-            switch (currType) {
-                case 1:
-                    button = Button.success(currID, currLabel);
-                    break;
-                case 2:
-                    button = Button.secondary(currID, currLabel);
-                    break;
-                case 3:
-                    button = Button.danger(currID, currLabel);
-                    break;
-                default:
-                    button = Button.primary(currID, currLabel);
-                    break;
-            }
-            reply.addActionRow(button);
-        }
-
-        reply.queue();
+        reply.addActionRow(buttons).queue();
     }
 
     /**
      * Links a button to an interaction.
      * @param caption the caption of the button.
-     * @param id the reference name of the button.
-     * @param label the label for the button.
-     * @param type the type of the button.
+     * @param button the button to link.
      */
-    default void sendButton(String caption, String id, String label,
-                            int type) {
-        sendButtons(caption,
-                Collections.singletonList(id),
-                Collections.singletonList(label),
-                Collections.singletonList(type));
+    default void sendButton(String caption, Button button) {
+        sendButtons(caption, Collections.singletonList(button));
     }
 
     /**

@@ -119,14 +119,22 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 3. `InteractionHook INTERACTION` - the original interaction made by the user.
 4. `int MAX_LP_DRAFTS` - the maximum number of LaunchPoint drafts.
 5. `int MAX_IO_DRAFTS` - the maximum number of Ink Odyssey drafts.
-6. `List<StartDraft> lpDrafts` - a list of started LaunchPoint drafts.
-7. `List<StartDraft ioDrafts` - a list of started Ink Odyssey drafts.
-
-----
+6. `List<Draft> lpDrafts` - a list of started LaunchPoint drafts.
+7. `List<Draft> ioDrafts` - a list of started Ink Odyssey drafts.
 
 ----
 
 ### Tools
+
+#### BuiltButton
+
+A class which builds a button quickly.
+
+###### Instance Variables
+1. `Button button` - the button that was built.
+
+
+----
 
 #### Command
 
@@ -203,6 +211,33 @@ A class for parenting MIT section-specific commands.
 ----
 
 ### Drafts (Engine)
+
+#### Draft
+
+A class which forms and starts drafts.
+
+###### Instance Variables
+1. `boolean started` - a flag for checking whether the draft has started or not.
+2. `int subsNeeded` - the amount of subs needed for the draft at any given time.
+3. `numDraft` - the formal number of the draft, with respect to the draft lists in `Events`.
+4. `List<DraftPlayer> players` - the core (8) players of the draft
+5. `List<DraftPlayer> subs` - the subs of the draft, if any.
+6. `Role draftRole` - the section of MIT which this draft is occurring in.
+7. `TextChannel draftChat` - the draft chat which this draft is linked to.
+
+----
+
+#### DraftPlayer
+
+A class which represents a player within a draft.
+
+###### Instance Variables
+1. `Member player` - the player within the draft.
+2. `int matchWins` - the player's match wins during the draft.
+3. `int matchLosses` - the player's match losses during the draft.
+4. `int pings` - the player's amount of pings during the draft.
+
+----
 
 #### Log
 
@@ -308,6 +343,18 @@ The `onButtonClick` method parses through clicked buttons `bc`, checking if a sp
 
 ### Tools
 
+#### BuiltButton
+
+###### BuiltButton
+
+The `BuiltButton` method, the class's constructor, builds a button given its implemented id `buttonID`, its label `buttonLabel`, and what type of button it is `buttonType`.
+
+###### getButton
+
+The `getButton` method retrieves the built button.
+
+----
+
 #### Command
 
 ###### runCmd
@@ -332,7 +379,11 @@ The `getChannel` method retrieves a text channel `channel` from the server.
 
 ###### sendReply (DEFAULT)
 
-The `sendReply` method sends a message `msg` to the user's interaction.
+The `sendReply` method sends a reply `msg` to the user's interaction.
+
+###### sendMessage (DEFAULT)
+
+The `sendMessage` method sends a message `msg` to the channel the user's original interaction was made.
 
 ###### sendEmbeds (DEFAULT)
 
@@ -348,11 +399,11 @@ The `disableButton` method disables a button that was clicked `bc`, changing its
 
 ###### sendButtons (DEFAULT)
 
-The `sendButtons` method constructs a group of buttons with reference names `ids`, labels `labels`, and types `types` and links them to the interaction which constructed those buttons, with caption `caption`.
+The `sendButtons` method constructs a line of buttons `buttons` and links them to the interaction which constructed those buttons, with caption `caption`.
 
 ###### sendButton (DEFAULT)
 
-The `sendButton` method constructs a button with reference name `id`, label `label`, and type `type` and link them to the interaction which constructed the button, with caption `caption`.
+The `sendButton` method constructs a button `button` and links them to the interaction which constructed the button, with caption `caption`.
 
 ###### wait (DEFAULT)
 
@@ -527,6 +578,107 @@ The `cyclesSheetID` method retrieves the section's cycle sheet ID.
 ----
 
 ### Drafts (Engine)
+
+#### Draft
+
+###### Draft
+
+The `Draft` method constructs a draft template, given the player who initialized it `initialPlayer`, the abbreviation of the section which the draft is occurring in `abbreivation`, and the number draft `draft` it is for the section.
+
+###### toggleDraft
+
+The `toggleDraft` method activates/deactivates the draft.
+
+###### inProgress
+
+the `inProgress` method checks whether the draft has started yet, i.e. if the draft is activated or not.
+
+###### getPlayers
+
+The `getPlayers` method retrieves the core players of the draft.
+
+###### getSubs
+
+The `getSubs` method retrieves the subs of the draft.
+
+###### getDraftRole
+
+The `getDraftRole` method retrieves the role ping of the draft's section.
+
+###### getDraftChannel
+
+The `getDraftChannel` method retrieves the draft chat channel that the draft is linked with.
+
+###### sendReport
+
+The `sendReport` method send a draft confirmation summary of a started draft.
+
+###### newRequest
+
+The `newRequest` method formats a new ping request for gathering players.
+
+###### draftContains
+
+The `draftContains` method checks whether a player `player` is within a draft's list of players `lst` or not (it returns the index of their spot in the draft queue or -1 if it cannot be found).
+
+###### attemptDraft
+
+The `attemptDraft` method tries to start a draft after a "Join Draft" button `bc` was clicked.
+
+###### requestSub
+
+The `requestSub` method tries to have a player request for a sub after a "Request Sub" button `bc` was clicked.
+
+###### addSub
+
+The `addSub` method tries to add a sub to the draft after a "Join As Sub" button `bc` was clicked.
+
+###### removePlayer
+
+The `removePlayer` method removes a core player from the draft queue after a "Leave" button was clicked.
+
+###### runCmd
+
+The `runCmd` method runs the `lp/io startdraft` commands, given the command `cmd` and its parameters/options `args`.
+
+
+----
+
+#### DraftPlayer
+
+###### DraftPlayer
+
+The `DraftPlayer` method, the class's constructor, builds the attributes of the draft player.
+
+###### getInfo
+
+The `getInfo` method retrieves the object representation of the player.
+
+###### getWins
+
+The `getWins` method retrieves the player's match wins during the draft.
+
+###### incrementWins
+
+The `incrementWins` method gives a match win to the player.
+
+###### getLosses
+
+The `getLosses` method retrieves the player's match losses during the draft.
+
+###### incrementLosses
+
+The `incrementLosses` method gives a match loss to the player.
+
+###### getPings
+
+The `getPings` method retrieves the amount of times the player has pinged during the draft.
+
+###### incrementPings
+
+The `incrementPings` method increases the player's amount of pings by one.
+
+----
 
 #### Log
 
