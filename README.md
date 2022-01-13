@@ -31,7 +31,7 @@
     - [MapGenerator](#mapgenerator)
     - [Undo](#undo)
 * [Algorithms](#algorithms)
-  - [Main] (#main-1)
+  - [Main](#main-1)
   - [Events](#events-1)
   - [Commands](#commands-1)
   + [Tools](#tools-1)
