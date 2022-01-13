@@ -21,7 +21,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * @author  Wil Aquino
@@ -31,9 +33,6 @@ import java.util.List;
  * Purpose: Builds the bot by processing commands and analyzing user input.
  */
 public class Events extends ListenerAdapter {
-
-    /** The current state of the bot. */
-    public static JDABuilder BOT;
 
     /** The Discord server's current state. */
     public static Guild SERVER;
@@ -45,9 +44,13 @@ public class Events extends ListenerAdapter {
     private final static int MAX_LP_DRAFTS = 4;
     private final static int MAX_IO_DRAFTS = 2;
 
-    /** Fields for storing started drafts. */
+    /** Fields for storing drafts. */
     private List<Draft> lpDrafts;
     private List<Draft> ioDrafts;
+
+    /** Fields for storing queues for started drafts. */
+    private Queue<Integer> lpQueue;
+    private Queue<Integer> ioQueue;
 
     /**
      * Checks whether a part of an input string can be found
@@ -188,18 +191,17 @@ public class Events extends ListenerAdapter {
      * Processes a draft, when possible.
      * @param prefix the prefix of the command.
      * @param author the user who ran the command.
-     * @param maxDrafts the maximum number of drafts that can occur.
      * @param ongoingDrafts list of ongoing drafts.
+     * @param queue the
      */
-    private void processDraft(String prefix, Member author, int maxDrafts,
-                              List<Draft> ongoingDrafts) {
-        // need to fix this, maybe use a queue
-        if (ongoingDrafts.size() == maxDrafts) {
+    private void processDraft(String prefix, Member author,
+                              List<Draft> ongoingDrafts, Queue<Integer> queue) {
+        if (queue.size() == 0) {
             INTERACTION.getInteraction().reply(
                     "Wait until a draft has finished!").queue();
         } else {
             Draft newDraft =
-                    new Draft(ongoingDrafts.size() + 1, prefix, author);
+                    new Draft(queue.remove(), prefix, author);
 
             ongoingDrafts.add(newDraft);
             newDraft.runCmd(null, null);
@@ -212,16 +214,33 @@ public class Events extends ListenerAdapter {
      * @param author the user who ran the command.
      */
     private void processDrafts(String prefix, Member author) {
-        if (prefix.equals("lp")) {
-            if (lpDrafts == null) {
-                lpDrafts = new ArrayList<>();
-            }
-            processDraft(prefix, author, MAX_LP_DRAFTS, lpDrafts);
-        } else {
-            if (ioDrafts == null) {
-                ioDrafts = new ArrayList<>();
-            }
-            processDraft(prefix, author, MAX_IO_DRAFTS, ioDrafts);
+        switch (prefix) {
+            case "lp":
+                if (lpDrafts == null) {
+                    lpDrafts = new ArrayList<>();
+                }
+                if (lpQueue == null) {
+                    lpQueue = new LinkedList<>();
+                    for (int i = 0; i < MAX_LP_DRAFTS; i++) {
+                        lpQueue.add(i + 1);
+                    }
+                }
+
+                processDraft(prefix, author, lpDrafts, lpQueue);
+                break;
+            case "io":
+                if (ioDrafts == null) {
+                    ioDrafts = new ArrayList<>();
+                }
+                if (ioQueue == null) {
+                    ioQueue = new LinkedList<>();
+                    for (int i = 0; i < MAX_IO_DRAFTS; i++) {
+                        ioQueue.add(i + 1);
+                    }
+                }
+
+                processDraft(prefix, author, ioDrafts, ioQueue);
+                break;
         }
     }
 
@@ -360,6 +379,12 @@ public class Events extends ListenerAdapter {
         SERVER = sc.getGuild();
         INTERACTION = sc.getHook();
 
+        // delete once the bot is ready
+        if (sc.getMember().getRoles() == null || !sc.getMember().getRoles().contains(
+                SERVER.getRolesByName("Staff", true).get(0))) {
+            INTERACTION.sendMessage("The bot is not ready to use yet.").queue();
+        }
+
         String formalCmd = cmd + subGroup + subCmd;
         parseCommands(author, cmd, formalCmd, args);
     }
@@ -372,33 +397,41 @@ public class Events extends ListenerAdapter {
     public void onButtonClick(ButtonClickEvent bc){
         String btnName = bc.getButton().getId();
         int indexOfNum = btnName.length() - 1;
-        int numButton = Integer.parseInt(btnName.substring(indexOfNum)) - 1;
 
-        switch (btnName.substring(0, indexOfNum)) {
-            case "joinLP":
-                lpDrafts.get(numButton).attemptDraft(bc);
+        Draft draft;
+        Queue<Integer> queue;
+        String suffix = btnName.substring(indexOfNum - 2, indexOfNum);
+        int numButton = Integer.parseInt(btnName.substring(indexOfNum)) - 1;
+        switch (suffix) {
+            case "LP":
+                draft = lpDrafts.get(numButton);
+                queue = lpQueue;
                 break;
-            case "joinIO":
-                ioDrafts.get(numButton).attemptDraft(bc);
+            default:
+                draft = ioDrafts.get(numButton);
+                queue = ioQueue;
                 break;
-            case "requestSubLP":
-                lpDrafts.get(numButton).requestSub(bc);
+        }
+
+        switch (btnName.substring(0, indexOfNum - 2)) {
+            case "join":
+                draft.attemptDraft(bc);
                 break;
-            case "requestSubIO":
-                ioDrafts.get(numButton).requestSub(bc);
+            case "leave":
+                draft.removePlayer(bc);
                 break;
-            case "subLP":
-                lpDrafts.get(numButton).addSub(bc);
+            case "requestSub":
+                draft.requestSub(bc);
                 break;
-            case "subIO":
-                ioDrafts.get(numButton).addSub(bc);
+            case "sub":
+                draft.addSub(bc);
                 break;
-            case "leaveLP":
-                lpDrafts.get(numButton).removePlayer(bc);
+            case "end":
+                if (draft.endDraft(bc)) {
+                    queue.add(draft.getNumDraft());
+                }
                 break;
-            case "leaveIO":
-                ioDrafts.get(numButton).removePlayer(bc);
-                break;
+
         }
     }
 }

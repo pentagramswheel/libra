@@ -34,10 +34,10 @@ public class DraftPlayer {
     }
 
     /**
-     * Retrieves the draft player (their info).
+     * Retrieves the draft player.
      * @return said player.
      */
-    public Member getInfo() {
+    public Member getAsMember() {
         return player;
     }
 
@@ -80,6 +80,4 @@ public class DraftPlayer {
     public void incrementPings() {
         pings++;
     }
-
-
 }

@@ -1,4 +1,4 @@
-# LaunchPoint Simp Design Documentation
+# Libra Design Documentation
 **Contributors:** Wil Aquino
 
 **Date:** February 17, 2021
@@ -15,6 +15,7 @@
   - [Events](#events)
   - [Commands](#commands)
   + [Tools](#tools)
+    - [BuiltButton] (#builtbutton)
     - [Command](#command)
     - [FileHandler] (#filehandler)
     - [GoogleAPI](#googleapi)
@@ -24,6 +25,8 @@
     - [Graduate](#graduate)
     - [PlayerStats](#playerstats)
   + [Drafts (Engine)](#drafts-engine)
+    - [Draft] (#draft)
+    - [DraftPlayer] (#draftplayer)
     - [Log](#log)
     - [MapGenerator] (#mapgenerator)
     - [Undo](#undo)
@@ -32,6 +35,7 @@
   - [Events](#events-1)
   - [Commands](#commands-1)
   + [Tools](#tools-1)
+    - [BuiltButton] (#builtbutton-1)
     - [Command](#command-1)
     - [FileHandler] (#filehandler-1)
     - [GoogleAPI](#googleapi-1)
@@ -41,6 +45,8 @@
     - [Graduate](#graduate-1)
     - [PlayerStats](#playerstats-1)
   + [Drafts (Engine)](#drafts-engine-1)
+    - [Draft] (#draft-1)
+    - [DraftPlayer] (#draftplayer-1)
     - [Log](#log-1)
     - [MapGenerator] (#mapgenerator-1)
     - [Undo](#undo-1)
@@ -51,7 +57,7 @@
 
 
 ## Introduction
-LaunchPoint Simp is an official staff convenience bot (written in Java) for the Splatoon Discord server: LaunchPoint. As its official simp, not only will it simp for everyone, but it will also help everyone to as much of its capacity.
+[ TBD ]
 
 
 
@@ -119,8 +125,10 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 3. `InteractionHook INTERACTION` - the original interaction made by the user.
 4. `int MAX_LP_DRAFTS` - the maximum number of LaunchPoint drafts.
 5. `int MAX_IO_DRAFTS` - the maximum number of Ink Odyssey drafts.
-6. `List<Draft> lpDrafts` - a list of started LaunchPoint drafts.
-7. `List<Draft> ioDrafts` - a list of started Ink Odyssey drafts.
+6. `List<Draft> lpDrafts` - a list of LaunchPoint drafts.
+7. `List<Draft> ioDrafts` - a list of Ink Odyssey drafts.
+8. `Queue<Integer> lpQueue` - a queue of started LaunchPoint drafts.
+9. `Queue<Integer> ioQueue` - a queue of started Ink Odyssey drafts.
 
 ----
 
@@ -309,7 +317,7 @@ The `printTroubleshootString` method prints the script for the `help` command.
 
 ###### processDraft
 
-The `processDraft` method starts a draft, if possible, given the inputted command's prefix `prefix`, the user who requested it `author`, and the maximum number of drafts `maxDrafts` for each draft within the running drafts `ongoingDrafts`.
+The `processDraft` method starts a draft, if possible, given the inputted command's prefix `prefix` and the user `author` who requested it, logging it into the list of drafts `ongoingDrafts`, and queue `queue`.
 
 ###### processDrafts
 
@@ -393,10 +401,6 @@ The `sendEmbed` method replies with a list of embeds `ebs` to the user's interac
 
 The `sendEmbed` method replies with an embed `eb` to the user's interaction.
 
-###### disableButton (DEFAULT)
-
-The `disableButton` method disables a button that was clicked `bc`, changing its label to a new one `newLabel`.
-
 ###### sendButtons (DEFAULT)
 
 The `sendButtons` method constructs a line of buttons `buttons` and links them to the interaction which constructed those buttons, with caption `caption`.
@@ -404,6 +408,14 @@ The `sendButtons` method constructs a line of buttons `buttons` and links them t
 ###### sendButton (DEFAULT)
 
 The `sendButton` method constructs a button `button` and links them to the interaction which constructed the button, with caption `caption`.
+
+###### editButtons (DEFAULT)
+
+The `editButtons` method replaces the parent interaction's buttons link of a button clicked `bc` with a new line of buttons `buttons`.
+
+###### editButton (DEFAULT)
+
+The `editButton` method replaces the parent interaction's button link of a button clicked `bc` with a new button `button`.
 
 ###### wait (DEFAULT)
 
@@ -591,7 +603,11 @@ The `toggleDraft` method activates/deactivates the draft.
 
 ###### inProgress
 
-the `inProgress` method checks whether the draft has started yet, i.e. if the draft is activated or not.
+The `inProgress` method checks whether the draft has started yet, i.e. if the draft is activated or not.
+
+###### getNumDraft
+
+The `getNumDraft` method retrieves the number draft this draft is.
 
 ###### getPlayers
 
@@ -613,17 +629,21 @@ The `getDraftChannel` method retrieves the draft chat channel that the draft is 
 
 The `sendReport` method send a draft confirmation summary of a started draft.
 
-###### newRequest
+###### newPing
 
-The `newRequest` method formats a new ping request for gathering players.
+The `newRequest` method formats a new ping for gathering players.
+
+###### attemptDraft
+
+The `attemptDraft` method tries to start a draft after a "Join Draft" button `bc` was clicked.
 
 ###### draftContains
 
 The `draftContains` method checks whether a player `player` is within a draft's list of players `lst` or not (it returns the index of their spot in the draft queue or -1 if it cannot be found).
 
-###### attemptDraft
+###### convertToSub
 
-The `attemptDraft` method tries to start a draft after a "Join Draft" button `bc` was clicked.
+The `convertToSub` method tries to find out if the player who requested a sub is part of the draft or not, retrieving them if they were.
 
 ###### requestSub
 
@@ -637,10 +657,20 @@ The `addSub` method tries to add a sub to the draft after a "Join As Sub" button
 
 The `removePlayer` method removes a core player from the draft queue after a "Leave" button was clicked.
 
+###### endDraft
+
+The `endDraft` method checks if the draft has finished or not after a "End Draft" button was clicked, with respect to the initial draft request.
+
 ###### runCmd
 
 The `runCmd` method runs the `lp/io startdraft` commands, given the command `cmd` and its parameters/options `args`.
 
+###### Buttons (static class)
+1. `joinDraft` - method that retrieves the "Join Draft" button.
+2. `leave` - method that retrieves the "Leave" button.
+3. `requestSub` - method that retrieves the "Request Sub" button.
+4. `joinAsSub` - method that retrieves the "Join As Sub" button.
+5. `end` - method that retrieves the "End Draft" button.
 
 ----
 
@@ -650,9 +680,9 @@ The `runCmd` method runs the `lp/io startdraft` commands, given the command `cmd
 
 The `DraftPlayer` method, the class's constructor, builds the attributes of the draft player.
 
-###### getInfo
+###### getAsMember
 
-The `getInfo` method retrieves the object representation of the player.
+The `getAsMember` method retrieves the object representation of the player.
 
 ###### getWins
 

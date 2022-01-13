@@ -125,21 +125,6 @@ public interface Command {
     }
 
     /**
-     * Disables a button.
-     * @param bc the button which was clicked.
-     * @param newLabel the new label of the button.
-     */
-    default void disableButton(ButtonClickEvent bc, String newLabel) {
-        String id = bc.getId();
-        if (newLabel == null) {
-            newLabel = bc.getButton().getLabel();
-        }
-
-        bc.getInteraction().editButton(
-                Button.secondary(id, newLabel).asDisabled()).queue();
-    }
-
-    /**
      * Links a line of buttons to an interaction.
      * @param caption the caption of the button group.
      * @param buttons the group of buttons to link.
@@ -156,6 +141,26 @@ public interface Command {
      */
     default void sendButton(String caption, Button button) {
         sendButtons(caption, Collections.singletonList(button));
+    }
+
+    /**
+     * Replaces the parent link of buttons for a button,
+     * by linking new buttons to the interaction.
+     * @param bc one of the original buttons.
+     * @param buttons the new buttons to link.
+     */
+    default void editButtons(ButtonClickEvent bc, List<Button> buttons) {
+        bc.getHook().editOriginalComponents().setActionRow(buttons).queue();
+    }
+
+    /**
+     * Replaces a parent button for a button, by linking
+     * a new button to the interaction.
+     * @param bc the original button.
+     * @param button the new button to link.
+     */
+    default void editButton(ButtonClickEvent bc, Button button) {
+        editButtons(bc, Collections.singletonList(button));
     }
 
     /**

@@ -34,7 +34,7 @@ public class Add extends Section implements Command {
 
         String rulesChannel = getChannel(rulesChannelName).getAsMention();
         return "Welcome to " + getSection() + "! Make sure to read "
-                + rulesChannel + "!";
+                + rulesChannel + " before playing in any drafts!";
     }
 
     /**

@@ -15,7 +15,7 @@ public class BuiltButton {
     private final Button button;
 
     /**
-     * Builds the button, given a numbered button type.
+     * Builds a button, given a numbered button type.
      * @param buttonID the ID of the button.
      * @param buttonLabel the label of the button.
      * @param buttonType 0 for a primary type button.

@@ -2,6 +2,7 @@ package bot;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -22,7 +23,7 @@ import javax.security.auth.login.LoginException;
 public class Main {
 
     /** Name of the bot and application. */
-    public static String NAME = "LaunchPoint Simp";
+    public static String NAME = "Libra";
 
     /**
      * Implement the bot's slash commands.
@@ -100,25 +101,25 @@ public class Main {
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(startdraft, cycle, sub, undo, add, grad);
         io.addSubcommands(startdraft, cycle, sub, undo, add, grad);
+
         jda.updateCommands().addCommands(mit, lp, io).queue();
     }
 
     public static void main(String[] args) {
-        Events.BOT = JDABuilder.createLight(Discord.getToken())
-                .enableIntents(GatewayIntent.GUILD_PRESENCES)
-                .enableIntents(GatewayIntent.GUILD_MEMBERS);
-
-        Events.BOT.addEventListeners(new Events());
-
         try {
-            JDA jda = Events.BOT.build();
+            JDA jda = JDABuilder.createLight(Discord.getToken())
+                    .enableIntents(GatewayIntent.GUILD_PRESENCES)
+                    .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                    .addEventListeners(new Events())
+                    .build();
 
             // run only if all slash commands have not been implemented yet
             Main.implementSlashCommands(jda);
 
             String status = "Splatoon 3";
-            jda.getPresence().setActivity(Activity.playing(
-                    status));
+            jda.getPresence().setPresence(
+                    OnlineStatus.IDLE,
+                    Activity.playing(status));
 
             Thread.sleep(4000);
             System.out.println("\nUSAGE LOG:\n==========");

@@ -1,36 +1,37 @@
-bot/Engine/Drafts/Log.java
- bot.Engine.Drafts.Log
-bot/Tools/BuiltButton.java
- bot.Tools.BuiltButton
-bot/Engine/Drafts/MapGenerator.java
- bot.Engine.Drafts.MapGenerator
-bot/Engine/Section.java
- bot.Engine.Section
-bot/Engine/Add.java
- bot.Engine.Add
-bot/Engine/Graduate.java
- bot.Engine.Graduate
-bot/Discord.java
- bot.Discord
 bot/DiscordExample.java
  bot.DiscordExample
-bot/Engine/Drafts/Undo.java
- bot.Engine.Drafts.Undo
 bot/Tools/Time.java
  bot.Tools.Time
+bot/Discord.java
+ bot.Discord
+bot/Tools/BuiltButton.java
+ bot.Tools.BuiltButton
 bot/Tools/FileHandler.java
  bot.Tools.FileHandler
+bot/Engine/Section.java
+ bot.Engine.Section
 bot/Main.java
  bot.Main
-bot/Engine/PlayerStats.java
- bot.Engine.PlayerStats
+bot/Engine/Drafts/Log.java
+ bot.Engine.Drafts.Log
+bot/Engine/Drafts/Undo.java
+ bot.Engine.Drafts.Undo
+bot/Engine/Drafts/MapGenerator.java
+ bot.Engine.Drafts.MapGenerator
 bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Tools/Command.java
  bot.Tools.Command
 bot/Engine/Drafts/DraftPlayer.java
  bot.Engine.Drafts.DraftPlayer
-bot/Engine/Drafts/FormatDraft.java
- bot.Engine.Drafts.FormatDraft
+bot/Engine/PlayerStats.java
+ bot.Engine.PlayerStats
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
+bot/Engine/Add.java
+ bot.Engine.Add
+bot/Engine/Drafts/Draft.java
+ bot.Engine.Drafts.Draft
+ bot.Engine.Drafts.Draft$Buttons
 bot/Events.java
  bot.Events
