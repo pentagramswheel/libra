@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,14 +124,15 @@ public class Draft extends Section implements Command {
      * Sends a draft confirmation summary with all players
      * of the draft.
      */
-    private void sendReport() {
+    private void updateReport() {
         EmbedBuilder eb = new EmbedBuilder();
 
-        eb.setTitle("Draft Confirmation");
+        eb.setTitle("Draft Queue");
         eb.setColor(getColor());
 
         StringBuilder queue = new StringBuilder();
         StringBuilder logList = new StringBuilder();
+
         Random r = new Random();
         int capt1 = r.nextInt(8);
         int capt2 = r.nextInt(8);
@@ -141,29 +143,30 @@ public class Draft extends Section implements Command {
         int size = getPlayers().size();
         for (int i = 0; i < size; i++) {
             Member currPlayer = getPlayers().get(i).getAsMember();
-
             queue.append(currPlayer.getAsMention());
             logList.append(currPlayer.getAsMention()).append(" ");
 
-            if (i == capt1 || i == capt2) {
+            if (size == 8 && (i == capt1 || i == capt2)) {
                 queue.append(" (captain)");
             }
             queue.append("\n");
         }
-        queue.append(getPlayers().get(size - 1).getAsMember().getAsMention());
-
         eb.addField("Players", queue.toString(), false);
-        String notice =
-                "Go to " + getDraftChannel().getAsMention() + " to begin\n"
-                + "the draft. Use the interface above\n"
-                + "request subs as needed, as well as\n"
-                + "end the draft to allow others to\n"
-                + "queue more drafts.";
-        eb.addField("Notice", notice, false);
 
-        logList.deleteCharAt(logList.length() - 1);
-        log("A draft was started with " + logList + ".");
-        sendEmbed(eb);
+        if (size == 8) {
+            String notice =
+                    "Go to " + getDraftChannel().getAsMention() + " to begin\n"
+                            + "the draft. Use the interface above to\n"
+                            + "request subs as needed, as well as\n"
+                            + "end the draft to allow others to\n"
+                            + "queue more drafts.";
+            eb.addField("Notice", notice, false);
+
+            logList.deleteCharAt(logList.length() - 1);
+            log("A draft was started with " + logList + ".");
+        }
+
+        editEmbed(eb);
     }
 
     /**
@@ -186,6 +189,8 @@ public class Draft extends Section implements Command {
      * @param bc a button click to analyze.
      */
     public void attemptDraft(ButtonClickEvent bc) {
+        bc.deferEdit().queue();
+
         Member potentialPlayer = bc.getMember();
         // this block prevents repeated players in the initial draft start
         // comment/uncomment as needed
@@ -195,11 +200,9 @@ public class Draft extends Section implements Command {
 
         DraftPlayer newPlayer = new DraftPlayer(potentialPlayer);
         getPlayers().add(newPlayer);
-        bc.editMessage(newPing()).queue();
 
         if (getPlayers().size() == 8) {
             toggleDraft();
-            sendReport();
 
             ArrayList<Button> buttons = new ArrayList<>();
             String idSuffix = getPrefix().toUpperCase() + getNumDraft();
@@ -211,6 +214,9 @@ public class Draft extends Section implements Command {
 
             editButtons(bc, buttons);
         }
+
+        updateReport();
+        bc.getHook().editOriginal(newPing()).queue();
     }
 
     /**
@@ -267,18 +273,17 @@ public class Draft extends Section implements Command {
             return;
         }
 
-        subsNeeded++;
-
         getPlayers().remove(convertedSub);
         getSubs().remove(convertedSub);
         subs.add(convertedSub);
-        bc.editMessage(newPing() + "   [ " + subsNeeded + " sub(s) needed ]").queue();
 
-        String update =
-                getDraftRole().getAsMention() + " sub needed "
-                        + "(search the drafts above).";
-        sendMessage(update);
+        subsNeeded++;
         convertedSub.incrementPings();
+
+        bc.editMessage(newPing() + "   // " + subsNeeded + " sub(s) needed").queue();
+
+        String update = getDraftRole().getAsMention() + " sub requested.";
+        bc.getHook().sendMessage(update).queue();
     }
 
     /**
@@ -301,20 +306,21 @@ public class Draft extends Section implements Command {
             return;
         }
 
-        subsNeeded--;
-
         DraftPlayer subPlayer = new DraftPlayer(player);
         subs.add(subPlayer);
+
+        subsNeeded--;
+
         if (subsNeeded == 0) {
             bc.editMessage(newPing()).queue();
         } else {
-            bc.editMessage(newPing() + "   [ " + subsNeeded + " sub(s) needed ]").queue();
+            bc.editMessage(newPing() + "   // " + subsNeeded + " sub(s) needed").queue();
         }
 
         String update =
                 subPlayer.getAsMember().getAsMention() + " will be subbing for "
-                        +"the draft in " + getDraftChannel().getAsMention() + ".";
-        sendMessage(update);
+                        +"this draft in " + getDraftChannel().getAsMention() + ".";
+        bc.getHook().sendMessage(update).queue();
     }
 
     /**
@@ -332,6 +338,8 @@ public class Draft extends Section implements Command {
         }
 
         getPlayers().remove(playerIndex);
+
+        updateReport();
         bc.editMessage(newPing()).queue();
     }
 
@@ -342,7 +350,9 @@ public class Draft extends Section implements Command {
     public boolean endDraft(ButtonClickEvent bc) {
         if (!inProgress()) {
             editButton(bc, Buttons.end(getPrefix() + getNumDraft())
-                    .withLabel("Draft Complete").asDisabled());
+                    .withStyle(ButtonStyle.SECONDARY).asDisabled());
+            bc.editMessage("This draft has ended.").queue();
+
             return true;
         } else {
             bc.reply("This draft hasn't finished yet.").setEphemeral(true).queue();

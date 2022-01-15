@@ -194,7 +194,7 @@ public class MapGenerator implements Command {
             matches.add(buildMatch(currMode, currMap));
         }
 
-        sendEmbeds(matches);
+        editEmbeds(matches);
         log("A map list was generated.");
     }
 }

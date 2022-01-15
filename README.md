@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** January 13, 2022
+**Last Updated:** January 14, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -127,8 +127,8 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 5. `int MAX_IO_DRAFTS` - the maximum number of Ink Odyssey drafts.
 6. `List<Draft> lpDrafts` - a list of LaunchPoint drafts.
 7. `List<Draft> ioDrafts` - a list of Ink Odyssey drafts.
-8. `Queue<Integer> lpQueue` - a queue of started LaunchPoint drafts.
-9. `Queue<Integer> ioQueue` - a queue of started Ink Odyssey drafts.
+8. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered LaunchPoint drafts.
+9. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered Ink Odyssey drafts.
 
 ----
 
@@ -167,12 +167,6 @@ A class which navigates a Google Sheet (spreadsheet).
 1. `Sheets sheetsService` - an object representation for the Google Sheets SDK.
 2. `String APPLICATION_NAME` - the name of the application.
 3. `String spreadsheetID` - the credential ID of the spreadsheet.
-
-----
-
-#### Time
-
-A class which retrieves the system's time.
 
 ----
 
@@ -309,7 +303,7 @@ The `isStaffCommand` method checks whether a user `author`'s command `cmd` is a 
 
 ###### wrongChannelUsed
 
-The `wrongChannelUsed` method checks whether a command `cmd` can be used in the channel the original interaction was sent in or not.
+The `wrongChannelUsed` method checks whether a command `cmd` can be used in the channel the interaction was sent in or not.
 
 ###### printTroubleshootString
 
@@ -391,15 +385,15 @@ The `sendReply` method sends a reply `msg` to the user's interaction.
 
 ###### sendMessage (DEFAULT)
 
-The `sendMessage` method sends a message `msg` to the channel the user's original interaction was made.
+The `sendMessage` method sends a message `msg` to the channel the user's interaction was made.
 
-###### sendEmbeds (DEFAULT)
+###### editEmbeds (DEFAULT)
 
-The `sendEmbed` method replies with a list of embeds `ebs` to the user's interaction.
+The `editEmbeds` method edits/sends a list of embeds `ebs` linked with the user's interaction.
 
-###### sendEmbed (DEFAULT)
+###### editEmbed (DEFAULT)
 
-The `sendEmbed` method replies with an embed `eb` to the user's interaction.
+The `editEmbed` method edits/sends an embed `eb` linked with the user's interaction.
 
 ###### sendButtons (DEFAULT)
 
@@ -480,14 +474,6 @@ The `appendRow` method appends a row `row` to at the end of the spreadsheet `spr
 ###### updateRow
 
 The `updateRow` method updates a tab `tab` of the spreadsheet `spreadsheet` to be the given row `row`.
-
-----
-
-#### Time
-
-###### currentTime
-
-The `currentTime` method retrieves the current time of the running machine.
 
 ----
 

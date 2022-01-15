@@ -6,6 +6,7 @@ import bot.Engine.Drafts.MapGenerator;
 import bot.Engine.Drafts.Log;
 import bot.Engine.Drafts.Undo;
 import bot.Engine.Graduate;
+import bot.Tools.ArrayHeapMinPQ;
 import bot.Tools.FileHandler;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -20,9 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * @author  Wil Aquino
@@ -47,9 +46,9 @@ public class Events extends ListenerAdapter {
     private List<Draft> lpDrafts;
     private List<Draft> ioDrafts;
 
-    /** Fields for storing queues for started drafts. */
-    private Queue<Integer> lpQueue;
-    private Queue<Integer> ioQueue;
+    /** Fields for storing queued draft positions. */
+    private ArrayHeapMinPQ<Integer> lpQueue;
+    private ArrayHeapMinPQ<Integer> ioQueue;
 
     /**
      * Checks whether a part of an input string can be found
@@ -194,13 +193,14 @@ public class Events extends ListenerAdapter {
      * @param queue the
      */
     private void processDraft(String prefix, Member author,
-                              List<Draft> ongoingDrafts, Queue<Integer> queue) {
+                              List<Draft> ongoingDrafts,
+                              ArrayHeapMinPQ<Integer> queue) {
         if (queue.size() == 0) {
             INTERACTION.getInteraction().reply(
                     "Wait until a draft has finished!").queue();
         } else {
             Draft newDraft =
-                    new Draft(queue.remove(), prefix, author);
+                    new Draft(queue.removeSmallest(), prefix, author);
 
             ongoingDrafts.add(newDraft);
             newDraft.runCmd(null, null);
@@ -219,9 +219,9 @@ public class Events extends ListenerAdapter {
                     lpDrafts = new ArrayList<>();
                 }
                 if (lpQueue == null) {
-                    lpQueue = new LinkedList<>();
-                    for (int i = 0; i < MAX_LP_DRAFTS; i++) {
-                        lpQueue.add(i + 1);
+                    lpQueue = new ArrayHeapMinPQ<>();
+                    for (int i = 1; i <= MAX_LP_DRAFTS; i++) {
+                        lpQueue.add(i, i);
                     }
                 }
 
@@ -232,9 +232,9 @@ public class Events extends ListenerAdapter {
                     ioDrafts = new ArrayList<>();
                 }
                 if (ioQueue == null) {
-                    ioQueue = new LinkedList<>();
-                    for (int i = 0; i < MAX_IO_DRAFTS; i++) {
-                        ioQueue.add(i + 1);
+                    ioQueue = new ArrayHeapMinPQ<>();
+                    for (int i = 1; i <= MAX_IO_DRAFTS; i++) {
+                        ioQueue.add(i, i);
                     }
                 }
 
@@ -393,41 +393,42 @@ public class Events extends ListenerAdapter {
      * @param bc a button click to analyze.
      */
     @Override
-    public void onButtonClick(ButtonClickEvent bc){
+    public void onButtonClick(ButtonClickEvent bc) {
         String btnName = bc.getButton().getId();
         int indexOfNum = btnName.length() - 1;
 
-        Draft draft;
-        Queue<Integer> queue;
+        List<Draft> drafts;
+        ArrayHeapMinPQ<Integer> queue;
         String suffix = btnName.substring(indexOfNum - 2, indexOfNum);
-        int numButton = Integer.parseInt(btnName.substring(indexOfNum)) - 1;
+        int numButton = Integer.parseInt(btnName.substring(indexOfNum));
         switch (suffix) {
             case "LP":
-                draft = lpDrafts.get(numButton);
+                drafts = lpDrafts;
                 queue = lpQueue;
                 break;
             default:
-                draft = ioDrafts.get(numButton);
+                drafts = ioDrafts;
                 queue = ioQueue;
                 break;
         }
 
         switch (btnName.substring(0, indexOfNum - 2)) {
             case "join":
-                draft.attemptDraft(bc);
+                drafts.get(numButton - 1).attemptDraft(bc);
                 break;
             case "leave":
-                draft.removePlayer(bc);
+                drafts.get(numButton - 1).removePlayer(bc);
                 break;
             case "requestSub":
-                draft.requestSub(bc);
+                drafts.get(numButton - 1).requestSub(bc);
                 break;
             case "sub":
-                draft.addSub(bc);
+                drafts.get(numButton - 1).addSub(bc);
                 break;
             case "end":
-                if (draft.endDraft(bc)) {
-                    queue.add(draft.getNumDraft());
+                if (drafts.get(numButton - 1).endDraft(bc)) {
+                    drafts.remove(drafts.get(numButton - 1));
+                    queue.add(numButton, numButton);
                 }
                 break;
 

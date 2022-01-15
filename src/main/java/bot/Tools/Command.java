@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
 /**
  * @author  Wil Aquino
@@ -83,8 +84,7 @@ public interface Command {
     }
 
     /**
-     * Send a reply to the original interaction made
-     * in Discord.
+     * Send a reply to the user's interaction made in Discord.
      * @param msg the message to send.
      */
     default void sendReply(String msg) {
@@ -92,7 +92,7 @@ public interface Command {
     }
 
     /**
-     * Send a message to Discord in the place the original
+     * Send a message to Discord in the place the user's
      * interaction was made.
      * @param msg the message to send.
      */
@@ -102,30 +102,30 @@ public interface Command {
     }
 
     /**
-     * Send a list of embedded messages to Discord in the place the
-     * original interaction was made.
+     * Edits/sends a list of embedded messages linked with the
+     * user's interaction.
      * @param ebs the embeds to send.
      */
-    default void sendEmbeds(List<EmbedBuilder> ebs) {
+    default void editEmbeds(List<EmbedBuilder> ebs) {
         ArrayList<MessageEmbed> builtEmbeds = new ArrayList<>(ebs.size());
         for (EmbedBuilder embed : ebs) {
             builtEmbeds.add(embed.build());
         }
 
-        Events.INTERACTION.sendMessageEmbeds(builtEmbeds).queue();
+        Events.INTERACTION.editOriginalEmbeds(builtEmbeds).queue();
     }
 
     /**
-     * Send an embedded message to Discord in the place the
-     * original command was sent.
+     * Edits/sends an embedded message linked with the
+     * user's interaction.
      * @param eb the embed to send.
      */
-    default void sendEmbed(EmbedBuilder eb) {
-        sendEmbeds(Collections.singletonList(eb));
+    default void editEmbed(EmbedBuilder eb) {
+        editEmbeds(Collections.singletonList(eb));
     }
 
     /**
-     * Links a line of buttons to an interaction.
+     * Links a line of buttons to the user's interaction.
      * @param caption the caption of the button group.
      * @param buttons the group of buttons to link.
      */
@@ -135,7 +135,7 @@ public interface Command {
     }
 
     /**
-     * Links a button to an interaction.
+     * Links a button to the user's interaction.
      * @param caption the caption of the button.
      * @param button the button to link.
      */
@@ -180,6 +180,6 @@ public interface Command {
      * @param msg the message to to attach to the log.
      */
     default void log(String msg) {
-        System.out.println(msg + " (" + Time.currentTime() + ")");
+        System.out.println(msg + " (" + new Date() + ")");
     }
 }

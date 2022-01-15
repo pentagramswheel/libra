@@ -136,7 +136,7 @@ public class Log extends Section implements Command {
             eb.addField("Status:", "INCOMPLETE", false);
         }
 
-        sendEmbed(eb);
+        editEmbed(eb);
     }
 
     /**

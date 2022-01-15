@@ -122,7 +122,7 @@ public class Undo extends Log implements Command {
             eb.addField("Status:", "INCOMPLETE", false);
         }
 
-        sendEmbed(eb);
+        editEmbed(eb);
     }
 
     /**
