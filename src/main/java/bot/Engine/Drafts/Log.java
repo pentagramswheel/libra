@@ -7,6 +7,7 @@ import bot.Tools.GoogleAPI;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -92,8 +93,7 @@ public class Log extends Section implements Command {
 
     /**
      * Print the summary of the cycle match report.
-     * @param wins the amount of games won by the players.
-     * @param losses the amount of games lost by the players.
+     * @param sc the user's inputted command.
      * @param color the color of the summary embed.
      * @param players the players within the set.
      * @param playerTypes array of types for each player
@@ -101,9 +101,9 @@ public class Log extends Section implements Command {
      * @param errorsFound array of errors found for each player, if any
      *                    (0 if no errors occurred, 1 otherwise).
      */
-    private void sendReport(int wins, int losses, Color color,
-                            List<OptionMapping> players, int[] playerTypes,
-                            int[] errorsFound) {
+    private void sendReport(SlashCommandEvent sc, Color color,
+                            List<OptionMapping> players,
+                            int[] playerTypes, int[] errorsFound) {
         EmbedBuilder eb = new EmbedBuilder();
         StringBuilder playerList = new StringBuilder();
 
@@ -125,6 +125,10 @@ public class Log extends Section implements Command {
             }
         }
 
+        List<OptionMapping> args = sc.getOptions();
+        int wins = getGamesWon(args);
+        int losses = getGamesPlayed(args) - wins;
+
         eb.setTitle("Summary of Report")
                 .setColor(color)
                 .addField("Score:", wins + " - " + losses, false)
@@ -136,7 +140,7 @@ public class Log extends Section implements Command {
             eb.addField("Status:", "INCOMPLETE", false);
         }
 
-        editEmbed(eb);
+        sendEmbed(sc, eb);
     }
 
     /**
@@ -195,8 +199,8 @@ public class Log extends Section implements Command {
 
             return 0;
         } catch (IOException e) {
-            log("Existing cycle user error occurred with "
-                    + user.getUser().getAsTag());
+            log("Existing " + getPrefix().toUpperCase() + " cycle user error "
+                    + "occurred with " + user.getUser().getAsMention() + ".", true);
             return 1;
         }
     }
@@ -247,19 +251,22 @@ public class Log extends Section implements Command {
 
             return 0;
         } catch (IOException e) {
-            log("New cycle user error occurred with "
-                    + user.getUser().getAsTag());
+            log("New " + getPrefix().toUpperCase() + " cycle user error "
+                    + "occurred with " + user.getUser().getAsMention() + ".", true);
             return 1;
         }
     }
 
     /**
      * Runs the cycle logging command.
-     * @param cmd the formal name of the command.
-     * @param args the arguments of the command, if they exist.
+     * @param sc the user's inputted command.
      */
     @Override
-    public void runCmd(String cmd, List<OptionMapping> args) {
+    public void runCmd(SlashCommandEvent sc) {
+        sc.deferReply().queue();
+        String cmd = sc.getSubcommandName();
+        List<OptionMapping> args = sc.getOptions();
+
         try {
             GoogleAPI link = new GoogleAPI(cyclesSheetID());
             Color replyColor = getColor();
@@ -269,12 +276,12 @@ public class Log extends Section implements Command {
 
             Values spreadsheet = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> data = link.readSection(
-                    tab, spreadsheet);
+                    sc, tab, spreadsheet);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
 
-            List<OptionMapping> userArgs = args.subList(2, args.size());
+            List<OptionMapping> userArgs = extractUsers(sc);
             int numUsers = userArgs.size();
             int[] playerTypes = new int[numUsers];
             int[] errorsFound = new int[numUsers];
@@ -291,12 +298,13 @@ public class Log extends Section implements Command {
                 }
             }
 
-            int gamesWon = getGamesWon(args);
-            int gamesLost = getGamesPlayed(args) - gamesWon;
-            sendReport(gamesWon, gamesLost, replyColor, userArgs, playerTypes, errorsFound);
-            log(userArgs.size() + " cycle match(es) were processed.");
+            sendReport(sc, replyColor, userArgs, playerTypes, errorsFound);
+            log(userArgs.size() + " " + getPrefix().toUpperCase()
+                    + " cycle match(es) were processed.", false);
         } catch (IOException | GeneralSecurityException e) {
-            log("The spreadsheet could not load.");
+            sendResponse(sc, "The spreadsheet could not load.", true);
+            log("The " + getSection()
+                    + " cycles spreadsheet could not load.", true);
         }
     }
 }

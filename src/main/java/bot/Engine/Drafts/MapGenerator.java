@@ -3,6 +3,7 @@ package bot.Engine.Drafts;
 import bot.Tools.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.awt.Color;
@@ -146,15 +147,17 @@ public class MapGenerator implements Command {
 
     /**
      * Runs the map generation command.
-     * @param cmd the formal name of the command.
-     * @param args the arguments of the command, if they exist.
+     * @param sc the user's inputted command.
      */
     @Override
-    public void runCmd(String cmd, List<OptionMapping> args) {
+    public void runCmd(SlashCommandEvent sc) {
+        List<OptionMapping> args = sc.getOptions();
+
         int numGens = getListSize(args);
         if (numGens > 9) {
-            sendReply("Too many maps requested. The set would be too long!");
-            log("A requested map list was too long.");
+            sendResponse(sc,
+                    "Too many maps requested. The set would be too long!", true);
+            log("A requested map list was too long.", false);
             return;
         }
 
@@ -194,7 +197,7 @@ public class MapGenerator implements Command {
             matches.add(buildMatch(currMode, currMap));
         }
 
-        editEmbeds(matches);
-        log("A map list was generated.");
+        sendEmbeds(sc, matches);
+        log("A map list was generated.", false);
     }
 }

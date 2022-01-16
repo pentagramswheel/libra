@@ -19,32 +19,30 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * @author  Wil Aquino
  * Date:    February 17, 2021
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  Events.java
- * Purpose: Builds the bot by processing commands and analyzing user input.
+ * Purpose: Builds the bot by processing commands
+ *          and analyzing user input.
  */
 public class Events extends ListenerAdapter {
-
-    /** The Discord server's current state. */
-    public static Guild SERVER;
-
-    /** The original interaction engaged by a user's command. */
-    public static InteractionHook INTERACTION;
 
     /** Fields which determine the maximum number of drafts.  */
     private final static int MAX_LP_DRAFTS = 4;
     private final static int MAX_IO_DRAFTS = 2;
 
     /** Fields for storing drafts. */
-    private List<Draft> lpDrafts;
-    private List<Draft> ioDrafts;
+    TreeMap<Integer, Draft> lpDrafts;
+    TreeMap<Integer, Draft> ioDrafts;
 
     /** Fields for storing queued draft positions. */
     private ArrayHeapMinPQ<Integer> lpQueue;
@@ -69,35 +67,28 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Defers the reply of a slash command, if necessary.
-     * @param sc the slash command to analyze.
-     */
-    private void deferReplyIfNeeded(SlashCommandEvent sc) {
-        String[] nonDeferCmds = {"startdraft"};
-        if (!isSimilar(sc.getSubcommandName(), nonDeferCmds)) {
-            sc.deferReply().queue();
-        }
-    }
-
-    /**
      * Checks if the game set parameters make sense.
-     * @param args the parameters to analyze.
+     * @param sc the user's inputted command.
      * @return True if there were less wins than total games.
      *         False otherwise.
      */
-    private boolean gamesPlayedValid(List<OptionMapping> args) {
+    private boolean gamesPlayedValid(SlashCommandEvent sc) {
+        InteractionHook interaction = sc.getHook();
+        List<OptionMapping> args = sc.getOptions();
+
         int gamesPlayed = (int) args.get(0).getAsLong();
         int gamesWon = (int) args.get(1).getAsLong();
+
         if (gamesPlayed < gamesWon) {
-            INTERACTION.sendMessage("Total games won cannot go beyond the set. "
+            interaction.sendMessage("Total games won cannot go beyond the set. "
                     + "Try again.").queue();
             return false;
         } else if (gamesPlayed < 0 || gamesWon < 0) {
-            INTERACTION.sendMessage(
+            interaction.sendMessage(
                     "The amount games played can't be negative?").queue();
             return false;
         } else if (gamesPlayed > 19) {
-            INTERACTION.sendMessage(
+            interaction.sendMessage(
                     "Are you sure that's how many games were played?").queue();
             return false;
         }
@@ -108,17 +99,29 @@ public class Events extends ListenerAdapter {
     /**
      * Checks whether the command user has permission to use the
      * command or not.
-     * @param cmd the formal name of the command.
-     * @param author the user of the command.
+     * @param sc the user's inputted command.
      * @return True if the command is not a staff command.
      *         False otherwise.
      */
-    private boolean isStaffCommand(String cmd, Member author) {
+    private boolean isStaffCommand(SlashCommandEvent sc) {
         String[] staffCmds = {"cycle", "sub", "undo", "add", "grad"};
-        Role staffRole = SERVER.getRolesByName("Staff", true).get(0);
 
-        if (!author.getRoles().contains(staffRole)) {
-            return isSimilar(cmd, staffCmds);
+        try {
+            Guild server = sc.getGuild();
+            if (server == null) {
+                throw new NullPointerException("Role not found.");
+            }
+
+            Member author = sc.getMember();
+            String subCmd = sc.getSubcommandName();
+            Role staffRole = server.getRolesByName("Staff", true).get(0);
+
+            if (author != null && !author.getRoles().contains(staffRole)) {
+                return isSimilar(subCmd, staffCmds);
+            }
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
+            Logger logger = LoggerFactory.getLogger(this.getClass());
+            logger.error("Roles could not be found.");
         }
 
         return false;
@@ -127,30 +130,33 @@ public class Events extends ListenerAdapter {
     /**
      * Checks whether a command can be used in the interaction's channel
      * or not.
-     * @param cmd the formal name of the command.
+     * @param sc the user's inputted command.
      * @return True if the command can be used in the channel.
      *         False otherwise.
      */
-    private boolean wrongChannelUsed(String cmd) {
-        String entryChannel = SERVER.getTextChannelsByName(
+    private boolean wrongChannelUsed(SlashCommandEvent sc) {
+        Guild server = sc.getGuild();
+        String subCmd = sc.getSubcommandName();
+
+        String entryChannel = server.getTextChannelsByName(
                 "mit-entry-confirmation", false).get(0).getName();
-        String lpDraftChannel = SERVER.getTextChannelsByName(
+        String lpDraftChannel = server.getTextChannelsByName(
                 "lp-looking-for-draft", false).get(0).getName();
-        String lpReportsChannel = SERVER.getTextChannelsByName(
+        String lpReportsChannel = server.getTextChannelsByName(
                 "lp-staff-match-report", false).get(0).getName();
-        String ioDraftChannel = SERVER.getTextChannelsByName(
+        String ioDraftChannel = server.getTextChannelsByName(
                 "lp-looking-for-draft", false).get(0).getName();
-        String ioReportsChannel = SERVER.getTextChannelsByName(
+        String ioReportsChannel = server.getTextChannelsByName(
                 "io-staff-match-report", false).get(0).getName();
-        String testChannel = SERVER.getTextChannelsByName(
+        String testChannel = server.getTextChannelsByName(
                 "bot-testing", false).get(0).getName();
 
-        String channel = INTERACTION.getInteraction().getTextChannel().getName();
-        boolean isEntryChannel = cmd.contains("add")
+        String channel = sc.getTextChannel().getName();
+        boolean isEntryChannel = subCmd.equals("add")
                 && channel.equals(entryChannel);
-        boolean isDraftChannel = cmd.contains("startdraft")
+        boolean isDraftChannel = subCmd.equals("startdraft")
                 && channel.equals(lpDraftChannel) || channel.equals(ioDraftChannel);
-        boolean isReportsChannel = (cmd.contains("cycle") || cmd.contains("sub"))
+        boolean isReportsChannel = (subCmd.equals("cycle") || subCmd.equals("sub"))
                 && channel.equals(lpReportsChannel) || channel.equals(ioReportsChannel);
         boolean isTestChannel = channel.equals(testChannel);
 
@@ -160,8 +166,9 @@ public class Events extends ListenerAdapter {
 
     /**
      * Prints troubleshooting information.
+     * @param sc the user's inputted command.
      */
-    private void printTroubleshootString() {
+    private void printTroubleshootString(SlashCommandEvent sc) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Command Troubleshooting");
         eb.setColor(Color.BLUE);
@@ -182,28 +189,29 @@ public class Events extends ListenerAdapter {
                         + "Discord.",
                 false);
 
-        INTERACTION.sendMessageEmbeds(eb.build()).queue();
+        sc.getHook().editOriginalEmbeds(eb.build()).queue();
     }
 
     /**
      * Processes a draft, when possible.
+     * @param sc the user's inputted command.
      * @param prefix the prefix of the command.
      * @param author the user who ran the command.
-     * @param ongoingDrafts list of ongoing drafts.
-     * @param queue the
+     * @param ongoingDrafts map of ongoing drafts.
+     * @param queue the queue of drafts.
      */
-    private void processDraft(String prefix, Member author,
-                              List<Draft> ongoingDrafts,
+    private void processDraft(SlashCommandEvent sc, String prefix, Member author,
+                              TreeMap<Integer, Draft> ongoingDrafts,
                               ArrayHeapMinPQ<Integer> queue) {
         if (queue.size() == 0) {
-            INTERACTION.getInteraction().reply(
-                    "Wait until a draft has finished!").queue();
+            sc.reply("Wait until a draft has finished!").queue();
         } else {
+            int draftButton = queue.removeSmallest();
             Draft newDraft =
-                    new Draft(queue.removeSmallest(), prefix, author);
+                    new Draft(sc, draftButton, prefix, author);
 
-            ongoingDrafts.add(newDraft);
-            newDraft.runCmd(null, null);
+            ongoingDrafts.put(draftButton, newDraft);
+            newDraft.runCmd(sc);
         }
     }
 
@@ -212,11 +220,11 @@ public class Events extends ListenerAdapter {
      * @param prefix the prefix of the command.
      * @param author the user who ran the command.
      */
-    private void processDrafts(String prefix, Member author) {
+    private void processDrafts(SlashCommandEvent sc, String prefix, Member author) {
         switch (prefix) {
             case "lp":
                 if (lpDrafts == null) {
-                    lpDrafts = new ArrayList<>();
+                    lpDrafts = new TreeMap<>();
                 }
                 if (lpQueue == null) {
                     lpQueue = new ArrayHeapMinPQ<>();
@@ -225,11 +233,11 @@ public class Events extends ListenerAdapter {
                     }
                 }
 
-                processDraft(prefix, author, lpDrafts, lpQueue);
+                processDraft(sc, prefix, author, lpDrafts, lpQueue);
                 break;
             case "io":
                 if (ioDrafts == null) {
-                    ioDrafts = new ArrayList<>();
+                    ioDrafts = new TreeMap<>();
                 }
                 if (ioQueue == null) {
                     ioQueue = new ArrayHeapMinPQ<>();
@@ -238,7 +246,7 @@ public class Events extends ListenerAdapter {
                     }
                 }
 
-                processDraft(prefix, author, ioDrafts, ioQueue);
+                processDraft(sc, prefix, author, ioDrafts, ioQueue);
                 break;
         }
     }
@@ -289,82 +297,49 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Parses through which of the bot's commands to run.
-     * @param author the user who ran the command.
-     * @param prefix the prefix of the formal command name.
-     * @param cmd the formal name of the command.
-     * @param args the arguments of the command, if they exist.
+     * Runs a general command.
+     * @param sc the slash command to analyze.
      */
-    private void parseCommands(Member author, String prefix, String cmd,
-                               List<OptionMapping> args) {
-        if (isStaffCommand(cmd, author) || wrongChannelUsed(cmd)) {
-            if (!INTERACTION.getInteraction().isAcknowledged()) {
-                INTERACTION.getInteraction().deferReply().queue();
-            }
-            INTERACTION.sendMessage(
-                    "You do not have permission to use this command here.").queue();
-        } else if (prefix.equals("mit")) {
-            switch (cmd.substring(3)) {
-                case "status":
-                    INTERACTION.sendMessageFormat(
-                            "The bot is online. Welcome, %s.",
-                            author.getEffectiveName()).queue();
-                    break;
-                case "help":
-                    printTroubleshootString();
-                    break;
-                case "profile":
-                    INTERACTION.sendMessage(
-                            "This command has not been implemented yet.").queue();
-                    break;
-                case "genmaps":
-                    MapGenerator maps = new MapGenerator();
-                    maps.runCmd(cmd, args);
-                    break;
-            }
-        } else {
-            switch (cmd.substring(2)) {
-                case "add":
-                    Add newcomer = new Add(prefix);
-                    newcomer.runCmd(cmd, args);
-                    break;
-                case "grad":
-                    Graduate grad = new Graduate(prefix);
-                    grad.runCmd(cmd, args);
-                    break;
-                case "startdraft":
-                    processDrafts(prefix, author);
-                    break;
-                case "cycle":
-                case "sub":
-                    if (gamesPlayedValid(args)) {
-                        Log log = new Log(prefix);
-                        log.runCmd(cmd, args);
+    private void parseGeneralCommands(SlashCommandEvent sc) {
+        sc.deferReply().queue();
 
-                        saveCycleCall(cmd, args);
-                    }
-                    break;
-                case "undo":
-                    Undo undo = new Undo(prefix);
-                    undo.runCmd(cmd, null);
+        Member author = sc.getMember();
+        String subGroup = sc.getSubcommandGroup();
+        String subCmd = sc.getSubcommandName();
+        if (subGroup == null) {
+            subGroup = "";
+        }
+        if (subCmd == null) {
+            subCmd = "";
+        }
 
-                    FileHandler save = findSave(cmd);
-                    save.writeContents("REDACTED");
-                    break;
-            }
+        switch (subCmd) {
+            case "status":
+                sc.getHook().sendMessageFormat(
+                        "The bot is online. Welcome, %s.",
+                        author.getEffectiveName()).queue();
+                break;
+            case "help":
+                printTroubleshootString(sc);
+                break;
+            case "profile":
+                sc.getHook().sendMessage(
+                        "This command has not been implemented yet.").queue();
+                break;
+            case "genmaps":
+                MapGenerator maps = new MapGenerator();
+                maps.runCmd(sc);
+                break;
         }
     }
 
     /**
-     * Runs one of the bot's commands.
-     * @param sc a slash command to analyze.
+     * Runs a section command.
+     * @param sc the slash command to analyze.
      */
-    @Override
-    public void onSlashCommand(SlashCommandEvent sc) {
-        deferReplyIfNeeded(sc);
-
+    private void parseSectionCommands(SlashCommandEvent sc) {
         Member author = sc.getMember();
-        String cmd = sc.getName();
+        String prefix = sc.getName();
         String subGroup = sc.getSubcommandGroup();
         String subCmd = sc.getSubcommandName();
         List<OptionMapping> args = sc.getOptions();
@@ -375,21 +350,62 @@ public class Events extends ListenerAdapter {
             subCmd = "";
         }
 
-        SERVER = sc.getGuild();
-        INTERACTION = sc.getHook();
+        switch (subCmd) {
+            case "add":
+                Add newcomer = new Add(prefix);
+                newcomer.runCmd(sc);
+                break;
+            case "grad":
+                Graduate grad = new Graduate(prefix);
+                grad.runCmd(sc);
+                break;
+            case "startdraft":
+                processDrafts(sc, prefix, author);
+                break;
+            case "cycle":
+            case "sub":
+                if (gamesPlayedValid(sc)) {
+                    Log log = new Log(prefix);
+                    log.runCmd(sc);
 
-        // delete once the bot is ready
-        if (sc.getMember().getRoles() == null || !sc.getMember().getRoles().contains(
-                SERVER.getRolesByName("Staff", true).get(0))) {
-            INTERACTION.sendMessage("The bot is not ready to use yet.").queue();
+                    saveCycleCall(prefix + subCmd, args);
+                }
+                break;
+            case "undo":
+                Undo undo = new Undo(prefix);
+                undo.runCmd(sc);
+
+                FileHandler save = findSave(prefix);
+                save.writeContents("REDACTED");
+                break;
         }
-
-        String formalCmd = cmd + subGroup + subCmd;
-        parseCommands(author, cmd, formalCmd, args);
     }
 
     /**
-     * Checks any button clicks.
+     * Runs one of the bot's commands.
+     * @param sc a slash command to analyze.
+     */
+    @Override
+    public void onSlashCommand(SlashCommandEvent sc) {
+        String cmdPrefix = sc.getName();
+        if (isStaffCommand(sc)
+                || wrongChannelUsed(sc)) {
+            sc.reply("You do not have permission to use this command here.").queue();
+        }
+
+        switch (cmdPrefix) {
+            case "mit":
+                parseGeneralCommands(sc);
+                break;
+            case "lp":
+            case "io":
+                parseSectionCommands(sc);
+                break;
+        }
+    }
+
+    /**
+     * Checks for any button clicks.
      * @param bc a button click to analyze.
      */
     @Override
@@ -397,7 +413,7 @@ public class Events extends ListenerAdapter {
         String btnName = bc.getButton().getId();
         int indexOfNum = btnName.length() - 1;
 
-        List<Draft> drafts;
+        TreeMap<Integer, Draft> drafts;
         ArrayHeapMinPQ<Integer> queue;
         String suffix = btnName.substring(indexOfNum - 2, indexOfNum);
         int numButton = Integer.parseInt(btnName.substring(indexOfNum));
@@ -412,22 +428,23 @@ public class Events extends ListenerAdapter {
                 break;
         }
 
+        Draft currDraft = drafts.get(numButton);
         switch (btnName.substring(0, indexOfNum - 2)) {
             case "join":
-                drafts.get(numButton - 1).attemptDraft(bc);
+                currDraft.attemptDraft(bc);
                 break;
             case "leave":
-                drafts.get(numButton - 1).removePlayer(bc);
+                currDraft.removePlayer(bc);
                 break;
             case "requestSub":
-                drafts.get(numButton - 1).requestSub(bc);
+                currDraft.requestSub(bc);
                 break;
             case "sub":
-                drafts.get(numButton - 1).addSub(bc);
+                currDraft.addSub(bc);
                 break;
             case "end":
-                if (drafts.get(numButton - 1).endDraft(bc)) {
-                    drafts.remove(drafts.get(numButton - 1));
+                if (currDraft.hasEnded(bc)) {
+                    drafts.remove(numButton);
                     queue.add(numButton, numButton);
                 }
                 break;

@@ -3,7 +3,6 @@ package bot.Tools;
 import bot.Main;
 import bot.Engine.Graduate;
 import bot.Engine.PlayerStats;
-import bot.Events;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -17,6 +16,10 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -117,13 +120,14 @@ public class GoogleAPI {
 
     /**
      * Retrieves a table section of the spreadsheet.
+     * @param sc a user inputted slash command.
      * @param tab the name of the spreadsheet section.
      * @param spreadsheet the values of the spreadsheet section.
      * @return said section as a map, indexed by Discord ID.
      *         null otherwise.
      */
     public TreeMap<Object, PlayerStats> readSection(
-            String tab, Values spreadsheet) {
+            SlashCommandEvent sc, String tab, Values spreadsheet) {
         try {
             ValueRange spreadSheetTable = spreadsheet.get(
                     getSpreadsheetID(), tab).execute();
@@ -135,7 +139,7 @@ public class GoogleAPI {
                     List<Object> row = values.get(i);
                     Object id = row.remove(0);
                     PlayerStats rowStats = new PlayerStats(
-                            Integer.toString(i + 1), row);
+                            sc, Integer.toString(i + 1), row);
 
                     data.put(id, rowStats);
                 }
@@ -143,7 +147,9 @@ public class GoogleAPI {
                 return data;
             }
         } catch (IOException e) {
-            Events.INTERACTION.sendMessage(
+            Logger logger = LoggerFactory.getLogger(this.getClass());
+            logger.error("The data could not load.");
+            sc.getHook().sendMessage(
                     "The data could not load.").queue();
         }
 

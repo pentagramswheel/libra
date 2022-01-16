@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 
@@ -20,7 +20,7 @@ import java.util.Random;
 /**
  * @author  Wil Aquino, Turtle#1504
  * Date:    December 6, 2021
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  Draft.java
  * Purpose: Formalizes and starts a draft.
  */
@@ -48,10 +48,13 @@ public class Draft extends Section implements Command {
     /**
      * Constructs a draft template and initializes the
      * draft start attributes.
+     * @param sc the user's inputted command.
+     * @param draft the numbered draft that this draft is.
      * @param abbreviation the abbreviation of the section.
      * @param initialPlayer the first player of the draft.
      */
-    public Draft(int draft, String abbreviation, Member initialPlayer) {
+    public Draft(SlashCommandEvent sc, int draft,
+                 String abbreviation, Member initialPlayer) {
         super(abbreviation);
         started = false;
         subsNeeded = 0;
@@ -62,8 +65,8 @@ public class Draft extends Section implements Command {
         DraftPlayer newPlayer = new DraftPlayer(initialPlayer);
         players.add(newPlayer);
 
-        draftRole = getRole(getSection());
-        draftChat = getChannel(getPrefix() + "-draft-chat-" + draft);
+        draftRole = getRole(sc, getSection());
+        draftChat = getChannel(sc, getPrefix() + "-draft-chat-" + draft);
     }
 
     /**
@@ -123,8 +126,9 @@ public class Draft extends Section implements Command {
     /**
      * Sends a draft confirmation summary with all players
      * of the draft.
+     * @param bc the button click to analyze.
      */
-    private void updateReport() {
+    private void updateReport(ButtonClickEvent bc) {
         EmbedBuilder eb = new EmbedBuilder();
 
         eb.setTitle("Draft Queue");
@@ -163,10 +167,11 @@ public class Draft extends Section implements Command {
             eb.addField("Notice", notice, false);
 
             logList.deleteCharAt(logList.length() - 1);
-            log("A draft was started with " + logList + ".");
+            log("A " + getPrefix().toUpperCase() + " draft was started with "
+                    + logList + ".", false);
         }
 
-        editEmbed(eb);
+        sendEmbed(bc, eb);
     }
 
     /**
@@ -194,9 +199,9 @@ public class Draft extends Section implements Command {
         Member potentialPlayer = bc.getMember();
         // this block prevents repeated players in the initial draft start
         // comment/uncomment as needed
-//        if (draftContains(potentialPlayer, getPlayers()) != -1) {
-//            return;
-//        }
+        if (draftContains(potentialPlayer, getPlayers()) != -1) {
+            return;
+        }
 
         DraftPlayer newPlayer = new DraftPlayer(potentialPlayer);
         getPlayers().add(newPlayer);
@@ -212,11 +217,12 @@ public class Draft extends Section implements Command {
             buttons.add(Buttons.joinAsSub(idSuffix));
             buttons.add(Buttons.end(idSuffix));
 
-            editButtons(bc, buttons);
+            sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
+                    buttons);
         }
 
-        updateReport();
-        bc.getHook().editOriginal(newPing()).queue();
+        editMessage(bc, newPing());
+        updateReport(bc);
     }
 
     /**
@@ -264,14 +270,14 @@ public class Draft extends Section implements Command {
         DraftPlayer convertedSub = convertToSub(bc.getMember());
 
         if (convertedSub == null) {
-            bc.reply("You are not part of this draft!")
-                    .setEphemeral(true).queue();
+            sendReply(bc, "You are not part of this draft!", true);
             return;
         } else if (convertedSub.getPings() > 0) {
-            bc.reply("Stop spamming " + convertedSub.getAsMember().getAsMention()
-                    + "!").setEphemeral(true).queue();
+            sendReply(bc, "Stop spamming " + convertedSub.getAsMember().getAsMention()
+                    + "!", true);
             return;
         }
+        bc.deferEdit().queue();
 
         getPlayers().remove(convertedSub);
         getSubs().remove(convertedSub);
@@ -280,10 +286,10 @@ public class Draft extends Section implements Command {
         subsNeeded++;
         convertedSub.incrementPings();
 
-        bc.editMessage(newPing() + "   // " + subsNeeded + " sub(s) needed").queue();
+        editMessage(bc, newPing() + "   // " + subsNeeded + " sub(s) needed");
 
         String update = getDraftRole().getAsMention() + " sub requested.";
-        bc.getHook().sendMessage(update).queue();
+        sendResponse(bc, update, false);
     }
 
     /**
@@ -297,14 +303,13 @@ public class Draft extends Section implements Command {
                 && draftContains(player, getSubs()) == -1);
 
         if (inDraft) {
-            bc.reply("Why would you sub for yourself?")
-                    .setEphemeral(true).queue();
+            sendReply(bc, "Why would you sub for yourself?", true);
             return;
         } else if (subsNeeded == 0) {
-            bc.reply("This draft hasn't requested any subs yet.")
-                    .setEphemeral(true).queue();
+            sendReply(bc, "This draft hasn't requested any subs yet.", true);
             return;
         }
+        bc.deferEdit().queue();
 
         DraftPlayer subPlayer = new DraftPlayer(player);
         subs.add(subPlayer);
@@ -312,15 +317,15 @@ public class Draft extends Section implements Command {
         subsNeeded--;
 
         if (subsNeeded == 0) {
-            bc.editMessage(newPing()).queue();
+            editMessage(bc, newPing());
         } else {
-            bc.editMessage(newPing() + "   // " + subsNeeded + " sub(s) needed").queue();
+            editMessage(bc, newPing() + "   // " + subsNeeded + " sub(s) needed");
         }
 
         String update =
                 subPlayer.getAsMember().getAsMention() + " will be subbing for "
                         +"this draft in " + getDraftChannel().getAsMention() + ".";
-        bc.getHook().sendMessage(update).queue();
+        sendResponse(bc, update, false);
     }
 
     /**
@@ -332,49 +337,52 @@ public class Draft extends Section implements Command {
         int playerIndex = draftContains(player, getPlayers());
 
         if (playerIndex == -1) {
-            bc.reply("You're not in this draft!")
-                    .setEphemeral(true).queue();
+            sendReply(bc, "You're not in this draft!", true);
             return;
         }
+        bc.deferEdit().queue();
 
         getPlayers().remove(playerIndex);
 
-        updateReport();
-        bc.editMessage(newPing()).queue();
+        editMessage(bc, newPing());
+        updateReport(bc);
     }
 
     /**
      * Ends the draft is it is completed, via a button.
      * @param bc a button click to analyze.
      */
-    public boolean endDraft(ButtonClickEvent bc) {
+    public boolean hasEnded(ButtonClickEvent bc) {
         if (!inProgress()) {
-            editButton(bc, Buttons.end(getPrefix() + getNumDraft())
+            bc.deferEdit().queue();
+            sendButton(bc, "This draft has ended.",
+                    Buttons.end(getPrefix() + getNumDraft())
                     .withStyle(ButtonStyle.SECONDARY).asDisabled());
-            bc.editMessage("This draft has ended.").queue();
 
             return true;
         } else {
-            bc.reply("This draft hasn't finished yet.").setEphemeral(true).queue();
+            sendReply(bc, "This draft hasn't finished yet.", true);
             return false;
         }
     }
 
     /**
      * Runs the draft start command.
-     * @param cmd the formal name of the command.
-     * @param args the arguments of the command, if they exist.
+     * @param sc the user's inputted command.
      */
     @Override
-    public void runCmd(String cmd, List<OptionMapping> args) {
+    public void runCmd(SlashCommandEvent sc) {
+        sc.deferReply().queue();
+
         ArrayList<Button> buttons = new ArrayList<>();
         String idSuffix = getPrefix().toUpperCase() + getNumDraft();
         buttons.add(Buttons.joinDraft(idSuffix));
         buttons.add(Buttons.leave(idSuffix));
 
         String caption = getDraftRole().getAsMention() + " +7";
-        sendButtons(caption, buttons);
-        log("A " + getPrefix().toUpperCase() + " draft has been requested.");
+        sendButtons(sc, caption, buttons);
+        log("A " + getPrefix().toUpperCase()
+                + " draft has been requested.", false);
     }
 
     /**

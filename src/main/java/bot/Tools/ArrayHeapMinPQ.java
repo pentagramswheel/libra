@@ -10,7 +10,6 @@ import java.util.TreeMap;
  *  Purpose: Provides implementation of an extrinsic min-heap
  *           priority queue.
  */
-
 public class ArrayHeapMinPQ<T> {
 
     /** ArrayList to store the min-heap in. */

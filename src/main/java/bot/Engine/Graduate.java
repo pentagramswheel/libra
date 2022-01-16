@@ -4,6 +4,7 @@ import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
 
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -34,26 +35,24 @@ public class Graduate extends Section implements Command {
 
     /**
      * Graduates a user from LaunchPoint.
+     * @param sc the user's inputted command.
      * @param user the user to graduate.
      * @return a graduation congratulation message.
      */
-    private String graduate(Member user) {
+    private String graduate(SlashCommandEvent sc, Member user) {
         String exitMessage = "";
 
         try {
             GoogleAPI link = new GoogleAPI(gradSheetID());
-            if (getPrefix().equals("lp")) {
-                removeRole(user, getRole("LaunchPoint"));
-                addRole(user, getRole("LaunchPoint Graduate"));
-                addRole(user, getRole("Ink Odyssey"));
+            removeRole(sc, user.getId(), getRole(sc, getSection()));
+            addRole(sc, user.getId(), getRole(sc, getSection() + " Graduate"));
 
+            if (getPrefix().equals("lp")) {
+                addRole(sc, user.getId(), getRole(sc, "Ink Odyssey"));
                 exitMessage = "Congratulations! We look forward to "
                         + "seeing you in Ink Odyssey and outside "
                         + "of MIT.";
             } else {
-                removeRole(user, getRole("Ink Odyssey"));
-                addRole(user, getRole("Ink Odyssey Graduate"));
-
                 exitMessage = "Congratulations! We look forward to "
                         + "seeing you beyond MIT.";
             }
@@ -63,7 +62,7 @@ public class Graduate extends Section implements Command {
 
             Values spreadsheet = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> data = link.readSection(
-                    tab, spreadsheet);
+                    sc, tab, spreadsheet);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             } else if (!data.containsKey(user.getId())) {
@@ -73,8 +72,9 @@ public class Graduate extends Section implements Command {
                 link.appendRow(tab, spreadsheet, newRow);
             }
         } catch (IOException | GeneralSecurityException e) {
-            sendReply("The spreadsheet could not load.");
-            log("The spreadsheet could not load.");
+            sendResponse(sc, "The spreadsheet could not load.", true);
+            log("The " + getSection()
+                    + " graduates spreadsheet could not load.", true);
         }
 
         return exitMessage;
@@ -82,16 +82,17 @@ public class Graduate extends Section implements Command {
 
     /**
      * Runs the graduation command.
-     * @param cmd the formal name of the command.
-     * @param args the arguments of the command, if they exist.
+     * @param sc the user's inputted command.
      */
     @Override
-    public void runCmd(String cmd, List<OptionMapping> args) {
-        StringBuilder listOfUsers = new StringBuilder();
+    public void runCmd(SlashCommandEvent sc) {
+        sc.deferReply().queue();
+        List<OptionMapping> args = sc.getOptions();
 
+        StringBuilder listOfUsers = new StringBuilder();
         for (OptionMapping om : args) {
             Member user = om.getAsMember();
-            String exitMessage = graduate(user);
+            String exitMessage = graduate(sc, user);
 
             Member finalUser = args.get(args.size() - 1).getAsMember();
             if (user.equals(finalUser)) {
@@ -103,7 +104,7 @@ public class Graduate extends Section implements Command {
             }
         }
 
-        sendReply(listOfUsers.toString());
-        log(args.size() + " graduates were processed.");
+        sendResponse(sc, listOfUsers.toString(), false);
+        log(args.size() + " " + getSection() + " graduate(s) processed.", false);
     }
 }

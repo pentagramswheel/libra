@@ -11,12 +11,11 @@ tokens/
 *.ear
 *.logs
 *.iml
-*.xml
 *.target
 .eclipse
 
-src/main/java/bot/Discord.java
-src/main/resources/*
+src/main/java/bot/Config.java
+src/main/resources/credentials.json
 
 loadLP.txt
 loadIO.txt

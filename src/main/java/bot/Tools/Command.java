@@ -1,21 +1,19 @@
 package bot.Tools;
 
-import bot.Events;
-
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 
 /**
  * @author  Wil Aquino
@@ -27,140 +25,244 @@ import java.util.Date;
 public interface Command {
 
     /**
-     * Runs the command.
-     * @param cmd the formal name of the command.
-     * @param args the arguments of the command, if they exist.
+      * Runs the slash command.
+      * @param sc the command to analyze.
+      */
+    void runCmd(SlashCommandEvent sc);
+
+    /**
+     * Retrieves the users of a slash command.
+     * @param sc the command to analyze.
+     * @return said users.
      */
-    void runCmd(String cmd, List<OptionMapping> args);
+    default List<OptionMapping> extractUsers(SlashCommandEvent sc) {
+        List<OptionMapping> users = new ArrayList<>();
+        for (OptionMapping om : sc.getOptions()) {
+            if (om.getType().equals(OptionType.USER)) {
+                users.add(om);
+            }
+        }
+
+        return users;
+    }
 
     /**
      * Retrieves a role given its name.
+     * @param interaction the user interaction calling this method.
      * @param role the name of the role.
      * @return the role.
      */
-    default Role getRole(String role) {
-        return Events.SERVER.getRolesByName(role, true).get(0);
+    default Role getRole(GenericInteractionCreateEvent interaction,
+                         String role) {
+        try {
+            Guild server = interaction.getGuild();
+            if (server == null) {
+                throw new NullPointerException("Roles not found.");
+            }
+
+            return server.getRolesByName(role, true).get(0);
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
+            log("The role, " + role + ", could not be found.", true);
+            return null;
+        }
     }
 
     /**
      * Adds a role to a user.
-     * @param user the given user.
+     * @param interaction the user interaction calling this method.
+     * @param id the user's Discord ID.
      * @param role the role to add.
      */
-    default void addRole(Member user, Role role) {
-        List<Role> roleList = user.getRoles();
-        while (!roleList.contains(role)) {
-            Events.SERVER.addRoleToMember(user.getId(), role).queue();
+    default void addRole(GenericInteractionCreateEvent interaction,
+            String id, Role role) {
+        try {
+            Guild server = interaction.getGuild();
+            if (server == null) {
+                throw new NullPointerException("Role not found.");
+            }
 
-            // prevent Discord rate limiting
-            wait(2000);
-            user = Events.SERVER.retrieveMemberById(user.getId()).complete();
-            roleList = user.getRoles();
+            Member user = server.retrieveMemberById(id).complete();
+            List<Role> roleList = user.getRoles();
+            while (!roleList.contains(role)) {
+                server.addRoleToMember(id, role).queue();
+
+                // prevent Discord rate limiting
+                wait(2000);
+
+                server = interaction.getGuild();
+                user = server.retrieveMemberById(id).complete();
+                roleList = user.getRoles();
+            }
+        } catch (NullPointerException e) {
+            log("The role, " + role.getName() + ", could not be found.", true);
         }
     }
 
     /**
      * Removes a role from a user.
-     * @param user the given user.
+     * @param interaction the user interaction calling this method.
+     * @param id the user's Discord ID.
      * @param role the role to remove.
      */
-    default void removeRole(Member user, Role role) {
-        while (user.getRoles().contains(role)) {
-            Events.SERVER.removeRoleFromMember(user.getId(), role).queue();
+    default void removeRole(GenericInteractionCreateEvent interaction,
+                            String id, Role role) {
+        try {
+            Guild server = interaction.getGuild();
+            if (server == null) {
+                throw new NullPointerException("Role not found.");
+            }
 
-            // prevent Discord rate limiting
-            wait(2000);
-            user = Events.SERVER.retrieveMemberById(user.getId()).complete();
+            Member user = server.retrieveMemberById(id).complete();
+            List<Role> roleList = user.getRoles();
+            while (roleList.contains(role)) {
+                server.removeRoleFromMember(id, role).queue();
+
+                // prevent Discord rate limiting
+                wait(2000);
+
+                server = interaction.getGuild();
+                user = server.retrieveMemberById(id).complete();
+                roleList = user.getRoles();
+            }
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
+            log("The role, " + role.getName() + ", could not be found.", true);
         }
     }
 
     /**
      * Retrieves a channel given its name.
+     * @param interaction the user interaction calling this method.
      * @param channel the name of the channel.
      * @return the channel.
      */
-    default TextChannel getChannel(String channel) {
-        return Events.SERVER.getTextChannelsByName(channel, true).get(0);
+    default TextChannel getChannel(GenericInteractionCreateEvent interaction,
+                                   String channel) {
+        try {
+            Guild server = interaction.getGuild();
+            if (server == null) {
+                throw new NullPointerException("Channel not found.");
+            }
+
+            return server.getTextChannelsByName(channel, true).get(0);
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
+            log("The channel, " + channel + ", could not be found.", true);
+            return null;
+        }
     }
 
     /**
-     * Send a reply to the user's interaction made in Discord.
+     * Sends a response to the user's interaction.
+     * @param interaction the user interaction calling this method.
      * @param msg the message to send.
+     * @param isEphemeral True if this should be an ephemeral message.
+     *                    False otherwise.
+     *
+     * Note: The interaction must have been acknowledged before
+     *       this method.
      */
-    default void sendReply(String msg) {
-        Events.INTERACTION.sendMessage(msg).queue();
+    default void sendResponse(GenericInteractionCreateEvent interaction,
+                              String msg, boolean isEphemeral) {
+        interaction.getHook().sendMessage(msg).setEphemeral(isEphemeral).queue();
     }
 
     /**
-     * Send a message to Discord in the place the user's
+     * Sends a reply to the user's interaction.
+     * @param interaction the user interaction calling this method.
+     * @param msg the message to send.
+     * @param isEphemeral True if this should be an ephemeral message.
+     *                    False otherwise.
+     */
+    default void sendReply(GenericInteractionCreateEvent interaction,
+                           String msg, boolean isEphemeral) {
+        interaction.reply(msg).setEphemeral(isEphemeral).queue();
+    }
+
+    /**
+     * Sends a message to Discord in the channel the user's
      * interaction was made.
+     * @param interaction the user interaction calling this method.
      * @param msg the message to send.
      */
-    default void sendMessage(String msg) {
-        Events.INTERACTION.getInteraction().getMessageChannel().sendMessage(
-                msg).queue();
+    default void sendMessage(GenericInteractionCreateEvent interaction,
+                             String msg) {
+        interaction.getMessageChannel().sendMessage(msg).queue();
+    }
+
+    /**
+     * Edits the message the user's interaction is linked with.
+     * @param interaction the user interaction calling this method.
+     * @param msg the message to send.
+     *
+     * Note: The interaction must have been acknowledged before
+     *       this method.
+     */
+    default void editMessage(GenericInteractionCreateEvent interaction,
+                             String msg) {
+        interaction.getHook().editOriginal(msg).queue();
     }
 
     /**
      * Edits/sends a list of embedded messages linked with the
      * user's interaction.
+     * @param interaction the user interaction calling this method.
      * @param ebs the embeds to send.
+     *
+     * Note: The interaction must have been acknowledged before
+     *       this method.
      */
-    default void editEmbeds(List<EmbedBuilder> ebs) {
+    default void sendEmbeds(GenericInteractionCreateEvent interaction,
+                            List<EmbedBuilder> ebs) {
         ArrayList<MessageEmbed> builtEmbeds = new ArrayList<>(ebs.size());
         for (EmbedBuilder embed : ebs) {
             builtEmbeds.add(embed.build());
         }
 
-        Events.INTERACTION.editOriginalEmbeds(builtEmbeds).queue();
+        interaction.getHook().editOriginalEmbeds(builtEmbeds).queue();
     }
 
     /**
      * Edits/sends an embedded message linked with the
      * user's interaction.
+     * @param interaction the user interaction calling this method.
      * @param eb the embed to send.
+     *
+     * Note: The interaction must have been acknowledged before
+     *       this method.
      */
-    default void editEmbed(EmbedBuilder eb) {
-        editEmbeds(Collections.singletonList(eb));
-    }
-
-    /**
-     * Links a line of buttons to the user's interaction.
-     * @param caption the caption of the button group.
-     * @param buttons the group of buttons to link.
-     */
-    default void sendButtons(String caption, List<Button> buttons) {
-        ReplyAction reply = Events.INTERACTION.getInteraction().reply(caption);
-        reply.addActionRow(buttons).queue();
-    }
-
-    /**
-     * Links a button to the user's interaction.
-     * @param caption the caption of the button.
-     * @param button the button to link.
-     */
-    default void sendButton(String caption, Button button) {
-        sendButtons(caption, Collections.singletonList(button));
+    default void sendEmbed(GenericInteractionCreateEvent interaction,
+                           EmbedBuilder eb) {
+        sendEmbeds(interaction, Collections.singletonList(eb));
     }
 
     /**
      * Replaces the parent link of buttons for a button,
      * by linking new buttons to the interaction.
-     * @param bc one of the original buttons.
+     * @param interaction the user interaction calling this method.
+     * @param caption the caption above the buttons
      * @param buttons the new buttons to link.
+     *
+     * Note: The interaction must have been acknowledged before
+     *       this method.
      */
-    default void editButtons(ButtonClickEvent bc, List<Button> buttons) {
-        bc.getHook().editOriginalComponents().setActionRow(buttons).queue();
+    default void sendButtons(GenericInteractionCreateEvent interaction,
+                             String caption, List<Button> buttons) {
+        interaction.getHook().editOriginal(caption)
+                .setActionRow(buttons).queue();
     }
 
     /**
      * Replaces a parent button for a button, by linking
      * a new button to the interaction.
-     * @param bc the original button.
+     * @param interaction the user interaction calling this method.
+     * @param caption the caption above the button.
      * @param button the new button to link.
+     *
+     * Note: The interaction must have been acknowledged before
+     *       this method.
      */
-    default void editButton(ButtonClickEvent bc, Button button) {
-        editButtons(bc, Collections.singletonList(button));
+    default void sendButton(GenericInteractionCreateEvent interaction,
+                            String caption, Button button) {
+        sendButtons(interaction, caption, Collections.singletonList(button));
     }
 
     /**
@@ -179,7 +281,12 @@ public interface Command {
      * Log the processed command's actions to the console.
      * @param msg the message to to attach to the log.
      */
-    default void log(String msg) {
-        System.out.println(msg + " (" + new Date() + ")");
+    default void log(String msg, boolean isProblem) {
+        Logger logger = LoggerFactory.getLogger(this.getClass());
+        if (isProblem) {
+            logger.error(msg);
+        } else {
+            logger.info(msg);
+        }
     }
 }

@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** January 14, 2022
+**Last Updated:** January 16, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -15,6 +15,7 @@
   - [Events](#events)
   - [Commands](#commands)
   + [Tools](#tools)
+    - [ArrayHeapMinPQ](#arrayheapminpq)
     - [BuiltButton](#builtbutton)
     - [Command](#command)
     - [FileHandler](#filehandler)
@@ -109,9 +110,9 @@ The entry point of the bot. It constructs the bot and prepares it for processing
 
 ----
 
-#### Discord
+#### Config
 
-A class consisting of credential-specific information, pertaining to Discord and the bot's persistence. Due to the credentials of this class, the secrets have been redacted. See DiscordExample.java for a template.
+A class consisting of credential-specific information, pertaining to Discord and the bot's persistence. Due to the credentials of this class, the secrets have been redacted. See ConfigExample.java for a template.
 
 ----
 
@@ -133,6 +134,10 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 ----
 
 ### Tools
+
+#### ArrayHeapMinPQ
+
+A class which builds a heap a minimum priority queue (This class is taken from another project and is therefore not detailed here. See the class itself for more details).
 
 #### BuiltButton
 
@@ -165,8 +170,7 @@ A class which navigates a Google Sheet (spreadsheet).
 
 ###### Instance Variables
 1. `Sheets sheetsService` - an object representation for the Google Sheets SDK.
-2. `String APPLICATION_NAME` - the name of the application.
-3. `String spreadsheetID` - the credential ID of the spreadsheet.
+2. `String spreadsheetID` - the credential ID of the spreadsheet.
 
 ----
 
@@ -220,10 +224,10 @@ A class which forms and starts drafts.
 
 ###### Instance Variables
 1. `boolean started` - a flag for checking whether the draft has started or not.
-2. `int subsNeeded` - the amount of subs needed for the draft at any given time.
-3. `numDraft` - the formal number of the draft, with respect to the draft lists in `Events`.
-4. `List<DraftPlayer> players` - the core (8) players of the draft
-5. `List<DraftPlayer> subs` - the subs of the draft, if any.
+2. `int numDraft` - the formal number of the draft, with respect to the draft maps in `Events`.
+3. `List<DraftPlayer> players` - the core (8) players of the draft.
+4. `List<DraftPlayer> subs` - the subs of the draft, if any.
+5. `int subsNeeded` - the amount of subs needed for the draft at any given time.
 6. `Role draftRole` - the section of MIT which this draft is occurring in.
 7. `TextChannel draftChat` - the draft chat which this draft is linked to.
 
@@ -250,18 +254,6 @@ A class which updates the draft stats of a user, processing the `lp/io cycle` an
 #### MapGenerator
 
 A class which generates map lists for drafts.
-
-----
-
-#### StartDraft
-
-A class which starts a draft.
-
-###### Instance Variables
-1. `int numLPDrafts` - the number of active LaunchPoint drafts at any time.
-2. `int numIODrafts` - the number of active Ink Odyssey drafts at any time.
-3. `List<Member> players` - the list of players within the draft.
-4. `Role draftRole` - the role to ping for this draft.
 
 ----
 
@@ -295,27 +287,27 @@ The `isSimilar` method checks whether a portion of a string `input` can be found
 
 ###### gamesPlayedValid
 
-The `gamesPlayersValid` method checks whether there were more games won than games played (which makes no sense), of the cycle commands, given the command parameters `args`.
+The `gamesPlayersValid` method checks whether there were more games won than games played (which makes no sense), of the cycle commands, given the user inputted slash command `sc`.
 
 ###### isStaffCommand
 
-The `isStaffCommand` method checks whether a user `author`'s command `cmd` is a staff command or not.
+The `isStaffCommand` method checks whether the user's inputted slash command `sc` is a staff command or not.
 
 ###### wrongChannelUsed
 
-The `wrongChannelUsed` method checks whether a command `cmd` can be used in the channel the interaction was sent in or not.
+The `wrongChannelUsed` method checks whether a user's inputted slash command `sc` can be used in the channel the interaction was sent in or not.
 
 ###### printTroubleshootString
 
-The `printTroubleshootString` method prints the script for the `help` command.
+The `printTroubleshootString` method prints the script for the `help` command, given its slash command `sc`.
 
 ###### processDraft
 
-The `processDraft` method starts a draft, if possible, given the inputted command's prefix `prefix` and the user `author` who requested it, logging it into the list of drafts `ongoingDrafts`, and queue `queue`.
+The `processDraft` method starts a draft, if possible, given the inputted command's prefix `prefix` and the user `author` who requested it, logging it into the map of drafts `ongoingDrafts` and queue `queue`, given its slash command `sc`.
 
 ###### processDrafts
 
-The `processDrafts` method starts a draft, if possible, given the inputted command's prefix `prefix` and the user who requested it `author`.
+The `processDrafts` method starts a draft, if possible, given the inputted command's prefix `prefix`, the user who requested it `author`, and its slash command `sc`.
 
 ###### findSave
 
@@ -329,17 +321,21 @@ The `mentionableFor` method formats a user `om` into a mentionable text ping.
 
 The `saveCycleCall` method saves the user input `cmd` and `args` to the one of the cycle save files.
 
-###### parseCommands
+###### parseGeneralCommands
 
-The `parseCommands` method runs a command based on the full command `cmd`, its prefix `prefix`, and its parameters/options `args`, given the user who inputted it `author` and the object representation of the command itself `sc`.
+The `parseGeneralCommands` method runs a general command based on the user inputted slash command `sc`.
+
+###### parseSectionCommands
+
+The `parseSectionCommands` method runs a section command based on the user inputted slash command `sc`.
 
 ###### onSlashCommand
 
-The `onSlashCommand` method parses through user input `sc`, checking if a slash command was used, and executing based on the command and its parameters/options.
+The `onSlashCommand` method analyzes a slash command `sc`, executing based on the command and its parameters/options.
 
 ###### onButtonClick
 
-The `onButtonClick` method parses through clicked buttons `bc`, checking if a specific button was clicked.
+The `onButtonClick` method parses through clicked buttons `bc`.
 
 ----
 
@@ -361,63 +357,67 @@ The `getButton` method retrieves the built button.
 
 ###### runCmd
 
-The `runCmd` method runs a command, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs a command, given its slash command `sc`.
+
+###### extractUsers
+
+The `extractUsers` method extracts the users of a slash command `sc`.
 
 ###### getRole (DEFAULT)
 
-The `retrieveRole` method retrieves the role `role` from the server.
+The `getRole` method retrieves the role `role` from the server, using the interaction `interaction`.
 
 ###### addRole (DEFAULT)
 
-The `addRole` method adds a role `role` to a user `user`.
+The `addRole` method adds a role `role` to a user with Discord ID `id`, using the interaction `interaction`.
 
 ###### removeRole (DEFAULT)
 
-The `removeRole` method removes a role `role` to a user `user`.
+The `removeRole` method removes a role `role` from a user with Discord ID `id`, using the interaction `interaction`.
 
 ###### getChannel (DEFAULT)
 
-The `getChannel` method retrieves a text channel `channel` from the server.
+The `getChannel` method retrieves a text channel `channel` from the server, using the interaction `interaction`.
+
+###### sendResponse (DEFAULT)
+
+The `sendResponse` method responds to the user's acknowledged interaction `interaction` with message `msg`, with a field `ephemeral` to check whether to send it as an ephemeral message or not.
 
 ###### sendReply (DEFAULT)
 
-The `sendReply` method sends a reply `msg` to the user's interaction.
+The `sendReply` method replies to the user's interaction `interaction` with message `msg`, with a field `ephemeral` to check whether to send it as an ephemeral message or not.
 
 ###### sendMessage (DEFAULT)
 
-The `sendMessage` method sends a message `msg` to the channel the user's interaction was made.
+The `sendMessage` method sends a message `msg` to the channel where the user's interaction `interaction` was made.
 
-###### editEmbeds (DEFAULT)
+###### editMessage (DEFAULT)
 
-The `editEmbeds` method edits/sends a list of embeds `ebs` linked with the user's interaction.
+The `editMessage` method replaces the user's acknowledged interaction `interaction`'s message with a new message `msg`
 
-###### editEmbed (DEFAULT)
+###### sendEmbeds (DEFAULT)
 
-The `editEmbed` method edits/sends an embed `eb` linked with the user's interaction.
+The `sendEmbeds` method edits or sends a list of embedded messages `ebs`, linked with the user's acknowledged interaction `interaction`.
 
-###### sendButtons (DEFAULT)
+###### sendEmbed (DEFAULT)
 
-The `sendButtons` method constructs a line of buttons `buttons` and links them to the interaction which constructed those buttons, with caption `caption`.
+The `sendEmbed` method edits or sends an embedded message `eb`, linked with the user's acknowledged interaction `interaction`.
+
+####### sendButtons (DEFAULT)
+
+The `sendButtons` method edits or sends a list of buttons `buttons` with caption `caption`, linked with the user's acknowledged interaction `interaction`.
 
 ###### sendButton (DEFAULT)
 
-The `sendButton` method constructs a button `button` and links them to the interaction which constructed the button, with caption `caption`.
-
-###### editButtons (DEFAULT)
-
-The `editButtons` method replaces the parent interaction's buttons link of a button clicked `bc` with a new line of buttons `buttons`.
-
-###### editButton (DEFAULT)
-
-The `editButton` method replaces the parent interaction's button link of a button clicked `bc` with a new button `button`.
-
+The `sendButton` method edits or sends a button `button` with caption `caption`, linked with the user's acknowledged interaction `interaction`.
+ 
 ###### wait (DEFAULT)
 
 The `wait` method pauses the program for `ms` milliseconds.
 
 ###### log (DEFAULT)
 
-The `log` method logs a processed command message `msg` onto the console.
+The `log` method logs a processed command message `msg` onto the console, labelling it as an error depending on a flag `isProblem`.
 
 ----
 
@@ -457,7 +457,7 @@ The `getSpreadSheetID` method retrieves the spreadsheet's affiliated ID.
 
 ###### readSection
 
-The `readSection` method reads a tab `tab` of the spreadsheet `spreadsheet` and organizes it into a map, in the form of a red-black tree, indexing by Discord user ID.
+The `readSection` method reads a tab `tab` of the spreadsheet `spreadsheet` and organizes it into a map indexing by Discord user ID, given a user inputted slash command `sc`.
 
 ###### buildRange
 
@@ -487,11 +487,11 @@ The `Add` method, the class's constructor, builds the assigned add attributes gi
 
 ###### enter
 
-The `enter` method adds the section role to a user `user` and retrieves a welcome message.
+The `enter` method adds the section role to a user `user` and retrieves a welcome message, given the user inputted slash command `sc`.
 
 ###### runCmd
 
-The `runCmd` method runs the `lp/io add` commands, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs the `lp/io add` commands, given its slash command `sc`.
 
 ----
 
@@ -503,11 +503,11 @@ The `Graduate` method, the class's constructor, builds the assigned graduation a
 
 ###### graduate
 
-The `graduate` method adds a user `user` to a spreadsheet list of MIT graduates and gives them a graduate role.
+The `graduate` method adds a user `user` to a spreadsheet list of MIT graduates and gives them a graduate role, given the user inputted slash command `sc`.
 
 ###### runCmd
 
-The `runCmd` method runs the `lp/io grad` commands, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs the `lp/io grad` commands, given its slash command `sc`.
 
 ----
 
@@ -515,7 +515,7 @@ The `runCmd` method runs the `lp/io grad` commands, given the command `cmd` and 
 
 ###### PlayerStats
 
-The `PlayerStats` method, the class's constructor, initializes the class's instance variables. An error may be caught here if a formatting problem is found within the spreadsheet.
+The `PlayerStats` method, the class's constructor, initializes the player's attributes given a user inputted slash command `sc`, row number `pos`, and row values `vals`.
 
 ###### getDraftPosition
 
@@ -581,7 +581,7 @@ The `cyclesSheetID` method retrieves the section's cycle sheet ID.
 
 ###### Draft
 
-The `Draft` method constructs a draft template, given the player who initialized it `initialPlayer`, the abbreviation of the section which the draft is occurring in `abbreivation`, and the number draft `draft` it is for the section.
+The `Draft` method constructs a draft template, given the player who initialized it `initialPlayer`, the abbreviation of the section which the draft is occurring in `abbreivation`, the number draft `draft` it is for the section, and the user inputted slash command `sc`.
 
 ###### toggleDraft
 
@@ -611,13 +611,13 @@ The `getDraftRole` method retrieves the role ping of the draft's section.
 
 The `getDraftChannel` method retrieves the draft chat channel that the draft is linked with.
 
-###### sendReport
+###### updateReport
 
-The `sendReport` method send a draft confirmation summary of a started draft.
+The `updateReport` method edits/sends a draft queue summary of a started draft, given a button clicked `bc`.
 
 ###### newPing
 
-The `newRequest` method formats a new ping for gathering players.
+The `newPing` method formats a new ping for gathering players.
 
 ###### attemptDraft
 
@@ -643,13 +643,13 @@ The `addSub` method tries to add a sub to the draft after a "Join As Sub" button
 
 The `removePlayer` method removes a core player from the draft queue after a "Leave" button was clicked.
 
-###### endDraft
+###### hasEnded
 
-The `endDraft` method checks if the draft has finished or not after a "End Draft" button was clicked, with respect to the initial draft request.
+The `hasEnded` method checks if the draft has finished or not after a "End Draft" button was clicked, with respect to the initial draft request.
 
 ###### runCmd
 
-The `runCmd` method runs the `lp/io startdraft` commands, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs the `lp/io startdraft` commands, given its slash command `sc`.
 
 ###### Buttons (static class)
 1. `joinDraft` - method that retrieves the "Join Draft" button.
@@ -664,11 +664,11 @@ The `runCmd` method runs the `lp/io startdraft` commands, given the command `cmd
 
 ###### DraftPlayer
 
-The `DraftPlayer` method, the class's constructor, builds the attributes of the draft player.
+The `DraftPlayer` method, the class's constructor, builds the attributes of the draft player, given the player themselves `user`.
 
 ###### getAsMember
 
-The `getAsMember` method retrieves the object representation of the player.
+The `getAsMember` method retrieves the `Member` object representation of the player.
 
 ###### getWins
 
@@ -724,7 +724,7 @@ The `sum` method returns the sum of all values within an array `arr`, by using r
 
 ###### sendReport
 
-The `sendReport` method sends a summary of all errors during the match report, given the wins/losses `wins`/`losses`, color label `color`, players `players`, whether they were new or existing players `playerTypes`, and which players `errorsFound` resulted in an error.
+The `sendReport` method sends a summary of all errors during the match report, given the color label `color`, players `players`, whether they were new or existing players `playerTypes`, which players `errorsFound` resulted in an error, and the user's inputted slash command `sc`.
 
 ###### updateUser
 
@@ -736,7 +736,7 @@ This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user
 
 ###### runCmd
 
-The `runCmd` method runs the `lp/io cycle` and `lp/io sub` commands, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs the `lp/io cycle` and `lp/io sub` commands, given its slash command `sc`.
 
 ----
 
@@ -764,31 +764,7 @@ The `buildMatch` method builds a match with a map `map` and mode `mode` in the f
 
 ###### runCmd
 
-The `runCmd` method runs the `mit genmaps` command, given the command `cmd` and its parameters/options `args`.
-
-----
-
-#### StartDraft
-
-###### StartDraft
-
-The `StartDraft` method, the class's constructor, builds the initialized draft using the player who called for it `initialPlayer` and builds the assigned cycle log attributes given its prefix `abbreviation`.
-
-###### getPlayers
-
-The `getPlayers` method retrieves the players of the draft.
-
-###### sendReport
-
-The `sendReport` method sends a summary of the started draft labeled with color `color` and leading the players to communicate through the draft channel `channel`.
-
-###### attemptDraft
-
-The `attemptDraft` method attempts to start the draft after a "join draft" button `bc` was clicked.
-
-###### runCmd
-
-The `runCmd` method runs the `lp/io startdraft` commands, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs the `mit genmaps` command, given its slash command `sc`.
 
 ----
 
@@ -816,7 +792,7 @@ The `getGamesWon` method retrieves the amount of games won, given `args`.
 
 ###### sendReport
 
-The `sendReport` method sends a revert summary of the previous report, given the last command input `lastInput`, the amount of user args `userArgs` within the input, and which players `errorsFound` resulted in an error.
+The `sendReport` method sends a revert summary of the previous report, given the last command input `lastInput`, the amount of user args `userArgs` within the input, and which players `errorsFound` resulted in an error, and the user inputted slash command `sc`.
 
 ###### undoUser
 
@@ -824,7 +800,7 @@ This `undoUser` method uses the GoogleAPI `link` to revert the stats of a user `
 
 ###### runCmd
 
-The `runCmd` method runs the `lp/io undo` commands, given the command `cmd` and its parameters/options `args`.
+The `runCmd` method runs the `lp/io undo` commands, given its slash command `sc`.
 
 ----
 

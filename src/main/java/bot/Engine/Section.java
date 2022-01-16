@@ -1,13 +1,13 @@
 package bot.Engine;
 
-import bot.Discord;
+import bot.Config;
 
 import java.awt.Color;
 
 /**
  * @author  Wil Aquino
  * Date:    January 10, 2022
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  Section.java
  * Purpose: Designates MIT section specific information.
  */
@@ -38,13 +38,13 @@ public class Section {
         if (prefix.equals("lp")) {
             name = "LaunchPoint";
             color = Color.GREEN;
-            gradSheetID = Discord.getLPGradSheetID();
-            cyclesSheetID = Discord.getLPCyclesSheetID();
+            gradSheetID = Config.lpGradSheetID;
+            cyclesSheetID = Config.lpCyclesSheetID;
         } else {
             name = "Ink Odyssey";
             color = Color.MAGENTA;
-            gradSheetID = Discord.getIOGradSheetID();
-            cyclesSheetID = Discord.getIOCyclesSheetID();
+            gradSheetID = Config.ioGradSheetID;
+            cyclesSheetID = Config.ioCyclesSheetID;
         }
     }
 

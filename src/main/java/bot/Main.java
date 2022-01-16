@@ -16,7 +16,7 @@ import javax.security.auth.login.LoginException;
 /**
  * @author  Wil Aquino
  * Date:    February 17, 2021
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  Main.java
  * Purpose: The entry point of the bot.
  */
@@ -51,7 +51,7 @@ public class Main {
         // edit in subcommand data in here chaedr
 //        profile.addSubcommands(...)
 
-        // draft commands
+        // section commands
         CommandData lp = new CommandData("lp",
                 "Commands to use within LaunchPoint.");
         CommandData io = new CommandData("io",
@@ -105,9 +105,13 @@ public class Main {
         jda.updateCommands().addCommands(mit, lp, io).queue();
     }
 
+    /**
+     * The main entry point of the bot (run this method).
+     * @param args input arguments, if any.
+     */
     public static void main(String[] args) {
         try {
-            JDA jda = JDABuilder.createLight(Discord.getToken())
+            JDA jda = JDABuilder.createLight(Config.botToken)
                     .enableIntents(GatewayIntent.GUILD_PRESENCES)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS)
                     .addEventListeners(new Events())
@@ -121,7 +125,7 @@ public class Main {
                     OnlineStatus.IDLE,
                     Activity.playing(status));
 
-            Thread.sleep(4000);
+            Thread.sleep(2000);
             System.out.println("\nUSAGE LOG:\n==========");
         } catch (LoginException le) {
             le.printStackTrace();

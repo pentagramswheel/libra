@@ -5,20 +5,19 @@ import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
 import java.awt.Color;
-import java.io.File;
 import java.util.Scanner;
-import java.util.Arrays;
-import java.util.TreeMap;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.TreeMap;
+import java.util.Arrays;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.List;
 
 /**
  * @author  Wil Aquino
@@ -50,8 +49,6 @@ public class Undo extends Log implements Command {
 
             return message;
         } catch (FileNotFoundException ioe) {
-            sendReply("Something went wrong with the undo file.");
-            ioe.printStackTrace();
             return null;
         }
     }
@@ -86,12 +83,14 @@ public class Undo extends Log implements Command {
 
     /**
      * Print the summary of the cycle revert.
+     * @param sc the user's inputted command.
      * @param lastInput the previously inputted command.
      * @param userArgs the amount of user arguments within the input.
      * @param errorsFound array of errors found for each player, if any
      *                    (0 if no errors occurred, 1 otherwise).
      */
-    private void sendReport(String[] lastInput, int userArgs, int[] errorsFound) {
+    private void sendReport(SlashCommandEvent sc, String[] lastInput,
+                            int userArgs, int[] errorsFound) {
         EmbedBuilder eb = new EmbedBuilder();
         StringBuilder input = new StringBuilder();
         StringBuilder playerList = new StringBuilder();
@@ -122,7 +121,7 @@ public class Undo extends Log implements Command {
             eb.addField("Status:", "INCOMPLETE", false);
         }
 
-        editEmbed(eb);
+        sendEmbed(sc, eb);
     }
 
     /**
@@ -139,8 +138,8 @@ public class Undo extends Log implements Command {
     private int undoUser(String[] args, GoogleAPI link,
                          String user, String tab, Values spreadsheet,
                          TreeMap<Object, PlayerStats> data) {
+        String userID = user.substring(2, user.length() - 1);
         try {
-            String userID = user.substring(2, user.length() - 1);
             PlayerStats player = data.get(userID);
 
             int gamesPlayed = getGamesPlayed(args);
@@ -183,17 +182,20 @@ public class Undo extends Log implements Command {
 
             return 0;
         } catch (IOException e) {
+            log(getPrefix() + " cycle undo error"
+                    + "occurred with <@" + userID + ">.", true);
             return 1;
         }
     }
 
     /**
      * Runs a cycle undoing command.
-     * @param cmd the formal name of the command.
-     * @param args the arguments of the command, if they exist.
+     * @param sc the user's inputted command.
      */
     @Override
-    public void runCmd(String cmd, List<OptionMapping> args) {
+    public void runCmd(SlashCommandEvent sc) {
+        sc.deferReply().queue();
+
         try {
             GoogleAPI link = new GoogleAPI(cyclesSheetID());
             File undoFile = new File("load" + getPrefix().toUpperCase() + ".txt");
@@ -203,16 +205,16 @@ public class Undo extends Log implements Command {
 
             Values spreadsheet = link.getSheet().spreadsheets().values();
             TreeMap<Object, PlayerStats> data = link.readSection(
-                    tab, spreadsheet);
+                    sc, tab, spreadsheet);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
 
             String lastMessage = retrieveLastMessage(undoFile);
             if (lastMessage == null) {
-                throw new IOException();
+                throw new IOException("An error occurred with the undo file.");
             } else if (lastMessage.equals("REDACTED")) {
-                sendReply("There is nothing to revert.");
+                sendResponse(sc, "There is nothing to revert.", true);
                 return;
             }
 
@@ -225,12 +227,13 @@ public class Undo extends Log implements Command {
                         messageArgs[i], tab, spreadsheet, data);
             }
 
-            sendReport(messageArgs, userArgs, errorsFound);
+            sendReport(sc, messageArgs, userArgs, errorsFound);
+            log(getPrefix().toUpperCase()
+                    + " draft undo was processed.", false);
         } catch (IOException | GeneralSecurityException e) {
-            log("The save could not load.");
-            sendReply("The save could not load.");
+            sendResponse(sc, "The save could not load.", true);
+            log("The saved " + getPrefix().toUpperCase()
+                    + " draft data could not load.", true);
         }
-
-        log("Draft undo was processed.");
     }
 }
