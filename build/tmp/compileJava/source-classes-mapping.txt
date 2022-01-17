@@ -25,6 +25,8 @@ bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Tools/Command.java
  bot.Tools.Command
+bot/Engine/Drafts/DraftProcess.java
+ bot.Engine.Drafts.DraftProcess
 bot/Tools/ArrayHeapMinPQ.java
  bot.Tools.ArrayHeapMinPQ
  bot.Tools.ArrayHeapMinPQ$Node

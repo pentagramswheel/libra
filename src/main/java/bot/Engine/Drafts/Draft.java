@@ -76,7 +76,7 @@ public class Draft extends Section implements Command {
         team2 = new ArrayList<>();
         DraftPlayer newPlayer = new DraftPlayer(initialPlayer);
         players.add(newPlayer);
-
+        players2.add(newPlayer);
         draftRole = getRole(sc, getSection());
         draftChat = getChannel(sc, getPrefix() + "-draft-chat-" + draft);
     }
@@ -120,6 +120,22 @@ public class Draft extends Section implements Command {
     public List<DraftPlayer> getPlayers2() {
         return players2;
     }
+
+    /**
+     * Retrieves the team1 players of the draft.
+     * @return said players.
+     */
+    public List<DraftPlayer> getTeam1() {
+        return team1;
+    }
+    /**
+     * Retrieves the team2 players of the draft.
+     * @return said players.
+     */
+    public List<DraftPlayer> getTeam2() {
+        return team2;
+    }
+
 
     /** Retrieves the subs of the draft. */
     public List<DraftPlayer> getSubs() {
@@ -236,18 +252,7 @@ public class Draft extends Section implements Command {
         if (getPlayers().size() == 8) {
             toggleDraft();
 
-           // if(getPlayers2().size() == 0){
-                ArrayList<Button> buttons = new ArrayList<>();
-                String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-                buttons.add(Buttons.joinDraft(idSuffix)
-                        .withLabel("Draft queue full.").asDisabled());
-                buttons.add(Buttons.requestSub(idSuffix));
-                buttons.add(Buttons.joinAsSub(idSuffix));
-                buttons.add(Buttons.end(idSuffix));
 
-                sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
-                        buttons);
-          //  }
 
             ArrayList<String> nonCaptainPlayers = new ArrayList<>();
             for(int i = 0; i < getPlayers().size(); i++){
@@ -263,46 +268,26 @@ public class Draft extends Section implements Command {
                 nonCaptainPlayers.add(getPlayers().get(i).getAsMember().getAsMention());
 
             }
-           // sendSelectionMenu(bc, bc.getInteraction().getMessage().getContentRaw(), nonCaptainPlayers, getNumDraft());
+          sendSelectionMenu(bc, bc.getInteraction().getMessage().getContentRaw(), nonCaptainPlayers, getNumDraft(), getPrefix().toUpperCase());
 
         }
 
         editMessage(bc, newPing());
         updateReport(bc);
     }
+    public void finishedPicking(SelectionMenuEvent sm){
+        ArrayList<Button> buttons = new ArrayList<>();
+        String idSuffix = getPrefix().toUpperCase() + getNumDraft();
+        buttons.add(Draft.Buttons.joinDraft(idSuffix)
+                .withLabel("Draft queue full.").asDisabled());
+        buttons.add(Draft.Buttons.requestSub(idSuffix));
+        buttons.add(Draft.Buttons.joinAsSub(idSuffix));
+        buttons.add(Draft.Buttons.end(idSuffix));
 
-    public void addPlayerToTeam(SelectionMenuEvent sm, Member captain, Member player){
-        DraftPlayer dp = null;
-        int indexOfPickedPlayer = 0;
-        for(int i = 0; i < getPlayers2().size(); i++){
-            if(getPlayers2().get(i).getAsMember().getId() == player.getId()){
-                indexOfPickedPlayer = i;
-               dp = getPlayers2().get(i);
-            }
-        }
-        if(getPlayers().get(captain1).getAsMember().getId() == captain.getId()){
-           team1.add(dp);
-        }else if(getPlayers().get(captain2).getAsMember().getId() == captain.getId()){
-           team2.add(dp);
-        }else{
-            //add reject statement saying you are not the captain.
-        }
-
-        ArrayList<String> nonCaptainPlayers = new ArrayList<>();
-        for(int i = 0; i < getPlayers().size(); i++){
-            if(i == captain1 || i == captain2 || i == indexOfPickedPlayer) {
-                if(i == indexOfPickedPlayer){
-                    getPlayers2().remove(indexOfPickedPlayer);
-                }
-                continue;
-            }
-            nonCaptainPlayers.add(getPlayers().get(i).getAsMember().getAsMention());
-
-        }
-
-        sendSelectionMenu(sm, sm.getInteraction().getMessage().getContentRaw(), nonCaptainPlayers, getNumDraft());
-
+        sendButtons(sm, sm.getInteraction().getMessage().getContentRaw(),
+                buttons);
     }
+
     /**
      * Checks whether a player is within a draft player list or not.
      * @param player the player to check for.

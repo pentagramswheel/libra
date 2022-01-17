@@ -268,9 +268,9 @@ public interface Command {
         sendButtons(interaction, caption, Collections.singletonList(button));
     }
 
-    default void sendSelectionMenu(GenericInteractionCreateEvent interaction, String caption, List<String> options, int draftNumber){
+    default void sendSelectionMenu(GenericInteractionCreateEvent interaction, String caption, List<String> options, int draftNumber, String prefix){
 
-            interaction.getHook().editOriginal(caption).setActionRow(SelectionMenu.create("playerSelection" + draftNumber).addOption(options.get(0), "0").addOption(options.get(1), "1")
+            interaction.getHook().editOriginal(caption).setActionRow(SelectionMenu.create("playerSelection" + prefix + draftNumber).addOption(options.get(0), "0").addOption(options.get(1), "1")
                             .addOption(options.get(2), "2").addOption(options.get(3), "3").addOption(options.get(4), "4").addOption(options.get(5), "5")
                             .build())
                     .queue();
