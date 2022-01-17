@@ -1,5 +1,5 @@
 # Libra Design Documentation
-**Contributors:** Wil Aquino
+**Contributors:** Wil Aquino, Turtle#1504
 
 **Date:** February 17, 2021
 
@@ -126,8 +126,8 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 3. `InteractionHook INTERACTION` - the original interaction made by the user.
 4. `int MAX_LP_DRAFTS` - the maximum number of LaunchPoint drafts.
 5. `int MAX_IO_DRAFTS` - the maximum number of Ink Odyssey drafts.
-6. `List<Draft> lpDrafts` - a list of LaunchPoint drafts.
-7. `List<Draft> ioDrafts` - a list of Ink Odyssey drafts.
+6. `TreeMap<Integer, Draft> lpDrafts` - a map of LaunchPoint drafts to number draft/button.
+7. `TreeMap<Integer, Draft> ioDrafts` - a map of Ink Odyssey drafts to number draft/button.
 8. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered LaunchPoint drafts.
 9. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered Ink Odyssey drafts.
 
