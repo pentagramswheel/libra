@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- * @author  Wil Aquino
+ * @author  Wil Aquino, Turtle#1504
  * Date:    February 17, 2021
  * Project: LaunchPoint Bot
  * Module:  Command.java
@@ -268,17 +268,12 @@ public interface Command {
         sendButtons(interaction, caption, Collections.singletonList(button));
     }
 
-    default void sendSelectionMenu(GenericInteractionCreateEvent interaction, String caption, List<String> options, int draftNumber, String prefix){
-
-            interaction.getHook().editOriginal(caption).setActionRow(SelectionMenu.create("playerSelection" + prefix + draftNumber).addOption(options.get(0), "0").addOption(options.get(1), "1")
-                            .addOption(options.get(2), "2").addOption(options.get(3), "3").addOption(options.get(4), "4").addOption(options.get(5), "5")
-                            .build())
-                    .queue();
-
-
-
-
+    default void sendSelectionMenu(GenericInteractionCreateEvent interaction,
+                                   String caption, SelectionMenu menu) {
+        interaction.getHook().editOriginal(caption)
+                .setActionRow(menu).queue();
     }
+
     /**
      * Pause the program for a certain amount of time.
      * @param ms the time to pause in milliseconds.

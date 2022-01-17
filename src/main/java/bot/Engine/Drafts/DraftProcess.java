@@ -1,19 +1,15 @@
 package bot.Engine.Drafts;
 
-import bot.Engine.PlayerStats;
-import bot.Engine.Section;
-import bot.Tools.BuiltButton;
-import bot.Tools.Command;
-
-import net.dv8tion.jda.api.EmbedBuilder;
+import bot.Tools.ButtonBuilder;
+import bot.Tools.SelectionMenuBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.Component;
+import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
 import java.util.*;
 
@@ -24,153 +20,133 @@ import java.util.*;
  * Module:  Draft.java
  * Purpose: Formalizes and starts a draft.
  */
+public class DraftProcess {
 
-public class DraftProcess extends Section implements Command {
-    /** The formal number of the draft. */
-    private final int numDraft;
-    private TreeMap<Integer, Draft> lpdraft;
-    /** The players of the draft. */
-    private final List<DraftPlayer> players;
-    /** removes players from this array if it's added to team1 or team2 **/
-    private final List<DraftPlayer> players2;
-    private final List<DraftPlayer> subs;
+    private final Draft draft;
+    private final List<DraftPlayer> regularPlayers;
     private final List<DraftPlayer> team1;
     private final List<DraftPlayer> team2;
 
-    /**index of captain 1 players array **/
-    private int captain1;
-    /**index of captain 2 from players array **/
-    private int captain2;
+    public DraftProcess(Draft draftToProcess) {
+        draft = draftToProcess;
 
-    /** The pinged role for this draft. */
-    private final Role draftRole;
-
-    /** The draft chat channel this draft is occurring in. */
-    private final TextChannel draftChat;
-
-    /**
-     * Retrieves which draft number this is.
-     * @return said number.
-     */
-    public int getNumDraft() {
-        return numDraft;
+        regularPlayers = new ArrayList<>();
+        team1 = new ArrayList<>();
+        team2 = new ArrayList<>();
     }
 
-    /**
-     * Retrieves the players of the draft.
-     * @return said players.
-     */
-    public List<DraftPlayer> getPlayers() {
-        return players;
+    public void start(ButtonClickEvent bc) {
+        StringBuilder ping = new StringBuilder();
+
+        for (int i = 0; i < draft.getPlayers().size(); i++) {
+            DraftPlayer currPlayer = draft.getPlayers().get(i);
+            ping.append(currPlayer.getAsMember().getAsMention()).append(" ");
+
+            if (i == draft.getCaptIndex1()) {
+                team1.add(currPlayer);
+            } else if (i == draft.getCaptIndex2()) {
+                team2.add(currPlayer);
+            } else {
+                regularPlayers.add(currPlayer);
+            }
+        }
+        ping.append(
+                "\n\nHave your captains choose teammates, then choose maps!");
+
+        String idSuffix = draft.getPrefix().toUpperCase() + draft.getNumDraft();
+        draft.sendSelectionMenu(bc, "",
+                DraftComponents.teamSelectionMenu(idSuffix, regularPlayers));
+
+        // trying to output to other channel, currently doesn't work
+//        TextChannel channel = draft.getDraftChannel();
+//        TextChannel channel = draft.getChannel(bc, "vc-text");
+//        String idSuffix = draft.getPrefix().toUpperCase() + draft.getNumDraft();
+//        List<SelectionMenu> menus = new ArrayList<>();
+//        List<Button> buttons = new ArrayList<>();
+//
+//        menus.add(DraftComponents.teamSelectionMenu(idSuffix, regularPlayers));
+//        channel.sendMessage(ping).setActionRows(
+//                ActionRow.of(menus)).queue();
     }
 
-    /**
-     * Retrieves the REMOVABLE players of the draft.
-     * @return said players.
-     */
-    public List<DraftPlayer> getPlayers2() {
-        return players2;
-    }
-
-    /**
-     * Retrieves the team1 players of the draft.
-     * @return said players.
-     */
-    public List<DraftPlayer> getTeam1() {
-        return team1;
-    }
-    /**
-     * Retrieves the team2 players of the draft.
-     * @return said players.
-     */
-    public List<DraftPlayer> getTeam2() {
-        return team2;
-    }
-
-
-    /** Retrieves the subs of the draft. */
-    public List<DraftPlayer> getSubs() {
-        return subs;
-    }
-
-    /**
-     * Retrieves the pinged role for this draft.
-     * @return said role.
-     */
-    public Role getDraftRole() {
-        return draftRole;
-    }
-
-    /**
-     * Retrieves the draft chat channel which this draft
-     * is occurring in.
-     * @return said channel.
-     */
-    public TextChannel getDraftChannel() {
-        return draftChat;
-    }
-
-    public DraftProcess(SlashCommandEvent sc, int draft,
-                        String abbreviation, Member initialPlayer, TreeMap<Integer, Draft> lpdraft) {
-        super(abbreviation);
-        numDraft = lpdraft.get(draft).getNumDraft();
-        this.lpdraft = lpdraft;
-        players =  lpdraft.get(draft).getPlayers();
-        players2 =  lpdraft.get(draft).getPlayers2();
-        subs =  lpdraft.get(draft).getSubs();
-        team1 = lpdraft.get(draft).getTeam1();
-        team2 = lpdraft.get(draft).getTeam2();
-        DraftPlayer newPlayer = new DraftPlayer(initialPlayer);
-        players.add(newPlayer);
-
-        draftRole = lpdraft.get(draft).getRole(sc, getSection());
-        draftChat = lpdraft.get(draft).getChannel(sc, getPrefix() + "-draft-chat-" + draft);
-    }
     public void addPlayerToTeam(SelectionMenuEvent sm, Member captain, Member player){
         DraftPlayer dp = null;
         int indexOfPickedPlayer = 0;
-        for(int i = 0; i < getPlayers2().size(); i++){
-            if(getPlayers2().get(i).getAsMember().getId() == player.getId()){
+        for(int i = 0; i < regularPlayers.size(); i++){
+            if(regularPlayers.get(i).getAsMember().getId() == player.getId()){
                 indexOfPickedPlayer = i;
-                dp = getPlayers2().get(i);
+                dp = regularPlayers.get(i);
             }
         }
-        if(getPlayers().get(captain1).getAsMember().getId() == captain.getId()){
+        if(draft.getPlayers().get(draft.getCaptIndex1()).getAsMember().getId() == captain.getId()){
             team1.add(dp);
-        }else if(getPlayers().get(captain2).getAsMember().getId() == captain.getId()){
+        }else if(draft.getPlayers().get(draft.getCaptIndex2()).getAsMember().getId() == captain.getId()){
             team2.add(dp);
         }else{
             //add reject statement saying you are not the captain.
         }
 
         ArrayList<String> nonCaptainPlayers = new ArrayList<>();
-        for(int i = 0; i < getPlayers().size(); i++){
-            if(i == captain1 || i == captain2 || i == indexOfPickedPlayer) {
+        for(int i = 0; i < draft.getPlayers().size(); i++){
+            if(i == draft.getCaptIndex1() || i == draft.getCaptIndex2() || i == indexOfPickedPlayer) {
                 if(i == indexOfPickedPlayer){
-                    getPlayers2().remove(indexOfPickedPlayer);
+                    regularPlayers.remove(indexOfPickedPlayer);
                 }
                 continue;
             }
-            nonCaptainPlayers.add(getPlayers().get(i).getAsMember().getAsMention());
+            nonCaptainPlayers.add(draft.getPlayers().get(i).getAsMember().getAsMention());
 
         }
-        if(getPlayers2().size() == 0){
-            lpdraft.get(getNumDraft()).finishedPicking(sm);
-        }
 
-        if(captain.getId() == getPlayers().get(captain1).getAsMember().getId()){
-            Member otherCaptain = sm.getGuild().retrieveMemberById(getPlayers().get(captain2).getAsMember().getId()).complete();
-            sendReply(sm, otherCaptain.getAsMention() + "please pick a player", false);
+        if(captain.getId() == draft.getPlayers().get(draft.getCaptIndex1()).getAsMember().getId()){
+            Member otherCaptain = sm.getGuild().retrieveMemberById(draft.getPlayers().get(draft.getCaptIndex2()).getAsMember().getId()).complete();
+            draft.sendReply(sm, otherCaptain.getAsMention() + "please pick a player", false);
         }else{
-            Member otherCaptain = sm.getGuild().retrieveMemberById(getPlayers().get(captain1).getAsMember().getId()).complete();
-            sendReply(sm, otherCaptain.getAsMention() + "please pick a player", false);
+            Member otherCaptain = sm.getGuild().retrieveMemberById(draft.getPlayers().get(draft.getCaptIndex1()).getAsMember().getId()).complete();
+            draft.sendReply(sm, otherCaptain.getAsMention() + "please pick a player", false);
         }
         // sendSelectionMenu(sm, sm.getInteraction().getMessage().getContentRaw(), nonCaptainPlayers, getNumDraft(), getPrefix().toUpperCase());
 
     }
 
-    @Override
-    public void runCmd(SlashCommandEvent sc) {
+    /**
+     * Components for running the draft.
+     */
+    private static class DraftComponents {
+
+        /**
+         * Builds the team selection menu.
+         * @param suffix the ID's suffix.
+         * @param players the players to include within the menu.
+         * @return said menu.
+         */
+        private static SelectionMenu teamSelectionMenu(
+                String suffix, List<DraftPlayer> players) {
+            List<String> labels = new ArrayList<>();
+            List<String> values = new ArrayList<>();
+
+            int i = 0;
+            for (DraftPlayer player : players) {
+                Member currPlayer = player.getAsMember();
+//                labels.add(currPlayer.getEffectiveName()); // collect actual player names later?
+//                values.add(currPlayer.getId()); // collect actual players later?
+                labels.add(currPlayer.getAsMention());
+                values.add(String.format("%s", i++));
+            }
+
+            return new SelectionMenuBuilder("playerSelection" + suffix,
+                    labels, values, null).getMenu();
+        }
+
+        /**
+         * Builds the "Join Draft" button.
+         * @param suffix the ID's suffix.
+         * @return said button.
+         */
+        private static Button resetTeams(String suffix) {
+            return new ButtonBuilder("resetTeams" + suffix,
+                    "Reset Teams", null, 3).getButton();
+        }
 
     }
 }

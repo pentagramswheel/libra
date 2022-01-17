@@ -16,7 +16,7 @@
   - [Commands](#commands)
   + [Tools](#tools)
     - [ArrayHeapMinPQ](#arrayheapminpq)
-    - [BuiltButton](#builtbutton)
+    - [ButtonBuilder](#buttonbuilder)
     - [Command](#command)
     - [FileHandler](#filehandler)
     - [GoogleAPI](#googleapi)
@@ -36,7 +36,7 @@
   - [Events](#events-1)
   - [Commands](#commands-1)
   + [Tools](#tools-1)
-    - [BuiltButton](#builtbutton-1)
+    - [ButtonBuilder](#buttonbuilder-1)
     - [Command](#command-1)
     - [FileHandler](#filehandler-1)
     - [GoogleAPI](#googleapi-1)
@@ -139,7 +139,7 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 
 A class which builds a heap a minimum priority queue (This class is taken from another project and is therefore not detailed here. See the class itself for more details).
 
-#### BuiltButton
+#### ButtonBuilder
 
 A class which builds a button quickly.
 
@@ -341,11 +341,11 @@ The `onButtonClick` method parses through clicked buttons `bc`.
 
 ### Tools
 
-#### BuiltButton
+#### ButtonBuilder
 
-###### BuiltButton
+###### ButtonBuilder
 
-The `BuiltButton` method, the class's constructor, builds a button given its implemented id `buttonID`, its label `buttonLabel`, and what type of button it is `buttonType`.
+The `ButtonBuilder` method, the class's constructor, builds a button given its implemented id `buttonID`, its label `buttonLabel`, a URL `url` to link if any, and what type of button it is `buttonType`.
 
 ###### getButton
 
@@ -654,9 +654,10 @@ The `runCmd` method runs the `lp/io startdraft` commands, given its slash comman
 ###### Buttons (static class)
 1. `joinDraft` - method that retrieves the "Join Draft" button.
 2. `leave` - method that retrieves the "Leave" button.
-3. `requestSub` - method that retrieves the "Request Sub" button.
-4. `joinAsSub` - method that retrieves the "Join As Sub" button.
-5. `end` - method that retrieves the "End Draft" button.
+3. `link` - method that retrieves the "Draft Channel" button.
+4. `requestSub` - method that retrieves the "Request Sub" button.
+5. `joinAsSub` - method that retrieves the "Join As Sub" button.
+6. `end` - method that retrieves the "End Draft" button.
 
 ----
 

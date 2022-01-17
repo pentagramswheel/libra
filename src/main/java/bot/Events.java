@@ -39,8 +39,6 @@ public class Events extends ListenerAdapter {
     private final static int MAX_IO_DRAFTS = 2;
 
     /** Fields for storing drafts. */
-    TreeMap<Integer, DraftProcess> lpDraftProcess;
-    TreeMap<Integer, DraftProcess> ioDraftProcess;
     TreeMap<Integer, Draft> lpDrafts;
     TreeMap<Integer, Draft> ioDrafts;
 
@@ -209,10 +207,8 @@ public class Events extends ListenerAdapter {
             int draftButton = queue.removeSmallest();
             Draft newDraft =
                     new Draft(sc, draftButton, prefix, author);
-            ongoingDrafts.put(draftButton, newDraft);
-            DraftProcess newDraftProcess = new DraftProcess(sc, draftButton, prefix, author, lpDrafts);
-            lpDraftProcess.put(draftButton, newDraftProcess);
 
+            ongoingDrafts.put(draftButton, newDraft);
             newDraft.runCmd(sc);
         }
     }
@@ -228,9 +224,6 @@ public class Events extends ListenerAdapter {
                 if (lpDrafts == null) {
                     lpDrafts = new TreeMap<>();
                 }
-                if (lpDraftProcess == null) {
-                    lpDraftProcess = new TreeMap<>();
-                }
                 if (lpQueue == null) {
                     lpQueue = new ArrayHeapMinPQ<>();
                     for (int i = 1; i <= MAX_LP_DRAFTS; i++) {
@@ -243,9 +236,6 @@ public class Events extends ListenerAdapter {
             case "io":
                 if (ioDrafts == null) {
                     ioDrafts = new TreeMap<>();
-                }
-                if (ioDraftProcess == null) {
-                    ioDraftProcess = new TreeMap<>();
                 }
                 if (ioQueue == null) {
                     ioQueue = new ArrayHeapMinPQ<>();
@@ -459,51 +449,43 @@ public class Events extends ListenerAdapter {
 
         }
     }
-      /**
-        *  Checks for any selection clicks.
-        * @param sm a button click to analyze.
-       */
-        @Override
-        public void onSelectionMenu(SelectionMenuEvent sm) {
-            String menuName = sm.getComponent().getId();
-            System.out.println("menuName = " + menuName);
-            int indexOfNum = menuName.length() - 1;
 
-            TreeMap<Integer, Draft> drafts;
-            TreeMap<Integer, DraftProcess> draftsProcess;
-            ArrayHeapMinPQ<Integer> queue;
-            String suffix = menuName.substring(indexOfNum - 2, indexOfNum);
-            int numDraft = Integer.parseInt(menuName.substring(indexOfNum));
-            switch (suffix) {
-                case "LP":
-                    drafts = lpDrafts;
-                    draftsProcess = lpDraftProcess;
-                    queue = lpQueue;
-                    break;
-                default:
-                    drafts = ioDrafts;
-                    draftsProcess = ioDraftProcess;
-                    queue = ioQueue;
-                    break;
-            }
+    /**
+     * Checks for any selection clicks.
+     * @param sm a menu selection to analyze.
+     */
+    @Override
+    public void onSelectionMenu(SelectionMenuEvent sm) {
+        String menuName = sm.getComponent().getId();
+        System.out.println("menuName = " + menuName);
+        int indexOfNum = menuName.length() - 1;
 
-
-            DraftProcess currDraftProcess = draftsProcess.get(numDraft);
-            switch (menuName.substring(0, indexOfNum - 2)) {
-                case "playerSelection":
-                    String playerMention = sm.getInteraction().getSelectedOptions().get(0).getLabel();
-                    System.out.println("playerMention = " +  playerMention);
-
-                    String playerID = playerMention.substring(3, playerMention.length() - 1);
-                    System.out.println(playerID);
-                    Member player = sm.getGuild().retrieveMemberById(playerID).complete();
-
-
-                    System.out.println("player " + playerID + " was added to " + sm.getMember().getId() + "'s Team");
-                    currDraftProcess.addPlayerToTeam(sm, sm.getMember(), player);
-                    break;
-
-
-            }
+        TreeMap<Integer, Draft> drafts;
+        String suffix = menuName.substring(indexOfNum - 2, indexOfNum);
+        int numDraft = Integer.parseInt(menuName.substring(indexOfNum));
+        switch (suffix) {
+            case "LP":
+                drafts = lpDrafts;
+                break;
+            default:
+                drafts = ioDrafts;
+                break;
         }
+
+        DraftProcess currDraftProcess = drafts.get(numDraft).getProcess();
+        switch (menuName.substring(0, indexOfNum - 2)) {
+            case "playerSelection":
+                String playerMention = sm.getInteraction().getSelectedOptions().get(0).getLabel();
+                System.out.println("playerMention = " +  playerMention);
+
+                String playerID = playerMention.substring(3, playerMention.length() - 1);
+                System.out.println(playerID);
+                Member player = sm.getGuild().retrieveMemberById(playerID).complete();
+
+                System.out.println("player " + playerID + " was added to " + sm.getMember().getId() + "'s Team");
+                currDraftProcess.addPlayerToTeam(sm, sm.getMember(), player);
+                break;
+
+        }
+    }
 }
