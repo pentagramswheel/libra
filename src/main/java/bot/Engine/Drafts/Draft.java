@@ -259,7 +259,7 @@ public class Draft extends Section implements Command {
 
             sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
                     buttons);
-            draftProcess.start(bc);
+            getProcess().start(bc);
         }
 
         editMessage(bc, newPing());
