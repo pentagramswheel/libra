@@ -200,6 +200,7 @@ public class Draft extends Section implements Command {
         // this block prevents repeated players in the initial draft start
         // comment/uncomment as needed
         if (draftContains(potentialPlayer, getPlayers()) != -1) {
+            sendResponse(bc, "You are already in this draft!", true);
             return;
         }
 
@@ -281,7 +282,7 @@ public class Draft extends Section implements Command {
 
         getPlayers().remove(convertedSub);
         getSubs().remove(convertedSub);
-        subs.add(convertedSub);
+        getSubs().add(convertedSub);
 
         subsNeeded++;
         convertedSub.incrementPings();
@@ -312,7 +313,7 @@ public class Draft extends Section implements Command {
         bc.deferEdit().queue();
 
         DraftPlayer subPlayer = new DraftPlayer(player);
-        subs.add(subPlayer);
+        getSubs().add(subPlayer);
 
         subsNeeded--;
 

@@ -65,9 +65,9 @@ public class Main {
         SubcommandData undo = new SubcommandData("undo",
                 "Manually reverts the previous draft command, once and only once.");
         SubcommandData add = new SubcommandData("add",
-                "Adds players into an area within MIT.");
+                "Adds players into the designated within MIT (~7 sec/player).");
         SubcommandData grad = new SubcommandData("grad",
-                "Graduates players from an area within MIT.");
+                "Graduates players from the designated section within MIT (~7 sec/player).");
 
         int numMentions = 25;
         OptionData matches = new OptionData(

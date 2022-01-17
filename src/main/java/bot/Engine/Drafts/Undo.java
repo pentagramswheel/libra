@@ -97,7 +97,11 @@ public class Undo extends Log implements Command {
 
         for (int i = 0; i < lastInput.length; i++) {
             String currentArg = lastInput[i];
-            input.append(currentArg).append(" ");
+            if (i == lastInput.length - 3) {
+                input.append(currentArg).append("\n");
+            } else {
+                input.append(currentArg).append(" ");
+            }
 
             if (i > 2 && i < userArgs + 3) {
                 String completionSymbol = ":white_check_mark: ";
