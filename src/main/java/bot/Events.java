@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -451,4 +452,44 @@ public class Events extends ListenerAdapter {
 
         }
     }
+      /**
+        *  Checks for any selection clicks.
+        * @param sm a button click to analyze.
+       */
+        @Override
+        public void onSelectionMenu(SelectionMenuEvent sm) {
+            String menuName = sm.getComponent().getId();
+            System.out.println("menuName = " + menuName);
+            int indexOfNum = menuName.length() - 1;
+
+            TreeMap<Integer, Draft> drafts;
+            ArrayHeapMinPQ<Integer> queue;
+            String suffix = menuName.substring(indexOfNum - 2, indexOfNum);
+            int numDraft = Integer.parseInt(menuName.substring(indexOfNum));
+            switch (suffix) {
+                case "LP":
+                    drafts = lpDrafts;
+                    queue = lpQueue;
+                    break;
+                default:
+                    drafts = ioDrafts;
+                    queue = ioQueue;
+                    break;
+            }
+
+
+            Draft currDraft = drafts.get(numDraft);
+            switch (menuName.substring(0, indexOfNum)) {
+                case "playerSelection":
+                    String playerMention = sm.getInteraction().getSelectedOptions().get(0).toString();
+                    String playerID = playerMention.substring(2, playerMention.length() - 1);
+                    Member player = sm.getGuild().retrieveMemberById(playerID).complete();
+
+                    System.out.println("player " + playerID + " was added to " + sm.getMember().getId() + "'s Team");
+                    currDraft.addPlayerToTeam(sm, sm.getMember(), player);
+                    break;
+
+
+            }
+        }
 }

@@ -3,11 +3,14 @@ package bot.Tools;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.Button;
 
+import net.dv8tion.jda.api.interactions.components.Component;
+import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -265,6 +268,17 @@ public interface Command {
         sendButtons(interaction, caption, Collections.singletonList(button));
     }
 
+    default void sendSelectionMenu(GenericInteractionCreateEvent interaction, String caption, List<String> options, int draftNumber){
+
+            interaction.getHook().editOriginal(caption).setActionRow(SelectionMenu.create("playerSelection" + draftNumber).addOption(options.get(0), "0").addOption(options.get(1), "1")
+                            .addOption(options.get(2), "2").addOption(options.get(3), "3").addOption(options.get(4), "4").addOption(options.get(5), "5")
+                            .build())
+                    .queue();
+
+
+
+
+    }
     /**
      * Pause the program for a certain amount of time.
      * @param ms the time to pause in milliseconds.

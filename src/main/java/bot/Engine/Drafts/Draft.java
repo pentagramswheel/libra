@@ -1,5 +1,6 @@
 package bot.Engine.Drafts;
 
+import bot.Engine.PlayerStats;
 import bot.Engine.Section;
 import bot.Tools.BuiltButton;
 import bot.Tools.Command;
@@ -9,6 +10,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
@@ -34,8 +36,15 @@ public class Draft extends Section implements Command {
 
     /** The players of the draft. */
     private final List<DraftPlayer> players;
+    /** removes players from this array if it's added to team1 or team2 **/
+    private final List<DraftPlayer> players2;
     private final List<DraftPlayer> subs;
-
+    private final List<DraftPlayer> team1;
+    private final List<DraftPlayer> team2;
+    /**index of captain 1 players array **/
+    private int captain1;
+    /**index of captain 2 from players array **/
+    private int captain2;
     /** The number of subs needed for a draft. */
     private int subsNeeded;
 
@@ -61,7 +70,10 @@ public class Draft extends Section implements Command {
         numDraft = draft;
 
         players = new ArrayList<>();
+        players2 = new ArrayList<>();
         subs = new ArrayList<>();
+        team1 = new ArrayList<>();
+        team2 = new ArrayList<>();
         DraftPlayer newPlayer = new DraftPlayer(initialPlayer);
         players.add(newPlayer);
 
@@ -101,6 +113,14 @@ public class Draft extends Section implements Command {
         return players;
     }
 
+    /**
+     * Retrieves the REMOVABLE players of the draft.
+     * @return said players.
+     */
+    public List<DraftPlayer> getPlayers2() {
+        return players2;
+    }
+
     /** Retrieves the subs of the draft. */
     public List<DraftPlayer> getSubs() {
         return subs;
@@ -136,13 +156,17 @@ public class Draft extends Section implements Command {
 
         StringBuilder queue = new StringBuilder();
         StringBuilder logList = new StringBuilder();
-
+    /*
         Random r = new Random();
         int capt1 = r.nextInt(8);
         int capt2 = r.nextInt(8);
-        while (capt1 == capt2) {
+        while (capt1 == capt2) {\
             capt2 = r.nextInt(8);
-        }
+        }*/
+        int capt1 = 0;
+        int capt2 = 1;
+        captain1 = capt1;
+        captain2 = capt2;
 
         int size = getPlayers().size();
         for (int i = 0; i < size; i++) {
@@ -152,6 +176,7 @@ public class Draft extends Section implements Command {
 
             if (size == 8 && (i == capt1 || i == capt2)) {
                 queue.append(" (captain)");
+
             }
             queue.append("\n");
         }
@@ -199,33 +224,85 @@ public class Draft extends Section implements Command {
         Member potentialPlayer = bc.getMember();
         // this block prevents repeated players in the initial draft start
         // comment/uncomment as needed
+        /*
         if (draftContains(potentialPlayer, getPlayers()) != -1) {
             sendResponse(bc, "You are already in this draft!", true);
             return;
         }
-
+*/
         DraftPlayer newPlayer = new DraftPlayer(potentialPlayer);
         getPlayers().add(newPlayer);
-
+        getPlayers2().add(newPlayer);
         if (getPlayers().size() == 8) {
             toggleDraft();
 
-            ArrayList<Button> buttons = new ArrayList<>();
-            String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-            buttons.add(Buttons.joinDraft(idSuffix)
-                    .withLabel("Draft queue full.").asDisabled());
-            buttons.add(Buttons.requestSub(idSuffix));
-            buttons.add(Buttons.joinAsSub(idSuffix));
-            buttons.add(Buttons.end(idSuffix));
+           // if(getPlayers2().size() == 0){
+                ArrayList<Button> buttons = new ArrayList<>();
+                String idSuffix = getPrefix().toUpperCase() + getNumDraft();
+                buttons.add(Buttons.joinDraft(idSuffix)
+                        .withLabel("Draft queue full.").asDisabled());
+                buttons.add(Buttons.requestSub(idSuffix));
+                buttons.add(Buttons.joinAsSub(idSuffix));
+                buttons.add(Buttons.end(idSuffix));
 
-            sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
-                    buttons);
+                sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
+                        buttons);
+          //  }
+
+            ArrayList<String> nonCaptainPlayers = new ArrayList<>();
+            for(int i = 0; i < getPlayers().size(); i++){
+                if(i == captain1){
+                    team1.add(getPlayers().get(captain1));
+                    getPlayers2().remove(captain1);
+                    continue;
+                }else if(i == captain2){
+                    team2.add(getPlayers().get(captain2));
+                    getPlayers2().remove(captain2);
+                    continue;
+                }
+                nonCaptainPlayers.add(getPlayers().get(i).getAsMember().getAsMention());
+
+            }
+           // sendSelectionMenu(bc, bc.getInteraction().getMessage().getContentRaw(), nonCaptainPlayers, getNumDraft());
+
         }
 
         editMessage(bc, newPing());
         updateReport(bc);
     }
 
+    public void addPlayerToTeam(SelectionMenuEvent sm, Member captain, Member player){
+        DraftPlayer dp = null;
+        int indexOfPickedPlayer = 0;
+        for(int i = 0; i < getPlayers2().size(); i++){
+            if(getPlayers2().get(i).getAsMember().getId() == player.getId()){
+                indexOfPickedPlayer = i;
+               dp = getPlayers2().get(i);
+            }
+        }
+        if(getPlayers().get(captain1).getAsMember().getId() == captain.getId()){
+           team1.add(dp);
+        }else if(getPlayers().get(captain2).getAsMember().getId() == captain.getId()){
+           team2.add(dp);
+        }else{
+            //add reject statement saying you are not the captain.
+        }
+
+        ArrayList<String> nonCaptainPlayers = new ArrayList<>();
+        for(int i = 0; i < getPlayers().size(); i++){
+            if(i == captain1 || i == captain2 || i == indexOfPickedPlayer) {
+                if(i == indexOfPickedPlayer){
+                    getPlayers2().remove(indexOfPickedPlayer);
+                }
+                continue;
+            }
+            nonCaptainPlayers.add(getPlayers().get(i).getAsMember().getAsMention());
+
+        }
+
+        sendSelectionMenu(sm, sm.getInteraction().getMessage().getContentRaw(), nonCaptainPlayers, getNumDraft());
+
+    }
     /**
      * Checks whether a player is within a draft player list or not.
      * @param player the player to check for.
@@ -302,11 +379,11 @@ public class Draft extends Section implements Command {
         boolean inDraft =
                 !(draftContains(player, getPlayers()) == -1
                 && draftContains(player, getSubs()) == -1);
-
+    /*
         if (inDraft) {
             sendReply(bc, "Why would you sub for yourself?", true);
             return;
-        } else if (subsNeeded == 0) {
+        } else */if (subsNeeded == 0) {
             sendReply(bc, "This draft hasn't requested any subs yet.", true);
             return;
         }
