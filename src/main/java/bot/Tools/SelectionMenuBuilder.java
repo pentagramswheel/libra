@@ -24,7 +24,8 @@ public class SelectionMenuBuilder {
      * @param values the values to each of the labels in the menu.
      * @param emojis the emoji values to each of the labels in the menu.
      */
-    public SelectionMenuBuilder(String menuID, List<String> labels, List<String> values, List<Emoji> emojis) {
+    public SelectionMenuBuilder(String menuID, List<String> labels,
+                                List<String> values, List<Emoji> emojis) {
         SelectionMenu.Builder menuBuilder = SelectionMenu.create(menuID);
         for (int i = 0; i < labels.size(); i++) {
             if (emojis == null) {

@@ -1,7 +1,5 @@
 package bot.Engine.Drafts;
 
-import net.dv8tion.jda.api.entities.Member;
-
 /**
  * @author  Wil Aquino
  * Date:    January 11, 2022
@@ -11,8 +9,8 @@ import net.dv8tion.jda.api.entities.Member;
  */
 public class DraftPlayer {
 
-    /** The draft player. */
-    private final Member player;
+    /** The draft player's Discord ID. */
+    private final String id;
 
     /** The player's amount of won matches during the draft. */
     private int matchWins;
@@ -25,20 +23,20 @@ public class DraftPlayer {
 
     /**
      * Constructs the attributes of the draft player.
-     * @param user the player to build the attributes for.
+     * @param playerID the ID of the player to build the attributes for.
      */
-    public DraftPlayer(Member user) {
-        player = user;
+    public DraftPlayer(String playerID) {
+        id = playerID;
         matchWins = matchLosses = 0;
         pings = 0;
     }
 
     /**
-     * Retrieves the draft player.
-     * @return said player.
+     * Retrieves the draft player's Discord ID.
+     * @return said ID.
      */
-    public Member getAsMember() {
-        return player;
+    public String getID() {
+        return id;
     }
 
     /**

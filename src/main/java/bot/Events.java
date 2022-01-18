@@ -446,18 +446,16 @@ public class Events extends ListenerAdapter {
                     queue.add(numButton, numButton);
                 }
                 break;
-
         }
     }
 
     /**
-     * Checks for any selection clicks.
+     * Checks for any menu selections.
      * @param sm a menu selection to analyze.
      */
     @Override
     public void onSelectionMenu(SelectionMenuEvent sm) {
         String menuName = sm.getComponent().getId();
-        System.out.println("menuName = " + menuName);
         int indexOfNum = menuName.length() - 1;
 
         TreeMap<Integer, Draft> drafts;
@@ -472,20 +470,18 @@ public class Events extends ListenerAdapter {
                 break;
         }
 
-        DraftProcess currDraftProcess = drafts.get(numDraft).getProcess();
-        switch (menuName.substring(0, indexOfNum - 2)) {
-            case "playerSelection":
-                String playerMention = sm.getInteraction().getSelectedOptions().get(0).getLabel();
-                System.out.println("playerMention = " +  playerMention);
+        DraftProcess currProcess = drafts.get(numDraft).getProcess();
+        if (menuName.substring(0, indexOfNum - 2).equals("teamSelection")) {
+            String playerID = sm.getInteraction().getSelectedOptions().get(0).getLabel();
+            Member player = sm.getGuild().retrieveMemberById(playerID).complete();
 
-                String playerID = playerMention.substring(3, playerMention.length() - 1);
-                System.out.println(playerID);
-                Member player = sm.getGuild().retrieveMemberById(playerID).complete();
+            System.out.println("player " + playerID + " was added to " + sm.getMember().getId() + "'s Team");
+            currProcess.addPlayerToTeam(sm, sm.getMember(), player);
 
-                System.out.println("player " + playerID + " was added to " + sm.getMember().getId() + "'s Team");
-                currDraftProcess.addPlayerToTeam(sm, sm.getMember(), player);
-                break;
-
+            // replace with this block later
+//            String playerID = sm.getInteraction().getSelectedOptions().get(0).getValue();
+//            Member player = sm.getGuild().retrieveMemberById(playerID).complete();
+//            currProcess.addPlayerToTeam(sm, sm.getMember(), player);
         }
     }
 }

@@ -17,8 +17,8 @@ import java.util.*;
  * @author  Wil Aquino, Turtle#1504
  * Date:    January 16, 2022
  * Project: Libra
- * Module:  Draft.java
- * Purpose: Formalizes and starts a draft.
+ * Module:  DraftProcess.java
+ * Purpose: Processes a draft.
  */
 public class DraftProcess {
 
@@ -38,9 +38,11 @@ public class DraftProcess {
     public void start(ButtonClickEvent bc) {
         StringBuilder ping = new StringBuilder();
 
+        ping.append(draft.getEmote()).append(" ");
         for (int i = 0; i < draft.getPlayers().size(); i++) {
             DraftPlayer currPlayer = draft.getPlayers().get(i);
-            ping.append(currPlayer.getAsMember().getAsMention()).append(" ");
+            ping.append(draft.findMember(bc, currPlayer.getID()).getAsMention())
+                    .append(" ");
 
             if (i == draft.getCaptIndex1()) {
                 team1.add(currPlayer);
@@ -51,36 +53,37 @@ public class DraftProcess {
             }
         }
         ping.append(
-                "\n\nHave your captains choose teammates, then choose maps!");
+                "\n\nWelcome to the draft. Jump in a VC and have your "
+                        + "captains choose teammates. Approve of a maplist "
+                        + "using `/mit genmaps`, and begin the draft when "
+                        + "ready. Reset the selection for mistakes.");
 
-        String idSuffix = draft.getPrefix().toUpperCase() + draft.getNumDraft();
-        draft.sendSelectionMenu(bc, "",
-                DraftComponents.teamSelectionMenu(idSuffix, regularPlayers));
-
-        // trying to output to other channel, currently doesn't work
 //        TextChannel channel = draft.getDraftChannel();
-//        TextChannel channel = draft.getChannel(bc, "vc-text");
-//        String idSuffix = draft.getPrefix().toUpperCase() + draft.getNumDraft();
-//        List<SelectionMenu> menus = new ArrayList<>();
-//        List<Button> buttons = new ArrayList<>();
-//
-//        menus.add(DraftComponents.teamSelectionMenu(idSuffix, regularPlayers));
-//        channel.sendMessage(ping).setActionRows(
-//                ActionRow.of(menus)).queue();
+        TextChannel channel = draft.getChannel(bc, "vc-text");
+        String idSuffix = draft.getPrefix().toUpperCase() + draft.getNumDraft();
+        List<SelectionMenu> menus = new ArrayList<>();
+        List<Button> buttons = new ArrayList<>();
+
+        menus.add(DraftComponents.teamSelectionMenu(
+                idSuffix, bc, draft, regularPlayers));
+        buttons.add(DraftComponents.resetTeams(idSuffix));
+
+        channel.sendMessage(ping).setActionRows(
+                ActionRow.of(menus), ActionRow.of(buttons)).queue();
     }
 
     public void addPlayerToTeam(SelectionMenuEvent sm, Member captain, Member player){
         DraftPlayer dp = null;
         int indexOfPickedPlayer = 0;
         for(int i = 0; i < regularPlayers.size(); i++){
-            if(regularPlayers.get(i).getAsMember().getId() == player.getId()){
+            if(regularPlayers.get(i).getID() == player.getId()){
                 indexOfPickedPlayer = i;
                 dp = regularPlayers.get(i);
             }
         }
-        if(draft.getPlayers().get(draft.getCaptIndex1()).getAsMember().getId() == captain.getId()){
+        if(draft.getPlayers().get(draft.getCaptIndex1()).getID() == captain.getId()){
             team1.add(dp);
-        }else if(draft.getPlayers().get(draft.getCaptIndex2()).getAsMember().getId() == captain.getId()){
+        }else if(draft.getPlayers().get(draft.getCaptIndex2()).getID() == captain.getId()){
             team2.add(dp);
         }else{
             //add reject statement saying you are not the captain.
@@ -94,19 +97,21 @@ public class DraftProcess {
                 }
                 continue;
             }
-            nonCaptainPlayers.add(draft.getPlayers().get(i).getAsMember().getAsMention());
+            nonCaptainPlayers.add(
+                    draft.findMember(
+                            sm, draft.getPlayers().get(i).getID()).getAsMention());
 
         }
 
-        if(captain.getId() == draft.getPlayers().get(draft.getCaptIndex1()).getAsMember().getId()){
-            Member otherCaptain = sm.getGuild().retrieveMemberById(draft.getPlayers().get(draft.getCaptIndex2()).getAsMember().getId()).complete();
+        if(captain.getId() == draft.getPlayers().get(draft.getCaptIndex1()).getID()){
+            Member otherCaptain = draft.findMember(
+                    sm, draft.getPlayers().get(draft.getCaptIndex1()).getID());
             draft.sendReply(sm, otherCaptain.getAsMention() + "please pick a player", false);
         }else{
-            Member otherCaptain = sm.getGuild().retrieveMemberById(draft.getPlayers().get(draft.getCaptIndex1()).getAsMember().getId()).complete();
+            Member otherCaptain = draft.findMember(
+                    sm, draft.getPlayers().get(draft.getCaptIndex2()).getID());
             draft.sendReply(sm, otherCaptain.getAsMention() + "please pick a player", false);
         }
-        // sendSelectionMenu(sm, sm.getInteraction().getMessage().getContentRaw(), nonCaptainPlayers, getNumDraft(), getPrefix().toUpperCase());
-
     }
 
     /**
@@ -121,25 +126,29 @@ public class DraftProcess {
          * @return said menu.
          */
         private static SelectionMenu teamSelectionMenu(
-                String suffix, List<DraftPlayer> players) {
+                String suffix, ButtonClickEvent bc,
+                Draft draft, List<DraftPlayer> players) {
             List<String> labels = new ArrayList<>();
             List<String> values = new ArrayList<>();
 
             int i = 0;
             for (DraftPlayer player : players) {
-                Member currPlayer = player.getAsMember();
-//                labels.add(currPlayer.getEffectiveName()); // collect actual player names later?
-//                values.add(currPlayer.getId()); // collect actual players later?
-                labels.add(currPlayer.getAsMention());
+                Member currPlayer = draft.findMember(bc, player.getID());
+
+                // use these choices later (menu doesn't allow duplicates)
+//                labels.add(currPlayer.getEffectiveName());
+//                values.add(currPlayer.getId());
+
+                labels.add(currPlayer.getId());
                 values.add(String.format("%s", i++));
             }
 
-            return new SelectionMenuBuilder("playerSelection" + suffix,
+            return new SelectionMenuBuilder("teamSelection" + suffix,
                     labels, values, null).getMenu();
         }
 
         /**
-         * Builds the "Join Draft" button.
+         * Builds the "Reset Teams" button.
          * @param suffix the ID's suffix.
          * @return said button.
          */

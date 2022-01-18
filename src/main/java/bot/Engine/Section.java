@@ -19,6 +19,9 @@ public class Section {
     /** The abbreviation of the section. */
     private final String prefix;
 
+    /** The emote of the section. */
+    private final String emote;
+
     /** The color of the section. */
     private final Color color;
 
@@ -37,11 +40,13 @@ public class Section {
 
         if (prefix.equals("lp")) {
             name = "LaunchPoint";
+            emote = "<:LaunchPoint:918936266190512168>";
             color = Color.GREEN;
             gradSheetID = Config.lpGradSheetID;
             cyclesSheetID = Config.lpCyclesSheetID;
         } else {
             name = "Ink Odyssey";
+            emote = "<:InkOdyssey:918936305788923944>";
             color = Color.MAGENTA;
             gradSheetID = Config.ioGradSheetID;
             cyclesSheetID = Config.ioCyclesSheetID;
@@ -62,6 +67,14 @@ public class Section {
      */
     public String getPrefix() {
         return prefix;
+    }
+
+    /**
+     * Retrieves the emote of the MIT section.
+     * @return said emote.
+     */
+    public String getEmote() {
+        return emote;
     }
 
     /**

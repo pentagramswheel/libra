@@ -20,7 +20,7 @@
     - [Command](#command)
     - [FileHandler](#filehandler)
     - [GoogleAPI](#googleapi)
-    - [Time](#time)
+    - [SelectionMenuBuilder](#selectionmenubuilder)
   + [Engine](#engine)
     - [Add](#add)
     - [Graduate](#graduate)
@@ -40,7 +40,7 @@
     - [Command](#command-1)
     - [FileHandler](#filehandler-1)
     - [GoogleAPI](#googleapi-1)
-    - [Time](#time-1)
+    - [SelectionMenuBuilder](#selectionmenubuilder-1)
   + [Engine](#engine-1)
     - [Add](#add-1)
     - [Graduate](#graduate-1)
@@ -139,6 +139,8 @@ The class which parses through user-inputted commands, as referenced in `Usage`.
 
 A class which builds a heap a minimum priority queue (This class is taken from another project and is therefore not detailed here. See the class itself for more details).
 
+----
+
 #### ButtonBuilder
 
 A class which builds a button quickly.
@@ -171,6 +173,15 @@ A class which navigates a Google Sheet (spreadsheet).
 ###### Instance Variables
 1. `Sheets sheetsService` - an object representation for the Google Sheets SDK.
 2. `String spreadsheetID` - the credential ID of the spreadsheet.
+
+----
+
+#### SelectionMenuBuilder
+
+A class which builds a selection menu quickly.
+
+###### Instance Variables
+1. `SelectionMenu menu` - the menu that was built.
 
 ----
 
@@ -210,9 +221,10 @@ A class for parenting MIT section-specific commands.
 ###### Instance Variables
 1. `String name` - the name of this section.
 2. `String prefix` - the prefix of this section. 
-3. `Color color` - the color of this section.
-4. `String gradSheetID` - the graduates spreadsheet ID for this section.
-5. `String cyclesSheetID` - the graduates spreadsheet ID for this section.
+3. `String emote` - the emote of this section.
+4. `Color color` - the color of this section.
+5. `String gradSheetID` - the graduates spreadsheet ID for this section.
+6. `String cyclesSheetID` - the graduates spreadsheet ID for this section.
 
 ----
 
@@ -225,11 +237,14 @@ A class which forms and starts drafts.
 ###### Instance Variables
 1. `boolean started` - a flag for checking whether the draft has started or not.
 2. `int numDraft` - the formal number of the draft, with respect to the draft maps in `Events`.
-3. `List<DraftPlayer> players` - the core (8) players of the draft.
-4. `List<DraftPlayer> subs` - the subs of the draft, if any.
-5. `int subsNeeded` - the amount of subs needed for the draft at any given time.
-6. `Role draftRole` - the section of MIT which this draft is occurring in.
-7. `TextChannel draftChat` - the draft chat which this draft is linked to.
+3. `DraftProcess draftProcess` - the formal process for the draft's execution.
+4. `List<DraftPlayer> players` - the core (8) players of the draft.
+5. `List<DraftPlayer> subs` - the subs of the draft, if any.
+6. `int captain1` - the index of team one's captain.
+7. `int captain2` - the index of team two's captain.
+8. `int subsNeeded` - the amount of subs needed for the draft at any given time.
+9. `Role draftRole` - the section of MIT which this draft is occurring in.
+10. `TextChannel draftChat` - the draft chat which this draft is linked to.
 
 ----
 
@@ -238,7 +253,7 @@ A class which forms and starts drafts.
 A class which represents a player within a draft.
 
 ###### Instance Variables
-1. `Member player` - the player within the draft.
+1. `String id` - the Discord ID of the player within the draft.
 2. `int matchWins` - the player's match wins during the draft.
 3. `int matchLosses` - the player's match losses during the draft.
 4. `int pings` - the player's amount of pings during the draft.
@@ -337,6 +352,10 @@ The `onSlashCommand` method analyzes a slash command `sc`, executing based on th
 
 The `onButtonClick` method parses through clicked buttons `bc`.
 
+###### onSelectionMenu
+
+The `onSelectionMenu` method parses through menu selections `sm`.
+
 ----
 
 ### Tools
@@ -359,9 +378,13 @@ The `getButton` method retrieves the built button.
 
 The `runCmd` method runs a command, given its slash command `sc`.
 
-###### extractUsers
+###### extractUsers (DEFAULT)
 
 The `extractUsers` method extracts the users of a slash command `sc`.
+
+###### findMember (DEFAULT)
+
+The `findMember` method retrieves a user given their Discord ID, using the interaction `interaction`.
 
 ###### getRole (DEFAULT)
 
@@ -411,6 +434,10 @@ The `sendButtons` method edits or sends a list of buttons `buttons` with caption
 
 The `sendButton` method edits or sends a button `button` with caption `caption`, linked with the user's acknowledged interaction `interaction`.
  
+###### sendSelectionMenu (DEFAULT)
+
+The `sendSelectionMenu` method edits or sends a selection menu `menu` with caption `caption`, linked with the user's acknowledged interaction `interaction`.
+
 ###### wait (DEFAULT)
 
 The `wait` method pauses the program for `ms` milliseconds.
@@ -474,6 +501,18 @@ The `appendRow` method appends a row `row` to at the end of the spreadsheet `spr
 ###### updateRow
 
 The `updateRow` method updates a tab `tab` of the spreadsheet `spreadsheet` to be the given row `row`.
+
+----
+
+#### SelectionMenuBuilder
+
+###### SelectionMenuBuilder
+
+The `SelectionMenuBuilder` method, the class's constructor, builds a selection menu given its implemented id `menuID`, list of labels `labels`, list of values `values`, and list of emotes `emojis`.
+
+###### getMenu
+
+The `getMenu` method retrieves the built menu.
 
 ----
 
@@ -561,6 +600,10 @@ The `getSection` method retrieves the section's name.
 
 The `getPrefix` method retrieves the section's designated prefix.
 
+###### getEmote
+
+The `getEmote` method retrieves the section's designated emote.
+
 ###### getColor
 
 The `getColor` method retrieves the section's designated color.
@@ -595,6 +638,10 @@ The `inProgress` method checks whether the draft has started yet, i.e. if the dr
 
 The `getNumDraft` method retrieves the number draft this draft is.
 
+###### getProcess
+
+The `getProcess` method retrieves the formal execution process of this draft.
+
 ###### getPlayers
 
 The `getPlayers` method retrieves the core players of the draft.
@@ -625,11 +672,11 @@ The `attemptDraft` method tries to start a draft after a "Join Draft" button `bc
 
 ###### draftContains
 
-The `draftContains` method checks whether a player `player` is within a draft's list of players `lst` or not (it returns the index of their spot in the draft queue or -1 if it cannot be found).
+The `draftContains` method checks whether a player `player` is within a draft's list of players `lst` or not (it returns the index of their spot in the draft queue or -1 if it cannot be found), using the original button clicked `bc`.
 
 ###### convertToSub
 
-The `convertToSub` method tries to find out if the player who requested a sub is part of the draft or not, retrieving them if they were.
+The `convertToSub` method tries to find out if the player `player` who requested a sub is part of the draft or not, retrieving them if they were, using the original button clicked `bc`.
 
 ###### requestSub
 
@@ -665,11 +712,11 @@ The `runCmd` method runs the `lp/io startdraft` commands, given its slash comman
 
 ###### DraftPlayer
 
-The `DraftPlayer` method, the class's constructor, builds the attributes of the draft player, given the player themselves `user`.
+The `DraftPlayer` method, the class's constructor, builds the attributes of the draft player, given the player's Discord ID `playerID`.
 
-###### getAsMember
+###### getID
 
-The `getAsMember` method retrieves the `Member` object representation of the player.
+The `getID` method retrieves the Discord ID of the player.
 
 ###### getWins
 

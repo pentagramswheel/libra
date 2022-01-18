@@ -50,6 +50,27 @@ public interface Command {
     }
 
     /**
+     * Retrieves a user given their Discord ID.
+     * @param interaction the user interaction calling this method.
+     * @param id the Discord IO of the user.
+     * @return the user.
+     */
+    default Member findMember(GenericInteractionCreateEvent interaction,
+                              String id) {
+        try {
+            Guild server = interaction.getGuild();
+            if (server == null) {
+                throw new NullPointerException("Server link disconnected.");
+            }
+
+            return server.retrieveMemberById(id).complete();
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
+            log("The user could not be found.", true);
+            return null;
+        }
+    }
+
+    /**
      * Retrieves a role given its name.
      * @param interaction the user interaction calling this method.
      * @param role the name of the role.
@@ -60,7 +81,7 @@ public interface Command {
         try {
             Guild server = interaction.getGuild();
             if (server == null) {
-                throw new NullPointerException("Roles not found.");
+                throw new NullPointerException("Server link disconnected.");
             }
 
             return server.getRolesByName(role, true).get(0);
@@ -81,7 +102,7 @@ public interface Command {
         try {
             Guild server = interaction.getGuild();
             if (server == null) {
-                throw new NullPointerException("Role not found.");
+                throw new NullPointerException("Server link disconnected.");
             }
 
             Member user = server.retrieveMemberById(id).complete();
@@ -112,7 +133,7 @@ public interface Command {
         try {
             Guild server = interaction.getGuild();
             if (server == null) {
-                throw new NullPointerException("Role not found.");
+                throw new NullPointerException("Server link disconnected.");
             }
 
             Member user = server.retrieveMemberById(id).complete();
@@ -143,7 +164,7 @@ public interface Command {
         try {
             Guild server = interaction.getGuild();
             if (server == null) {
-                throw new NullPointerException("Channel not found.");
+                throw new NullPointerException("Server link disconnected.");
             }
 
             return server.getTextChannelsByName(channel, true).get(0);
@@ -268,6 +289,16 @@ public interface Command {
         sendButtons(interaction, caption, Collections.singletonList(button));
     }
 
+    /**
+     * Replaces a selection menu, by linking a new menu
+     * to the interaction.
+     * @param interaction the user interaction calling this method.
+     * @param caption the caption above the menu.
+     * @param menu the selection menu to link.
+     *
+     * Note: The interaction must have been acknowledged before
+     *       this method.
+     */
     default void sendSelectionMenu(GenericInteractionCreateEvent interaction,
                                    String caption, SelectionMenu menu) {
         interaction.getHook().editOriginal(caption)

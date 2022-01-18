@@ -5,7 +5,6 @@ import bot.Tools.ButtonBuilder;
 import bot.Tools.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -77,7 +76,7 @@ public class Draft extends Section implements Command {
 
         players = new ArrayList<>();
         subs = new ArrayList<>();
-        DraftPlayer newPlayer = new DraftPlayer(initialPlayer);
+        DraftPlayer newPlayer = new DraftPlayer(initialPlayer.getId());
         players.add(newPlayer);
 
         draftRole = getRole(sc, getSection());
@@ -183,7 +182,7 @@ public class Draft extends Section implements Command {
 
         int size = getPlayers().size();
         for (int i = 0; i < size; i++) {
-            Member currPlayer = getPlayers().get(i).getAsMember();
+            Member currPlayer = findMember(bc, getPlayers().get(i).getID());
             queue.append(currPlayer.getAsMention());
             logList.append(currPlayer.getAsMention()).append(" ");
 
@@ -227,6 +226,26 @@ public class Draft extends Section implements Command {
     }
 
     /**
+     * Checks whether a player is within a draft player list or not.
+     * @param bc a button click to analyze.
+     * @param player the player to check for.
+     * @param lst a draft's list of players.
+     * @return the index of the player within the draft's list of players.
+     *         -1 if they are not in the draft yet.
+     */
+    private int draftContains(ButtonClickEvent bc, Member player,
+                              List<DraftPlayer> lst) {
+        for (int i = 0; i < lst.size(); i++) {
+            Member currPlayer = findMember(bc, lst.get(i).getID());
+            if (currPlayer.equals(player)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
      * Attempts to start a draft.
      * @param bc a button click to analyze.
      */
@@ -241,7 +260,7 @@ public class Draft extends Section implements Command {
 //            return;
 //        }
 
-        DraftPlayer newPlayer = new DraftPlayer(potentialPlayer);
+        DraftPlayer newPlayer = new DraftPlayer(potentialPlayer.getId());
         getPlayers().add(newPlayer);
 
         if (getPlayers().size() == 8) {
@@ -267,32 +286,15 @@ public class Draft extends Section implements Command {
     }
 
     /**
-     * Checks whether a player is within a draft player list or not.
-     * @param player the player to check for.
-     * @param lst a draft's list of players.
-     * @return the index of the player within the draft's list of players.
-     *         -1 if they are not in the draft yet.
-     */
-    private int draftContains(Member player, List<DraftPlayer> lst) {
-        for (int i = 0; i < lst.size(); i++) {
-            Member currPlayer = lst.get(i).getAsMember();
-            if (currPlayer.equals(player)) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    /**
      * Retrieves a player from the draft to sub, if they exist.
+     * @param bc a button click to analyze.
      * @param player the player to convert.
      * @return the found player within the draft.
      *         null otherwise.
      */
-    private DraftPlayer convertToSub(Member player) {
-        int playerIndex = draftContains(player, getPlayers());
-        int subIndex = draftContains(player, getSubs());
+    private DraftPlayer convertToSub(ButtonClickEvent bc, Member player) {
+        int playerIndex = draftContains(bc, player, getPlayers());
+        int subIndex = draftContains(bc, player, getSubs());
 
         if (playerIndex != -1) {
             return getPlayers().get(playerIndex);
@@ -308,14 +310,14 @@ public class Draft extends Section implements Command {
      * @param bc a button click to analyze.
      */
     public void requestSub(ButtonClickEvent bc) {
-        DraftPlayer convertedSub = convertToSub(bc.getMember());
+        DraftPlayer convertedSub = convertToSub(bc, bc.getMember());
 
         if (convertedSub == null) {
             sendReply(bc, "You are not part of this draft!", true);
             return;
         } else if (convertedSub.getPings() > 0) {
-            sendReply(bc, "Stop spamming " + convertedSub.getAsMember().getAsMention()
-                    + "!", true);
+            sendReply(bc, "Stop spamming " + bc.getMember().getAsMention()+ "!",
+                    true);
             return;
         }
         bc.deferEdit().queue();
@@ -340,8 +342,8 @@ public class Draft extends Section implements Command {
     public void addSub(ButtonClickEvent bc) {
         Member player = bc.getMember();
         boolean inDraft =
-                !(draftContains(player, getPlayers()) == -1
-                && draftContains(player, getSubs()) == -1);
+                !(draftContains(bc, player, getPlayers()) == -1
+                && draftContains(bc, player, getSubs()) == -1);
 
         /*if (inDraft) {
             sendReply(bc, "Why would you sub for yourself?", true);
@@ -352,7 +354,7 @@ public class Draft extends Section implements Command {
         }
         bc.deferEdit().queue();
 
-        DraftPlayer subPlayer = new DraftPlayer(player);
+        DraftPlayer subPlayer = new DraftPlayer(player.getId());
         getSubs().add(subPlayer);
 
         subsNeeded--;
@@ -364,8 +366,8 @@ public class Draft extends Section implements Command {
         }
 
         String update =
-                subPlayer.getAsMember().getAsMention() + " will be subbing for "
-                        +"this draft in " + getDraftChannel().getAsMention() + ".";
+                player.getAsMention() + " will be subbing for "
+                        + "this draft in " + getDraftChannel().getAsMention() + ".";
         sendResponse(bc, update, false);
     }
 
@@ -375,7 +377,7 @@ public class Draft extends Section implements Command {
      */
     public void removePlayer(ButtonClickEvent bc) {
         Member player = bc.getMember();
-        int playerIndex = draftContains(player, getPlayers());
+        int playerIndex = draftContains(bc, player, getPlayers());
 
         if (playerIndex == -1) {
             sendReply(bc, "You're not in this draft!", true);
