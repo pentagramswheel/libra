@@ -36,6 +36,10 @@ public class DraftProcess {
     }
 
     public void start(ButtonClickEvent bc) {
+        if (!draft.inProgress()) {
+            return;
+        }
+
         StringBuilder ping = new StringBuilder();
 
         ping.append(draft.getEmote()).append(" ");
@@ -67,6 +71,7 @@ public class DraftProcess {
         menus.add(DraftComponents.teamSelectionMenu(
                 idSuffix, bc, draft, regularPlayers));
         buttons.add(DraftComponents.resetTeams(idSuffix));
+        buttons.add(DraftComponents.beginDraft(idSuffix));
 
         channel.sendMessage(ping).setActionRows(
                 ActionRow.of(menus), ActionRow.of(buttons)).queue();
@@ -157,5 +162,14 @@ public class DraftProcess {
                     "Reset Teams", null, 3).getButton();
         }
 
+        /**
+         * Builds the "Begin Draft" button.
+         * @param suffix the ID's suffix.
+         * @return said button.
+         */
+        private static Button beginDraft(String suffix) {
+            return new ButtonBuilder("beginDraft" + suffix,
+                    "Begin Draft", null, 1).getButton();
+        }
     }
 }
