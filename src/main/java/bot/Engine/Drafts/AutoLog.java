@@ -224,7 +224,7 @@ public class AutoLog extends Section {
 
             sendReport(log, draft, bc, team1, team2, subs, playerTypes, errorsFound);
             draft.log(totalSize + " " + getPrefix().toUpperCase()
-                    + " draft player(s) were processed.", false);
+                    + " draft player(s) were automatically processed.", false);
         } catch (IOException | GeneralSecurityException e) {
             draft.sendResponse(bc, "The spreadsheet could not load.", true);
             draft.log("The " + getSection()

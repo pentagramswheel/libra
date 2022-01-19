@@ -61,26 +61,30 @@ public class DraftProcess {
         }
 
         StringBuilder ping = new StringBuilder();
+        StringBuilder captains = new StringBuilder();
 
         ping.append(draft.getEmote()).append(" ");
         for (int i = 0; i < draft.getPlayers().size(); i++) {
             DraftPlayer currPlayer = draft.getPlayers().get(i);
-            ping.append(draft.findMember(bc, currPlayer.getID()).getAsMention())
-                    .append(" ");
+            String currPing = draft.findMember(bc, currPlayer.getID()).getAsMention();
+            ping.append(currPing).append(" ");
 
             if (i == draft.getCaptIndex1()) {
                 getTeam1().add(currPlayer);
+                captains.append(currPing).append(" ");
             } else if (i == draft.getCaptIndex2()) {
                 getTeam2().add(currPlayer);
+                captains.append(currPing).append(" ");
             } else {
                 regularPlayers.add(currPlayer);
             }
         }
         ping.append(
                 "\n\nWelcome to the draft. Jump in a VC and have your "
-                        + "captains choose teammates. Approve of a maplist "
-                        + "using `/mit genmaps`, and begin the draft when "
-                        + "ready. Reset the selection for mistakes.");
+                        + "captains " + captains + "choose teammates. "
+                        + "Approve of a maplist using `/mit genmaps`, "
+                        + "and begin the draft when ready. Reset the "
+                        + "selection for mistakes.");
 
 //        TextChannel channel = draft.getDraftChannel();
         TextChannel channel = draft.getChannel(bc, "vc-text");

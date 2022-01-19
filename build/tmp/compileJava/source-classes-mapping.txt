@@ -1,0 +1,45 @@
+bot/Engine/Drafts/Undo.java
+ bot.Engine.Drafts.Undo
+bot/Main.java
+ bot.Main
+bot/Engine/Drafts/MapGenerator.java
+ bot.Engine.Drafts.MapGenerator
+bot/Tools/ButtonBuilder.java
+ bot.Tools.ButtonBuilder
+bot/Config.java
+ bot.Config
+bot/Engine/Section.java
+ bot.Engine.Section
+bot/Engine/Drafts/DraftPlayer.java
+ bot.Engine.Drafts.DraftPlayer
+bot/Engine/Add.java
+ bot.Engine.Add
+bot/Engine/PlayerStats.java
+ bot.Engine.PlayerStats
+bot/Tools/SelectionMenuBuilder.java
+ bot.Tools.SelectionMenuBuilder
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
+bot/Tools/FileHandler.java
+ bot.Tools.FileHandler
+bot/ConfigExample.java
+ bot.ConfigExample
+bot/Tools/GoogleAPI.java
+ bot.Tools.GoogleAPI
+bot/Tools/Command.java
+ bot.Tools.Command
+bot/Engine/Drafts/ManualLog.java
+ bot.Engine.Drafts.ManualLog
+bot/Tools/ArrayHeapMinPQ.java
+ bot.Tools.ArrayHeapMinPQ
+ bot.Tools.ArrayHeapMinPQ$Node
+bot/Engine/Drafts/Draft.java
+ bot.Engine.Drafts.Draft
+ bot.Engine.Drafts.Draft$Buttons
+bot/Events.java
+ bot.Events
+bot/Engine/Drafts/AutoLog.java
+ bot.Engine.Drafts.AutoLog
+bot/Engine/Drafts/DraftProcess.java
+ bot.Engine.Drafts.DraftProcess
+ bot.Engine.Drafts.DraftProcess$DraftComponents

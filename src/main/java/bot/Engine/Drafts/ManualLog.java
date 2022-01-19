@@ -297,7 +297,7 @@ public class ManualLog extends Section implements Command {
 
             sendReport(sc, userArgs, playerTypes, errorsFound);
             log(userArgs.size() + " " + getPrefix().toUpperCase()
-                    + " draft player(s) were processed.", false);
+                    + " draft player(s) were manually processed.", false);
         } catch (IOException | GeneralSecurityException e) {
             sendResponse(sc, "The spreadsheet could not load.", true);
             log("The " + getSection()
