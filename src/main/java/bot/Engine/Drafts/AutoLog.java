@@ -64,17 +64,22 @@ public class AutoLog extends Section {
             }
 
             StringBuilder list = playerList;
+            String subScore = "";
             if (subs.contains(currPlayer)) {
                 list = subList;
+                subScore = String.format(" [%s-%s]",
+                        currPlayer.getWins(), currPlayer.getLosses());
             }
 
             if (playerTypes[offset + i] == 0) {
                 list.append(completionSymbol)
                         .append(player.getAsMention())
+                        .append(subScore)
                         .append("\n");
             } else {
                 list.append(completionSymbol)
                         .append(player.getAsMention())
+                        .append(subScore)
                         .append(" (new)\n");
             }
         }
