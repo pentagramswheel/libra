@@ -16,6 +16,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import org.slf4j.Logger;
@@ -120,14 +121,15 @@ public class GoogleAPI {
 
     /**
      * Retrieves a table section of the spreadsheet.
-     * @param sc a user inputted slash command.
+     * @param interaction the user interaction calling this method.
      * @param tab the name of the spreadsheet section.
      * @param spreadsheet the values of the spreadsheet section.
      * @return said section as a map, indexed by Discord ID.
      *         null otherwise.
      */
     public TreeMap<Object, PlayerStats> readSection(
-            SlashCommandEvent sc, String tab, Values spreadsheet) {
+            GenericInteractionCreateEvent interaction,
+            String tab, Values spreadsheet) {
         try {
             ValueRange spreadSheetTable = spreadsheet.get(
                     getSpreadsheetID(), tab).execute();
@@ -139,7 +141,7 @@ public class GoogleAPI {
                     List<Object> row = values.get(i);
                     Object id = row.remove(0);
                     PlayerStats rowStats = new PlayerStats(
-                            sc, Integer.toString(i + 1), row);
+                            interaction, Integer.toString(i + 1), row);
 
                     data.put(id, rowStats);
                 }
@@ -149,7 +151,7 @@ public class GoogleAPI {
         } catch (IOException e) {
             Logger logger = LoggerFactory.getLogger(this.getClass());
             logger.error("The data could not load.");
-            sc.getHook().sendMessage(
+            interaction.getHook().sendMessage(
                     "The data could not load.").queue();
         }
 

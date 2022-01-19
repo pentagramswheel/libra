@@ -23,8 +23,11 @@ import java.util.*;
 public class DraftProcess {
 
     private final Draft draft;
+
     private final List<DraftPlayer> regularPlayers;
+
     private final List<DraftPlayer> team1;
+
     private final List<DraftPlayer> team2;
 
     public DraftProcess(Draft draftToProcess) {
@@ -33,6 +36,22 @@ public class DraftProcess {
         regularPlayers = new ArrayList<>();
         team1 = new ArrayList<>();
         team2 = new ArrayList<>();
+    }
+
+    /**
+     * Retrieves team 1.
+     * @return said team.
+     */
+    public List<DraftPlayer> getTeam1() {
+        return team1;
+    }
+
+    /**
+     * Retrieves team 2.
+     * @return said team.
+     */
+    public List<DraftPlayer> getTeam2() {
+        return team2;
     }
 
     public void start(ButtonClickEvent bc) {
@@ -49,9 +68,9 @@ public class DraftProcess {
                     .append(" ");
 
             if (i == draft.getCaptIndex1()) {
-                team1.add(currPlayer);
+                getTeam1().add(currPlayer);
             } else if (i == draft.getCaptIndex2()) {
-                team2.add(currPlayer);
+                getTeam2().add(currPlayer);
             } else {
                 regularPlayers.add(currPlayer);
             }
@@ -75,6 +94,30 @@ public class DraftProcess {
 
         channel.sendMessage(ping).setActionRows(
                 ActionRow.of(menus), ActionRow.of(buttons)).queue();
+    }
+
+    /**
+     * Adds a match won point to each player of a team.
+     * @param team the team to analyze.
+     */
+    public void addWinTo(List<DraftPlayer> team) {
+        for (DraftPlayer player : team) {
+            if (player.isActive()) {
+                player.incrementWins();
+            }
+        }
+    }
+
+    /**
+     * Adds a match lost point to each player of a team.
+     * @param team the team to analyze.
+     */
+    public void addLossTo(List<DraftPlayer> team){
+        for (DraftPlayer player : team) {
+            if (player.isActive()) {
+                player.incrementLosses();
+            }
+        }
     }
 
     public void addPlayerToTeam(SelectionMenuEvent sm, Member captain, Member player){

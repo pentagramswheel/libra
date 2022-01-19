@@ -363,7 +363,7 @@ public class Events extends ListenerAdapter {
             case "cycle":
             case "sub":
                 if (gamesPlayedValid(sc)) {
-                    Log log = new Log(prefix);
+                    ManualLog log = new ManualLog(prefix);
                     log.runCmd(sc);
 
                     saveCycleCall(prefix + subCmd, args);

@@ -24,16 +24,16 @@ import java.security.GeneralSecurityException;
  * @author  Wil Aquino
  * Date:    February 17, 2021
  * Project: LaunchPoint Bot
- * Module:  Log.java
+ * Module:  ManualLog.java
  * Purpose: Logs cycle information via command.
  */
-public class Log extends Section implements Command {
+public class ManualLog extends Section implements Command {
 
     /**
      * Constructs the cycle log attributes.
      * @param abbreviation the abbreviation of the section.
      */
-    public Log(String abbreviation) {
+    public ManualLog(String abbreviation) {
         super(abbreviation);
     }
 
@@ -94,15 +94,13 @@ public class Log extends Section implements Command {
     /**
      * Print the summary of the cycle match report.
      * @param sc the user's inputted command.
-     * @param color the color of the summary embed.
      * @param players the players within the set.
      * @param playerTypes array of types for each player
      *                    (0 if an existing player, 1 if a new player).
      * @param errorsFound array of errors found for each player, if any
      *                    (0 if no errors occurred, 1 otherwise).
      */
-    private void sendReport(SlashCommandEvent sc, Color color,
-                            List<OptionMapping> players,
+    private void sendReport(SlashCommandEvent sc, List<OptionMapping> players,
                             int[] playerTypes, int[] errorsFound) {
         EmbedBuilder eb = new EmbedBuilder();
         StringBuilder playerList = new StringBuilder();
@@ -116,11 +114,11 @@ public class Log extends Section implements Command {
 
             if (playerTypes[i] == 0) {
                 playerList.append(completionSymbol)
-                        .append(player.getUser().getAsMention())
+                        .append(player.getAsMention())
                         .append("\n");
             } else {
                 playerList.append(completionSymbol)
-                        .append(player.getUser().getAsMention())
+                        .append(player.getAsMention())
                         .append(" (new)\n");
             }
         }
@@ -130,7 +128,7 @@ public class Log extends Section implements Command {
         int losses = getGamesPlayed(args) - wins;
 
         eb.setTitle("Summary of Report")
-                .setColor(color)
+                .setColor(getColor())
                 .addField("Score:", wins + " - " + losses, false)
                 .addField("Players Updated:", playerList.toString(), false);
         if (sum(errorsFound, errorsFound.length - 1) == 0) {
@@ -146,24 +144,23 @@ public class Log extends Section implements Command {
     /**
      * Updates a user's stats within a spreadsheet.
      * @param cmd the formal name of the command.
-     * @param args the arguments of the command.
-     * @param link a connection to the spreadsheet.
+     * @param gamesPlayed the total games played.
+     * @param gameWins the total games won.
      * @param user the user to update the stats of.
+     * @param link a connection to the spreadsheet.
      * @param tab the name of the spreadsheet section.
      * @param spreadsheet the values of the spreadsheet section.
      * @param data a map of all rows of the spreadsheet.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
-    private int updateUser(String cmd, List<OptionMapping> args, GoogleAPI link,
-                           Member user, String tab, Values spreadsheet,
+    public int updateUser(String cmd, int gamesPlayed, int gameWins, Member user,
+                           GoogleAPI link, String tab, Values spreadsheet,
                            TreeMap<Object, PlayerStats> data) {
         try {
             String userTag = user.getUser().getAsTag();
             PlayerStats player = data.get(user.getId());
 
-            int gamesPlayed = getGamesPlayed(args);
-            int gameWins = getGamesWon(args);
             int gameLosses = gamesPlayed - gameWins;
 
             int setWins = player.getSetWins();
@@ -208,9 +205,10 @@ public class Log extends Section implements Command {
     /**
      * Adds a user's stats within a spreadsheet.
      * @param cmd the formal name of the command.
-     * @param args the arguments of the command.
-     * @param link a connection to the spreadsheet.
+     * @param gamesPlayed the total games played.
+     * @param gameWins the total games won.
      * @param user the user to update the stats of.
+     * @param link a connection to the spreadsheet.
      * @param tab the name of the spreadsheet section.
      * @param spreadsheet the values of the spreadsheet section.
      * @return 0 if the player could be found in the spreadsheet.
@@ -218,13 +216,11 @@ public class Log extends Section implements Command {
      *
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
-    private int addUser(String cmd, List<OptionMapping> args, GoogleAPI link,
-                        Member user, String tab, Values spreadsheet) {
+    public int addUser(String cmd, int gamesPlayed, int gameWins, Member user,
+                        GoogleAPI link, String tab, Values spreadsheet) {
         try {
             String userTag = user.getUser().getAsTag();
 
-            int gamesPlayed = getGamesPlayed(args);
-            int gameWins = getGamesWon(args);
             int gameLosses = gamesPlayed - gameWins;
             double gameWinrate = (double) gameWins / gamesPlayed;
 
@@ -269,7 +265,6 @@ public class Log extends Section implements Command {
 
         try {
             GoogleAPI link = new GoogleAPI(cyclesSheetID());
-            Color replyColor = getColor();
 
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";
@@ -288,19 +283,21 @@ public class Log extends Section implements Command {
             for (int i = 0; i < numUsers; i++) {
                 Member user = userArgs.get(i).getAsMember();
                 if (data.containsKey(user.getId())) {
-                    errorsFound[i] =
-                            updateUser(cmd, args, link, user, tab, spreadsheet, data);
+                    errorsFound[i] = updateUser(
+                            cmd, getGamesPlayed(args), getGamesWon(args),
+                            user, link, tab, spreadsheet, data);
                     playerTypes[i] = 0;
                 } else {
-                    errorsFound[i] =
-                            addUser(cmd, args, link, user, tab, spreadsheet);
+                    errorsFound[i] = addUser(
+                            cmd, getGamesPlayed(args), getGamesWon(args),
+                            user, link, tab, spreadsheet);
                     playerTypes[i] = 1;
                 }
             }
 
-            sendReport(sc, replyColor, userArgs, playerTypes, errorsFound);
+            sendReport(sc, userArgs, playerTypes, errorsFound);
             log(userArgs.size() + " " + getPrefix().toUpperCase()
-                    + " cycle match(es) were processed.", false);
+                    + " draft player(s) were processed.", false);
         } catch (IOException | GeneralSecurityException e) {
             sendResponse(sc, "The spreadsheet could not load.", true);
             log("The " + getSection()

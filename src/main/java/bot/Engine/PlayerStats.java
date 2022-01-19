@@ -1,5 +1,6 @@
 package bot.Engine;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import org.slf4j.Logger;
@@ -39,11 +40,12 @@ public class PlayerStats {
 
     /**
      * Construct the object by storing row data.
-     * @param sc a user inputted slash command.
+     * @param interaction the user interaction calling this method.
      * @param pos the row of the player within the cycle spreadsheet.
      * @param vals the row data.
      */
-    public PlayerStats(SlashCommandEvent sc, String pos, List<Object> vals) {
+    public PlayerStats(GenericInteractionCreateEvent interaction,
+                       String pos, List<Object> vals) {
         try {
             draftPosition = pos;
             name = vals.get(0).toString();
@@ -57,7 +59,7 @@ public class PlayerStats {
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
             Logger logger = LoggerFactory.getLogger(this.getClass());
             logger.error("Spreadsheet formatting problem detected.");
-            sc.getHook().sendMessage(
+            interaction.getHook().sendMessage(
                     "***There seems to be a formatting problem within the "
                             + "spreadsheet.*** Please fix it!").queue();
         }

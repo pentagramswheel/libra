@@ -12,6 +12,9 @@ public class DraftPlayer {
     /** The draft player's Discord ID. */
     private final String id;
 
+    /** Flag for checking whether this player is active or not. */
+    private boolean active;
+
     /** The player's amount of won matches during the draft. */
     private int matchWins;
 
@@ -27,6 +30,7 @@ public class DraftPlayer {
      */
     public DraftPlayer(String playerID) {
         id = playerID;
+        active = true;
         matchWins = matchLosses = 0;
         pings = 0;
     }
@@ -37,6 +41,23 @@ public class DraftPlayer {
      */
     public String getID() {
         return id;
+    }
+
+    /**
+     * Checks whether the player is active within
+     * the draft or not.
+     * @return True if they are active.
+     *         False otherwise.
+     */
+    public boolean isActive() {
+        return active;
+    }
+
+    /**
+     * Sets the player to an inactive.
+     */
+    public void setInactive() {
+        active = false;
     }
 
     /**

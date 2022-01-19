@@ -26,7 +26,7 @@ import java.security.GeneralSecurityException;
  * Module:  Undo.java
  * Purpose: Reverts the Cycle spreadsheet to the previous state.
  */
-public class Undo extends Log implements Command {
+public class Undo extends ManualLog implements Command {
 
     /**
      * Constructs the cycle undo attributes.

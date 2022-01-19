@@ -325,6 +325,8 @@ public class Draft extends Section implements Command {
 
         getPlayers().remove(convertedSub);
         getSubs().remove(convertedSub);
+
+        convertedSub.setInactive();
         getSubs().add(convertedSub);
 
         subsNeeded++;

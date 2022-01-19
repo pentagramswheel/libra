@@ -26,6 +26,7 @@
     - [Graduate](#graduate)
     - [PlayerStats](#playerstats)
   + [Drafts (Engine)](#drafts-engine)
+    - [AutoLog](#autolog)
     - [Draft](#draft)
     - [DraftPlayer](#draftplayer)
     - [Log](#log)
@@ -46,6 +47,7 @@
     - [Graduate](#graduate-1)
     - [PlayerStats](#playerstats-1)
   + [Drafts (Engine)](#drafts-engine-1)
+    - [AutoLog](#autolog-1)
     - [Draft](#draft-1)
     - [DraftPlayer](#draftplayer-1)
     - [Log](#log-1)
@@ -230,6 +232,10 @@ A class for parenting MIT section-specific commands.
 
 ### Drafts (Engine)
 
+#### AutoLog
+
+A class which manually updates the draft stats of a user.
+
 #### Draft
 
 A class which forms and starts drafts.
@@ -254,15 +260,16 @@ A class which represents a player within a draft.
 
 ###### Instance Variables
 1. `String id` - the Discord ID of the player within the draft.
-2. `int matchWins` - the player's match wins during the draft.
-3. `int matchLosses` - the player's match losses during the draft.
-4. `int pings` - the player's amount of pings during the draft.
+2. `boolean active` - a flag for checking whether a player is active in the draft or not.
+3. `int matchWins` - the player's match wins during the draft.
+4. `int matchLosses` - the player's match losses during the draft.
+5. `int pings` - the player's amount of pings during the draft.
 
 ----
 
-#### Log
+#### ManualLog
 
-A class which updates the draft stats of a user, processing the `lp/io cycle` and `lp/io sub` commands.
+A class which manually updates the draft stats of a user by processing the `lp/io cycle` and `lp/io sub` commands.
 
 ----
 
@@ -484,7 +491,7 @@ The `getSpreadSheetID` method retrieves the spreadsheet's affiliated ID.
 
 ###### readSection
 
-The `readSection` method reads a tab `tab` of the spreadsheet `spreadsheet` and organizes it into a map indexing by Discord user ID, given a user inputted slash command `sc`.
+The `readSection` method reads a tab `tab` of the spreadsheet `spreadsheet` and organizes it into a map indexing by Discord user ID, given a user's acknowledged interaction `interaction`.
 
 ###### buildRange
 
@@ -554,7 +561,7 @@ The `runCmd` method runs the `lp/io grad` commands, given its slash command `sc`
 
 ###### PlayerStats
 
-The `PlayerStats` method, the class's constructor, initializes the player's attributes given a user inputted slash command `sc`, row number `pos`, and row values `vals`.
+The `PlayerStats` method, the class's constructor, initializes the player's attributes given a user inputted slash command `sc`, row number `pos`, and row values `vals`, given the user's acknowledged interaction `interaction`.
 
 ###### getDraftPosition
 
@@ -619,6 +626,30 @@ The `cyclesSheetID` method retrieves the section's cycle sheet ID.
 ----
 
 ### Drafts (Engine)
+
+#### AutoLog
+
+###### AutoLog
+
+The `AutoLog` method, the class's constructor, builds the assigned cycle log attributes given its prefix `abbreviation`.
+
+###### updateLists
+
+The `updateLists` method builds the stringed player lists `playerList` and `subList` of a draft `draft`, with respect to a team's player `team` and the draft's subs `subs`, given whether they were new or existing players `playerTypes`, which players `errorsFound` resulted in an error, an index `offset` to offset the `playerTypes`/`errorsFound` arrays, and the button `bc` that was clicked to call the method.
+
+###### sendReport
+
+The `sendReport` method sends a summary of the match report of a draft `draft` using a `ManualLog` instance `log`, given the teams `team1` and `team2`, subs `subs`, whether they were new or existing players `playerTypes`, which players `errorsFound` resulted in an error, and the button `bc` that was clicked to call the method.
+
+###### updateSpreadsheet
+
+This `updateUser` method uses `ManualLog` instance `lod` and a GoogleAPI `link` to update the draft `draft` stats of a team `team` and the draft's subs `subs`, within the spreadsheet tab `tab` with values `spreadsheet`, using a map `data`, given the total games played `gamesPlayed`, and games won `gameWins`, retrieving a 0 (if there were no errors) or 1 (if there were), an index `offset` to offset the `playerTypes`/`errorsFound` arrays, and the button `bc` that was clicked to call the method.
+
+###### matchReport
+
+The `matchReport` method reports the draft `draft`, given its button click `bc`.
+
+----
 
 #### Draft
 
@@ -718,6 +749,14 @@ The `DraftPlayer` method, the class's constructor, builds the attributes of the 
 
 The `getID` method retrieves the Discord ID of the player.
 
+###### isActive
+
+The `isActive` method checks whether a player is currently active within the draft.
+
+###### setInactive
+
+The `setInactive` method sets a player's status within the draft to inactive.
+
 ###### getWins
 
 The `getWins` method retrieves the player's match wins during the draft.
@@ -744,11 +783,11 @@ The `incrementPings` method increases the player's amount of pings by one.
 
 ----
 
-#### Log
+#### ManualLog
 
-###### Log
+###### ManualLog
 
-The `Log` method, the class's constructor, builds the assigned cycle log attributes given its prefix `abbreviation`.
+The `ManualLog` method, the class's constructor, builds the assigned cycle log attributes given its prefix `abbreviation`.
 
 ###### notSub
 
@@ -772,15 +811,15 @@ The `sum` method returns the sum of all values within an array `arr`, by using r
 
 ###### sendReport
 
-The `sendReport` method sends a summary of all errors during the match report, given the color label `color`, players `players`, whether they were new or existing players `playerTypes`, which players `errorsFound` resulted in an error, and the user's inputted slash command `sc`.
+The `sendReport` method sends a summary of the match report, given the players `players`, whether they were new or existing players `playerTypes`, which players `errorsFound` resulted in an error, and the user's inputted slash command `sc`.
 
 ###### updateUser
 
-This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, within the spreadsheet tab `tab` with values `spreadsheet`, using a map `data`, and given the original user input command `cmd` and parameters/options `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
+This `updateUser` method uses the GoogleAPI `link` to update the stats of a user `user`, within the spreadsheet tab `tab` with values `spreadsheet`, using a map `data`, and given the original user input command `cmd`, total games played `gamesPlayed`, and games won `gameWins`, retrieving a 0 (if there were no errors) or 1 (if there were).
 
 ###### addUser
 
-This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, within the spreadsheet tab `tab` with values `spreadsheet`, and given the original user input command `cmd` and parameters/options `args`, retrieving a 0 (if there were no errors) or 1 (if there were).
+This `addUser` method uses the GoogleAPI `link` to add the stats of a user `user`, within the spreadsheet tab `tab` with values `spreadsheet`, and given the original user input command `cmd`, total games played `gamesPlayed`, and games won `gameWins`, retrieving a 0 (if there were no errors) or 1 (if there were).
 
 ###### runCmd
 
