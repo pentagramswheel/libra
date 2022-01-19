@@ -1,7 +1,6 @@
 package bot.Engine;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,7 @@ import java.util.List;
 /**
  * @author  Wil Aquino
  * Date:    April 13, 2021
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  PlayersStats.java
  * Purpose: Stores player stats.
  */

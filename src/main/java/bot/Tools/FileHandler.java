@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * @author  Wil Aquino
  * Date:    December 28, 2021
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  FileHandler.java
  * Purpose: Handles files used throughout the project.
  */

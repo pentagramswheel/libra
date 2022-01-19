@@ -20,9 +20,10 @@ import java.security.GeneralSecurityException;
 /**
  * @author  Wil Aquino
  * Date:    January 18, 2022
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  AutoLog.java
- * Purpose: Logs cycle information via automatic system.
+ * Purpose: Logs cycle information via the automatic
+ *          draft system.
  */
 public class AutoLog extends Section {
 

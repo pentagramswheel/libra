@@ -19,7 +19,7 @@ import java.security.GeneralSecurityException;
 /**
  * @author  Wil Aquino
  * Date:    April 1, 2021
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  Graduate.java
  * Purpose: Graduates users from LaunchPoint.
  */

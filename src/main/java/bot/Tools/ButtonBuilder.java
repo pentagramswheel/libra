@@ -5,9 +5,9 @@ import net.dv8tion.jda.api.interactions.components.Button;
 /**
  * @author  Wil Aquino
  * Date:    January 10, 2022
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  Draft.java
- * Purpose: Conveniently builds a button..
+ * Purpose: Conveniently builds a button.
  */
 public class ButtonBuilder {
 

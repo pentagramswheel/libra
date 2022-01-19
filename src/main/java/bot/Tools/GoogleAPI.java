@@ -17,7 +17,6 @@ import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ import java.security.GeneralSecurityException;
 /**
  * @author  Wil Aquino
  * Date:    April 12, 2021
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  GoogleAPI.java
  * Purpose: Establishes a connection with a Google Sheet
  *          through the Google API.

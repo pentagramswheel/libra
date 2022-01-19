@@ -84,13 +84,13 @@ java src/main/java/bot/Main.java
 | mit help | Outputs troubleshooting information for the bot. |
 | mit profile | Outputs a summary of a player's profile within MIT. |
 | mit genmaps | Generates a map list for a draft. | 1. `matches` - the amount of maps needed for the amount of matches going to be played. |
-| lp draftstart | Starts an automatic LaunchPoint draft. |
+| lp startdraft | Starts an automatic LaunchPoint draft. |
 | lp cycle | Manually updates players' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | lp sub | Manually updates subs' LaunchPoint Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | lp undo | Reverts the previous LP cycle command, *once and only once*. |
 | lp add | Gives players the LaunchPoint role. | 1. `users` - Discord users in the form of Discord pings. |
 | lp grad | Graduates players from LaunchPoint, logging their status on an affiliated spreadsheet and replacing their "LaunchPoint" role with the "LaunchPoint Graduate" role on the Discord server. | 1. `users` - Discord users in the form of Discord pings. |
-| io draftstart | Starts an automatic Ink Odyssey draft. |
+| io startdraft | Starts an automatic Ink Odyssey draft. |
 | io cycle | Manually updates players' Ink Odyssey Cycles stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | io sub | Manually updates subs' Ink Odyssey stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | io undo | Reverts the previous IO cycle command, *once and only once*. |

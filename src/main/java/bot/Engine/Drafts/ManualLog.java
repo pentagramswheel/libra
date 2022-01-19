@@ -23,7 +23,7 @@ import java.security.GeneralSecurityException;
 /**
  * @author  Wil Aquino
  * Date:    February 17, 2021
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  ManualLog.java
  * Purpose: Logs cycle information via command.
  */

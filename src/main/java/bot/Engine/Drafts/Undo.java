@@ -22,7 +22,7 @@ import java.security.GeneralSecurityException;
 /**
  * @author  Wil Aquino
  * Date:    June 1, 2021
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  Undo.java
  * Purpose: Reverts the Cycle spreadsheet to the previous state.
  */

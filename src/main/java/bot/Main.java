@@ -118,7 +118,7 @@ public class Main {
                     .build();
 
             // run only if all slash commands have not been implemented yet
-            Main.implementSlashCommands(jda);
+//            Main.implementSlashCommands(jda);
 
             String status = "Splatoon 3";
             jda.getPresence().setPresence(

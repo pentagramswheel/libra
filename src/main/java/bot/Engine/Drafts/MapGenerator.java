@@ -16,7 +16,7 @@ import java.util.Random;
 /**
  * @author  Wil Aquino
  * Date:    January 5, 2022
- * Project: LaunchPoint Bot
+ * Project: Libra
  * Module:  MapGenerator.java
  * Purpose: Generates a map list.
  */
