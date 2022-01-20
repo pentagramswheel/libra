@@ -10,8 +10,9 @@ bot/Config.java
  bot.Config
 bot/Engine/Section.java
  bot.Engine.Section
-bot/Engine/Drafts/DraftPlayer.java
- bot.Engine.Drafts.DraftPlayer
+bot/Tools/ArrayHeapMinPQ.java
+ bot.Tools.ArrayHeapMinPQ
+ bot.Tools.ArrayHeapMinPQ$Node
 bot/Engine/Add.java
  bot.Engine.Add
 bot/Engine/PlayerStats.java
@@ -30,16 +31,15 @@ bot/Tools/Command.java
  bot.Tools.Command
 bot/Engine/Drafts/ManualLog.java
  bot.Engine.Drafts.ManualLog
-bot/Tools/ArrayHeapMinPQ.java
- bot.Tools.ArrayHeapMinPQ
- bot.Tools.ArrayHeapMinPQ$Node
+bot/Events.java
+ bot.Events
 bot/Engine/Drafts/Draft.java
  bot.Engine.Drafts.Draft
  bot.Engine.Drafts.Draft$Buttons
-bot/Events.java
- bot.Events
 bot/Engine/Drafts/AutoLog.java
  bot.Engine.Drafts.AutoLog
 bot/Engine/Drafts/DraftProcess.java
  bot.Engine.Drafts.DraftProcess
  bot.Engine.Drafts.DraftProcess$DraftComponents
+bot/Engine/Drafts/DraftPlayer.java
+ bot.Engine.Drafts.DraftPlayer

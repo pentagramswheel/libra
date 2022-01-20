@@ -99,4 +99,33 @@ public class DraftPlayer {
     public void incrementPings() {
         pings++;
     }
+
+    /**
+     * Overrided comparison method for draft players.
+     * @param o another object to compare.
+     * @return whether this is the same draft player or not.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || (this.getClass() != o.getClass())) {
+            return false;
+        } else {
+            DraftPlayer player = (DraftPlayer) o;
+
+            return this.getID().equals(player.getID())
+                    && this.getWins() == player.getWins()
+                    && this.getLosses() == player.getLosses()
+                    && this.getPings() == player.getPings();
+        }
+    }
+
+    /** Main method for testing the class. */
+    public static void main(String[] args) {
+        DraftPlayer p1 = new DraftPlayer("123456789");
+        DraftPlayer p2 = new DraftPlayer("123456789");
+
+        System.out.println(".equals() " + p1.equals(p2));
+        System.out.println("== " + (p1 == p2));
+    }
+
 }
