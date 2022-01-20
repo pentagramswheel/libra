@@ -781,9 +781,13 @@ The `getPings` method retrieves the amount of times the player has pinged during
 
 The `incrementPings` method increases the player's amount of pings by one.
 
+###### hashDode (OVERRIDED)
+
+The `hashCode` method gives a unique hash code to identify the `DraftPlayer`.
+
 ###### equals (OVERRIDED)
 
-The `equals` method checks whether this instance of a `DraftPlayer` is the same type of object as `o` and has the same attributes as `o`.
+The `equals` method checks whether this `DraftPlayer` is the same `DraftPlayer` as `o`.
 
 ###### main
 

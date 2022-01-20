@@ -101,9 +101,28 @@ public class DraftPlayer {
     }
 
     /**
-     * Overrided comparison method for draft players.
+     * Overrided hashCode() method for draft players.
+     * @return the hashcode.
+     *
+     * @source Josh Bloch's "Effective Java" in Item 8
+     */
+    @Override
+    public int hashCode() {
+        int hash = 31;
+        hash = (31 * hash) + getID().hashCode();
+        hash = (31 * hash) + (isActive() ? 0 : 1);
+        hash = (31 * hash) + getWins();
+        hash = (31 * hash) + getLosses();
+        hash = (31 * hash) + getPings();
+
+        return hash;
+    }
+
+    /**
+     * Overrided equals() method for draft players.
      * @param o another object to compare.
-     * @return whether this is the same draft player or not.
+     * @return True if they are the same draft player.
+     *         False otherwise.
      */
     @Override
     public boolean equals(Object o) {
