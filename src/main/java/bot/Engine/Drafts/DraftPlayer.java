@@ -124,8 +124,9 @@ public class DraftPlayer {
         DraftPlayer p1 = new DraftPlayer("123456789");
         DraftPlayer p2 = new DraftPlayer("123456789");
 
-        System.out.println(".equals() " + p1.equals(p2));
-        System.out.println("== " + (p1 == p2));
+        System.out.println("p1.equals(p2) " + p1.equals(p2));
+        System.out.println("p2.equals(p1) " + p2.equals(p1));
+        System.out.println("p1.equals(p1) " + p1.equals(p1));
+        System.out.println("p1 == p2 " + (p1 == p2));
     }
-
 }
