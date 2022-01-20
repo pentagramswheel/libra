@@ -99,4 +99,53 @@ public class DraftPlayer {
     public void incrementPings() {
         pings++;
     }
+
+    /**
+     * Overrided hashCode() method for draft players.
+     * @return the hashcode.
+     *
+     * @source Josh Bloch's "Effective Java" in Item 8
+     */
+    @Override
+    public int hashCode() {
+        int hash = 31;
+        hash = (31 * hash) + getID().hashCode();
+        hash = (31 * hash) + (isActive() ? 0 : 1);
+        hash = (31 * hash) + getWins();
+        hash = (31 * hash) + getLosses();
+        hash = (31 * hash) + getPings();
+
+        return hash;
+    }
+
+    /**
+     * Overrided equals() method for draft players.
+     * @param o another object to compare.
+     * @return True if they are the same draft player.
+     *         False otherwise.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || (this.getClass() != o.getClass())) {
+            return false;
+        } else {
+            DraftPlayer player = (DraftPlayer) o;
+
+            return this.getID().equals(player.getID())
+                    && this.getWins() == player.getWins()
+                    && this.getLosses() == player.getLosses()
+                    && this.getPings() == player.getPings();
+        }
+    }
+
+    /** Main method for testing the class. */
+    public static void main(String[] args) {
+        DraftPlayer p1 = new DraftPlayer("123456789");
+        DraftPlayer p2 = new DraftPlayer("123456789");
+
+        System.out.println("p1.equals(p2) " + p1.equals(p2));
+        System.out.println("p2.equals(p1) " + p2.equals(p1));
+        System.out.println("p1.equals(p1) " + p1.equals(p1));
+        System.out.println("p1 == p2 " + (p1 == p2));
+    }
 }
