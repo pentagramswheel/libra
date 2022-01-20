@@ -469,11 +469,14 @@ public class Events extends ListenerAdapter {
                 currProcess.resetTeams(bc);
                 System.out.println("Draft teams reset by " + bc.getMember().getId());
                 break;
-            case "add1":
+            case "beginDraft":
+                currProcess.updateProgress(bc);
+                break;
+            case "plusOne":
                 numEndClicked.replace(currDraft,0);
                 currProcess.addPointToTeam(bc, bc.getMember());
                 break;
-            case "subtract1":
+            case "minusOne":
                 numEndClicked.replace(currDraft,0);
                 currProcess.subtractPointFromTeam(bc, bc.getMember());
                 break;
@@ -503,16 +506,7 @@ public class Events extends ListenerAdapter {
 
         DraftProcess currProcess = drafts.get(numDraft).getProcess();
         if (menuName.substring(0, indexOfNum - 2).equals("teamSelection")) {
-            String playerID = sm.getInteraction().getSelectedOptions().get(0).getLabel();
-            Member player = sm.getGuild().retrieveMemberById(playerID).complete();
-
-            System.out.println("player " + playerID + " was added to " + sm.getMember().getId() + "'s Team");
-            currProcess.addPlayerToTeam(sm, sm.getMember(), player);
-
-            // replace with this block later
-//            String playerID = sm.getInteraction().getSelectedOptions().get(0).getValue();
-//            Member player = sm.getGuild().retrieveMemberById(playerID).complete();
-//            currProcess.addPlayerToTeam(sm, sm.getMember(), player);
+            currProcess.addPlayerToTeam(sm);
         }
     }
 }

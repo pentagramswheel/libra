@@ -50,6 +50,8 @@ public class Draft extends Section implements Command {
     /** The draft chat channel this draft is occurring in. */
     private final TextChannel draftChat;
 
+    private String messageURL;
+
     /**
      * Constructs a draft template and initializes the
      * draft start attributes.
@@ -165,6 +167,10 @@ public class Draft extends Section implements Command {
      */
     public TextChannel getDraftChannel() {
         return draftChat;
+    }
+
+    public String getURL() {
+        return messageURL;
     }
 
     /**
@@ -284,6 +290,7 @@ public class Draft extends Section implements Command {
         editMessage(bc, newPing());
         updateReport(bc);
 
+        messageURL = bc.getMessage().getJumpUrl();
         getProcess().start(bc);
     }
 
