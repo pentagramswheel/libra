@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -41,6 +42,9 @@ public class Events extends ListenerAdapter {
     /** Fields for storing drafts. */
     TreeMap<Integer, Draft> lpDrafts;
     TreeMap<Integer, Draft> ioDrafts;
+
+    /**Stores How many times End Button has been clicked**/
+    HashMap<Draft, Integer> numEndClicked = new HashMap<>();
 
     /** Fields for storing queued draft positions. */
     private ArrayHeapMinPQ<Integer> lpQueue;
@@ -207,7 +211,7 @@ public class Events extends ListenerAdapter {
             int draftButton = queue.removeSmallest();
             Draft newDraft =
                     new Draft(sc, draftButton, prefix, author);
-
+            numEndClicked.put(newDraft, 0);
             ongoingDrafts.put(draftButton, newDraft);
             newDraft.runCmd(sc);
         }
@@ -406,6 +410,7 @@ public class Events extends ListenerAdapter {
      * Checks for any button clicks.
      * @param bc a button click to analyze.
      */
+
     @Override
     public void onButtonClick(ButtonClickEvent bc) {
         String btnName = bc.getButton().getId();
@@ -427,24 +432,50 @@ public class Events extends ListenerAdapter {
         }
 
         Draft currDraft = drafts.get(numButton);
+        DraftProcess currProcess = drafts.get(numButton).getProcess();
         switch (btnName.substring(0, indexOfNum - 2)) {
             case "join":
+                numEndClicked.replace(currDraft,0);
                 currDraft.attemptDraft(bc);
                 break;
             case "leave":
+                numEndClicked.replace(currDraft,0);
                 currDraft.removePlayer(bc);
                 break;
             case "requestSub":
+                numEndClicked.replace(currDraft,0);
                 currDraft.requestSub(bc);
                 break;
             case "sub":
+                numEndClicked.replace(currDraft,0);
                 currDraft.addSub(bc);
                 break;
             case "end":
-                if (currDraft.hasEnded(bc)) {
-                    drafts.remove(numButton);
-                    queue.add(numButton, numButton);
-                }
+                //if(differentperson){
+                    int timesClicked = numEndClicked.get(currDraft);
+                    numEndClicked.replace(currDraft, timesClicked+1);
+                    if(numEndClicked.get(currDraft) >= 3){
+                        //insert autolog here
+                        currDraft.sendReply(bc, "Ended the draft.", false);
+                        if (currDraft.hasEnded(bc)) {
+                            drafts.remove(numButton);
+                            queue.add(numButton, numButton);
+                        }
+                    }
+                //}
+                break;
+            case "resetTeams":
+                numEndClicked.replace(currDraft,0);
+                currProcess.resetTeams(bc);
+                System.out.println("Draft teams reset by " + bc.getMember().getId());
+                break;
+            case "add1":
+                numEndClicked.replace(currDraft,0);
+                currProcess.addPointToTeam(bc, bc.getMember());
+                break;
+            case "subtract1":
+                numEndClicked.replace(currDraft,0);
+                currProcess.subtractPointFromTeam(bc, bc.getMember());
                 break;
         }
     }
