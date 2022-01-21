@@ -131,9 +131,6 @@ public class DraftProcess{
         eb.setTitle("Draft Details");
         eb.setColor(draft.getColor());
 
-        StringBuilder queue = new StringBuilder();
-        StringBuilder logList = new StringBuilder();
-
         String score = String.format("%s - %s", scoreTeam1, scoreTeam2);
         eb.addField("Score:", score, false);
 

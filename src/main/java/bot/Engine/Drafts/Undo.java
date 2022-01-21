@@ -97,11 +97,7 @@ public class Undo extends ManualLog implements Command {
 
         for (int i = 0; i < lastInput.length; i++) {
             String currentArg = lastInput[i];
-            if (i == lastInput.length - 3) {
-                input.append(currentArg).append("\n");
-            } else {
-                input.append(currentArg).append(" ");
-            }
+            input.append(currentArg).append(" ");
 
             if (i > 2 && i < userArgs + 3) {
                 String completionSymbol = ":white_check_mark: ";
