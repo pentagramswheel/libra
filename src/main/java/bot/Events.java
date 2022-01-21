@@ -158,8 +158,8 @@ public class Events extends ListenerAdapter {
                 && channel.equals(entryChannel);
         boolean isDraftChannel = subCmd.equals("startdraft")
                 && channel.equals(lpDraftChannel) || channel.equals(ioDraftChannel);
-        boolean isReportsChannel = (subCmd.equals("cycle") || subCmd.equals("sub"))
-                && channel.equals(lpReportsChannel) || channel.equals(ioReportsChannel);
+        boolean isReportsChannel = (subCmd.equals("cycle") || subCmd.equals("sub") || subCmd.equals("undo"))
+                && (channel.equals(lpReportsChannel) || channel.equals(ioReportsChannel));
         boolean isTestChannel = channel.equals(testChannel);
 
         return !(isEntryChannel || isDraftChannel || isReportsChannel
@@ -393,6 +393,7 @@ public class Events extends ListenerAdapter {
         if (isStaffCommand(sc)
                 || wrongChannelUsed(sc)) {
             sc.reply("You do not have permission to use this command here.").queue();
+            return;
         }
 
         switch (cmdPrefix) {
