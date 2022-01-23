@@ -43,8 +43,6 @@ public class Events extends ListenerAdapter {
     TreeMap<Integer, Draft> lpDrafts;
     TreeMap<Integer, Draft> ioDrafts;
 
-    /**Stores How many times End Button has been clicked**/
-    HashMap<Draft, Integer> numEndClicked = new HashMap<>();
 
     /** Fields for storing queued draft positions. */
     private ArrayHeapMinPQ<Integer> lpQueue;
@@ -211,7 +209,6 @@ public class Events extends ListenerAdapter {
             int draftButton = queue.removeSmallest();
             Draft newDraft =
                     new Draft(sc, draftButton, prefix, author);
-            numEndClicked.put(newDraft, 0);
             ongoingDrafts.put(draftButton, newDraft);
             newDraft.runCmd(sc);
         }
@@ -436,27 +433,30 @@ public class Events extends ListenerAdapter {
         DraftProcess currProcess = drafts.get(numButton).getProcess();
         switch (btnName.substring(0, indexOfNum - 2)) {
             case "join":
-                numEndClicked.replace(currDraft,0);
+                currProcess.setNumEndClicked(0);
                 currDraft.attemptDraft(bc);
                 break;
             case "leave":
-                numEndClicked.replace(currDraft,0);
+                currProcess.setNumEndClicked(0);
                 currDraft.removePlayer(bc);
                 break;
             case "requestSub":
-                numEndClicked.replace(currDraft,0);
+                currProcess.setNumEndClicked(0);
                 currDraft.requestSub(bc);
                 break;
             case "sub":
-                numEndClicked.replace(currDraft,0);
+                currProcess.setNumEndClicked(0);
                 currDraft.addSub(bc);
                 break;
             case "end":
                 //if(differentperson){
-                    int timesClicked = numEndClicked.get(currDraft);
-                    numEndClicked.replace(currDraft, timesClicked+1);
-                    if(numEndClicked.get(currDraft) >= 3){
+                    int timesClicked = currProcess.getNumEndClicked();
+                    currProcess.setNumEndClicked(timesClicked + 1);
+                    if(currDraft.getNumDraft() >= 3){
                         //insert autolog here
+
+                        //AutoLog al = new AutoLog(suffix);
+                       // al.matchReport(bc, currDraft);
                         currDraft.sendReply(bc, "Ended the draft.", false);
                         if (currDraft.hasEnded(bc)) {
                             drafts.remove(numButton);
@@ -466,7 +466,7 @@ public class Events extends ListenerAdapter {
                 //}
                 break;
             case "resetTeams":
-                numEndClicked.replace(currDraft,0);
+                currProcess.setNumEndClicked(0);
                 currProcess.resetTeams(bc);
                 System.out.println("Draft teams reset by " + bc.getMember().getId());
                 break;
@@ -474,11 +474,11 @@ public class Events extends ListenerAdapter {
                 currProcess.updateProgress(bc);
                 break;
             case "plusOne":
-                numEndClicked.replace(currDraft,0);
+                currProcess.setNumEndClicked(0);
                 currProcess.addPointToTeam(bc, bc.getMember());
                 break;
             case "minusOne":
-                numEndClicked.replace(currDraft,0);
+                currProcess.setNumEndClicked(0);
                 currProcess.subtractPointFromTeam(bc, bc.getMember());
                 break;
         }

@@ -39,6 +39,8 @@ public class DraftProcess{
     private int scoreTeam1 = 0;
     private int scoreTeam2 = 0;
 
+    /**Stores How many times End Button has been clicked**/
+    private int numEndClicked = 0;
 //    StringBuilder teamSelectionMsg;
 
     public DraftProcess(Draft draftToProcess) {
@@ -65,6 +67,20 @@ public class DraftProcess{
         return team2;
     }
 
+    public int getScoreTeam1(){
+        return scoreTeam1;
+    }
+
+    public int getScoreTeam2(){
+        return scoreTeam2;
+    }
+
+    public int getNumEndClicked(){
+        return numEndClicked;
+    }
+    public void setNumEndClicked(int numClicked){
+        numEndClicked = numClicked;
+    }
     public void start(ButtonClickEvent bc) {
         if (!draft.inProgress()) {
             return;
@@ -146,25 +162,6 @@ public class DraftProcess{
         draft.sendEmbed(interaction, eb);
     }
 
-    /**
-     * Sets the draft scores for a team.
-     * @param team the team to analyze.
-     */
-    public void setScoresFor(List<DraftPlayer> team) {
-        int wins, losses;
-        if (team == team1) {
-            wins = scoreTeam1;
-            losses = scoreTeam2;
-        } else {
-            wins = scoreTeam2;
-            losses = scoreTeam1;
-        }
-
-        for (DraftPlayer player : team) {
-            player.setWins(wins);
-            player.setLosses(losses);
-        }
-    }
 
     /**
      * Adds a point from a team.
@@ -177,6 +174,12 @@ public class DraftProcess{
         boolean found = false;
         for(int i = 0; i < getTeam1().size(); i++){
             if(author.getId().equals(getTeam1().get(i).getID())){
+                for(DraftPlayer player : getTeam1()){
+                    player.incrementWins();
+                }
+                for(DraftPlayer player : getTeam2()){
+                    player.incrementLosses();
+                }
                 scoreTeam1++;
                 found = true;
                 break;
@@ -185,6 +188,12 @@ public class DraftProcess{
        if(!found){
            for(int i = 0; i < getTeam2().size(); i++){
                if(author.getId().equals(getTeam2().get(i).getID())){
+                   for(DraftPlayer player : getTeam1()){
+                       player.incrementLosses();
+                   }
+                   for(DraftPlayer player : getTeam2()){
+                       player.incrementWins();
+                   }
                    scoreTeam2++;
                    found = true;
                    break;
@@ -206,6 +215,12 @@ public class DraftProcess{
         boolean found = false;
         for(int i = 0; i < getTeam1().size(); i++){
             if(author.getId().equals(getTeam1().get(i).getID())){
+                for(DraftPlayer player : getTeam1()){
+                    player.decrementWins();
+                }
+                for(DraftPlayer player : getTeam2()){
+                    player.decrementLosses();
+                }
                 scoreTeam1--;
                 found = true;
                 break;
@@ -215,6 +230,12 @@ public class DraftProcess{
             for(int i = 0; i < getTeam2().size(); i++){
                 if(author.getId().equals(getTeam2().get(i).getID())){
                     scoreTeam2--;
+                    for(DraftPlayer player : getTeam1()){
+                        player.decrementLosses();
+                    }
+                    for(DraftPlayer player : getTeam2()){
+                        player.decrementWins();
+                    }
                     found = true;
                     break;
                 }
@@ -250,8 +271,8 @@ public class DraftProcess{
         sm.deferEdit().queue();
 
         SelectOption chosenPlayer = sm.getInteraction().getSelectedOptions().get(0);
-        Member player = draft.findMember(sm, chosenPlayer.getLabel());
-        Member captain = sm.getMember();
+        Member captain = draft.findMember(sm, chosenPlayer.getLabel());
+        Member player = sm.getMember();
 
         // replace with this block later
 //            String chosenPlayerID = sm.getInteraction().getSelectedOptions().get(0).getValue();
@@ -275,25 +296,33 @@ public class DraftProcess{
 
 
         }else{
+            /*
             draft.sendReply(sm, "You are not the captain, so you can not pick.", true);
             System.out.println(captain.getId() + " is not the captain. Rejected their pick.");
-
+*/
+            //this else statement will never run.
             return;
         }
 
-        ArrayList<String> nonCaptainPlayers = new ArrayList<>();
-        for(int i = 0; i < draft.getPlayers().size(); i++){
-            if(i == draft.getCaptIndex1() || i == draft.getCaptIndex2() || i == indexOfPickedPlayer) {
-                if(i == indexOfPickedPlayer){
-                    regularPlayers.remove(indexOfPickedPlayer);
+        try{
+            ArrayList<String> nonCaptainPlayers = new ArrayList<>();
+            for(int i = 0; i < draft.getPlayers().size(); i++){
+                if(i == draft.getCaptIndex1() || i == draft.getCaptIndex2() || i == indexOfPickedPlayer) {
+                    if(i == indexOfPickedPlayer){
+                        regularPlayers.remove(indexOfPickedPlayer);
+                    }
+                    continue;
                 }
-                continue;
-            }
-            nonCaptainPlayers.add(
-                    draft.findMember(
-                            sm, draft.getPlayers().get(i).getID()).getAsMention());
+                nonCaptainPlayers.add(
+                        draft.findMember(
+                                sm, draft.getPlayers().get(i).getID()).getAsMention());
 
+            }
+        }catch (IndexOutOfBoundsException e){
+            draft.sendResponse(sm, "You can not add yourself twice to the team.", true);
+            return;
         }
+
 
 //        if(captain.getId().equals(draft.getPlayers().get(draft.getCaptIndex1()).getID())){
 //            Member otherCaptain = draft.findMember(
@@ -337,6 +366,8 @@ public class DraftProcess{
             List<String> values = new ArrayList<>();
 
             int i = 0;
+            //for captains adding players
+            /*
             for (DraftPlayer player : players) {
                 Member currPlayer = draft.findMember(bc, player.getID());
 
@@ -347,6 +378,25 @@ public class DraftProcess{
                 labels.add(currPlayer.getId());
                 values.add(String.format("%s", i++));
             }
+            */
+            //for players adding captains
+
+                Member currPlayer = draft.findMember(bc,  draft.getPlayers().get(draft.getCaptIndex1()).getID());
+
+                // use these choices later (menu doesn't allow duplicates)
+//                labels.add(currPlayer.getEffectiveName());
+//                values.add(currPlayer.getId());
+
+                labels.add(currPlayer.getId());
+                values.add(String.format("%s", i++));
+
+                currPlayer = draft.findMember(bc,  draft.getPlayers().get(draft.getCaptIndex2()).getID());
+
+                labels.add(currPlayer.getId());
+                values.add(String.format("%s", i++));
+
+
+
 
             return new SelectionMenuBuilder("teamSelection" + suffix,
                     labels, values, null).getMenu();
