@@ -69,11 +69,10 @@ public class DraftPlayer {
     }
 
     /**
-     * Sets the player's draft wins.
-     * @param wins the player's amount of wins.
+     * Increases the player's amount of wins by one.
      */
-    public void setWins(int wins) {
-        matchWins = wins;
+    public void incrementWins() {
+        matchWins++;
     }
 
     /**
@@ -85,11 +84,10 @@ public class DraftPlayer {
     }
 
     /**
-     * Sets the player's draft losses.
-     * @param losses the player's amount of losses.
+     * Increases the player's amount of losses by one.
      */
-    public void setLosses(int losses) {
-        matchLosses = losses;
+    public void incrementLosses() {
+        matchLosses++;
     }
 
     /**
