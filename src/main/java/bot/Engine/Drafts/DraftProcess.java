@@ -199,6 +199,8 @@ public class DraftProcess{
      */
     public void addPlayerToTeam(SelectionMenuEvent sm) {
         SelectOption chosenPlayer = sm.getInteraction().getSelectedOptions().get(0);
+        // use these choices later
+//        Member captain = draft.findMember(sm, chosenPlayer.getValue());
         Member captain = draft.findMember(sm, chosenPlayer.getLabel());
         DraftPlayer potentialPlayer = new DraftPlayer(sm.getMember().getId());
 
@@ -383,37 +385,22 @@ public class DraftProcess{
             List<String> values = new ArrayList<>();
 
             int i = 0;
-            //for captains adding players
-            /*
-            for (DraftPlayer player : players) {
-                Member currPlayer = draft.findMember(bc, player.getID());
 
-                // use these choices later (menu doesn't allow duplicates)
+            Member currPlayer = draft.findMember(bc,  draft.getPlayers().get(draft.getCaptIndex1()).getID());
+            // use these choices later (menu doesn't allow duplicates)
 //                labels.add(currPlayer.getEffectiveName());
 //                values.add(currPlayer.getId());
 
-                labels.add(currPlayer.getId());
-                values.add(String.format("%s", i++));
-            }
-            */
-            //for players adding captains
+            labels.add(currPlayer.getId());
+            values.add(String.format("%s", i++));
 
-                Member currPlayer = draft.findMember(bc,  draft.getPlayers().get(draft.getCaptIndex1()).getID());
-
-                // use these choices later (menu doesn't allow duplicates)
+            currPlayer = draft.findMember(bc,  draft.getPlayers().get(draft.getCaptIndex2()).getID());
+            // use these choices later (menu doesn't allow duplicates)
 //                labels.add(currPlayer.getEffectiveName());
 //                values.add(currPlayer.getId());
 
-                labels.add(currPlayer.getId());
-                values.add(String.format("%s", i++));
-
-                currPlayer = draft.findMember(bc,  draft.getPlayers().get(draft.getCaptIndex2()).getID());
-
-                labels.add(currPlayer.getId());
-                values.add(String.format("%s", i++));
-
-
-
+            labels.add(currPlayer.getId());
+            values.add(String.format("%s", i++));
 
             return new SelectionMenuBuilder("teamSelection" + suffix,
                     labels, values, null).getMenu();
