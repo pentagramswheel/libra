@@ -251,6 +251,7 @@ A class which forms and starts drafts.
 8. `int subsNeeded` - the amount of subs needed for the draft at any given time.
 9. `Role draftRole` - the section of MIT which this draft is occurring in.
 10. `TextChannel draftChat` - the draft chat which this draft is linked to.
+11. `String messageURL` - the Discord URL of this draft request.
 
 ----
 
@@ -688,6 +689,10 @@ The `getDraftRole` method retrieves the role ping of the draft's section.
 ###### getDraftChannel
 
 The `getDraftChannel` method retrieves the draft chat channel that the draft is linked with.
+
+###### getURL
+
+The `getURL` method retrieves the URL of the draft's request interface.
 
 ###### updateReport
 

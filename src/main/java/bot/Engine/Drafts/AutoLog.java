@@ -51,7 +51,7 @@ public class AutoLog extends Section {
      * @param offset an index to offset the type arrays, based on the
      *               current team.
      */
-    public void updateLists(Draft draft, ButtonClickEvent bc,
+    private void updateLists(Draft draft, ButtonClickEvent bc,
                            List<DraftPlayer> team, StringBuilder playerList,
                            List<DraftPlayer> subs, StringBuilder subList,
                            int[] playerTypes, int[] errorsFound, int offset) {
@@ -98,7 +98,7 @@ public class AutoLog extends Section {
      * @param errorsFound array of errors found for each player, if any
      *                    (0 if no errors occurred, 1 otherwise).
      */
-    public void sendReport(ManualLog log, Draft draft, ButtonClickEvent bc,
+    private void sendReport(ManualLog log, Draft draft, ButtonClickEvent bc,
                            List<DraftPlayer> team1, List<DraftPlayer> team2,
                            List<DraftPlayer> subs, int[] playerTypes,
                            int[] errorsFound) {
@@ -162,7 +162,7 @@ public class AutoLog extends Section {
      * @param spreadsheet the values of the spreadsheet section.
      * @param data a map of all rows of the spreadsheet.
      */
-    public void updateSpreadsheet(ManualLog log, Draft draft, ButtonClickEvent bc,
+    private void updateSpreadsheet(ManualLog log, Draft draft, ButtonClickEvent bc,
                                   List<DraftPlayer> team, List<DraftPlayer> subs,
                                   int[] playerTypes, int[] errorsFound, int offset,
                                   GoogleAPI link, String tab, Values spreadsheet,
@@ -198,8 +198,6 @@ public class AutoLog extends Section {
      * @param draft the draft to report.
      */
     public void matchReport(ButtonClickEvent bc, Draft draft) {
-        bc.deferReply().queue();
-
         try {
             GoogleAPI link = new GoogleAPI(cyclesSheetID());
 

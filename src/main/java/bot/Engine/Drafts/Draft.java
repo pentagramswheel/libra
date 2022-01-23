@@ -50,6 +50,7 @@ public class Draft extends Section implements Command {
     /** The draft chat channel this draft is occurring in. */
     private final TextChannel draftChat;
 
+    /** The discord URL for this draft interface. */
     private String messageURL;
 
     /**
@@ -169,6 +170,10 @@ public class Draft extends Section implements Command {
         return draftChat;
     }
 
+    /**
+     * Retrieves the URL of the request interface of the draft.
+     * @return said URL.
+     */
     public String getURL() {
         return messageURL;
     }
@@ -291,7 +296,7 @@ public class Draft extends Section implements Command {
         updateReport(bc);
 
         messageURL = bc.getMessage().getJumpUrl();
-        getProcess().start(bc);
+        getProcess().initialize(bc);
     }
 
     /**

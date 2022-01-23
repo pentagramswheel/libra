@@ -17,16 +17,19 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
 /**
- * @author  Wil Aquino
+ * @author  Wil Aquino, Turtle#1504
  * Date:    February 17, 2021
  * Project: Libra
  * Module:  Events.java
@@ -42,7 +45,6 @@ public class Events extends ListenerAdapter {
     /** Fields for storing drafts. */
     TreeMap<Integer, Draft> lpDrafts;
     TreeMap<Integer, Draft> ioDrafts;
-
 
     /** Fields for storing queued draft positions. */
     private ArrayHeapMinPQ<Integer> lpQueue;
@@ -209,6 +211,7 @@ public class Events extends ListenerAdapter {
             int draftButton = queue.removeSmallest();
             Draft newDraft =
                     new Draft(sc, draftButton, prefix, author);
+
             ongoingDrafts.put(draftButton, newDraft);
             newDraft.runCmd(sc);
         }
@@ -408,7 +411,6 @@ public class Events extends ListenerAdapter {
      * Checks for any button clicks.
      * @param bc a button click to analyze.
      */
-
     @Override
     public void onButtonClick(ButtonClickEvent bc) {
         String btnName = bc.getButton().getId();
@@ -430,56 +432,47 @@ public class Events extends ListenerAdapter {
         }
 
         Draft currDraft = drafts.get(numButton);
-        DraftProcess currProcess = drafts.get(numButton).getProcess();
+        DraftProcess currProcess = currDraft.getProcess();
         switch (btnName.substring(0, indexOfNum - 2)) {
             case "join":
-                currProcess.setNumEndClicked(0);
                 currDraft.attemptDraft(bc);
                 break;
             case "leave":
-                currProcess.setNumEndClicked(0);
                 currDraft.removePlayer(bc);
                 break;
             case "requestSub":
-                currProcess.setNumEndClicked(0);
                 currDraft.requestSub(bc);
                 break;
             case "sub":
-                currProcess.setNumEndClicked(0);
                 currDraft.addSub(bc);
                 break;
             case "end":
-                //if(differentperson){
-                    int timesClicked = currProcess.getNumEndClicked();
-                    currProcess.setNumEndClicked(timesClicked + 1);
-                    if(currDraft.getNumDraft() >= 3){
-                        //insert autolog here
-
-                        //AutoLog al = new AutoLog(suffix);
-                       // al.matchReport(bc, currDraft);
-                        currDraft.sendReply(bc, "Ended the draft.", false);
-                        if (currDraft.hasEnded(bc)) {
-                            drafts.remove(numButton);
-                            queue.add(numButton, numButton);
-                        }
-                    }
-                //}
+                if (currDraft.hasEnded(bc)) {
+                    drafts.remove(numButton);
+                    queue.add(numButton, numButton);
+                }
                 break;
             case "resetTeams":
-                currProcess.setNumEndClicked(0);
                 currProcess.resetTeams(bc);
-                System.out.println("Draft teams reset by " + bc.getMember().getId());
                 break;
             case "beginDraft":
-                currProcess.updateProgress(bc);
+                currProcess.start(bc);
+                break;
+            case "relink":
+                bc.deferEdit().queue();
+                bc.getMessageChannel().sendMessage("Here's your link!")
+                        .setActionRows(ActionRow.of(Button.link(
+                                bc.getMessage().getJumpUrl(),
+                                "Interface"))).queue();
                 break;
             case "plusOne":
-                currProcess.setNumEndClicked(0);
                 currProcess.addPointToTeam(bc, bc.getMember());
                 break;
             case "minusOne":
-                currProcess.setNumEndClicked(0);
                 currProcess.subtractPointFromTeam(bc, bc.getMember());
+                break;
+            case "endDraft":
+                currProcess.attemptEnd(bc);
                 break;
         }
     }
