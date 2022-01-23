@@ -765,6 +765,10 @@ The `getWins` method retrieves the player's match wins during the draft.
 
 The `incrementWins` method gives a match win to the player.
 
+###### decrementWins
+
+The `decrementWins` method takes away a match win from the player.
+
 ###### getLosses
 
 The `getLosses` method retrieves the player's match losses during the draft.
@@ -772,6 +776,10 @@ The `getLosses` method retrieves the player's match losses during the draft.
 ###### incrementLosses
 
 The `incrementLosses` method gives a match loss to the player.
+
+###### decrementLosses
+
+The `decrementLosses` method takes away a match loss from the player.
 
 ###### getPings
 

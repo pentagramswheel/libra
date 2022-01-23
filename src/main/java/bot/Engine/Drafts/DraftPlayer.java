@@ -75,6 +75,11 @@ public class DraftPlayer {
         matchWins++;
     }
 
+    /** Decreases the player's amount of wins by one. */
+    public void decrementWins() {
+        matchWins--;
+    }
+
     /**
      * Retrieves the player's draft losses.
      * @return said losses.
@@ -88,6 +93,11 @@ public class DraftPlayer {
      */
     public void incrementLosses() {
         matchLosses++;
+    }
+
+    /** Decreases the player's amount of wins by one. */
+    public void decrementLosses() {
+        matchLosses--;
     }
 
     /**
