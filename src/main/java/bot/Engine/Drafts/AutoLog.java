@@ -129,13 +129,16 @@ public class AutoLog extends Section {
                 .setColor(getColor())
                 .addField("Score:", wins + " - " + losses, false)
                 .addField("Team 1:", teamList1.toString(), false)
-                .addField("Team 2:", teamList2.toString(), true)
-                .addField("Subs:", subList.toString(), false);
+                .addField("Team 2:", teamList2.toString(), true);
+        if (subs.size() > 0) {
+            eb.addField("Subs:", subList.toString(), false);
+        }
+
         if (log.sum(errorsFound, errorsFound.length - 1) == 0) {
-            eb.addField("Status:", "COMPLETE", true);
+            eb.addField("Status:", "COMPLETE", false);
         } else {
             eb.setColor(Color.RED);
-            eb.addField("Status:", "INCOMPLETE", true);
+            eb.addField("Status:", "INCOMPLETE", false);
         }
 
 //        TextChannel channel = draft.getChannel(bc, getPrefix() + "-match-report");

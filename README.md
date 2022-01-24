@@ -702,13 +702,17 @@ The `updateReport` method edits/sends a draft queue summary of a started draft, 
 
 The `newPing` method formats a new ping for gathering players.
 
-###### attemptDraft
-
-The `attemptDraft` method tries to start a draft after a "Join Draft" button `bc` was clicked.
-
 ###### draftContains
 
 The `draftContains` method checks whether a player `player` is within a draft's list of players `lst` or not (it returns the index of their spot in the draft queue or -1 if it cannot be found), using the original button clicked `bc`.
+
+###### updateRequest
+
+The `updateRequest` method updates the draft request after a button `bc` was clicked.
+
+###### attemptDraft
+
+The `attemptDraft` method tries to start a draft after a "Join Draft" button `bc` was clicked.
 
 ###### convertToSub
 

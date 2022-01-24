@@ -32,25 +32,25 @@ public class Draft extends Section implements Command {
     private final int numDraft;
 
     /** The formal process for executing the draft. */
-    private final DraftProcess draftProcess;
+    private DraftProcess draftProcess;
 
     /** The players of the draft. */
     private final List<DraftPlayer> players;
     private final List<DraftPlayer> subs;
 
-    /** The indexes of the captains for this draft. */
+    /** The indexes of the captains of the draft. */
     private int captain1, captain2;
 
-    /** The number of subs needed for this draft. */
+    /** The number of subs needed for the draft. */
     private int subsNeeded;
 
-    /** The pinged role for this draft. */
+    /** The pinged role of the draft. */
     private final Role draftRole;
 
-    /** The draft chat channel this draft is occurring in. */
+    /** The draft chat channel the draft is occurring in. */
     private final TextChannel draftChat;
 
-    /** The discord URL for this draft interface. */
+    /** The discord URL for the draft's initial interface. */
     private String messageURL;
 
     /**
@@ -67,7 +67,6 @@ public class Draft extends Section implements Command {
         started = false;
         subsNeeded = 0;
         numDraft = draft;
-        draftProcess = new DraftProcess(this);
 
 //        Random r = new Random();
 //        captain1 = r.nextInt(8);
@@ -203,16 +202,27 @@ public class Draft extends Section implements Command {
             }
             queue.append("\n");
         }
-        eb.addField("Players", queue.toString(), false);
+        eb.addField("Players:", queue.toString(), false);
 
-        if (size == 8) {
+        size = getSubs().size();
+        queue = new StringBuilder();
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                Member currPlayer = findMember(bc, getSubs().get(i).getID());
+                queue.append(currPlayer.getAsMention()).append("\n");
+                logList.append(currPlayer.getAsMention()).append(" ");
+            }
+            eb.addField("Subs:", queue.toString(), false);
+        }
+
+        if (getPlayers().size() + getSubs().size() >= 8) {
             String notice =
                     "Go to " + getDraftChannel().getAsMention() + " to begin\n"
                             + "the draft. Use the interface above to\n"
                             + "request subs as needed, as well as\n"
                             + "end the draft to allow others to\n"
                             + "queue more drafts.";
-            eb.addField("Notice", notice, false);
+            eb.addField("Notice:", notice, false);
 
             logList.deleteCharAt(logList.length() - 1);
             log("A " + getPrefix().toUpperCase() + " draft was started with "
@@ -258,6 +268,15 @@ public class Draft extends Section implements Command {
     }
 
     /**
+     * Updates the draft request.
+     * @param bc a button click to analyze.
+     */
+    private void updateRequest(ButtonClickEvent bc) {
+        editMessage(bc, newPing());
+        updateReport(bc);
+    }
+
+    /**
      * Attempts to start a draft.
      * @param bc a button click to analyze.
      */
@@ -265,8 +284,6 @@ public class Draft extends Section implements Command {
         bc.deferEdit().queue();
 
         Member potentialPlayer = bc.getMember();
-        // this block prevents repeated players in the initial draft start
-        // comment/uncomment as needed
 //        if (draftContains(potentialPlayer, getPlayers()) != -1) {
 //            sendResponse(bc, "You are already in this draft!", true);
 //            return;
@@ -277,6 +294,7 @@ public class Draft extends Section implements Command {
 
         if (getPlayers().size() == 8) {
             toggleDraft();
+            draftProcess = new DraftProcess(this);
 
             List<Button> buttons = new ArrayList<>();
             String idSuffix = getPrefix().toUpperCase() + getNumDraft();
@@ -290,13 +308,12 @@ public class Draft extends Section implements Command {
 
             sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
                     buttons);
+            updateRequest(bc);
+            getProcess().initialize(bc);
+        } else {
+            updateRequest(bc);
+            messageURL = bc.getMessage().getJumpUrl();
         }
-
-        editMessage(bc, newPing());
-        updateReport(bc);
-
-        messageURL = bc.getMessage().getJumpUrl();
-        getProcess().initialize(bc);
     }
 
     /**
@@ -328,27 +345,28 @@ public class Draft extends Section implements Command {
 
         if (convertedSub == null) {
             sendReply(bc, "You are not part of this draft!", true);
-            return;
         } else if (convertedSub.getPings() > 0) {
             sendReply(bc, "Stop spamming " + bc.getMember().getAsMention()+ "!",
                     true);
-            return;
+        } else {
+            bc.deferEdit().queue();
+
+            getPlayers().remove(convertedSub);
+            getSubs().remove(convertedSub);
+
+            convertedSub.setInactive();
+            getSubs().add(convertedSub);
+
+            subsNeeded++;
+            convertedSub.incrementPings();
+
+            editMessage(bc,
+                    newPing() + "   // " + subsNeeded + " sub(s) needed");
+            updateReport(bc);
+
+            String update = getDraftRole().getAsMention() + " sub requested.";
+            sendResponse(bc, update, false);
         }
-        bc.deferEdit().queue();
-
-        getPlayers().remove(convertedSub);
-        getSubs().remove(convertedSub);
-
-        convertedSub.setInactive();
-        getSubs().add(convertedSub);
-
-        subsNeeded++;
-        convertedSub.incrementPings();
-
-        editMessage(bc, newPing() + "   // " + subsNeeded + " sub(s) needed");
-
-        String update = getDraftRole().getAsMention() + " sub requested.";
-        sendResponse(bc, update, false);
     }
 
     /**
@@ -363,28 +381,29 @@ public class Draft extends Section implements Command {
 
         /*if (inDraft) {
             sendReply(bc, "Why would you sub for yourself?", true);
-            return;
         } else */if (subsNeeded == 0) {
             sendReply(bc, "This draft hasn't requested any subs yet.", true);
-            return;
-        }
-        bc.deferEdit().queue();
-
-        DraftPlayer subPlayer = new DraftPlayer(player.getId());
-        getSubs().add(subPlayer);
-
-        subsNeeded--;
-
-        if (subsNeeded == 0) {
-            editMessage(bc, newPing());
         } else {
-            editMessage(bc, newPing() + "   // " + subsNeeded + " sub(s) needed");
-        }
+            bc.deferEdit().queue();
 
-        String update =
-                player.getAsMention() + " will be subbing for "
-                        + "this draft in " + getDraftChannel().getAsMention() + ".";
-        sendResponse(bc, update, false);
+            DraftPlayer subPlayer = new DraftPlayer(player.getId());
+            getSubs().add(subPlayer);
+
+            subsNeeded--;
+
+            if (subsNeeded == 0) {
+                editMessage(bc, newPing());
+            } else {
+                editMessage(bc,
+                        newPing() + "   // " + subsNeeded + " sub(s) needed");
+            }
+            updateReport(bc);
+
+            String update =
+                    player.getAsMention() + " will be subbing for this draft "
+                            + "in " + getDraftChannel().getAsMention() + ".";
+            sendResponse(bc, update, false);
+        }
     }
 
     /**
@@ -397,14 +416,14 @@ public class Draft extends Section implements Command {
 
         if (playerIndex == -1) {
             sendReply(bc, "You're not in this draft!", true);
-            return;
+        } else {
+            bc.deferEdit().queue();
+
+            getPlayers().remove(playerIndex);
+
+            editMessage(bc, newPing());
+            updateReport(bc);
         }
-        bc.deferEdit().queue();
-
-        getPlayers().remove(playerIndex);
-
-        editMessage(bc, newPing());
-        updateReport(bc);
     }
 
     /**
@@ -412,16 +431,16 @@ public class Draft extends Section implements Command {
      * @param bc a button click to analyze.
      */
     public boolean hasEnded(ButtonClickEvent bc) {
-        if (!inProgress()) {
+        if (inProgress()) {
+            sendReply(bc, "This draft hasn't finished yet.", true);
+            return false;
+        } else {
             bc.deferEdit().queue();
             sendButton(bc, "This draft has ended.",
                     Buttons.end(getPrefix() + getNumDraft())
-                    .withStyle(ButtonStyle.SECONDARY).asDisabled());
+                            .withStyle(ButtonStyle.SECONDARY).asDisabled());
 
             return true;
-        } else {
-            sendReply(bc, "This draft hasn't finished yet.", true);
-            return false;
         }
     }
 

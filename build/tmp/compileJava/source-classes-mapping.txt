@@ -1,11 +1,11 @@
-bot/Main.java
- bot.Main
-bot/Tools/ButtonBuilder.java
- bot.Tools.ButtonBuilder
-bot/Engine/Drafts/MapGenerator.java
- bot.Engine.Drafts.MapGenerator
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
 bot/Engine/Add.java
  bot.Engine.Add
+bot/Engine/Drafts/MapGenerator.java
+ bot.Engine.Drafts.MapGenerator
+bot/Main.java
+ bot.Main
 bot/Config.java
  bot.Config
 bot/Engine/Section.java
@@ -28,8 +28,8 @@ bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Tools/Command.java
  bot.Tools.Command
-bot/Engine/Graduate.java
- bot.Engine.Graduate
+bot/Tools/ButtonBuilder.java
+ bot.Tools.ButtonBuilder
 bot/Tools/ArrayHeapMinPQ.java
  bot.Tools.ArrayHeapMinPQ
  bot.Tools.ArrayHeapMinPQ$Node

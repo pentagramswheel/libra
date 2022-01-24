@@ -27,27 +27,45 @@ import java.util.ArrayList;
  */
 public class DraftProcess{
 
+    /** The draft which is to be processed. */
     private final Draft draft;
 
+    /** The captains of the draft. */
+    private final DraftPlayer captain1;
+    private final DraftPlayer captain2;
+
+    /** The non-captain players of the draft. */
     private final List<DraftPlayer> regularPlayers;
 
+    /** The teams of the draft. */
     private final List<DraftPlayer> team1;
-
     private final List<DraftPlayer> team2;
 
+    /** The scoreboard of the draft. */
     private int scoreTeam1;
     private int scoreTeam2;
 
+    /** The players who have clicked the 'End Draft` button consecutively. */
     private List<String> endButtonClicked;
 
+    /** The number of players required to formally end the draft. */
+//    private final static int NUM_PLAYERS_TO_END_DRAFT = 3;
     private final static int NUM_PLAYERS_TO_END_DRAFT = 1;
 
+    /**
+     * Resets who has clicked the 'End Draft' button.
+     */
     private void resetEndDraftButton() {
         endButtonClicked = new ArrayList<>();
     }
 
     public DraftProcess(Draft draftToProcess) {
         draft = draftToProcess;
+
+        captain1 = new DraftPlayer(
+                draft.getPlayers().get(draft.getCaptIndex1()).getID());
+        captain2 = new DraftPlayer(
+                draft.getPlayers().get(draft.getCaptIndex2()).getID());
 
         regularPlayers = new ArrayList<>();
         team1 = new ArrayList<>();
@@ -74,36 +92,34 @@ public class DraftProcess{
     }
 
     public void initialize(ButtonClickEvent bc) {
-        if (!draft.inProgress()) {
-            return;
-        }
-
         StringBuilder ping = new StringBuilder();
         List<String> captains = new ArrayList<>(2);
 
         ping.append(draft.getEmote()).append(" ");
-        for (int i = 0; i < draft.getPlayers().size(); i++) {
-            DraftPlayer currPlayer = draft.getPlayers().get(i);
+        for (DraftPlayer currPlayer : draft.getPlayers()) {
             String currPing = draft.findMember(bc, currPlayer.getID()).getAsMention();
             ping.append(currPing).append(" ");
 
-            if (i == draft.getCaptIndex1()) {
+            if (currPlayer.equals(captain1)) {
                 getTeam1().add(currPlayer);
                 captains.add(currPing);
-            } else if (i == draft.getCaptIndex2()) {
+            } else if (currPlayer.equals(captain2)) {
                 getTeam2().add(currPlayer);
                 captains.add(currPing);
             } else {
                 regularPlayers.add(currPlayer);
             }
         }
-        ping.append(
-                "\n\nWelcome to the draft. Jump in a VC and have the captains "
-                        + "alternate choosing teammates. Join Team 1 ("
-                        + captains.get(0) + ") or Team 2 (" + captains.get(1)
-                        + ") based on their selection. Approve of a maplist using the "
-                        + "`/mit genmaps`, and begin the draft when everyone is ready. "
-                        + "The captains will reset the team selection as needed.");
+        ping.append("\n\n")
+                .append("Welcome to the draft. Jump in a VC and have the ")
+                .append("captains alternate choosing teammates. Join Team 1 (")
+                .append(captains.get(0))
+                .append(") or Team 2 (")
+                .append(captains.get(1))
+                .append(") based on their selection. Approve of a maplist ")
+                .append("using `/mit genmaps`, and begin the draft when ")
+                .append("everyone is ready. The captains will reset the team ")
+                .append("selection as needed.");
 
 //        TextChannel channel = draft.getDraftChannel();
         TextChannel channel = draft.getChannel(bc, "vc-text");
@@ -112,7 +128,7 @@ public class DraftProcess{
         List<Button> buttons = new ArrayList<>();
 
         menus.add(DraftComponents.teamSelectionMenu(
-                idSuffix, bc, draft, regularPlayers));
+                idSuffix, bc, draft, captain1, captain2));
         buttons.add(DraftComponents.resetTeams(idSuffix));
         buttons.add(DraftComponents.beginDraft(idSuffix));
         buttons.add(DraftComponents.relink(idSuffix));
@@ -140,6 +156,11 @@ public class DraftProcess{
         return teamBuilder.toString();
     }
 
+    /**
+     * Sends the details of the overall team selection with
+     * the players of the draft.
+     * @param interaction the user interaction calling this method.
+     */
     private void updateReport(GenericInteractionCreateEvent interaction) {
         EmbedBuilder eb = new EmbedBuilder();
 
@@ -153,6 +174,8 @@ public class DraftProcess{
             eb.addField("Status:", "IN PROGRESS", false);
         } else {
             eb.addField("Status:", "FINISHED", false);
+            eb.addField("Notice:", "Please end the the original draft request\n"
+                    + "to allow others to queue more drafts.", false);
         }
 
         eb.addField("Team 1:", buildTeamString(interaction, getTeam1()), false);
@@ -161,16 +184,20 @@ public class DraftProcess{
         draft.sendEmbed(interaction, eb);
     }
 
-    public void updateProgress(ButtonClickEvent bc) {
+    /**
+     * Updates the overall progress of the draft process.
+     * @param bc a button click to analyze.
+     */
+    private void updateProgress(ButtonClickEvent bc) {
         String idSuffix = draft.getPrefix().toUpperCase() + draft.getNumDraft();
         List<SelectionMenu> menus = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
 
         menus.add(DraftComponents.teamSelectionMenu(
-                idSuffix, bc, draft, regularPlayers));
+                idSuffix, bc, draft, captain1, captain2));
         buttons.add(DraftComponents.plusOne(idSuffix));
         buttons.add(DraftComponents.minusOne(idSuffix));
-        buttons.add(DraftComponents.draftSubLink(idSuffix, draft));
+        buttons.add(DraftComponents.draftSubLink(draft));
         buttons.add(DraftComponents.relink(idSuffix));
         buttons.add(DraftComponents.endDraft(idSuffix));
 
@@ -178,15 +205,24 @@ public class DraftProcess{
                 ActionRow.of(menus), ActionRow.of(buttons)).queue();
     }
 
+    /**
+     * Checks whether a player is a captain or not.
+     * @param player the player to check.
+     * @return True if they are a captain.
+     *         False otherwise.
+     */
     private boolean notCaptain(DraftPlayer player) {
-        return !draft.getPlayers().get(draft.getCaptIndex1()).equals(player)
-                || !draft.getPlayers().get(draft.getCaptIndex2()).equals(player);
+        return !player.equals(captain1)
+                || !player.equals(captain2);
     }
 
+    /**
+     * Adds a player to a team, given a captain.
+     * @param player the player to add.
+     * @param captain the captain of the team to add to.
+     */
     private void addPlayer(DraftPlayer player, Member captain) {
-        String captID1 = draft.getPlayers().get(draft.getCaptIndex1()).getID();
-
-        if (captain.getId().equals(captID1)) {
+        if (captain.getId().equals(captain1.getID())) {
             getTeam1().add(player);
         } else {
             getTeam2().add(player);
@@ -194,23 +230,22 @@ public class DraftProcess{
     }
 
     /**
-     * adds a player to a team.
+     * Adds a player to a team.
      * @param sm the menu selection to analyze.
      */
     public void addPlayerToTeam(SelectionMenuEvent sm) {
         SelectOption chosenPlayer = sm.getInteraction().getSelectedOptions().get(0);
-        // use these choices later
 //        Member captain = draft.findMember(sm, chosenPlayer.getValue());
         Member captain = draft.findMember(sm, chosenPlayer.getLabel());
         DraftPlayer potentialPlayer = new DraftPlayer(sm.getMember().getId());
 
-        if (!draft.getPlayers().contains(potentialPlayer)
-            || !draft.getSubs().contains((potentialPlayer))) {
-            String reply =
-                    "You are either already in this draft or not in it at all.";
-            draft.sendReply(sm, reply, true);
-            return;
-        }
+//        if (!draft.getPlayers().contains(potentialPlayer)
+//            || !draft.getSubs().contains((potentialPlayer))) {
+//            String reply =
+//                    "You are either already in this draft or not in it at all.";
+//            draft.sendReply(sm, reply, true);
+//            return;
+//        }
         sm.deferEdit().queue();
 
         int foundCoreIndex = regularPlayers.indexOf(potentialPlayer);
@@ -237,8 +272,8 @@ public class DraftProcess{
             getTeam1().clear();
             getTeam2().clear();
 
-            getTeam1().add(draft.getPlayers().get(draft.getCaptIndex1()));
-            getTeam2().add(draft.getPlayers().get(draft.getCaptIndex2()));
+            getTeam1().add(captain1);
+            getTeam2().add(captain2);
 
             updateReport(bc);
         }
@@ -257,7 +292,13 @@ public class DraftProcess{
         }
     }
 
-    private void givePoints(List<DraftPlayer> team, List<DraftPlayer> otherTeam) {
+    /**
+     * Gives points to teams.
+     * @param team the winning team.
+     * @param otherTeam the losing team.
+     */
+    private void givePoints(List<DraftPlayer> team,
+                            List<DraftPlayer> otherTeam) {
         for (DraftPlayer player : team) {
             player.incrementWins();
         }
@@ -272,12 +313,21 @@ public class DraftProcess{
         }
     }
 
+    /**
+     * Takes away points from teams.
+     * @param team the "winning" team.
+     * @param otherTeam the "losing" team.
+     */
     private void revertPoints(List<DraftPlayer> team, List<DraftPlayer> otherTeam) {
         for (DraftPlayer player : team) {
-            player.decrementWins();
+            if (player.isActive()) {
+                player.decrementWins();
+            }
         }
         for (DraftPlayer player : otherTeam) {
-            player.decrementLosses();
+            if (player.isActive()) {
+                player.decrementLosses();
+            }
         }
 
         if (team == getTeam1()) {
@@ -287,6 +337,15 @@ public class DraftProcess{
         }
     }
 
+    /**
+     * Determines points to give or take away from teams.
+     * @param team the team to base the decision on.
+     * @param author the player who clicked the initial button.
+     * @param increment True for giving points to the team above.
+     *                  False for taking away points from the team above.
+     * @return True if the author was found in the team.
+     *         False otherwise.
+     */
     private boolean determinePoints(List<DraftPlayer> team, Member author,
                                  boolean increment) {
         List<DraftPlayer> otherTeam = getTeam2();
@@ -311,7 +370,7 @@ public class DraftProcess{
     /**
      * Adds a point to a team.
      * @param bc the button click to analyze.
-     * @param author the member who clicked the button.
+     * @param author the player who clicked the button.
      */
     public void addPointToTeam(ButtonClickEvent bc, Member author){
         bc.deferEdit().queue();
@@ -346,14 +405,21 @@ public class DraftProcess{
 
         if (numClicksLeft <= 0) {
             bc.deferEdit().queue();
+            draft.toggleDraft();
 
-            draft.sendButton(bc, "This draft has ended.",
-                    DraftComponents.endDraft(draft.getPrefix() + draft.getNumDraft())
-                            .withStyle(ButtonStyle.SECONDARY).asDisabled());
+            updateReport(bc);
+
+            String idSuffix = draft.getPrefix() + draft.getNumDraft();
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(DraftComponents.draftSubLink(draft)
+                    .withLabel("Original Request"));
+            buttons.add(DraftComponents.endDraft(idSuffix)
+                    .withStyle(ButtonStyle.SECONDARY).asDisabled());
+
+            draft.sendButtons(bc, "This draft has ended.", buttons);
 
             AutoLog log = new AutoLog(draft.getPrefix());
             log.matchReport(bc, draft);
-            draft.toggleDraft();
         } else if (endButtonClicked.contains(bc.getMember().getId())) {
             String reply = "You need " + numClicksLeft
                     + " *other* player(s) to end the draft.";
@@ -366,7 +432,6 @@ public class DraftProcess{
         }
     }
 
-
     /**
      * Components for running the draft.
      */
@@ -375,28 +440,29 @@ public class DraftProcess{
         /**
          * Builds the team selection menu.
          * @param suffix the ID's suffix.
-         * @param players the players to include within the menu.
+         * @param bc a button click to analyze.
+         * @param draft the draft pertaining to this menu.
+         * @param captain1 the first captain of the draft.
+         * @param captain2 the second captain of the draft.
          * @return said menu.
          */
         private static SelectionMenu teamSelectionMenu(
-                String suffix, ButtonClickEvent bc,
-                Draft draft, List<DraftPlayer> players) {
+                String suffix, ButtonClickEvent bc, Draft draft,
+                DraftPlayer captain1, DraftPlayer captain2) {
             List<String> labels = new ArrayList<>();
             List<String> values = new ArrayList<>();
 
             int i = 0;
 
-            Member currPlayer = draft.findMember(bc,  draft.getPlayers().get(draft.getCaptIndex1()).getID());
-            // use these choices later (menu doesn't allow duplicates)
-//                labels.add(currPlayer.getEffectiveName());
+            Member currPlayer = draft.findMember(bc, captain1.getID());
+//                labels.add(currPlayer.getEffectiveName() + "'s Team");
 //                values.add(currPlayer.getId());
 
             labels.add(currPlayer.getId());
             values.add(String.format("%s", i++));
 
-            currPlayer = draft.findMember(bc,  draft.getPlayers().get(draft.getCaptIndex2()).getID());
-            // use these choices later (menu doesn't allow duplicates)
-//                labels.add(currPlayer.getEffectiveName());
+            currPlayer = draft.findMember(bc, captain2.getID());
+//                labels.add(currPlayer.getEffectiveName() + "'s Team");
 //                values.add(currPlayer.getId());
 
             labels.add(currPlayer.getId());
@@ -456,7 +522,12 @@ public class DraftProcess{
                     "-1", null, 0).getButton();
         }
 
-        private static Button draftSubLink(String suffix, Draft draft) {
+        /**
+         * Builds the "Request Sub" button.
+         * @param draft the draft pertaining to this button.
+         * @return said button.
+         */
+        private static Button draftSubLink(Draft draft) {
             return new ButtonBuilder("requestSubLink",
                     "Request Sub", draft.getURL(), 4).getButton();
         }
