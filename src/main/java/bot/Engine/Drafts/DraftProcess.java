@@ -53,12 +53,16 @@ public class DraftProcess{
     private final static int NUM_PLAYERS_TO_END_DRAFT = 1;
 
     /**
-     * Resets who has clicked the 'End Draft' button.
+     * Resets who have clicked the 'End Draft' button.
      */
     private void resetEndDraftButton() {
         endButtonClicked = new ArrayList<>();
     }
 
+    /**
+     * Assigns the corresponding instance variables from the Draft class.
+     * @param draftToProcess the draft to process.
+     */
     public DraftProcess(Draft draftToProcess) {
         draft = draftToProcess;
 
@@ -91,6 +95,10 @@ public class DraftProcess{
         return team2;
     }
 
+    /**
+     * Initializes the team picking process and sends a message to players.
+     * @param bc
+     */
     public void initialize(ButtonClickEvent bc) {
         StringBuilder ping = new StringBuilder();
         List<String> captains = new ArrayList<>(2);
@@ -137,6 +145,12 @@ public class DraftProcess{
                 ActionRow.of(menus), ActionRow.of(buttons)).queue();
     }
 
+    /**
+     * Gets the team members and formats it into mentionable text.
+     * @param interaction the interaction to analyze.
+     * @param team the draft team to use.
+     * @return the team's mentions of the players
+     */
     public String buildTeamString(GenericInteractionCreateEvent interaction,
                                   List<DraftPlayer> team) {
         StringBuilder teamBuilder = new StringBuilder();
@@ -259,6 +273,10 @@ public class DraftProcess{
         updateReport(sm);
     }
 
+    /**
+     * Resets the teams list.
+     * @param bc the button click to analyze.
+     */
     public void resetTeams(ButtonClickEvent bc) {
         DraftPlayer author = new DraftPlayer(bc.getMember().getId());
         if (notCaptain(author)) {
@@ -279,6 +297,10 @@ public class DraftProcess{
         }
     }
 
+    /**
+     * Determines if the draft meets the requirements to be started.
+     * @param bc the button click to analyze.
+     */
     public void start(ButtonClickEvent bc) {
         DraftPlayer author = new DraftPlayer(bc.getMember().getId());
         if (notCaptain(author)) {
@@ -399,6 +421,10 @@ public class DraftProcess{
         updateReport(bc);
     }
 
+    /**
+     * Determines if the draft meets the requirements to be ended.
+     * @param bc the button click to analyze.
+     */
     public void attemptEnd(ButtonClickEvent bc) {
         endButtonClicked.add(bc.getMember().getId());
         int numClicksLeft = NUM_PLAYERS_TO_END_DRAFT - endButtonClicked.size();

@@ -29,6 +29,7 @@
     - [AutoLog](#autolog)
     - [Draft](#draft)
     - [DraftPlayer](#draftplayer)
+    - [DraftProcess](#draftprocess)
     - [Log](#log)
     - [MapGenerator](#mapgenerator)
     - [Undo](#undo)
@@ -252,7 +253,6 @@ A class which forms and starts drafts.
 9. `Role draftRole` - the section of MIT which this draft is occurring in.
 10. `TextChannel draftChat` - the draft chat which this draft is linked to.
 11. `String messageURL` - the Discord URL of this draft request.
-
 ----
 
 #### DraftPlayer
@@ -265,6 +265,24 @@ A class which represents a player within a draft.
 3. `int matchWins` - the player's match wins during the draft.
 4. `int matchLosses` - the player's match losses during the draft.
 5. `int pings` - the player's amount of pings during the draft.
+
+----
+
+#### DraftProcess
+
+A class which manages and processes drafts.
+
+###### Instance Variables
+1. `Draft draft` - The draft which is to be processed.
+2. `DraftPlayer captain1` - The first captain of the draft.
+3. `DraftPlayer captain2` - The second captain of the draft.
+4. `List<DraftPlayer> regularPlayers` - The non-captain players of the draft.
+5. `List<DraftPlayer> team1` - The first team of the draft.
+6. `List<DraftPlayer> team2` - The second team of the draft.
+7. `int scoreTeam1` - The `team1`'s scoreboard of the draft.
+8. `int scoreTeam2` - The `team2`'s scoreboard of the draft.
+9. `List<String> endButtonClicked` - The players who have clicked the "End Draft" button consecutively.
+10. `int NUM_PLAYERS_TO_END_DRAFT` - The number of players required to formally end the draft.
 
 ----
 
@@ -809,6 +827,86 @@ The `equals` method checks whether this `DraftPlayer` is the same `DraftPlayer` 
 ###### main
 
 This `main` method is used for testing `DraftPlayer` as a whole class.
+
+----
+
+#### DraftProcess
+
+###### resetEndDraftButton
+
+The `resetEndDraftButton` resets the people who have clicked the "End Draft" button.
+
+###### DraftProcess  
+
+The `DraftProcess` method assigns the corresponding instance variables from the Draft class.
+
+###### getTeam1
+
+The `getTeam1` method retrieves team 1 of the draft.
+
+###### getTeam2
+
+The `getTeam2` method retrieves team 2 of the draft.
+
+###### initialize
+
+The `initialize` method initializes the team picking process and sends a message to players and notifies them.
+
+###### buildTeamString
+
+The `buildTeamString` method uses the team members list and formats it into mentionable text.
+
+###### updateReport
+
+The `updateReport` method sends the overall team selection with the players of the draft.
+
+###### updateProgress
+
+The `updateProgress` method updates the overall progress of the draft process.
+
+###### notCaptain
+
+The `notCaptain` method checks whether a player is a captain or not.
+
+###### addPlayer
+
+The `addPlayer` method adds a player to a team depending on the captain the player chose.
+
+###### addPlayerToTeam
+
+The `addPlayerToTeam` method adds a player to a team and updates the team selection message.
+
+###### resetTeams
+
+The `resetTeams` method resets both team's list.
+
+###### start
+
+The `start` method determines if the draft meets the requirements to be started and sends a reply.
+
+###### givePoints
+
+The `givePoints` method increment wins to the winning team and losses to the other team. It also updates the `scoreTeam1` or `scoreTeam2` variables.
+
+###### revertPoints
+
+The `revertPoints` method takes away points from teams. It is the opposite of `givePoints`.
+
+###### determinePoints
+
+The `determinePoints` method determines points to give or take away from teams.
+
+###### addPointToTeam
+
+The `addPointToTeam` method adds a point to a team by running `determinePoints`.
+
+###### subtractPointFromTeam
+
+The `subtractPointFromTeam` method subtracts a point from a team by running `determinePoints`.
+
+###### attemptEnd
+
+The `attemptEnd` method determines if the draft meets the requirements to be ended and sends a reply.
 
 ----
 
