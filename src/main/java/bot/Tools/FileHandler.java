@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author  Wil Aquino
  * Date:    December 28, 2021
@@ -41,8 +44,8 @@ public class FileHandler {
             fw.write(contents);
             fw.close();
         } catch (IOException ioe) {
-            System.out.println(
-                    "An error occurred with writing to " + file.getName());
+            Logger logger = LoggerFactory.getLogger(this.getClass());
+            logger.error("Could not write to " + file.getName());
         }
     }
 }

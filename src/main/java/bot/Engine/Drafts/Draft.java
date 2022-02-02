@@ -1,20 +1,20 @@
 package bot.Engine.Drafts;
 
 import bot.Engine.Section;
-import bot.Tools.ButtonBuilder;
 import bot.Tools.Command;
 
+import bot.Tools.Components;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
  * @author  Wil Aquino, Turtle#1504
@@ -25,33 +25,36 @@ import java.util.ArrayList;
  */
 public class Draft extends Section implements Command {
 
-    /** Flag for checking whether the draft has started or not. */
-    private boolean started;
+    /** Flag for checking whether this draft has initialized or not. */
+    private boolean initialized;
 
-    /** The formal number of the draft. */
+    /** The starting time of this draft's initial request. */
+    private final long startTime;
+
+    /** The formal number of this draft. */
     private final int numDraft;
 
-    /** The formal process for executing the draft. */
+    /** The formal process for executing this draft. */
     private DraftProcess draftProcess;
 
-    /** The players of the draft. */
-    private final List<DraftPlayer> players;
-    private final List<DraftPlayer> subs;
+    /** The players of this draft. */
+    private final TreeMap<String, DraftPlayer> players;
+    private final TreeMap<String, DraftPlayer> subs;
 
-    /** The indexes of the captains of the draft. */
+    /** The indexes of the captains of this draft. */
     private int captain1, captain2;
 
-    /** The number of subs needed for the draft. */
+    /** The number of subs needed for this draft. */
     private int subsNeeded;
 
-    /** The pinged role of the draft. */
+    /** The pinged role of this draft. */
     private final Role draftRole;
 
-    /** The draft chat channel the draft is occurring in. */
+    /** The draft chat channel this draft is occurring in. */
     private final TextChannel draftChat;
 
-    /** The discord URL for the draft's initial interface. */
-    private String messageURL;
+    /** The discord message ID for this draft's initial interface. */
+    private String messageID;
 
     /**
      * Constructs a draft template and initializes the
@@ -64,7 +67,10 @@ public class Draft extends Section implements Command {
     public Draft(SlashCommandEvent sc, int draft,
                  String abbreviation, Member initialPlayer) {
         super(abbreviation);
-        started = false;
+
+        initialized = false;
+        startTime = System.currentTimeMillis();
+
         subsNeeded = 0;
         numDraft = draft;
 
@@ -75,31 +81,60 @@ public class Draft extends Section implements Command {
 //            captain2 = r.nextInt(8);
 //        }
         captain1 = 0;
-        captain2 = 1;
+        captain2 = 5;
 
-        players = new ArrayList<>();
-        subs = new ArrayList<>();
-        DraftPlayer newPlayer = new DraftPlayer(initialPlayer.getId());
-        players.add(newPlayer);
+        players = new TreeMap<>();
+        subs = new TreeMap<>();
+        players.put(initialPlayer.getId(), new DraftPlayer());
 
         draftRole = getRole(sc, getSection());
         draftChat = getChannel(sc, getPrefix() + "-draft-chat-" + draft);
     }
 
     /**
-     * Activates or deactivates the draft.
+     * Checks whether the draft request has been satisfied or not.
+     * @return True if eight players have joined the draft.
+     *         False otherwise.
      */
-    public void toggleDraft() {
-        started = !started;
+    public boolean isInitialized() {
+        return initialized;
     }
 
     /**
-     * Checks whether the draft has formally started yet.
-     * @return True if the draft is in progress.
+     * Activates or deactivates the draft.
+     */
+    public void toggleDraft() {
+        initialized = !initialized;
+    }
+
+    /**
+     * Checks whether the draft request has timed out or not.
+     * @param interaction the user interaction calling this method.
+     * @return True if the request expired.
      *         False otherwise.
      */
-    public boolean inProgress() {
-        return started;
+    public boolean timedOut(GenericInteractionCreateEvent interaction) {
+        // time limit of 30 minutes
+        long timeLimit = 1800000;
+        long currentTime = System.currentTimeMillis();
+
+        if (!isInitialized() && currentTime - startTime > timeLimit) {
+            ArrayList<Button> buttons = new ArrayList<>();
+            String idSuffix = getPrefix().toUpperCase() + getNumDraft();
+            buttons.add(Components.ForDraft.joinDraft(idSuffix)
+                    .withStyle(ButtonStyle.SECONDARY).asDisabled());
+            buttons.add(Components.ForDraft.leave(idSuffix)
+                    .withStyle(ButtonStyle.SECONDARY).asDisabled());
+
+            getMessage(interaction)
+                    .editMessage("This draft request has expired.")
+                    .setActionRow(buttons).queue();
+
+            log("A draft request has timed out.", false);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -122,7 +157,7 @@ public class Draft extends Section implements Command {
      * Retrieves the players of the draft.
      * @return said players.
      */
-    public List<DraftPlayer> getPlayers() {
+    public TreeMap<String, DraftPlayer> getPlayers() {
         return players;
     }
 
@@ -130,7 +165,7 @@ public class Draft extends Section implements Command {
      * Retrieves the subs of the draft.
      * @return said subs.
      */
-    public List<DraftPlayer> getSubs() {
+    public TreeMap<String, DraftPlayer> getSubs() {
         return subs;
     }
 
@@ -170,11 +205,14 @@ public class Draft extends Section implements Command {
     }
 
     /**
-     * Retrieves the URL of the request interface of the draft.
-     * @return said URL.
+     * Retrieves the request interface of the draft.
+     * @return said message.
      */
-    public String getURL() {
-        return messageURL;
+    public Message getMessage(GenericInteractionCreateEvent interaction) {
+        MessageChannel channel =
+//                getChannel(interaction, getPrefix() + "-looking-for-draft
+                getChannel(interaction, "bot-testing");
+        return channel.retrieveMessageById(messageID).complete();
     }
 
     /**
@@ -191,24 +229,26 @@ public class Draft extends Section implements Command {
         StringBuilder queue = new StringBuilder();
         StringBuilder logList = new StringBuilder();
 
-        int size = getPlayers().size();
-        for (int i = 0; i < size; i++) {
-            Member currPlayer = findMember(bc, getPlayers().get(i).getID());
+        int count = 0;
+        for (String id : getPlayers().keySet()) {
+            Member currPlayer = findMember(bc, id);
             queue.append(currPlayer.getAsMention());
-            logList.append(currPlayer.getAsMention()).append(" ");
+            logList.append(currPlayer.getEffectiveName()).append(", ");
 
-            if (size == 8 && (i == getCaptIndex1() || i == getCaptIndex2())) {
+            if (getPlayers().size() == 8
+                    && (count == getCaptIndex1() || count == getCaptIndex2())) {
                 queue.append(" (captain)");
             }
             queue.append("\n");
+
+            count++;
         }
         eb.addField("Players:", queue.toString(), false);
 
-        size = getSubs().size();
         queue = new StringBuilder();
-        if (size > 0) {
-            for (int i = 0; i < size; i++) {
-                Member currPlayer = findMember(bc, getSubs().get(i).getID());
+        if (getSubs().size() > 0) {
+            for (String id : getSubs().keySet()) {
+                Member currPlayer = findMember(bc, id);
                 queue.append(currPlayer.getAsMention()).append("\n");
                 logList.append(currPlayer.getAsMention()).append(" ");
             }
@@ -225,8 +265,10 @@ public class Draft extends Section implements Command {
             eb.addField("Notice:", notice, false);
 
             logList.deleteCharAt(logList.length() - 1);
-            log("A " + getPrefix().toUpperCase() + " draft was started with "
-                    + logList + ".", false);
+            if (!isInitialized()) {
+                log("A " + getPrefix().toUpperCase() + " draft was started with "
+                        + logList + ".", false);
+            }
         }
 
         sendEmbed(bc, eb);
@@ -238,33 +280,13 @@ public class Draft extends Section implements Command {
      */
     private String newPing() {
         int pingsLeft;
-        if (inProgress()) {
+        if (isInitialized()) {
             pingsLeft = 0;
         } else {
             pingsLeft = 8 - getPlayers().size();
         }
 
         return getDraftRole().getAsMention() + " +" + pingsLeft;
-    }
-
-    /**
-     * Checks whether a player is within a draft player list or not.
-     * @param bc a button click to analyze.
-     * @param player the player to check for.
-     * @param lst a draft's list of players.
-     * @return the index of the player within the draft's list of players.
-     *         -1 if they are not in the draft yet.
-     */
-    private int draftContains(ButtonClickEvent bc, Member player,
-                              List<DraftPlayer> lst) {
-        for (int i = 0; i < lst.size(); i++) {
-            Member currPlayer = findMember(bc, lst.get(i).getID());
-            if (currPlayer.equals(player)) {
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     /**
@@ -283,57 +305,77 @@ public class Draft extends Section implements Command {
     public void attemptDraft(ButtonClickEvent bc) {
         bc.deferEdit().queue();
 
-        Member potentialPlayer = bc.getMember();
-//        if (draftContains(potentialPlayer, getPlayers()) != -1) {
+        String playerID = bc.getMember().getId();
+//        if (getPlayers().containsKey(playerID)) {
 //            sendResponse(bc, "You are already in this draft!", true);
 //            return;
 //        }
+        getPlayers().put(playerID, new DraftPlayer());
 
-        DraftPlayer newPlayer = new DraftPlayer(potentialPlayer.getId());
-        getPlayers().add(newPlayer);
+        // for testing
+        getPlayers().put("191016647543357440", new DraftPlayer());
+        getPlayers().put("350386286256848896", new DraftPlayer());
+        getPlayers().put("140942181023219713", new DraftPlayer());
+        getPlayers().put("524592272411459584", new DraftPlayer());
+        getPlayers().put("97288493029416960", new DraftPlayer());
+        getPlayers().put("407939462325207044", new DraftPlayer());
+        getPlayers().put("388507632480157696", new DraftPlayer());
+        messageID = bc.getMessage().getId();
 
         if (getPlayers().size() == 8) {
-            toggleDraft();
             draftProcess = new DraftProcess(this);
 
             List<Button> buttons = new ArrayList<>();
             String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-            String serverID = bc.getGuild().getId();
-            String channelID = getDraftChannel().getId();
 
-            buttons.add(Buttons.link(serverID, channelID));
-            buttons.add(Buttons.requestSub(idSuffix));
-            buttons.add(Buttons.joinAsSub(idSuffix));
-            buttons.add(Buttons.end(idSuffix));
+            getProcess().initialize(bc);
+
+            buttons.add(Components.ForDraft.draftLink(bc, idSuffix, getProcess()));
+            buttons.add(Components.ForDraft.requestSub(idSuffix));
+            buttons.add(Components.ForDraft.joinAsSub(idSuffix));
+            buttons.add(Components.ForDraft.refresh(idSuffix));
+            buttons.add(Components.ForDraft.endDraft(idSuffix));
 
             sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
                     buttons);
             updateRequest(bc);
-            getProcess().initialize(bc);
+
+            toggleDraft();
         } else {
             updateRequest(bc);
-            messageURL = bc.getMessage().getJumpUrl();
+            messageID = bc.getMessage().getId();
         }
     }
 
     /**
-     * Retrieves a player from the draft to sub, if they exist.
+     * Refreshes the draft request's caption.
      * @param bc a button click to analyze.
-     * @param player the player to convert.
-     * @return the found player within the draft.
-     *         null otherwise.
      */
-    private DraftPlayer convertToSub(ButtonClickEvent bc, Member player) {
-        int playerIndex = draftContains(bc, player, getPlayers());
-        int subIndex = draftContains(bc, player, getSubs());
+    public void refresh(ButtonClickEvent bc) {
+        bc.deferEdit().queue();
 
-        if (playerIndex != -1) {
-            return getPlayers().get(playerIndex);
-        } else if (subIndex != -1) {
-            return getSubs().get(subIndex);
+        if (subsNeeded == 0) {
+            editMessage(bc, newPing());
         } else {
-            return null;
+            editMessage(bc,
+                    newPing() + "   // " + subsNeeded + " sub(s) needed");
         }
+        updateReport(bc);
+    }
+
+    /**
+     * Removes a player from the draft.
+     * @param id the Discord ID of the player.
+     * @return the removed player.
+     */
+    private DraftPlayer removePlayer(String id) {
+        if (getPlayers().containsKey(id)) {
+            return getPlayers().remove(id);
+        } else if (getSubs().containsKey(id)) {
+            return getSubs().remove(id);
+        }
+
+        return null;
     }
 
     /**
@@ -341,31 +383,54 @@ public class Draft extends Section implements Command {
      * @param bc a button click to analyze.
      */
     public void requestSub(ButtonClickEvent bc) {
-        DraftPlayer convertedSub = convertToSub(bc, bc.getMember());
+        String playerID = bc.getMember().getId();
+        DraftPlayer convertedSub = removePlayer(playerID);
 
         if (convertedSub == null) {
             sendReply(bc, "You are not part of this draft!", true);
         } else if (convertedSub.getPings() > 0) {
-            sendReply(bc, "Stop spamming " + bc.getMember().getAsMention()+ "!",
+            sendReply(bc, "You have already been subbed out of the draft!",
                     true);
         } else {
-            bc.deferEdit().queue();
-
-            getPlayers().remove(convertedSub);
-            getSubs().remove(convertedSub);
-
-            convertedSub.setInactive();
-            getSubs().add(convertedSub);
+            getSubs().put(playerID, convertedSub);
 
             subsNeeded++;
+            convertedSub.setInactive();
             convertedSub.incrementPings();
 
-            editMessage(bc,
-                    newPing() + "   // " + subsNeeded + " sub(s) needed");
-            updateReport(bc);
+            refresh(bc);
 
             String update = getDraftRole().getAsMention() + " sub requested.";
             sendResponse(bc, update, false);
+        }
+    }
+
+    /**
+     * Forcibly subs a person out of the draft.
+     * @param sc a slash command to analyze.
+     * @param playerID the Discord ID of the player to sub.
+     */
+    public void forceSub(SlashCommandEvent sc, String playerID) {
+        String authorID = sc.getMember().getId();
+        if (!getPlayers().containsKey(authorID)
+            || !getSubs().containsKey(authorID)) {
+            sendReply(sc, "You are not part of this draft!", true);
+        }
+
+        DraftPlayer convertedSub = removePlayer(playerID);
+
+        if (convertedSub == null) {
+            sendReply(sc, "That player is not part of this draft.", true);
+        } else {
+            getSubs().put(playerID, convertedSub);
+
+            subsNeeded++;
+            convertedSub.setInactive();
+            convertedSub.incrementPings();
+
+            String update = getDraftRole().getAsMention() + " sub requested "
+                    + "(see above drafts after refreshing).";
+            sendReply(sc, update, false);
         }
     }
 
@@ -374,34 +439,23 @@ public class Draft extends Section implements Command {
      * @param bc a button click to analyze.
      */
     public void addSub(ButtonClickEvent bc) {
-        Member player = bc.getMember();
-        boolean inDraft =
-                !(draftContains(bc, player, getPlayers()) == -1
-                && draftContains(bc, player, getSubs()) == -1);
+        String playerID = bc.getMember().getId();
+        boolean inDraft = getPlayers().containsKey(playerID)
+                || getSubs().containsKey(playerID);
 
         /*if (inDraft) {
-            sendReply(bc, "Why would you sub for yourself?", true);
+            sendReply(bc, "You already left the draft!", true);
         } else */if (subsNeeded == 0) {
             sendReply(bc, "This draft hasn't requested any subs yet.", true);
         } else {
-            bc.deferEdit().queue();
-
-            DraftPlayer subPlayer = new DraftPlayer(player.getId());
-            getSubs().add(subPlayer);
-
             subsNeeded--;
+            getSubs().put(playerID, new DraftPlayer());
 
-            if (subsNeeded == 0) {
-                editMessage(bc, newPing());
-            } else {
-                editMessage(bc,
-                        newPing() + "   // " + subsNeeded + " sub(s) needed");
-            }
-            updateReport(bc);
+            refresh(bc);
 
-            String update =
-                    player.getAsMention() + " will be subbing for this draft "
-                            + "in " + getDraftChannel().getAsMention() + ".";
+            String update = bc.getMember().getAsMention()
+                    + " will be subbing for this draft in "
+                    + getDraftChannel().getAsMention() + ".";
             sendResponse(bc, update, false);
         }
     }
@@ -410,16 +464,15 @@ public class Draft extends Section implements Command {
      * Removes a player from the draft, if possible, via a button.
      * @param bc a button click to analyze.
      */
-    public void removePlayer(ButtonClickEvent bc) {
-        Member player = bc.getMember();
-        int playerIndex = draftContains(bc, player, getPlayers());
+    public void removeFromQueue(ButtonClickEvent bc) {
+        String playerID = bc.getMember().getId();
 
-        if (playerIndex == -1) {
+        if (!getPlayers().containsKey(playerID)) {
             sendReply(bc, "You're not in this draft!", true);
         } else {
             bc.deferEdit().queue();
 
-            getPlayers().remove(playerIndex);
+            getPlayers().remove(playerID);
 
             editMessage(bc, newPing());
             updateReport(bc);
@@ -431,13 +484,13 @@ public class Draft extends Section implements Command {
      * @param bc a button click to analyze.
      */
     public boolean hasEnded(ButtonClickEvent bc) {
-        if (inProgress()) {
+        if (isInitialized()) {
             sendReply(bc, "This draft hasn't finished yet.", true);
             return false;
         } else {
             bc.deferEdit().queue();
             sendButton(bc, "This draft has ended.",
-                    Buttons.end(getPrefix() + getNumDraft())
+                    Components.ForDraft.endDraft(getPrefix() + getNumDraft())
                             .withStyle(ButtonStyle.SECONDARY).asDisabled());
 
             return true;
@@ -454,83 +507,15 @@ public class Draft extends Section implements Command {
 
         ArrayList<Button> buttons = new ArrayList<>();
         String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-        buttons.add(Buttons.joinDraft(idSuffix));
-        buttons.add(Buttons.leave(idSuffix));
+        buttons.add(Components.ForDraft.joinDraft(idSuffix));
+        buttons.add(Components.ForDraft.leave(idSuffix));
 
         String caption = getDraftRole().getAsMention() + " +7";
-        sendButtons(sc, caption, buttons);
+
+        sc.getHook().editOriginal(caption)
+                .setActionRow(buttons).queue(
+                        (message) -> messageID = message.getId());
         log("A " + getPrefix().toUpperCase()
                 + " draft has been requested.", false);
-    }
-
-    /**
-     * Buttons for formatting the draft.
-     */
-    private static class Buttons {
-
-        /**
-         * Builds the "Join Draft" button.
-         * @param suffix the ID's suffix.
-         * @return said button.
-         */
-        private static Button joinDraft(String suffix) {
-            return new ButtonBuilder("join" + suffix,
-                    "Join Draft", null, 0).getButton();
-        }
-
-        /**
-         * Builds the "Leave" button.
-         * @param suffix the ID's suffix.
-         * @return the button.
-         */
-        private static Button leave(String suffix) {
-            return new ButtonBuilder("leave" + suffix,
-                    "Leave", null, 3).getButton();
-        }
-
-        /**
-         * Builds the "Draft Channel" link button.
-         * @param serverID the ID of the server with the channel in it.
-         * @param channelID the ID of the channel to link to.
-         * @return said button.
-         */
-        private static Button link(String serverID, String channelID) {
-            String url =
-                    String.format("https://discord.com/channels/%s/%s",
-                            serverID, channelID);
-
-            return new ButtonBuilder(null, "Draft Channel",
-                    url, 4).getButton();
-        }
-
-        /**
-         * Builds the "Request Sub" button.
-         * @param suffix the ID's suffix.
-         * @return said button.
-         */
-        private static Button requestSub(String suffix) {
-            return new ButtonBuilder("requestSub" + suffix,
-                    "Request Sub", null, 1).getButton();
-        }
-
-        /**
-         * Builds the "Join As Sub" button.
-         * @param suffix the ID's suffix.
-         * @return said button.
-         */
-        private static Button joinAsSub(String suffix) {
-            return new ButtonBuilder("sub" + suffix,
-                    "Join as Sub", null, 0).getButton();
-        }
-
-        /**
-         * Builds the "End Draft" button.
-         * @param suffix the ID's suffix.
-         * @return the button.
-         */
-        private static Button end(String suffix) {
-            return new ButtonBuilder("end" + suffix,
-                    "End Draft", null, 3).getButton();
-        }
     }
 }

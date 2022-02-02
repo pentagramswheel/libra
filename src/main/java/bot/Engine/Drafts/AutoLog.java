@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
 import java.awt.Color;
-import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -40,7 +40,7 @@ public class AutoLog extends Section {
      * report summary
      * @param draft the draft to report.
      * @param bc a button click to analyze.
-     * @param team the current team to build the list of.
+     * @param team the current team from the draft.
      * @param playerList a store for building the string of the team's players.
      * @param subs the list of subs from the draft.
      * @param subList a store for building the string of the draft's subs.
@@ -52,12 +52,15 @@ public class AutoLog extends Section {
      *               current team.
      */
     private void updateLists(Draft draft, ButtonClickEvent bc,
-                           List<DraftPlayer> team, StringBuilder playerList,
-                           List<DraftPlayer> subs, StringBuilder subList,
-                           int[] playerTypes, int[] errorsFound, int offset) {
-        for (int i = 0; i < team.size(); i++) {
-            DraftPlayer currPlayer = team.get(i);
-            Member player = draft.findMember(bc, currPlayer.getID());
+                             TreeMap<String, DraftPlayer> team,
+                             TreeMap<String, DraftPlayer> subs,
+                             StringBuilder playerList, StringBuilder subList,
+                             int[] playerTypes, int[] errorsFound, int offset) {
+        int i = 0;
+        for (Map.Entry<String, DraftPlayer> player : team.entrySet()) {
+            String currID = player.getKey();
+            DraftPlayer currPlayer = player.getValue();
+            Member user = draft.findMember(bc, currID);
             String completionSymbol = ":white_check_mark: ";
             if (errorsFound[offset + i] == 1) {
                 completionSymbol = ":no_entry: ";
@@ -65,7 +68,7 @@ public class AutoLog extends Section {
 
             StringBuilder list = playerList;
             String subScore = "";
-            if (subs.contains(currPlayer)) {
+            if (subs.containsKey(currID)) {
                 list = subList;
                 subScore = String.format(" [%s-%s]",
                         currPlayer.getWins(), currPlayer.getLosses());
@@ -73,15 +76,17 @@ public class AutoLog extends Section {
 
             if (playerTypes[offset + i] == 0) {
                 list.append(completionSymbol)
-                        .append(player.getAsMention())
+                        .append(user.getAsMention())
                         .append(subScore)
                         .append("\n");
             } else {
                 list.append(completionSymbol)
-                        .append(player.getAsMention())
+                        .append(user.getAsMention())
                         .append(subScore)
                         .append(" (new)\n");
             }
+
+            i++;
         }
     }
 
@@ -99,26 +104,26 @@ public class AutoLog extends Section {
      *                    (0 if no errors occurred, 1 otherwise).
      */
     private void sendReport(ManualLog log, Draft draft, ButtonClickEvent bc,
-                           List<DraftPlayer> team1, List<DraftPlayer> team2,
-                           List<DraftPlayer> subs, int[] playerTypes,
-                           int[] errorsFound) {
+                            TreeMap<String, DraftPlayer> team1,
+                            TreeMap<String, DraftPlayer> team2,
+                            TreeMap<String, DraftPlayer> subs,
+                            int[] playerTypes, int[] errorsFound) {
         EmbedBuilder eb = new EmbedBuilder();
         StringBuilder teamList1 = new StringBuilder();
         StringBuilder teamList2 = new StringBuilder();
         StringBuilder subList = new StringBuilder();
 
-        updateLists(draft, bc, team1, teamList1, subs, subList,
+        updateLists(draft, bc, team1, subs, teamList1, subList,
                 playerTypes, errorsFound, 0);
-        updateLists(draft, bc, team2, teamList2, subs, subList,
+        updateLists(draft, bc, team2, subs, teamList2, subList,
                 playerTypes, errorsFound, team1.size());
 
-        int wins = team1.get(0).getWins();
-        int losses = team1.get(0).getLosses();
+        int wins = draft.getProcess().getScoreTeam1();
+        int losses = draft.getProcess().getScoreTeam2();
 
         if (wins < losses) {
-            int tempScore = wins;
-            wins = losses;
-            losses = tempScore;
+            wins = draft.getProcess().getScoreTeam2();
+            losses = draft.getProcess().getScoreTeam1();
 
             StringBuilder tempList = teamList1;
             teamList1 = teamList2;
@@ -165,19 +170,24 @@ public class AutoLog extends Section {
      * @param spreadsheet the values of the spreadsheet section.
      * @param data a map of all rows of the spreadsheet.
      */
-    private void updateSpreadsheet(ManualLog log, Draft draft, ButtonClickEvent bc,
-                                  List<DraftPlayer> team, List<DraftPlayer> subs,
-                                  int[] playerTypes, int[] errorsFound, int offset,
-                                  GoogleAPI link, String tab, Values spreadsheet,
-                                  TreeMap<Object, PlayerStats> data) {
-        for (int i = 0; i < team.size(); i++) {
-            DraftPlayer currPlayer = team.get(i);
-            Member user = draft.findMember(bc, currPlayer.getID());
+    private void updateSpreadsheet(ManualLog log, Draft draft,
+                                   ButtonClickEvent bc,
+                                   TreeMap<String, DraftPlayer> team,
+                                   TreeMap<String, DraftPlayer> subs,
+                                   int[] playerTypes, int[] errorsFound, int offset,
+                                   GoogleAPI link, String tab, Values spreadsheet,
+                                   TreeMap<Object, PlayerStats> data) {
+        int i = 0;
+        for (Map.Entry<String, DraftPlayer> player : team.entrySet()) {
+            String currID = player.getKey();
+            DraftPlayer currPlayer = player.getValue();
+            Member user = draft.findMember(bc, currID);
+
             int gameWins = currPlayer.getWins();
             int gamesPlayed = gameWins + currPlayer.getLosses();
 
             String cmd = "cycle";
-            if (subs.contains(currPlayer)) {
+            if (subs.containsKey(currID)) {
                 cmd = "sub";
             }
 
@@ -192,6 +202,8 @@ public class AutoLog extends Section {
                         user, link, tab, spreadsheet);
                 playerTypes[offset + i] = 1;
             }
+
+            i++;
         }
     }
 
@@ -214,15 +226,15 @@ public class AutoLog extends Section {
                 throw new IOException("The spreadsheet was empty.");
             }
 
-            List<DraftPlayer> team1 = draft.getProcess().getTeam1();
-            List<DraftPlayer> team2 = draft.getProcess().getTeam2();
+            TreeMap<String, DraftPlayer> team1 = draft.getProcess().getTeam1();
+            TreeMap<String, DraftPlayer> team2 = draft.getProcess().getTeam2();
+            TreeMap<String, DraftPlayer> subs = draft.getSubs();
 
             int totalSize = team1.size() + team2.size();
             int[] playerTypes = new int[totalSize];
             int[] errorsFound = new int[totalSize];
 
             ManualLog log = new ManualLog(getPrefix());
-            List<DraftPlayer> subs = draft.getSubs();
             updateSpreadsheet(log, draft, bc, team1, subs, playerTypes,
                     errorsFound, 0, link, tab, spreadsheet, data);
             updateSpreadsheet(log, draft, bc, team2, subs, playerTypes,

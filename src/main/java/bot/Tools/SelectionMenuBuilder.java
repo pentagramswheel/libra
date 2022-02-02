@@ -9,12 +9,12 @@ import java.util.List;
  * @author  Wil Aquino
  * Date:    January 17, 2022
  * Project: Libra
- * Module:  Draft.java
+ * Module:  SelectionMenuBuilder.java
  * Purpose: Conveniently builds a selection menu.
  */
 public class SelectionMenuBuilder {
 
-    /** Field for the built button. */
+    /** Field for the built menu. */
     private final SelectionMenu menu;
 
     /**

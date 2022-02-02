@@ -1,5 +1,6 @@
 target/
 .idea/
+deployable/
 .gradle/
 out/
 build/
@@ -12,8 +13,10 @@ tokens/
 *.logs
 *.iml
 *.target
-.eclipse
+*.eclipse
+*.MF
 
+logback_jar.xml
 src/main/java/bot/Config.java
 src/main/resources/credentials.json
 

@@ -10,7 +10,7 @@ package bot;
  */
 public final class ConfigExample {
 
-    /** LaunchPoint bot token. */
+    /** MIT bot token. */
     public final static String botToken = "TOKEN";
 
     /** LaunchPoint graduates Google Sheets ID. */
@@ -22,6 +22,6 @@ public final class ConfigExample {
     /** LaunchPoint Cycles Google Sheets ID. */
     public final static String lpCyclesSheetID = "ID";
 
-    /** Ink Odyssey Google Sheets ID */
+    /** Ink Odyssey Cycles Google Sheets ID */
     public final static String ioCyclesSheetID ="ID";
 }

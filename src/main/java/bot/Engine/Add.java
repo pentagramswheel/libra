@@ -28,11 +28,11 @@ public class Add extends Section implements Command {
     /**
      * Allows a user entry into a section.
      * @param sc the user's inputted command.
-     * @param user the user to add.
+     * @param playerID the Discord ID of the player to graduate.
      * @return the entrance welcome message.
      */
-    private String enter(SlashCommandEvent sc, Member user) {
-        addRole(sc, user.getId(), getRole(sc, getSection()));
+    private String enter(SlashCommandEvent sc, String playerID) {
+        addRole(sc, playerID, getRole(sc, getSection()));
         String rulesChannelName = getPrefix() + "-draft-rules";
 
         String rulesChannel = getChannel(sc, rulesChannelName).getAsMention();
@@ -52,7 +52,7 @@ public class Add extends Section implements Command {
         StringBuilder listOfUsers = new StringBuilder();
         for (OptionMapping om : args) {
             Member user = om.getAsMember();
-            String welcomeMessage = enter(sc, user);
+            String welcomeMessage = enter(sc, user.getId());
 
             Member finalUser = args.get(args.size() - 1).getAsMember();
             if (user.equals(finalUser)) {

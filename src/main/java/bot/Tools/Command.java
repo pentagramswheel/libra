@@ -204,17 +204,6 @@ public interface Command {
     }
 
     /**
-     * Sends a message to Discord in the channel the user's
-     * interaction was made.
-     * @param interaction the user interaction calling this method.
-     * @param msg the message to send.
-     */
-    default void sendMessage(GenericInteractionCreateEvent interaction,
-                             String msg) {
-        interaction.getMessageChannel().sendMessage(msg).queue();
-    }
-
-    /**
      * Edits the message the user's interaction is linked with.
      * @param interaction the user interaction calling this method.
      * @param msg the message to send.

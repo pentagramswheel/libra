@@ -9,9 +9,6 @@ package bot.Engine.Drafts;
  */
 public class DraftPlayer {
 
-    /** The draft player's Discord ID. */
-    private final String id;
-
     /** Flag for checking whether this player is active or not. */
     private boolean active;
 
@@ -26,21 +23,11 @@ public class DraftPlayer {
 
     /**
      * Constructs the attributes of the draft player.
-     * @param playerID the ID of the player to build the attributes for.
      */
-    public DraftPlayer(String playerID) {
-        id = playerID;
+    public DraftPlayer() {
         active = true;
         matchWins = matchLosses = 0;
         pings = 0;
-    }
-
-    /**
-     * Retrieves the draft player's Discord ID.
-     * @return said ID.
-     */
-    public String getID() {
-        return id;
     }
 
     /**
@@ -54,7 +41,7 @@ public class DraftPlayer {
     }
 
     /**
-     * Sets the player to an inactive.
+     * Sets the player to be inactive.
      */
     public void setInactive() {
         active = false;
@@ -114,52 +101,14 @@ public class DraftPlayer {
         pings++;
     }
 
-    /**
-     * Overrided hashCode() method for draft players.
-     * @return the hashcode.
-     *
-     * @source Josh Bloch's "Effective Java" in Item 8
-     */
-    @Override
-    public int hashCode() {
-        int hash = 31;
-        hash = (31 * hash) + getID().hashCode();
-        hash = (31 * hash) + (isActive() ? 0 : 1);
-        hash = (31 * hash) + getWins();
-        hash = (31 * hash) + getLosses();
-        hash = (31 * hash) + getPings();
-
-        return hash;
-    }
-
-    /**
-     * Overrided equals() method for draft players.
-     * @param o another object to compare.
-     * @return True if they are the same draft player.
-     *         False otherwise.
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || (this.getClass() != o.getClass())) {
-            return false;
-        } else {
-            DraftPlayer player = (DraftPlayer) o;
-
-            return this.getID().equals(player.getID())
-                    && this.getWins() == player.getWins()
-                    && this.getLosses() == player.getLosses()
-                    && this.getPings() == player.getPings();
-        }
-    }
-
     /** Main method for testing the class. */
     public static void main(String[] args) {
-        DraftPlayer p1 = new DraftPlayer("123456789");
-        DraftPlayer p2 = new DraftPlayer("123456789");
-
-        System.out.println("p1.equals(p2) " + p1.equals(p2));
-        System.out.println("p2.equals(p1) " + p2.equals(p1));
-        System.out.println("p1.equals(p1) " + p1.equals(p1));
-        System.out.println("p1 == p2 " + (p1 == p2));
+//        DraftPlayer p1 = new DraftPlayer("123456789");
+//        DraftPlayer p2 = new DraftPlayer("123456789");
+//
+//        System.out.println("p1.equals(p2) " + p1.equals(p2));
+//        System.out.println("p2.equals(p1) " + p2.equals(p1));
+//        System.out.println("p1.equals(p1) " + p1.equals(p1));
+//        System.out.println("p1 == p2 " + (p1 == p2));
     }
 }

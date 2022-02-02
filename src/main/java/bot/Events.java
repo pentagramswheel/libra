@@ -11,19 +11,21 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.Color;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -36,15 +38,15 @@ import java.util.TreeMap;
  */
 public class Events extends ListenerAdapter {
 
-    /** Fields which determine the maximum number of drafts.  */
+    /** Fields which determine the maximum number of drafts. */
     private final static int MAX_LP_DRAFTS = 4;
     private final static int MAX_IO_DRAFTS = 2;
 
-    /** Fields for storing drafts. */
-    TreeMap<Integer, Draft> lpDrafts;
-    TreeMap<Integer, Draft> ioDrafts;
+    /** Fields for storing numbers to drafts. */
+    private TreeMap<Integer, Draft> lpDrafts;
+    private TreeMap<Integer, Draft> ioDrafts;
 
-    /** Fields for storing queued draft positions. */
+    /** Fields for storing queued draft numbers. */
     private ArrayHeapMinPQ<Integer> lpQueue;
     private ArrayHeapMinPQ<Integer> ioQueue;
 
@@ -193,12 +195,58 @@ public class Events extends ListenerAdapter {
     }
 
     /**
+     * Checks whether a draft request expired or not.
+     * @param interaction the user interaction calling this method.
+     * @param numDraft the number draft to analyze.
+     * @param draft the actual draft to analyze.
+     * @param drafts the source map of drafts.
+     * @param queue the source queue of drafts.
+     * @return True if the draft request ran out of time.
+     */
+    private boolean draftExpired(GenericInteractionCreateEvent interaction,
+                                 int numDraft, Draft draft,
+                                 TreeMap<Integer, Draft> drafts,
+                                 ArrayHeapMinPQ<Integer> queue) {
+        if (draft.timedOut(interaction)) {
+            drafts.remove(numDraft);
+            queue.add(numDraft, numDraft);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Times out any drafts if possible.
+     * @param interaction the user interaction calling this method.
+     */
+    private void timeoutDrafts(GenericInteractionCreateEvent interaction) {
+        if (lpDrafts != null) {
+            for (Map.Entry<Integer, Draft> draft : lpDrafts.entrySet()) {
+                if (draftExpired(interaction, draft.getKey(), draft.getValue(),
+                        lpDrafts, lpQueue)) {
+                    break;
+                }
+            }
+        }
+
+        if (ioDrafts != null) {
+            for (Map.Entry<Integer, Draft> draft : ioDrafts.entrySet()) {
+                if (draftExpired(interaction, draft.getKey(), draft.getValue(),
+                        lpDrafts, lpQueue)) {
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
      * Processes a draft, when possible.
      * @param sc the user's inputted command.
      * @param prefix the prefix of the command.
      * @param author the user who ran the command.
-     * @param ongoingDrafts map of ongoing drafts.
-     * @param queue the queue of drafts.
+     * @param ongoingDrafts the source map of drafts.
+     * @param queue the source queue of drafts.
      */
     private void processDraft(SlashCommandEvent sc, String prefix, Member author,
                               TreeMap<Integer, Draft> ongoingDrafts,
@@ -217,6 +265,7 @@ public class Events extends ListenerAdapter {
 
     /**
      * Processes drafts, when possible.
+     * @param sc the user's inputted command.
      * @param prefix the prefix of the command.
      * @param author the user who ran the command.
      */
@@ -248,6 +297,28 @@ public class Events extends ListenerAdapter {
 
                 processDraft(sc, prefix, author, ioDrafts, ioQueue);
                 break;
+        }
+    }
+
+    /**
+     * Attempts to forcibly sub a player out of
+     * a draft.
+     * @param sc the user's inputted command.
+     * @param drafts the source map of drafts.
+     * @param args the arguments of the command.
+     */
+    private void attemptForceSub(SlashCommandEvent sc,
+                                 TreeMap<Integer, Draft> drafts,
+                                 List<OptionMapping> args) {
+        int numDraft = (int) args.get(0).getAsLong();
+        Member playerToSub = args.get(1).getAsMember();
+        Draft draft = drafts.get(numDraft);
+
+        if (draft == null) {
+            sc.reply("That number draft does not exist.")
+                    .setEphemeral(true).queue();
+        } else {
+            draft.forceSub(sc, playerToSub.getId());
         }
     }
 
@@ -362,6 +433,14 @@ public class Events extends ListenerAdapter {
             case "startdraft":
                 processDrafts(sc, prefix, author);
                 break;
+            case "forcesub":
+                TreeMap<Integer, Draft> drafts = lpDrafts;
+                if (prefix.equals("io")) {
+                    drafts = ioDrafts;
+                }
+
+                attemptForceSub(sc, drafts, args);
+                break;
             case "cycle":
             case "sub":
                 if (gamesPlayedValid(sc)) {
@@ -386,7 +465,9 @@ public class Events extends ListenerAdapter {
      * @param sc a slash command to analyze.
      */
     @Override
-    public void onSlashCommand(SlashCommandEvent sc) {
+    public void onSlashCommand(@NotNull SlashCommandEvent sc) {
+        timeoutDrafts(sc);
+
         String cmdPrefix = sc.getName();
         if (isStaffCommand(sc)
                 || wrongChannelUsed(sc)) {
@@ -410,7 +491,9 @@ public class Events extends ListenerAdapter {
      * @param bc a button click to analyze.
      */
     @Override
-    public void onButtonClick(ButtonClickEvent bc) {
+    public void onButtonClick(@NotNull ButtonClickEvent bc) {
+        timeoutDrafts(bc);
+
         String btnName = bc.getButton().getId();
         int indexOfNum = btnName.length() - 1;
 
@@ -436,7 +519,7 @@ public class Events extends ListenerAdapter {
                 currDraft.attemptDraft(bc);
                 break;
             case "leave":
-                currDraft.removePlayer(bc);
+                currDraft.removeFromQueue(bc);
                 break;
             case "requestSub":
                 currDraft.requestSub(bc);
@@ -444,7 +527,10 @@ public class Events extends ListenerAdapter {
             case "sub":
                 currDraft.addSub(bc);
                 break;
-            case "end":
+            case "refresh":
+                currDraft.refresh(bc);
+                break;
+            case "endDraft":
                 if (currDraft.hasEnded(bc)) {
                     drafts.remove(numButton);
                     queue.add(numButton, numButton);
@@ -456,20 +542,13 @@ public class Events extends ListenerAdapter {
             case "beginDraft":
                 currProcess.start(bc);
                 break;
-            case "relink":
-                bc.deferEdit().queue();
-                bc.getMessageChannel().sendMessage("Here's your link!")
-                        .setActionRows(ActionRow.of(Button.link(
-                                bc.getMessage().getJumpUrl(),
-                                "Interface"))).queue();
-                break;
             case "plusOne":
-                currProcess.addPointToTeam(bc, bc.getMember());
+                currProcess.addPointToTeam(bc, bc.getMember().getId());
                 break;
             case "minusOne":
-                currProcess.subtractPointFromTeam(bc, bc.getMember());
+                currProcess.subtractPointFromTeam(bc, bc.getMember().getId());
                 break;
-            case "endDraft":
+            case "endDraftProcess":
                 currProcess.attemptEnd(bc);
                 break;
         }
@@ -480,13 +559,15 @@ public class Events extends ListenerAdapter {
      * @param sm a menu selection to analyze.
      */
     @Override
-    public void onSelectionMenu(SelectionMenuEvent sm) {
+    public void onSelectionMenu(@NotNull SelectionMenuEvent sm) {
+        timeoutDrafts(sm);
+
         String menuName = sm.getComponent().getId();
         int indexOfNum = menuName.length() - 1;
 
         TreeMap<Integer, Draft> drafts;
         String suffix = menuName.substring(indexOfNum - 2, indexOfNum);
-        int numDraft = Integer.parseInt(menuName.substring(indexOfNum));
+        int numMenu = Integer.parseInt(menuName.substring(indexOfNum));
         switch (suffix) {
             case "LP":
                 drafts = lpDrafts;
@@ -496,7 +577,7 @@ public class Events extends ListenerAdapter {
                 break;
         }
 
-        DraftProcess currProcess = drafts.get(numDraft).getProcess();
+        DraftProcess currProcess = drafts.get(numMenu).getProcess();
         if (menuName.substring(0, indexOfNum - 2).equals("teamSelection")) {
             currProcess.addPlayerToTeam(sm);
         }

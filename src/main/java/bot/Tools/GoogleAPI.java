@@ -1,7 +1,6 @@
 package bot.Tools;
 
 import bot.Main;
-import bot.Engine.Graduate;
 import bot.Engine.PlayerStats;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -10,7 +9,8 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
@@ -21,12 +21,14 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 /**
@@ -57,35 +59,41 @@ public class GoogleAPI {
 
     /**
      * Creates an OAuth exchange to grant application access to Google Sheets.
+     * @param httpTransport the HTTP link to use in the authorization.
      * @return the authorization credential.
      */
-    private Credential authorize()
-            throws IOException, GeneralSecurityException {
+    private Credential getCredential(NetHttpTransport httpTransport)
+            throws IOException {
         // disable Google API warning
         final java.util.logging.Logger buggyLogger =
                 java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
         buggyLogger.setLevel(java.util.logging.Level.SEVERE);
 
-        InputStream in = Graduate.class.getResourceAsStream(
-                "/credentials.json");
-
-        assert in != null;
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets
-                .load(JacksonFactory.getDefaultInstance(), new InputStreamReader(in));
+        String resourcesPath = "src/main/resources";     // for local
+//        String resourcesPath = "resources";              // for JAR
+        String credentialsPath = resourcesPath + "/credentials.json";
+        String tokensPath = "tokens";
 
         List<String> scopes = Collections.singletonList(SheetsScopes.SPREADSHEETS);
+        InputStream in = new FileInputStream(credentialsPath);
+
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets
+                .load(GsonFactory.getDefaultInstance(), new InputStreamReader(in));
+        FileDataStoreFactory dataStoreFactory = new FileDataStoreFactory(new File(tokensPath));
 
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow
-                .Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(),
+                .Builder(httpTransport, GsonFactory.getDefaultInstance(),
                 clientSecrets, scopes)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File("tokens")))
+                .setDataStoreFactory(dataStoreFactory)
                 .setAccessType("offline")
                 .build();
 
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         AuthorizationCodeInstalledApp oAuth = new AuthorizationCodeInstalledApp(
-                flow, new LocalServerReceiver());
+                flow, receiver);
+        Credential credential = oAuth.authorize("user");
 
-        return oAuth.authorize("user");
+        return credential;
     }
 
     /**
@@ -94,12 +102,10 @@ public class GoogleAPI {
      */
     private Sheets getSheetsService()
             throws IOException, GeneralSecurityException {
-        Credential credential = authorize();
-        return new Sheets.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(),
-                JacksonFactory.getDefaultInstance(),
-                credential).setApplicationName(
-                Main.NAME).build();
+        NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        return new Sheets.Builder(httpTransport, GsonFactory.getDefaultInstance(), getCredential(httpTransport))
+                .setApplicationName(Main.NAME)
+                .build();
     }
 
     /**
@@ -151,7 +157,7 @@ public class GoogleAPI {
             Logger logger = LoggerFactory.getLogger(this.getClass());
             logger.error("The data could not load.");
             interaction.getHook().sendMessage(
-                    "The data could not load.").queue();
+                    "The data could not load.").setEphemeral(true).queue();
         }
 
         return null;
@@ -197,7 +203,7 @@ public class GoogleAPI {
     }
 
     /**
-     * Updates a row to the end of the spreadsheet section.
+     * Updates a row within the spreadsheet section.
      * @param tab the name of the spreadsheet section.
      * @param spreadsheet the values of the spreadsheet section.
      * @param row the row of values to update to.

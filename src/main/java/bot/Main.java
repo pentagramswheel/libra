@@ -58,6 +58,8 @@ public class Main {
                 "Commands to use within Ink Odyssey.");
         SubcommandData startdraft = new SubcommandData("startdraft",
                 "Requests an automatic draft with up to 8 players.");
+        SubcommandData forcesub = new SubcommandData("forcesub",
+                "Forces a player within a draft to become a sub.");
         SubcommandData cycle = new SubcommandData("cycle",
                 "Manually reports draft scores for up to four players.");
         SubcommandData sub = new SubcommandData("sub",
@@ -70,6 +72,8 @@ public class Main {
                 "Graduates players from the designated section within MIT (~7 sec/player).");
 
         int numMentions = 25;
+        OptionData numDraft = new OptionData(
+                OptionType.INTEGER, "numdraft", "The designated number of this draft", true);
         OptionData matches = new OptionData(
                 OptionType.INTEGER, "matches", "Total games played", true);
         OptionData won = new OptionData(
@@ -83,6 +87,7 @@ public class Main {
             if (i == 1) {
                 newMention = new OptionData(
                         OptionType.USER, "player", "Tag of a player", true);
+                forcesub.addOptions(numDraft, newMention);
             } else {
                 newMention = new OptionData(
                         OptionType.USER, String.format("player%s", i), "Tag of a player");
@@ -99,8 +104,8 @@ public class Main {
         // implementing commands
         mit.addSubcommands(status, help, genmaps);
         mit.addSubcommandGroups(profile);
-        lp.addSubcommands(startdraft, cycle, sub, undo, add, grad);
-        io.addSubcommands(startdraft, cycle, sub, undo, add, grad);
+        lp.addSubcommands(startdraft, forcesub, cycle, sub, undo, add, grad);
+        io.addSubcommands(startdraft, forcesub, cycle, sub, undo, add, grad);
 
         jda.updateCommands().addCommands(mit, lp, io).queue();
     }
@@ -111,6 +116,7 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
+            System.out.println();
             JDA jda = JDABuilder.createLight(Config.botToken)
                     .enableIntents(GatewayIntent.GUILD_PRESENCES)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS)
@@ -125,7 +131,7 @@ public class Main {
                     OnlineStatus.IDLE,
                     Activity.playing(status));
 
-            Thread.sleep(2000);
+            Thread.sleep(3000);
             System.out.println("\nUSAGE LOG:\n==========");
         } catch (LoginException le) {
             le.printStackTrace();
