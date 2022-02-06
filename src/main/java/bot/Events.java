@@ -571,6 +571,12 @@ public class Events extends ListenerAdapter {
         }
 
         Draft currDraft = drafts.get(numButton);
+        // may change in the future if more buttons are created
+        if (currDraft == null) {
+            bc.reply("Sorry but that draft has expired.")
+                    .setEphemeral(true).queue();
+            return;
+        }
         DraftProcess currProcess = currDraft.getProcess();
         switch (btnName.substring(0, indexOfNum - 2)) {
             case "join":
