@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** January 18, 2022
+**Last Updated:** February 5, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -18,6 +18,7 @@
     - [ArrayHeapMinPQ](#arrayheapminpq)
     - [ButtonBuilder](#buttonbuilder)
     - [Command](#command)
+    - [Components](#components)
     - [FileHandler](#filehandler)
     - [GoogleAPI](#googleapi)
     - [SelectionMenuBuilder](#selectionmenubuilder)
@@ -60,6 +61,7 @@ java src/main/java/bot/Main.java
 | mit genmaps | Generates a map list for a draft. | 1. `matches` - the amount of maps needed for the amount of matches going to be played. |
 | lp/io startdraft | Starts an automatic MIT draft. |
 | lp/io forcesub | Forces a player within a MIT draft to become a sub. |
+| lp/io forceend | Forces a MIT draft to end. |
 | lp/io cycle | Manually updates players' MIT draft stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | lp/io sub | Manually updates subs' MIT draft stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | lp/io undo | Reverts the previous MIT draft command, *once and only once*. |
@@ -122,7 +124,7 @@ An interface outlining the format of the bot's command implementations.
 
 ----
 
-#### ComponentsFor
+#### Components
 
 A class for storing components used throughout the bot.
 
@@ -192,10 +194,11 @@ A class for parenting MIT section-specific commands.
 ###### Instance Variables
 1. `String name` - the name of this section.
 2. `String prefix` - the prefix of this section. 
-3. `String emote` - the emote of this section.
-4. `Color color` - the color of this section.
-5. `String gradSheetID` - the graduates spreadsheet ID for this section.
-6. `String cyclesSheetID` - the graduates spreadsheet ID for this section.
+3. `String role` - the role of this section.
+4. `String emote` - the emote of this section.
+5. `Color color` - the color of this section.
+6. `String gradSheetID` - the graduates spreadsheet ID for this section.
+7. `String cyclesSheetID` - the graduates spreadsheet ID for this section.
 
 ----
 
@@ -218,10 +221,11 @@ A class which forms and starts drafts.
 6. `List<DraftPlayer> subs` - the subs of the draft, if any.
 7. `int captain1` - the index of team one's captain.
 8. `int captain2` - the index of team two's captain.
-9. `int subsNeeded` - the amount of subs needed for the draft at any given time.
-10. `Role draftRole` - the section of MIT which this draft is occurring in.
-11. `TextChannel draftChat` - the draft chat which this draft is linked to.
-12. `String messageID` - the Discord message ID of the draft request.
+9. `int subsNeededTeam1` - the amount of subs needed for the first team of the draft.
+10. `int subsNeededTeam2` - the amount of subs needed for the second team of the draft.
+11. `Role draftRole` - the section of MIT which this draft is occurring in.
+12. `TextChannel draftChat` - the draft chat which this draft is linked to.
+13. `String messageID` - the Discord message ID of the draft request.
 ----
 
 #### DraftPlayer
@@ -248,10 +252,11 @@ A class which manages and processes drafts.
 5. `List<DraftPlayer> regularPlayers` - The non-captain players of the draft.
 6. `List<DraftPlayer> team1` - The first team of the draft.
 7. `List<DraftPlayer> team2` - The second team of the draft.
-8. `int scoreTeam1` - The `team1`'s scoreboard of the draft.
-9. `int scoreTeam2` - The `team2`'s scoreboard of the draft.
-10. `List<String> endButtonClicked` - The players who have clicked the "End Draft" button consecutively.
-11. `int NUM_PLAYERS_TO_END_DRAFT` - The number of players required to formally end the draft.
+8. `int MAX_SCORE` - The maximum score for a draft.
+9. `int scoreTeam1` - The `team1`'s scoreboard of the draft.
+10. `int scoreTeam2` - The `team2`'s scoreboard of the draft.
+11. `List<String> endButtonClicked` - The players who have clicked the "End Draft" button consecutively.
+12. `int NUM_PLAYERS_TO_END_DRAFT` - The number of players required to formally end the draft.
 
 ----
 
@@ -271,7 +276,7 @@ A class which generates map lists.
 
 A class which reverts draft commands, processing the command `lp/io undo`.
 
---
+----
 
 
 ## Persistence

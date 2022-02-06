@@ -146,8 +146,8 @@ public class AutoLog extends Section {
             eb.addField("Status:", "INCOMPLETE", false);
         }
 
-//        TextChannel channel = draft.getChannel(bc, getPrefix() + "-match-report");
-        TextChannel channel = draft.getChannel(bc, "bot-testing");
+        TextChannel channel = draft.getChannel(bc, getPrefix() + "-match-report");
+//        TextChannel channel = draft.getChannel(bc, "bot-testing");
         channel.sendMessageEmbeds(eb.build()).queue();
     }
 

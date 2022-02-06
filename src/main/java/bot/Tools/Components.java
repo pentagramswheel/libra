@@ -48,14 +48,15 @@ public class Components {
 
         /**
          * Builds the "Draft Channel" link button.
-         * @param bc a button click to analyze.
+         * @param serverID the ID of the server with the channel in it.
+         * @param channelID the ID of the channel to link to.
          * @param suffix the button ID's suffix.
-         * @param process the draft process to link to.
          * @return said button.
          */
-        public static Button draftLink(ButtonClickEvent bc, String suffix,
-                                       DraftProcess process) {
-            String url = process.getMessage(bc).getJumpUrl();
+        public static Button draftLink(String serverID, String channelID,
+                                       String suffix) {
+            String url = String.format("https://discord.com/channels/%s/%s",
+                    serverID, channelID);
             return new ButtonBuilder("draftLink" + suffix,
                     "Draft Channel", url, 4).getButton();
         }
@@ -182,7 +183,7 @@ public class Components {
                                            bot.Engine.Drafts.Draft draft) {
             String url = draft.getMessage(bc).getJumpUrl();
             return new ButtonBuilder("requestSubLink" + suffix,
-                    "Request Sub", url, 4).getButton();
+                    "Leave/Request Sub", url, 4).getButton();
         }
 
         /**

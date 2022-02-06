@@ -19,6 +19,9 @@ public class Section {
     /** The abbreviation of the section. */
     private final String prefix;
 
+    /** The role mention of this section */
+    private final String role;
+
     /** The emote of the section. */
     private final String emote;
 
@@ -40,12 +43,14 @@ public class Section {
 
         if (prefix.equals("lp")) {
             name = "LaunchPoint";
+            role = "<@&732850504463286352>";
             emote = "<:LaunchPoint:918936266190512168>";
             color = Color.GREEN;
             gradSheetID = Config.lpGradSheetID;
             cyclesSheetID = Config.lpCyclesSheetID;
         } else {
             name = "Ink Odyssey";
+            role = "<@&918181354284408882>";
             emote = "<:InkOdyssey:918936305788923944>";
             color = Color.MAGENTA;
             gradSheetID = Config.ioGradSheetID;
@@ -67,6 +72,14 @@ public class Section {
      */
     public String getPrefix() {
         return prefix;
+    }
+
+    /**
+     * Retrieves the role of this section.
+     * @return said role.
+     */
+    public String getSectionRole() {
+        return role;
     }
 
     /**

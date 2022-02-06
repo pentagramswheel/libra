@@ -167,7 +167,7 @@ public class ManualLog extends Section implements Command {
             int setLosses = player.getSetLosses();
             int setsPlayed = setWins + setLosses;
             double setWinrate = 0.0;
-            if (notSub(cmd)) {
+            if (notSub(cmd) && gamesPlayed > 0) {
                 if (cycleSetWon(gameWins, gamesPlayed)) {
                     setWins++;
                 } else {
@@ -183,7 +183,10 @@ public class ManualLog extends Section implements Command {
             gameWins += player.getGamesWon();
             gameLosses += player.getGamesLost();
             gamesPlayed = gameWins + gameLosses;
-            double gameWinrate = (double) gameWins / gamesPlayed;
+            double gameWinrate = 0.0;
+            if (gamesPlayed > 0) {
+               gameWinrate =  (double) gameWins / gamesPlayed;
+            }
 
             String updateRange = link.buildRange(tab,
                     "B", player.getDraftPosition(),
@@ -222,13 +225,16 @@ public class ManualLog extends Section implements Command {
             String userTag = user.getUser().getAsTag();
 
             int gameLosses = gamesPlayed - gameWins;
-            double gameWinrate = (double) gameWins / gamesPlayed;
+            double gameWinrate = 0.0;
+            if (gamesPlayed > 0) {
+                gameWinrate =  (double) gameWins / gamesPlayed;
+            }
 
             int setWins = 0;
             int setLosses = 0;
             int setsPlayed = 0;
             double setWinrate = 0.0;
-            if (notSub(cmd)) {
+            if (notSub(cmd) && gamesPlayed > 0) {
                 if (cycleSetWon(gameWins, gamesPlayed)) {
                     setWins++;
                 } else {

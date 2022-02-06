@@ -36,7 +36,7 @@ public class DraftPlayer {
      * @return True if they are active.
      *         False otherwise.
      */
-    public boolean isActive() {
+    private boolean isActive() {
         return active;
     }
 
@@ -56,18 +56,6 @@ public class DraftPlayer {
     }
 
     /**
-     * Increases the player's amount of wins by one.
-     */
-    public void incrementWins() {
-        matchWins++;
-    }
-
-    /** Decreases the player's amount of wins by one. */
-    public void decrementWins() {
-        matchWins--;
-    }
-
-    /**
      * Retrieves the player's draft losses.
      * @return said losses.
      */
@@ -76,15 +64,35 @@ public class DraftPlayer {
     }
 
     /**
+     * Increases the player's amount of wins by one.
+     */
+    public void incrementWins() {
+        if (isActive()) {
+            matchWins++;
+        }
+    }
+
+    /** Decreases the player's amount of wins by one. */
+    public void decrementWins() {
+        if (isActive()) {
+            matchWins--;
+        }
+    }
+
+    /**
      * Increases the player's amount of losses by one.
      */
     public void incrementLosses() {
-        matchLosses++;
+        if (isActive()) {
+            matchLosses++;
+        }
     }
 
     /** Decreases the player's amount of wins by one. */
     public void decrementLosses() {
-        matchLosses--;
+        if (isActive()) {
+            matchLosses--;
+        }
     }
 
     /**

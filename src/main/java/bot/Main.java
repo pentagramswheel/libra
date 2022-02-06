@@ -48,7 +48,7 @@ public class Main {
         // profile commands
         SubcommandGroupData profile = new SubcommandGroupData("profile",
                 "Finds profile information on a player within MIT.");
-        // edit in subcommand data in here chaedr
+        // edit in subcommand data in here Robbinson
 //        profile.addSubcommands(...)
 
         // section commands
@@ -60,6 +60,8 @@ public class Main {
                 "Requests an automatic draft with up to 8 players.");
         SubcommandData forcesub = new SubcommandData("forcesub",
                 "Forces a player within a draft to become a sub.");
+        SubcommandData forceend = new SubcommandData("forceend",
+                "Forces a draft to end.");
         SubcommandData cycle = new SubcommandData("cycle",
                 "Manually reports draft scores for up to four players.");
         SubcommandData sub = new SubcommandData("sub",
@@ -88,6 +90,7 @@ public class Main {
                 newMention = new OptionData(
                         OptionType.USER, "player", "Tag of a player", true);
                 forcesub.addOptions(numDraft, newMention);
+                forceend.addOptions(numDraft);
             } else {
                 newMention = new OptionData(
                         OptionType.USER, String.format("player%s", i), "Tag of a player");
@@ -104,8 +107,12 @@ public class Main {
         // implementing commands
         mit.addSubcommands(status, help, genmaps);
         mit.addSubcommandGroups(profile);
-        lp.addSubcommands(startdraft, forcesub, cycle, sub, undo, add, grad);
-        io.addSubcommands(startdraft, forcesub, cycle, sub, undo, add, grad);
+        lp.addSubcommands(
+                startdraft, forcesub, forceend,
+                cycle, sub, undo, add, grad);
+        io.addSubcommands(
+                startdraft, forcesub, forceend,
+                cycle, sub, undo, add, grad);
 
         jda.updateCommands().addCommands(mit, lp, io).queue();
     }

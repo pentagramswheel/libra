@@ -106,7 +106,7 @@ public class Events extends ListenerAdapter {
      *         False otherwise.
      */
     private boolean isStaffCommand(SlashCommandEvent sc) {
-        String[] staffCmds = {"cycle", "sub", "undo", "add", "grad"};
+        String[] staffCmds = {"forceend", "cycle", "sub", "undo", "add", "grad"};
 
         try {
             Guild server = sc.getGuild();
@@ -147,7 +147,7 @@ public class Events extends ListenerAdapter {
         String lpReportsChannel = server.getTextChannelsByName(
                 "lp-staff-match-report", false).get(0).getName();
         String ioDraftChannel = server.getTextChannelsByName(
-                "lp-looking-for-draft", false).get(0).getName();
+                "io-looking-for-draft", false).get(0).getName();
         String ioReportsChannel = server.getTextChannelsByName(
                 "io-staff-match-report", false).get(0).getName();
         String testChannel = server.getTextChannelsByName(
@@ -156,8 +156,8 @@ public class Events extends ListenerAdapter {
         String channel = sc.getTextChannel().getName();
         boolean isEntryChannel = subCmd.equals("add")
                 && channel.equals(entryChannel);
-        boolean isDraftChannel = subCmd.equals("startdraft")
-                && channel.equals(lpDraftChannel) || channel.equals(ioDraftChannel);
+        boolean isDraftChannel = (subCmd.equals("startdraft") || subCmd.equals("forcesub") || subCmd.equals("forceend"))
+                && (channel.equals(lpDraftChannel) || channel.equals(ioDraftChannel));
         boolean isReportsChannel = (subCmd.equals("cycle") || subCmd.equals("sub") || subCmd.equals("undo"))
                 && (channel.equals(lpReportsChannel) || channel.equals(ioReportsChannel));
         boolean isTestChannel = channel.equals(testChannel);
@@ -310,6 +310,12 @@ public class Events extends ListenerAdapter {
     private void attemptForceSub(SlashCommandEvent sc,
                                  TreeMap<Integer, Draft> drafts,
                                  List<OptionMapping> args) {
+        if (drafts == null) {
+            sc.reply("No drafts have been started yet.")
+                    .setEphemeral(true).queue();
+            return;
+        }
+
         int numDraft = (int) args.get(0).getAsLong();
         Member playerToSub = args.get(1).getAsMember();
         Draft draft = drafts.get(numDraft);
@@ -319,6 +325,36 @@ public class Events extends ListenerAdapter {
                     .setEphemeral(true).queue();
         } else {
             draft.forceSub(sc, playerToSub.getId());
+        }
+    }
+
+    /**
+     * Attempts to forcibly end a draft.
+     * @param sc the user's inputted command.
+     * @param drafts the source map of drafts.
+     * @param args the arguments of the command.
+     */
+    private void attemptForceEnd(SlashCommandEvent sc,
+                                 TreeMap<Integer, Draft> drafts,
+                                 ArrayHeapMinPQ<Integer> queue,
+                                 List<OptionMapping> args) {
+        if (drafts == null) {
+            sc.reply("No drafts have been started yet.")
+                    .setEphemeral(true).queue();
+            return;
+        }
+
+        int numDraft = (int) args.get(0).getAsLong();
+        Draft draft = drafts.remove(numDraft);
+        if (draft == null) {
+            sc.reply("That number draft does not exist.")
+                    .setEphemeral(true).queue();
+        } else {
+            draft.forceEnd(sc);
+            queue.add(numDraft, numDraft);
+            sc.reply("Draft ended. If any, please don't forget to delete the process "
+                    + "interface in "
+                    + draft.getDraftChannel().getAsMention() + ".").queue();
         }
     }
 
@@ -421,6 +457,19 @@ public class Events extends ListenerAdapter {
             subCmd = "";
         }
 
+        TreeMap<Integer, Draft> drafts;
+        ArrayHeapMinPQ<Integer> queue;
+        switch (prefix) {
+            case "lp":
+                drafts = lpDrafts;
+                queue = lpQueue;
+                break;
+            default:
+                drafts = ioDrafts;
+                queue = ioQueue;
+                break;
+        }
+
         switch (subCmd) {
             case "add":
                 Add newcomer = new Add(prefix);
@@ -434,12 +483,10 @@ public class Events extends ListenerAdapter {
                 processDrafts(sc, prefix, author);
                 break;
             case "forcesub":
-                TreeMap<Integer, Draft> drafts = lpDrafts;
-                if (prefix.equals("io")) {
-                    drafts = ioDrafts;
-                }
-
                 attemptForceSub(sc, drafts, args);
+                break;
+            case "forceend":
+                attemptForceEnd(sc, drafts, queue, args);
                 break;
             case "cycle":
             case "sub":

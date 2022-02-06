@@ -47,6 +47,9 @@ public class DraftProcess {
     private final TreeMap<String, DraftPlayer> team1;
     private final TreeMap<String, DraftPlayer> team2;
 
+    /** The max amount of won matches within a draft. */
+    private final static int MAX_SCORE = 7;
+
     /** The scoreboard of the draft. */
     private int scoreTeam1;
     private int scoreTeam2;
@@ -55,21 +58,8 @@ public class DraftProcess {
     private List<String> endButtonClicked;
 
     /** The number of players required to formally end the draft. */
-//    private final static int NUM_PLAYERS_TO_END_DRAFT = 3;
-    private final static int NUM_PLAYERS_TO_END_DRAFT = 1;
-
-    /** The discord message ID for the draft's execution interface. */
-    private String messageID;
-
-    /**
-     * Retrieves the execution interface of the draft.
-     * @return said message.
-     */
-    public Message getMessage(GenericInteractionCreateEvent interaction) {
-        MessageChannel channel = draft.getChannel(interaction, "bot-testing");
-        return channel.retrieveMessageById(messageID).complete();
-//        return draft.getDraftChannel().retrieveMessageById(messageID).complete();
-    }
+    private final static int NUM_PLAYERS_TO_END_DRAFT = 3;
+//    private final static int NUM_PLAYERS_TO_END_DRAFT = 1;
 
     /**
      * Resets who have clicked the 'End Draft' button.
@@ -160,17 +150,17 @@ public class DraftProcess {
         }
         ping.append("\n\n")
                 .append("Welcome to the draft. Jump in a VC and have the ")
-                .append("captains alternate choosing teammates. Join Team 1 (")
+                .append("captains alternate choosing teammates. Join ")
                 .append(captains.get(0))
-                .append(") or Team 2 (")
+                .append("'s or ")
                 .append(captains.get(1))
-                .append(") based on their selection. Approve of a maplist ")
+                .append("'s team based on their selection. Approve of a maplist ")
                 .append("using `/mit genmaps`, and begin the draft when ")
                 .append("everyone is ready. The captains will reset the team ")
                 .append("selection as needed.");
 
-//        TextChannel channel = draft.getDraftChannel();
-        TextChannel channel = draft.getChannel(bc, "vc-text");
+        TextChannel channel = draft.getDraftChannel();
+//        TextChannel channel = draft.getChannel(bc, "vc-text");
         String idSuffix = draft.getPrefix().toUpperCase() + draft.getNumDraft();
         List<SelectionMenu> menus = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
@@ -181,8 +171,7 @@ public class DraftProcess {
         buttons.add(Components.ForDraftProcess.beginDraft(idSuffix));
 
         channel.sendMessage(ping).setActionRows(
-                ActionRow.of(menus), ActionRow.of(buttons)).queue(
-                        (message) -> messageID = message.getId());
+                ActionRow.of(menus), ActionRow.of(buttons)).queue();
     }
 
     /**
@@ -275,14 +264,33 @@ public class DraftProcess {
      * Adds a player to a team, given a captain.
      * @param player the player to add.
      * @param captainID the Discord ID of the captain of the team to add to.
+     * @return True if the player could be added.
+     *         False otherwise.
      */
-    private void addPlayer(String playerID, DraftPlayer player,
+    private boolean addPlayer(String playerID, DraftPlayer player,
                            String captainID) {
-        if (captainID.equals(captainID1)) {
-            getTeam1().put(playerID, player);
+        if (hasStarted()) {
+            if (captainID.equals(captainID1)
+                    && draft.getSubsNeededTeam1() > 0) {
+                draft.decrementSubs(playerID);
+                getTeam1().put(playerID, player);
+                return true;
+            } else if (captainID.equals(captainID2)
+                    && draft.getSubsNeededTeam2() > 0) {
+                draft.decrementSubs(playerID);
+                getTeam2().put(playerID, player);
+                return true;
+            }
         } else {
-            getTeam2().put(playerID, player);
+            if (captainID.equals(captainID1)) {
+                getTeam1().put(playerID, player);
+            } else {
+                getTeam2().put(playerID, player);
+            }
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -290,36 +298,40 @@ public class DraftProcess {
      * @param sm a menu selection to analyze.
      */
     public void addPlayerToTeam(SelectionMenuEvent sm) {
-        SelectOption chosenPlayer = sm.getInteraction().getSelectedOptions().get(0);
-        String captainID = chosenPlayer.getValue();
+        SelectOption chosenCaptain = sm.getInteraction().getSelectedOptions().get(0);
+        String captainID = chosenCaptain.getValue();
         String playerID = sm.getMember().getId();
 
-        /*if (getTeam1().containsKey(playerID)
+        if (getTeam1().containsKey(playerID)
                 || getTeam2().containsKey(playerID)) {
             draft.sendReply(sm, "You are already in a team.", true);
-        } else */if (!draft.getPlayers().containsKey(playerID)
+        } else if (!draft.getPlayers().containsKey(playerID)
             && !draft.getSubs().containsKey(playerID)) {
             draft.sendReply(sm, "You are not in this draft!", true);
         } else {
             sm.deferEdit().queue();
 
-            if (regularPlayers.containsKey(playerID)) {
-                addPlayer(playerID, regularPlayers.remove(playerID), captainID);
-            } else if (draft.getSubs().containsKey(playerID)) {
-                addPlayer(playerID, draft.getSubs().get(playerID), captainID);
+            if (regularPlayers.containsKey(playerID)
+                && addPlayer(playerID, draft.getPlayers().get(playerID), captainID)) {
+                regularPlayers.remove(playerID);
+                updateReport(sm);
+            } else if (draft.getSubs().containsKey(playerID)
+                && addPlayer(playerID, draft.getSubs().get(playerID), captainID)) {
+                updateReport(sm);
+            } else {
+                draft.sendResponse(sm, "That team does not need subs!", true);
             }
 
-            // for testing
-            if (getTeam1().size() < 4 || getTeam2().size() < 4) {
-                getTeam1().put("350386286256848896", new DraftPlayer());
-                getTeam1().put("524592272411459584", new DraftPlayer());
-                getTeam1().put("97288493029416960", new DraftPlayer());
-                getTeam2().put("407939462325207044", new DraftPlayer());
-                getTeam2().put("388507632480157696", new DraftPlayer());
-                getTeam2().put("191016647543357440", new DraftPlayer());
-            }
-
-            updateReport(sm);
+//            // for testing
+//            if (getTeam1().size() < 4 || getTeam2().size() < 4) {
+//                getTeam1().put("350386286256848896", new DraftPlayer());
+//                getTeam1().put("524592272411459584", new DraftPlayer());
+//                getTeam1().put("97288493029416960", new DraftPlayer());
+//                getTeam2().put("407939462325207044", new DraftPlayer());
+//                getTeam2().put("388507632480157696", new DraftPlayer());
+//                getTeam2().put("191016647543357440", new DraftPlayer());
+//            }
+//            updateReport(sm);
         }
     }
 
@@ -370,24 +382,23 @@ public class DraftProcess {
      * @param team the winning team.
      * @param otherTeam the losing team.
      */
-    private void givePoints(TreeMap<String, DraftPlayer> team,
+    private void givePoints(ButtonClickEvent bc,
+                            TreeMap<String, DraftPlayer> team,
                             TreeMap<String, DraftPlayer> otherTeam) {
-        for (DraftPlayer player : team.values()) {
-            if (player.isActive()) {
-                player.incrementWins();
-            }
-        }
-
-        for (DraftPlayer player : otherTeam.values()) {
-            if (player.isActive()) {
-                player.incrementLosses();
-            }
-        }
-
-        if (team == getTeam1()) {
+        if (team == getTeam1() && scoreTeam1 < MAX_SCORE) {
             scoreTeam1++;
-        } else {
+        } else if (team == getTeam2() && scoreTeam2 < MAX_SCORE) {
             scoreTeam2++;
+        } else {
+            draft.sendResponse(bc, "You've already hit the point limit!", true);
+            return;
+        }
+
+        for (DraftPlayer player : team.values()) {
+            player.incrementWins();
+        }
+        for (DraftPlayer player : otherTeam.values()) {
+            player.incrementLosses();
         }
     }
 
@@ -396,23 +407,23 @@ public class DraftProcess {
      * @param team the "winning" team.
      * @param otherTeam the "losing" team.
      */
-    private void revertPoints(TreeMap<String, DraftPlayer> team,
+    private void revertPoints(ButtonClickEvent bc,
+                              TreeMap<String, DraftPlayer> team,
                               TreeMap<String, DraftPlayer> otherTeam) {
-        for (DraftPlayer player : team.values()) {
-            if (player.isActive()) {
-                player.decrementWins();
-            }
-        }
-        for (DraftPlayer player : otherTeam.values()) {
-            if (player.isActive()) {
-                player.decrementLosses();
-            }
+        if (team == getTeam1() && scoreTeam1 > 0) {
+            scoreTeam1--;
+        } else if (team == getTeam2() && scoreTeam2 > 0) {
+            scoreTeam2--;
+        } else {
+            draft.sendResponse(bc, "You cannot have less than zero points!", true);
+            return;
         }
 
-        if (team == getTeam1()) {
-            scoreTeam1--;
-        } else {
-            scoreTeam2--;
+        for (DraftPlayer player : team.values()) {
+            player.decrementWins();
+        }
+        for (DraftPlayer player : otherTeam.values()) {
+            player.decrementLosses();
         }
     }
 
@@ -422,7 +433,8 @@ public class DraftProcess {
      * @param increment True for giving points to the team above.
      *                  False for taking away points from the team above.
      */
-    private void determinePoints(TreeMap<String, DraftPlayer> team,
+    private void determinePoints(ButtonClickEvent bc,
+                                 TreeMap<String, DraftPlayer> team,
                                  boolean increment) {
         TreeMap<String, DraftPlayer> otherTeam = getTeam2();
         if (team == getTeam2()) {
@@ -430,10 +442,12 @@ public class DraftProcess {
         }
 
         if (increment) {
-            givePoints(team, otherTeam);
+            givePoints(bc, team, otherTeam);
         } else {
-            revertPoints(team, otherTeam);
+            revertPoints(bc, team, otherTeam);
         }
+
+        updateReport(bc);
     }
 
     /**
@@ -446,15 +460,12 @@ public class DraftProcess {
         resetEndDraftButton();
 
         if (getTeam1().containsKey(authorID)) {
-            determinePoints(getTeam1(), true);
+            determinePoints(bc, getTeam1(), true);
         } else if (getTeam2().containsKey(authorID)) {
-            determinePoints(getTeam2(), true);
+            determinePoints(bc, getTeam2(), true);
         } else {
             draft.sendResponse(bc, "You're not part of this draft!", true);
-            return;
         }
-
-        updateReport(bc);
     }
 
     /**
@@ -467,15 +478,12 @@ public class DraftProcess {
         resetEndDraftButton();
 
         if (getTeam1().containsKey(authorID)) {
-            determinePoints(getTeam1(), false);
+            determinePoints(bc, getTeam1(), false);
         } else if (getTeam2().containsKey(authorID)) {
-            determinePoints(getTeam2(), false);
+            determinePoints(bc, getTeam2(), false);
         } else {
             draft.sendResponse(bc, "You're not part of this draft!", true);
-            return;
         }
-
-        updateReport(bc);
     }
 
     /**
@@ -483,14 +491,19 @@ public class DraftProcess {
      * @param bc the button click to analyze.
      */
     public void attemptEnd(ButtonClickEvent bc) {
-        endButtonClicked.add(bc.getMember().getId());
+        String authorID = bc.getMember().getId();
+        if (!getTeam1().containsKey(authorID)
+                && !getTeam2().containsKey(authorID)) {
+            draft.sendReply(bc, "You're not part of this draft!", true);
+            return;
+        }
+
+        endButtonClicked.add(authorID);
         int numClicksLeft = NUM_PLAYERS_TO_END_DRAFT - endButtonClicked.size();
 
         if (numClicksLeft <= 0) {
             bc.deferEdit().queue();
             draft.toggleDraft();
-
-            updateReport(bc);
 
             String idSuffix = draft.getPrefix() + draft.getNumDraft();
             List<Button> buttons = new ArrayList<>();
@@ -501,6 +514,7 @@ public class DraftProcess {
 
             draft.sendButtons(bc, "This draft has ended.", buttons);
 
+            updateReport(bc);
             AutoLog log = new AutoLog(draft.getPrefix());
             log.matchReport(bc, draft);
         } else if (endButtonClicked.contains(bc.getMember().getId())) {

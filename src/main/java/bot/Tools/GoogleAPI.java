@@ -69,8 +69,8 @@ public class GoogleAPI {
                 java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
         buggyLogger.setLevel(java.util.logging.Level.SEVERE);
 
-        String resourcesPath = "src/main/resources";     // for local
-//        String resourcesPath = "resources";              // for JAR
+//        String resourcesPath = "src/main/resources";     // for local
+        String resourcesPath = "resources";              // for JAR
         String credentialsPath = resourcesPath + "/credentials.json";
         String tokensPath = "tokens";
 

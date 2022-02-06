@@ -1,47 +1,47 @@
-bot/Engine/Drafts/Draft.java
- bot.Engine.Drafts.Draft
-bot/Events.java
- bot.Events
+bot/Tools/FileHandler.java
+ bot.Tools.FileHandler
+bot/Tools/ButtonBuilder.java
+ bot.Tools.ButtonBuilder
 bot/Engine/Drafts/MapGenerator.java
  bot.Engine.Drafts.MapGenerator
-bot/Main.java
- bot.Main
+bot/Tools/Command.java
+ bot.Tools.Command
 bot/Config.java
  bot.Config
-bot/Engine/Section.java
- bot.Engine.Section
+bot/ConfigExample.java
+ bot.ConfigExample
 bot/Engine/Drafts/DraftPlayer.java
  bot.Engine.Drafts.DraftPlayer
-bot/Engine/Add.java
- bot.Engine.Add
+bot/Tools/ArrayHeapMinPQ.java
+ bot.Tools.ArrayHeapMinPQ
+ bot.Tools.ArrayHeapMinPQ$Node
 bot/Engine/PlayerStats.java
  bot.Engine.PlayerStats
 bot/Tools/SelectionMenuBuilder.java
  bot.Tools.SelectionMenuBuilder
-bot/Tools/ComponentsFor.java
- bot.Tools.ComponentsFor
- bot.Tools.ComponentsFor$Draft
- bot.Tools.ComponentsFor$DraftProcess
-bot/Tools/ArrayHeapMinPQ.java
- bot.Tools.ArrayHeapMinPQ
- bot.Tools.ArrayHeapMinPQ$Node
-bot/Tools/FileHandler.java
- bot.Tools.FileHandler
-bot/ConfigExample.java
- bot.ConfigExample
-bot/Tools/ButtonBuilder.java
- bot.Tools.ButtonBuilder
-bot/Tools/Command.java
- bot.Tools.Command
-bot/Engine/Drafts/DraftProcess.java
- bot.Engine.Drafts.DraftProcess
-bot/Engine/Drafts/AutoLog.java
- bot.Engine.Drafts.AutoLog
-bot/Tools/GoogleAPI.java
- bot.Tools.GoogleAPI
 bot/Engine/Drafts/ManualLog.java
  bot.Engine.Drafts.ManualLog
-bot/Engine/Graduate.java
- bot.Engine.Graduate
+bot/Engine/Add.java
+ bot.Engine.Add
+bot/Engine/Section.java
+ bot.Engine.Section
 bot/Engine/Drafts/Undo.java
  bot.Engine.Drafts.Undo
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
+bot/Main.java
+ bot.Main
+bot/Tools/GoogleAPI.java
+ bot.Tools.GoogleAPI
+bot/Engine/Drafts/Draft.java
+ bot.Engine.Drafts.Draft
+bot/Events.java
+ bot.Events
+bot/Tools/Components.java
+ bot.Tools.Components
+ bot.Tools.Components$ForDraft
+ bot.Tools.Components$ForDraftProcess
+bot/Engine/Drafts/AutoLog.java
+ bot.Engine.Drafts.AutoLog
+bot/Engine/Drafts/DraftProcess.java
+ bot.Engine.Drafts.DraftProcess
