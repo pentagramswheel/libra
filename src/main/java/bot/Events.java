@@ -516,8 +516,7 @@ public class Events extends ListenerAdapter {
         timeoutDrafts(sc);
 
         String cmdPrefix = sc.getName();
-        if (isStaffCommand(sc)
-                || wrongChannelUsed(sc)) {
+        if (isStaffCommand(sc) || wrongChannelUsed(sc)) {
             sc.reply("You do not have permission to use this command here.").queue();
             return;
         }
