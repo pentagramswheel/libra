@@ -115,8 +115,8 @@ public class Draft extends Section implements Command {
      *         False otherwise.
      */
     public boolean timedOut(GenericInteractionCreateEvent interaction) {
-        // time limit of 30 minutes
-        long timeLimit = 1800000;
+        // time limit of 45 minutes
+        long timeLimit = 2700000;
         long currentTime = System.currentTimeMillis();
 
         if (!isInitialized() && currentTime - startTime > timeLimit) {

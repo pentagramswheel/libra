@@ -138,6 +138,7 @@ public class Events extends ListenerAdapter {
      */
     private boolean wrongChannelUsed(SlashCommandEvent sc) {
         Guild server = sc.getGuild();
+        String prefix = sc.getName();
         String subCmd = sc.getSubcommandName();
 
         String entryChannel = server.getTextChannelsByName(
@@ -154,16 +155,26 @@ public class Events extends ListenerAdapter {
                 "bot-testing", false).get(0).getName();
 
         String channel = sc.getTextChannel().getName();
-        boolean isEntryChannel = subCmd.equals("add")
-                && channel.equals(entryChannel);
-        boolean isDraftChannel = (subCmd.equals("startdraft") || subCmd.equals("forcesub") || subCmd.equals("forceend"))
-                && (channel.equals(lpDraftChannel) || channel.equals(ioDraftChannel));
-        boolean isReportsChannel = (subCmd.equals("cycle") || subCmd.equals("sub") || subCmd.equals("undo"))
-                && (channel.equals(lpReportsChannel) || channel.equals(ioReportsChannel));
-        boolean isTestChannel = channel.equals(testChannel);
+        boolean isDraftCommand =
+                subCmd.equals("startdraft") || subCmd.equals("forcesub") || subCmd.equals("forceend");
+        boolean isReportCommand =
+                subCmd.equals("cycle") || subCmd.equals("sub") || subCmd.equals("undo");
 
-        return !(isEntryChannel || isDraftChannel || isReportsChannel
-                || isTestChannel);
+        boolean inEntryChannel = (subCmd.equals("add") || subCmd.equals("grad"))
+                && channel.equals(entryChannel);
+        boolean inLPChannel = prefix.equals("lp") && isDraftCommand
+                && channel.equals(lpDraftChannel);
+        boolean inIOChannel = prefix.equals("io") && isDraftCommand
+                && channel.equals(ioDraftChannel);
+        boolean inLPReportsChannel = prefix.equals("lp") && isReportCommand
+                && channel.equals(lpReportsChannel);
+        boolean inIOReportsChannel = prefix.equals("io") && isReportCommand
+                && channel.equals(ioReportsChannel);
+        boolean inTestChannel = channel.equals(testChannel);
+
+        return !(inEntryChannel || inLPChannel || inIOChannel
+                || inLPReportsChannel || inIOReportsChannel
+                || inTestChannel);
     }
 
     /**
@@ -233,7 +244,7 @@ public class Events extends ListenerAdapter {
         if (ioDrafts != null) {
             for (Map.Entry<Integer, Draft> draft : ioDrafts.entrySet()) {
                 if (draftExpired(interaction, draft.getKey(), draft.getValue(),
-                        lpDrafts, lpQueue)) {
+                        ioDrafts, ioQueue)) {
                     break;
                 }
             }
@@ -517,7 +528,8 @@ public class Events extends ListenerAdapter {
 
         String cmdPrefix = sc.getName();
         if (isStaffCommand(sc) || wrongChannelUsed(sc)) {
-            sc.reply("You do not have permission to use this command here.").queue();
+            sc.reply("You do not have permission to use this command here.")
+                    .setEphemeral(true).queue();
             return;
         }
 
