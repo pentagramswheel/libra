@@ -59,7 +59,6 @@ java src/main/java/bot/Main.java
 | :-------: | ------- | ------- |
 | mit status | Checks to see if the bot is online. |
 | mit help | Outputs troubleshooting information for the bot. |
-| mit profile | Outputs a summary of a player's profile within MIT. |
 | mit genmaps | Generates a map list for a draft. | 1. `matches` - the amount of maps needed for the amount of matches going to be played. |
 | mit draftdoc | Retrieves the automated draft system documentation. |
 | lp/io startdraft | Starts an automatic MIT draft. |
