@@ -188,21 +188,22 @@ public class Events extends ListenerAdapter {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Command Troubleshooting");
         eb.setColor(Color.BLUE);
-        eb.addField("Manual Draft Reporting",
+        eb.addField("Manual Draft System [Staff]",
                 "If a match report is giving you an error message, \n"
                         + "it is most likely due to a row in the spreadsheet \n"
                         + "missing information. For example, one common \n"
                         + "problem is presetting or overextending the \n"
                         + "formulas past the bottommost row.",
                 false);
-        eb.addField("Entering and Graduating Players",
+        eb.addField("Automatic Draft System",
+                "(See the FAQ portion of `/mit draftdoc`)",
+                false);
+        eb.addField("Entering and Graduating Players [Staff]",
                 "If the role for a player isn't showing up or seemingly \n"
                         + "isn't being added, try *refreshing the roles* by opening \n"
                         + "`Server Settings > User Management > Members`. \n"
                         + "A second layer of refreshing can be done by \n"
-                        + "searching for a player's name in `... > Members`. \n"
-                        + "The roles should exist; this is currently a bug within \n"
-                        + "Discord.",
+                        + "searching for a player's name in `... > Members`.",
                 false);
 
         sc.getHook().editOriginalEmbeds(eb.build()).queue();
