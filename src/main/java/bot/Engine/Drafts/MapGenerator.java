@@ -48,7 +48,7 @@ public class MapGenerator implements Command {
     private TreeMap<String, ArrayList<String>> getLegalMaps() {
         TreeMap<String, ArrayList<String>> legalMaps = new TreeMap<>();
         ArrayList<String> szMaps = new ArrayList<>(Arrays.asList(
-                "Ancho-V Games", "Goby Arena", "Humpback Pumptrack",
+                "Ancho-V Games", "Goby Arena", "Humpback Pump Track",
                 "MakoMart", "Manta Maria", "Musselforge Fitness",
                 "New Albacore Hotel", "Piranha Pit", "Skipper Pavilion",
                 "Starfish Mainstage", "Sturgeon Shipyard", "The Reef",

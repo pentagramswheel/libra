@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** February 5, 2022
+**Last Updated:** February 6, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -55,20 +55,21 @@ java src/main/java/bot/Main.java
 
 
 ## Command Usage
-| Command | Usage | Parameters |
+| Slash Command | Usage | Parameters |
 | :-------: | ------- | ------- |
 | mit status | Checks to see if the bot is online. |
 | mit help | Outputs troubleshooting information for the bot. |
 | mit profile | Outputs a summary of a player's profile within MIT. |
 | mit genmaps | Generates a map list for a draft. | 1. `matches` - the amount of maps needed for the amount of matches going to be played. |
+| mit draftdoc | Retrieves the automated draft system documentation. |
 | lp/io startdraft | Starts an automatic MIT draft. |
-| lp/io forcesub | Forces a player within a MIT draft to become a sub. |
-| lp/io forceend | Forces a MIT draft to end. |
-| lp/io cycle | Manually updates players' MIT draft stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
-| lp/io sub | Manually updates subs' MIT draft stats through an affiliated spreadsheet. | 1. `games played` - the amount of games played in a set.<br />2. `score` - the amount of winning games of the set.<br />3. `users` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| lp/io forcesub | Forces a player within a MIT draft to become a sub. | 1. `numdraft` - the numbered draft to consider.<br />2. `player` - the player to sub out. |
+| lp/io forceend | Forces a MIT draft to end. | 1. `numdraft` - the numbered draft to consider. |
+| lp/io cycle | Manually updates players' MIT draft stats through an affiliated spreadsheet. | 1. `matches` - the amount of games played in a set.<br />2. `won` - the amount of winning games of the set.<br />3. `players` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| lp/io sub | Manually updates subs' MIT draft stats through an affiliated spreadsheet. | 1. `matches` - the amount of games played in a set.<br />2. `won` - the amount of winning games of the set.<br />3. `players` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | lp/io undo | Reverts the previous MIT draft command, *once and only once*. |
-| lp/io add | Gives players a MIT draft area role. | 1. `users` - Discord users in the form of Discord pings. |
-| lp/io grad | Graduates players from a MIT draft area, logging their status on an affiliated spreadsheet and replacing their current draft role with its graduate role. | 1. `users` - Discord users in the form of Discord pings. |
+| lp/io add | Gives players a MIT draft area role. | 1. `players` - Discord users in the form of Discord pings. |
+| lp/io grad | Graduates players from a MIT draft area, logging their status on an affiliated spreadsheet and replacing their current draft role with its graduate role. | 1. `players` - Discord users in the form of Discord pings. |
 
 ----
 

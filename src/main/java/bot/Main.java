@@ -39,6 +39,8 @@ public class Main {
                 "Displays troubleshooting information for the commands.");
         SubcommandData genmaps = new SubcommandData("genmaps",
                 "Generates a set map list.");
+        SubcommandData draftdoc = new SubcommandData("draftdoc",
+                "Retrieves the documentation for the automated draft system.");
 
         OptionData maps = new OptionData(
                 OptionType.INTEGER, "matches",
@@ -105,7 +107,7 @@ public class Main {
         }
 
         // implementing commands
-        mit.addSubcommands(status, help, genmaps);
+        mit.addSubcommands(status, help, genmaps, draftdoc);
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
                 startdraft, forcesub, forceend,
@@ -131,7 +133,7 @@ public class Main {
                     .build();
 
             // run only if all slash commands have not been implemented yet
-//            Main.implementSlashCommands(jda);
+            Main.implementSlashCommands(jda);
 
             String status = "Splatoon 3";
             jda.getPresence().setPresence(

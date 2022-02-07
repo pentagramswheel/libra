@@ -48,7 +48,7 @@ public class DraftProcess {
     private final TreeMap<String, DraftPlayer> team2;
 
     /** The max amount of won matches within a draft. */
-    private final static int MAX_SCORE = 7;
+    private final static int MAX_SCORE = 4;
 
     /** The scoreboard of the draft. */
     private int scoreTeam1;

@@ -140,6 +140,9 @@ public class Events extends ListenerAdapter {
         Guild server = sc.getGuild();
         String prefix = sc.getName();
         String subCmd = sc.getSubcommandName();
+        if (prefix.equals("mit")) {
+            return false;
+        }
 
         String entryChannel = server.getTextChannelsByName(
                 "mit-entry-confirmation", false).get(0).getName();
@@ -448,6 +451,11 @@ public class Events extends ListenerAdapter {
                 MapGenerator maps = new MapGenerator();
                 maps.runCmd(sc);
                 break;
+            case "draftdoc":
+                String docLink =
+                        "https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing";
+                sc.getHook().sendMessage(docLink).queue();
+                break;
         }
     }
 
@@ -525,14 +533,13 @@ public class Events extends ListenerAdapter {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent sc) {
         timeoutDrafts(sc);
-
-        String cmdPrefix = sc.getName();
         if (isStaffCommand(sc) || wrongChannelUsed(sc)) {
             sc.reply("You do not have permission to use this command here.")
                     .setEphemeral(true).queue();
             return;
         }
 
+        String cmdPrefix = sc.getName();
         switch (cmdPrefix) {
             case "mit":
                 parseGeneralCommands(sc);
@@ -573,7 +580,8 @@ public class Events extends ListenerAdapter {
         Draft currDraft = drafts.get(numButton);
         // may change in the future if more buttons are created
         if (currDraft == null) {
-            bc.reply("Sorry but that draft has expired.")
+            bc.reply("Sorry but that draft has expired. "
+                            + "Feel free to start a new one!")
                     .setEphemeral(true).queue();
             return;
         }

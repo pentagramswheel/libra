@@ -127,11 +127,22 @@ public class Draft extends Section implements Command {
             buttons.add(Components.ForDraft.leave(idSuffix)
                     .withStyle(ButtonStyle.SECONDARY).asDisabled());
 
-            getMessage(interaction)
-                    .editMessage("This draft request has expired.")
-                    .setActionRow(buttons).queue();
+            String caption = "This draft has expired.";
+            boolean matchesFound =
+                    getProcess().getScoreTeam1() + getProcess().getScoreTeam2() > 0;
+            if (getProcess() != null && matchesFound) {
+                caption = "This draft has ended.";
+            }
 
-            log("A draft request has timed out.", false);
+            getMessage(interaction)
+                    .editMessage(caption)
+                    .setActionRow(Components.ForDraft
+                            .endDraft(getPrefix() + getNumDraft())
+                            .withStyle(ButtonStyle.SECONDARY).asDisabled()).queue();
+
+            String update = "A " + getPrefix().toUpperCase()
+                    + " draft request has timed out.";
+            log(update, false);
             return true;
         }
 
@@ -427,6 +438,7 @@ public class Draft extends Section implements Command {
         if (convertedSub == null) {
             sendReply(bc, "You are not part of this draft!", true);
         } else if (getProcess() == null || !getProcess().hasStarted()) {
+            subsNeededTeam1++;
             String update = getSectionRole() + " +1";
             refresh(bc);
             sendResponse(bc, update, false);
@@ -465,6 +477,7 @@ public class Draft extends Section implements Command {
         if (convertedSub == null) {
             sendReply(sc, "That player is not part of this draft.", true);
         } else if (getProcess() == null || !getProcess().hasStarted()) {
+            subsNeededTeam1++;
             String update = getSectionRole() + " +1 "
                     + "(see above drafts after refreshing).";
             sendReply(sc, update, false);
@@ -489,11 +502,15 @@ public class Draft extends Section implements Command {
         String playerID = bc.getMember().getId();
         boolean inDraft = getPlayers().containsKey(playerID)
                 || getSubs().containsKey(playerID);
-        int subsNeeded = getSubsNeededTeam1() + getSubsNeededTeam2();
 
         if (inDraft) {
-            sendReply(bc, "You already in the draft!", true);
-        } else if (subsNeeded == 0) {
+            sendReply(bc, "You are already in the draft!", true);
+        } else if ((getProcess() == null || !getProcess().hasStarted())
+                && getSubsNeededTeam1() > 0) {
+            subsNeededTeam1--;
+            getPlayers().put(playerID, new DraftPlayer());
+            refresh(bc);
+        } else if (getSubsNeededTeam1() + getSubsNeededTeam2() == 0) {
             sendReply(bc, "This draft hasn't requested any subs yet.", true);
         } else {
             getSubs().put(playerID, new DraftPlayer());
