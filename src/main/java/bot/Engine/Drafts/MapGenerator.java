@@ -151,13 +151,19 @@ public class MapGenerator implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
+        sc.deferReply().queue();
         List<OptionMapping> args = sc.getOptions();
 
         int numGens = getListSize(args);
         if (numGens > 9) {
-            sendResponse(sc,
+            sendReply(sc,
                     "Too many maps requested. The set would be too long!", true);
             log("A requested map list was too long.", false);
+            return;
+        } else if (numGens <= 0) {
+            sendReply(sc,
+                    "Why would you request zero or less maps?", true);
+            log("A requested map list was too short.", false);
             return;
         }
 

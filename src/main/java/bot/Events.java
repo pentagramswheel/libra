@@ -423,8 +423,6 @@ public class Events extends ListenerAdapter {
      * @param sc the slash command to analyze.
      */
     private void parseGeneralCommands(SlashCommandEvent sc) {
-        sc.deferReply().queue();
-
         Member author = sc.getMember();
         String subGroup = sc.getSubcommandGroup();
         String subCmd = sc.getSubcommandName();
@@ -437,16 +435,14 @@ public class Events extends ListenerAdapter {
 
         switch (subCmd) {
             case "status":
-                sc.getHook().sendMessageFormat(
-                        "The bot is online. Welcome, %s.",
-                        author.getEffectiveName()).queue();
+                sc.reply("The bot is online. Welcome, "
+                        + author.getEffectiveName()).queue();
                 break;
             case "help":
                 printTroubleshootString(sc);
                 break;
             case "profile":
-                sc.getHook().sendMessage(
-                        "This command has not been implemented yet.").queue();
+                sc.reply("This command has not been implemented yet.").queue();
                 break;
             case "genmaps":
                 MapGenerator maps = new MapGenerator();
@@ -455,7 +451,7 @@ public class Events extends ListenerAdapter {
             case "draftdoc":
                 String docLink =
                         "https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing";
-                sc.getHook().sendMessage(docLink).queue();
+                sc.reply(docLink).queue();
                 break;
         }
     }
