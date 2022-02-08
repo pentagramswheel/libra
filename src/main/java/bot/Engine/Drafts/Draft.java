@@ -119,7 +119,8 @@ public class Draft extends Section implements Command {
         long timeLimit = 2700000;
         long currentTime = System.currentTimeMillis();
 
-        if (!isInitialized() && currentTime - startTime > timeLimit) {
+        if (messageID != null && !isInitialized()
+                && currentTime - startTime > timeLimit) {
             ArrayList<Button> buttons = new ArrayList<>();
             String idSuffix = getPrefix().toUpperCase() + getNumDraft();
             buttons.add(Components.ForDraft.joinDraft(idSuffix)
@@ -128,9 +129,9 @@ public class Draft extends Section implements Command {
                     .withStyle(ButtonStyle.SECONDARY).asDisabled());
 
             String caption = "This draft has expired.";
-            boolean matchesFound =
-                    getProcess().getScoreTeam1() + getProcess().getScoreTeam2() > 0;
-            if (getProcess() != null && matchesFound) {
+            boolean matchesFound = getProcess() != null
+                    && getProcess().getScoreTeam1() + getProcess().getScoreTeam2() > 0;
+            if (matchesFound) {
                 caption = "This draft has ended.";
             }
 
@@ -336,12 +337,22 @@ public class Draft extends Section implements Command {
     }
 
     /**
-     * Updates the draft request.
-     * @param interaction the user interaction calling this method.
+     * Refreshes the draft request's caption.
+     * @param bc a button click to analyze.
      */
-    private void updateRequest(GenericInteractionCreateEvent interaction) {
-        editMessage(interaction, newPing());
-        updateReport(interaction);
+    public void refresh(ButtonClickEvent bc) {
+        bc.deferEdit().queue();
+        messageID = bc.getMessage().getId();
+
+        int subsNeeded = getSubsNeededTeam1() + getSubsNeededTeam2();
+        if (subsNeeded == 0) {
+            editMessage(bc, newPing());
+        } else {
+            editMessage(bc,
+                    newPing() + "   // " + subsNeeded + " sub(s) needed");
+        }
+
+        updateReport(bc);
     }
 
     /**
@@ -386,30 +397,10 @@ public class Draft extends Section implements Command {
 
             sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
                     buttons);
-            updateRequest(bc);
-
             toggleDraft();
-        } else {
-            updateRequest(bc);
-            messageID = bc.getMessage().getId();
         }
-    }
 
-    /**
-     * Refreshes the draft request's caption.
-     * @param bc a button click to analyze.
-     */
-    public void refresh(ButtonClickEvent bc) {
-        bc.deferEdit().queue();
-
-        int subsNeeded = getSubsNeededTeam1() + getSubsNeededTeam2();
-        if (subsNeeded == 0) {
-            editMessage(bc, newPing());
-        } else {
-            editMessage(bc,
-                    newPing() + "   // " + subsNeeded + " sub(s) needed");
-        }
-        updateReport(bc);
+        refresh(bc);
     }
 
     /**
@@ -537,9 +528,7 @@ public class Draft extends Section implements Command {
             bc.deferEdit().queue();
 
             getPlayers().remove(playerID);
-
-            editMessage(bc, newPing());
-            updateReport(bc);
+            refresh(bc);
         }
     }
 
@@ -588,8 +577,7 @@ public class Draft extends Section implements Command {
         buttons.add(Components.ForDraft.leave(idSuffix));
 
         String caption = getSectionRole() + " +7";
-        sc.reply(caption).addActionRow(buttons).queue(
-                (message) -> messageID = message.getInteraction().getId());
+        sc.reply(caption).addActionRow(buttons).queue();
 
         log("A " + getPrefix().toUpperCase()
                 + " draft has been requested.", false);

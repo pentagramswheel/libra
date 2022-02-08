@@ -579,7 +579,6 @@ public class Events extends ListenerAdapter {
         }
 
         Draft currDraft = drafts.get(numButton);
-        // may change in the future if more buttons are created
         if (currDraft == null) {
             bc.reply("Sorry but that draft has expired. "
                             + "Feel free to start a new one!")
