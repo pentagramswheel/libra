@@ -296,6 +296,7 @@ public class DraftProcess {
      * @param sm a menu selection to analyze.
      */
     public void addPlayerToTeam(SelectionMenuEvent sm) {
+        resetEndDraftButton();
         SelectOption chosenCaptain = sm.getInteraction().getSelectedOptions().get(0);
         String captainID = chosenCaptain.getValue();
         String playerID = sm.getMember().getId();
@@ -453,7 +454,7 @@ public class DraftProcess {
      * @param bc the button click to analyze.
      * @param authorID the Discord ID of the player who clicked the button.
      */
-    public void addPointToTeam(ButtonClickEvent bc, String authorID){
+    public void addPointToTeam(ButtonClickEvent bc, String authorID) {
         bc.deferEdit().queue();
         resetEndDraftButton();
 

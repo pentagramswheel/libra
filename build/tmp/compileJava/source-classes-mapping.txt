@@ -1,25 +1,26 @@
 bot/Engine/Drafts/Draft.java
  bot.Engine.Drafts.Draft
-bot/Events.java
- bot.Events
+bot/Main.java
+ bot.Main
 bot/Engine/Drafts/MapGenerator.java
  bot.Engine.Drafts.MapGenerator
-bot/Engine/Drafts/AutoLog.java
- bot.Engine.Drafts.AutoLog
+bot/Tools/ButtonBuilder.java
+ bot.Tools.ButtonBuilder
 bot/Config.java
  bot.Config
 bot/Engine/Section.java
  bot.Engine.Section
 bot/Engine/Drafts/DraftPlayer.java
  bot.Engine.Drafts.DraftPlayer
-bot/Engine/Drafts/ManualLog.java
- bot.Engine.Drafts.ManualLog
+bot/Engine/Add.java
+ bot.Engine.Add
 bot/Engine/PlayerStats.java
  bot.Engine.PlayerStats
 bot/Tools/SelectionMenuBuilder.java
  bot.Tools.SelectionMenuBuilder
-bot/Engine/Drafts/Undo.java
- bot.Engine.Drafts.Undo
+bot/Tools/ArrayHeapMinPQ.java
+ bot.Tools.ArrayHeapMinPQ
+ bot.Tools.ArrayHeapMinPQ$Node
 bot/Tools/FileHandler.java
  bot.Tools.FileHandler
 bot/Tools/Components.java
@@ -28,20 +29,19 @@ bot/Tools/Components.java
  bot.Tools.Components$ForDraftProcess
 bot/ConfigExample.java
  bot.ConfigExample
-bot/Tools/GoogleAPI.java
- bot.Tools.GoogleAPI
-bot/Tools/Command.java
- bot.Tools.Command
 bot/Engine/Drafts/DraftProcess.java
  bot.Engine.Drafts.DraftProcess
-bot/Tools/ArrayHeapMinPQ.java
- bot.Tools.ArrayHeapMinPQ
- bot.Tools.ArrayHeapMinPQ$Node
+bot/Tools/Command.java
+ bot.Tools.Command
+bot/Events.java
+ bot.Events
+bot/Engine/Drafts/AutoLog.java
+ bot.Engine.Drafts.AutoLog
+bot/Tools/GoogleAPI.java
+ bot.Tools.GoogleAPI
+bot/Engine/Drafts/ManualLog.java
+ bot.Engine.Drafts.ManualLog
 bot/Engine/Graduate.java
  bot.Engine.Graduate
-bot/Engine/Add.java
- bot.Engine.Add
-bot/Tools/ButtonBuilder.java
- bot.Tools.ButtonBuilder
-bot/Main.java
- bot.Main
+bot/Engine/Drafts/Undo.java
+ bot.Engine.Drafts.Undo

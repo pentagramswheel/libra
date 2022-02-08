@@ -75,23 +75,46 @@ public class Events extends ListenerAdapter {
      *         False otherwise.
      */
     private boolean gamesPlayedValid(SlashCommandEvent sc) {
-        InteractionHook interaction = sc.getHook();
         List<OptionMapping> args = sc.getOptions();
 
         int gamesPlayed = (int) args.get(0).getAsLong();
         int gamesWon = (int) args.get(1).getAsLong();
 
         if (gamesPlayed < gamesWon) {
-            interaction.sendMessage("Total games won cannot go beyond the set. "
-                    + "Try again.").queue();
+            sc.reply("Total games won cannot go beyond the set. Try again.")
+                    .setEphemeral(true).queue();
             return false;
         } else if (gamesPlayed < 0 || gamesWon < 0) {
-            interaction.sendMessage(
-                    "The amount games played can't be negative?").queue();
+            sc.reply("The amount games played can't be negative.")
+                    .setEphemeral(true).queue();
             return false;
         } else if (gamesPlayed > 19) {
-            interaction.sendMessage(
-                    "Are you sure that's how many games were played?").queue();
+            sc.reply("Are you sure that's how many games were played?")
+                    .setEphemeral(true).queue();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if the number of maps needed for a map generation
+     * makes sense.
+     * @param sc the user's inputted command.
+     * @return True if the number of maps was between 1 and 9.
+     *         False otherwise.
+     */
+    private boolean mapsNeededValid(SlashCommandEvent sc) {
+        List<OptionMapping> args = sc.getOptions();
+
+        int numMaps = (int) args.get(0).getAsLong();
+        if (numMaps > 7) {
+            sc.reply("Too many maps requested. The set would be too long!")
+                    .setEphemeral(true).queue();
+            return false;
+        } else if (numMaps < 1) {
+            sc.reply("Why would you request zero or less maps?")
+                    .setEphemeral(true).queue();
             return false;
         }
 
@@ -185,6 +208,8 @@ public class Events extends ListenerAdapter {
      * @param sc the user's inputted command.
      */
     private void printTroubleshootString(SlashCommandEvent sc) {
+        sc.deferReply().queue();
+
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Command Troubleshooting");
         eb.setColor(Color.BLUE);
@@ -445,8 +470,10 @@ public class Events extends ListenerAdapter {
                 sc.reply("This command has not been implemented yet.").queue();
                 break;
             case "genmaps":
-                MapGenerator maps = new MapGenerator();
-                maps.runCmd(sc);
+                if (mapsNeededValid(sc)) {
+                    MapGenerator maps = new MapGenerator();
+                    maps.runCmd(sc);
+                }
                 break;
             case "draftdoc":
                 String docLink =

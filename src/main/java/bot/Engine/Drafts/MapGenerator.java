@@ -33,15 +33,6 @@ public class MapGenerator implements Command {
     }
 
     /**
-     * Retrieve the size of the map list.
-     * @param args the arguments of the command.
-     * @return said amount.
-     */
-    private int getListSize(List<OptionMapping> args) {
-        return (int) args.get(0).getAsLong();
-    }
-
-    /**
      * Retrieves the legal maps for each game mode.
      * @return said legal maps.
      */
@@ -154,18 +145,7 @@ public class MapGenerator implements Command {
         sc.deferReply().queue();
         List<OptionMapping> args = sc.getOptions();
 
-        int numGens = getListSize(args);
-        if (numGens > 9) {
-            sendResponse(sc,
-                    "Too many maps requested. The set would be too long!", true);
-            log("A requested map list was too long.", false);
-            return;
-        } else if (numGens <= 0) {
-            sendResponse(sc,
-                    "Why would you request zero or less maps?", true);
-            log("A requested map list was too short.", false);
-            return;
-        }
+        int numMaps = (int) args.get(0).getAsLong();
 
         int numModes = 0;
         ArrayList<String> modes = new ArrayList<>();
@@ -175,7 +155,7 @@ public class MapGenerator implements Command {
         ArrayList<String> pastMaps = new ArrayList<>();
 
         ArrayList<EmbedBuilder> matches = new ArrayList<>();
-        for (int i = 0; i < numGens; i++) {
+        for (int i = 0; i < numMaps; i++) {
             if (numModes == 0) {
                 resetModes(modes);
                 numModes = 4;
