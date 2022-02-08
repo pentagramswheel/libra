@@ -337,22 +337,12 @@ public class Draft extends Section implements Command {
     }
 
     /**
-     * Refreshes the draft request's caption.
-     * @param bc a button click to analyze.
+     * Updates the draft request.
+     * @param interaction the user interaction calling this method.
      */
-    public void refresh(ButtonClickEvent bc) {
-        bc.deferEdit().queue();
-        messageID = bc.getMessage().getId();
-
-        int subsNeeded = getSubsNeededTeam1() + getSubsNeededTeam2();
-        if (subsNeeded == 0) {
-            editMessage(bc, newPing());
-        } else {
-            editMessage(bc,
-                    newPing() + "   // " + subsNeeded + " sub(s) needed");
-        }
-
-        updateReport(bc);
+    private void updateRequest(GenericInteractionCreateEvent interaction) {
+        editMessage(interaction, newPing());
+        updateReport(interaction);
     }
 
     /**
@@ -397,10 +387,51 @@ public class Draft extends Section implements Command {
 
             sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
                     buttons);
+            updateRequest(bc);
+
             toggleDraft();
+        } else {
+            updateRequest(bc);
+            messageID = bc.getMessageId();
+        }
+    }
+
+    /**
+     * Refreshes the draft request's caption.
+     * @param bc a button click to analyze.
+     */
+    public void refresh(ButtonClickEvent bc) {
+        bc.deferEdit().queue();
+        messageID = bc.getMessageId();
+
+        int subsNeeded = getSubsNeededTeam1() + getSubsNeededTeam2();
+        if (subsNeeded == 0) {
+            editMessage(bc, newPing());
+        } else {
+            editMessage(bc,
+                    newPing() + "   // " + subsNeeded + " sub(s) needed");
         }
 
-        refresh(bc);
+        updateReport(bc);
+    }
+
+    /**
+     * Removes a player from the draft, if possible, via a button.
+     * @param bc a button click to analyze.
+     */
+    public void removeFromQueue(ButtonClickEvent bc) {
+        String playerID = bc.getMember().getId();
+        messageID = bc.getMessageId();
+
+        if (!getPlayers().containsKey(playerID)) {
+            sendReply(bc, "You're not in this draft!", true);
+        } else {
+            bc.deferEdit().queue();
+
+            getPlayers().remove(playerID);
+            editMessage(bc, newPing());
+            updateReport(bc);
+        }
     }
 
     /**
@@ -430,8 +461,8 @@ public class Draft extends Section implements Command {
             sendReply(bc, "You are not part of this draft!", true);
         } else if (getProcess() == null || !getProcess().hasStarted()) {
             subsNeededTeam1++;
-            String update = getSectionRole() + " +1";
             refresh(bc);
+            String update = getSectionRole() + " +1";
             sendResponse(bc, update, false);
         } else if (convertedSub.getPings() > 0) {
             sendReply(bc, "You have already been subbed out of the draft!",
@@ -472,6 +503,9 @@ public class Draft extends Section implements Command {
             String update = getSectionRole() + " +1 "
                     + "(see above drafts after refreshing).";
             sendReply(sc, update, false);
+        } else if (convertedSub.getPings() > 0) {
+            sendReply(sc, "That player has already been subbed out of the draft!",
+                    true);
         } else {
             getSubs().put(playerID, convertedSub);
 
@@ -512,23 +546,6 @@ public class Draft extends Section implements Command {
                     + " will be subbing for this draft in "
                     + getDraftChannel().getAsMention() + ".";
             sendResponse(bc, update, false);
-        }
-    }
-
-    /**
-     * Removes a player from the draft, if possible, via a button.
-     * @param bc a button click to analyze.
-     */
-    public void removeFromQueue(ButtonClickEvent bc) {
-        String playerID = bc.getMember().getId();
-
-        if (!getPlayers().containsKey(playerID)) {
-            sendReply(bc, "You're not in this draft!", true);
-        } else {
-            bc.deferEdit().queue();
-
-            getPlayers().remove(playerID);
-            refresh(bc);
         }
     }
 
