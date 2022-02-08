@@ -32,6 +32,9 @@ public class Draft extends Section implements Command {
     /** Flag for checking whether this draft has initialized or not. */
     private boolean initialized;
 
+    /** The time limit for a request to expire (last number is the time in minutes). */
+    private final static int TIME_LIMIT = 1000 * 60 * 45;
+
     /** The starting time of this draft's initial request. */
     private final long startTime;
 
@@ -45,14 +48,13 @@ public class Draft extends Section implements Command {
     private final TreeMap<String, DraftPlayer> players;
     private final TreeMap<String, DraftPlayer> subs;
 
+    /** The indices of the captains of this draft. */
+    private int captain1, captain2;
+
     /**
      * The subs amount of subs needed for each draft team.
      */
-    private int subsNeededTeam1;
-    private int subsNeededTeam2;
-
-    /** The indexes of the captains of this draft. */
-    private int captain1, captain2;
+    private int subsNeededTeam1, subsNeededTeam2;
 
     /** The draft chat channel this draft is occurring in. */
     private final TextChannel draftChat;
@@ -118,12 +120,10 @@ public class Draft extends Section implements Command {
      *         False otherwise.
      */
     public boolean timedOut(GenericInteractionCreateEvent interaction) {
-        // time limit of 45 minutes
-        long timeLimit = 2700000;
         long currentTime = System.currentTimeMillis();
 
         if (messageID != null && !isInitialized()
-                && currentTime - startTime > timeLimit) {
+                && currentTime - startTime > TIME_LIMIT) {
             ArrayList<Button> buttons = new ArrayList<>();
             String idSuffix = getPrefix().toUpperCase() + getNumDraft();
             buttons.add(Components.ForDraft.joinDraft(idSuffix)
@@ -432,6 +432,7 @@ public class Draft extends Section implements Command {
             bc.deferEdit().queue();
 
             getPlayers().remove(playerID);
+
             editMessage(bc, newPing());
             updateReport(bc);
         }

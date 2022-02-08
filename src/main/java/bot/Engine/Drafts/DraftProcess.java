@@ -37,8 +37,7 @@ public class DraftProcess {
     private final Draft draft;
 
     /** The Discord IDs of the captains of the draft. */
-    private String captainID1;
-    private String captainID2;
+    private String captainID1, captainID2;
 
     /** The non-captain players of the draft. */
     private final TreeMap<String, DraftPlayer> regularPlayers;
@@ -50,9 +49,8 @@ public class DraftProcess {
     /** The max amount of won matches within a draft. */
     private final static int MAX_SCORE = 4;
 
-    /** The scoreboard of the draft. */
-    private int scoreTeam1;
-    private int scoreTeam2;
+    /** The team's scores of the draft. */
+    private int scoreTeam1, scoreTeam2;
 
     /** The players who have clicked the 'End Draft` button consecutively. */
     private List<String> endButtonClicked;
