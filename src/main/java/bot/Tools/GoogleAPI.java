@@ -88,12 +88,12 @@ public class GoogleAPI {
                 .setAccessType("offline")
                 .build();
 
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+//        LocalServerReceiver receiver = new LocalServerReceiver();                                   // for local
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();     // for JAR
         AuthorizationCodeInstalledApp oAuth = new AuthorizationCodeInstalledApp(
                 flow, receiver);
-        Credential credential = oAuth.authorize("user");
 
-        return credential;
+        return oAuth.authorize("user");
     }
 
     /**
