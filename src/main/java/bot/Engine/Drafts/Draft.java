@@ -419,6 +419,38 @@ public class Draft extends Section implements Command {
     }
 
     /**
+     * Repings for remaining players.
+     * @param bc a button click to analyze.
+     */
+    public void reping(ButtonClickEvent bc) {
+        String authorID = bc.getMember().getId();
+        long currentTime = System.currentTimeMillis();
+        long waitTime = TIME_LIMIT / 3;
+
+        if (!getPlayers().containsKey(authorID)) {
+            sendReply(bc, "You're not in this draft!", true);
+        } else if (currentTime - startTime < waitTime) {
+            int approxTime = (int) waitTime / 60000;
+            sendReply(bc, "Wait until " + approxTime
+                    + " minutes have passed!", true);
+        } else {
+            bc.deferEdit().queue();
+
+            List<Button> buttons = new ArrayList<>();
+            String idSuffix = getPrefix().toUpperCase() + getNumDraft();
+
+            buttons.add(Components.ForDraft.joinDraft(idSuffix));
+            buttons.add(Components.ForDraft.refresh(idSuffix));
+            buttons.add(Components.ForDraft.reping(idSuffix).asDisabled());
+            buttons.add(Components.ForDraft.leave(idSuffix));
+
+            sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
+                    buttons);
+            sendResponse(bc, newPing() + " (see above drafts)", false);
+        }
+    }
+
+    /**
      * Removes a player from the draft, if possible, via a button.
      * @param bc a button click to analyze.
      */
@@ -462,7 +494,7 @@ public class Draft extends Section implements Command {
         DraftPlayer convertedSub = removePlayer(playerID);
 
         if (convertedSub == null) {
-            sendReply(bc, "You are not part of this draft!", true);
+            sendReply(bc, "You're not in this draft!", true);
         } else if (getProcess() == null || !getProcess().hasStarted()) {
             subsNeededTeam1++;
             refresh(bc);
@@ -480,7 +512,7 @@ public class Draft extends Section implements Command {
 
             refresh(bc);
 
-            String update = getSectionRole() + " sub requested.";
+            String update = getSectionRole() + " sub requested";
             sendResponse(bc, update, false);
         }
     }
@@ -494,7 +526,7 @@ public class Draft extends Section implements Command {
         String authorID = sc.getMember().getId();
         if (!getPlayers().containsKey(authorID)
                 && !getSubs().containsKey(authorID)) {
-            sendReply(sc, "You are not in that draft!", true);
+            sendReply(sc, "You're not in that draft!", true);
             return;
         }
 
@@ -533,7 +565,7 @@ public class Draft extends Section implements Command {
                 || getSubs().containsKey(playerID);
 
         if (inDraft) {
-            sendReply(bc, "You are already in the draft!", true);
+            sendReply(bc, "You are already in this draft!", true);
         } else if ((getProcess() == null || !getProcess().hasStarted())
                 && getSubsNeededTeam1() > 0) {
             subsNeededTeam1--;
@@ -595,6 +627,7 @@ public class Draft extends Section implements Command {
         String idSuffix = getPrefix().toUpperCase() + getNumDraft();
         buttons.add(Components.ForDraft.joinDraft(idSuffix));
         buttons.add(Components.ForDraft.refresh(idSuffix));
+        buttons.add(Components.ForDraft.reping(idSuffix));
         buttons.add(Components.ForDraft.leave(idSuffix));
 
         String caption = getSectionRole() + " +7";

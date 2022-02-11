@@ -613,6 +613,12 @@ public class Events extends ListenerAdapter {
             case "join":
                 currDraft.attemptDraft(bc);
                 break;
+            case "refresh":
+                currDraft.refresh(bc);
+                break;
+            case "reping":
+                currDraft.reping(bc);
+                break;
             case "leave":
                 currDraft.removeFromQueue(bc);
                 break;
@@ -621,9 +627,6 @@ public class Events extends ListenerAdapter {
                 break;
             case "sub":
                 currDraft.addSub(bc);
-                break;
-            case "refresh":
-                currDraft.refresh(bc);
                 break;
             case "endDraft":
                 if (currDraft.hasEnded(bc)) {

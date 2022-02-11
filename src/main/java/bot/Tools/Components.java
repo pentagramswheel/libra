@@ -37,6 +37,26 @@ public class Components {
         }
 
         /**
+         * Builds the "Refresh" button.
+         * @param suffix the button ID's suffix.
+         * @return said button.
+         */
+        public static Button refresh(String suffix) {
+            return new ButtonBuilder("refresh" + suffix,
+                    "Refresh", null, 2).getButton();
+        }
+
+        /**
+         * Builds the "Reping" button.
+         * @param suffix the button ID's suffix.
+         * @return said button.
+         */
+        public static Button reping(String suffix) {
+            return new ButtonBuilder("reping" + suffix,
+                    "Reping", null, 0).getButton();
+        }
+
+        /**
          * Builds the "Leave" button.
          * @param suffix the button ID's suffix.
          * @return the button.
@@ -79,16 +99,6 @@ public class Components {
         public static Button joinAsSub(String suffix) {
             return new ButtonBuilder("sub" + suffix,
                     "Join as Sub", null, 0).getButton();
-        }
-
-        /**
-         * Builds the "Refresh" button.
-         * @param suffix the button ID's suffix.
-         * @return said button.
-         */
-        public static Button refresh(String suffix) {
-            return new ButtonBuilder("refresh" + suffix,
-                    "Refresh", null, 2).getButton();
         }
 
         /**
