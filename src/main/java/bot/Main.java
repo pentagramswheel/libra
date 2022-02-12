@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import javax.security.auth.login.LoginException;
+import java.util.Random;
 
 /**
  * @author  Wil Aquino
@@ -125,11 +126,13 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
+            Random rGen = new Random();
+
             System.out.println();
             JDA jda = JDABuilder.createLight(Config.botToken)
                     .enableIntents(GatewayIntent.GUILD_PRESENCES)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                    .addEventListeners(new Events())
+                    .addEventListeners(new Events(rGen))
                     .build();
 
             // run only if all slash commands have not been implemented yet

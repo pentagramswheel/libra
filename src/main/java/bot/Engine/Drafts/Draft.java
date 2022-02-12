@@ -69,9 +69,10 @@ public class Draft extends Section implements Command {
      * @param draft the numbered draft that this draft is.
      * @param abbreviation the abbreviation of the section.
      * @param initialPlayer the first player of the draft.
+     * @param numGenerator a random number generator.
      */
-    public Draft(SlashCommandEvent sc, int draft,
-                 String abbreviation, Member initialPlayer) {
+    public Draft(SlashCommandEvent sc, int draft, String abbreviation,
+                 Member initialPlayer, Random numGenerator) {
         super(abbreviation);
 
         initialized = false;
@@ -81,11 +82,10 @@ public class Draft extends Section implements Command {
         subsNeededTeam2 = 0;
         numDraft = draft;
 
-        Random r = new Random();
-        captain1 = r.nextInt(8);
-        captain2 = r.nextInt(8);
+        captain1 = numGenerator.nextInt(8);
+        captain2 = numGenerator.nextInt(8);
         while (captain1 == captain2) {
-            captain2 = r.nextInt(8);
+            captain2 = numGenerator.nextInt(8);
         }
 //        captain1 = 0;
 //        captain2 = 5;

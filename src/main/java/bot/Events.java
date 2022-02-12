@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import org.slf4j.Logger;
@@ -26,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.Color;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 /**
@@ -38,6 +38,9 @@ import java.util.TreeMap;
  */
 public class Events extends ListenerAdapter {
 
+    /** A random number generator for the bot to use. */
+    private final Random numGenerator;
+
     /** Fields which determine the maximum number of drafts. */
     private final static int MAX_LP_DRAFTS = 4;
     private final static int MAX_IO_DRAFTS = 2;
@@ -49,6 +52,14 @@ public class Events extends ListenerAdapter {
     /** Fields for storing queued draft numbers. */
     private ArrayHeapMinPQ<Integer> lpQueue;
     private ArrayHeapMinPQ<Integer> ioQueue;
+
+    /**
+     * Loads the bot's event listener with a random number generator
+     * @param generator the random number generator.
+     */
+    public Events(Random generator) {
+        numGenerator = generator;
+    }
 
     /**
      * Checks whether a part of an input string can be found
@@ -296,7 +307,7 @@ public class Events extends ListenerAdapter {
         } else {
             int draftButton = queue.removeSmallest();
             Draft newDraft =
-                    new Draft(sc, draftButton, prefix, author);
+                    new Draft(sc, draftButton, prefix, author, numGenerator);
 
             ongoingDrafts.put(draftButton, newDraft);
             newDraft.runCmd(sc);
@@ -471,7 +482,7 @@ public class Events extends ListenerAdapter {
                 break;
             case "genmaps":
                 if (mapsNeededValid(sc)) {
-                    MapGenerator maps = new MapGenerator();
+                    MapGenerator maps = new MapGenerator(numGenerator);
                     maps.runCmd(sc);
                 }
                 break;

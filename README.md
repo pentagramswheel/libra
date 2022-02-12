@@ -94,12 +94,13 @@ A class consisting of credential-specific information, pertaining to Discord and
 The class which parses through user-inputted commands, as referenced in `Usage`.
 
 ###### Instance Variables
-1. `int MAX_LP_DRAFTS` - the maximum number of LaunchPoint drafts.
-2. `int MAX_IO_DRAFTS` - the maximum number of Ink Odyssey drafts.
-3. `TreeMap<Integer, Draft> lpDrafts` - a map of numbers/buttons to LaunchPoint drafts.
-4. `TreeMap<Integer, Draft> ioDrafts` - a map of numbers/buttons to Ink Odyssey drafts.
-5. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered LaunchPoint drafts.
-6. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered Ink Odyssey drafts.
+1. `Random rGen` - a random number generator for the bot.  
+2. `int MAX_LP_DRAFTS` - the maximum number of LaunchPoint drafts.
+3. `int MAX_IO_DRAFTS` - the maximum number of Ink Odyssey drafts.
+4. `TreeMap<Integer, Draft> lpDrafts` - a map of numbers/buttons to LaunchPoint drafts.
+5. `TreeMap<Integer, Draft> ioDrafts` - a map of numbers/buttons to Ink Odyssey drafts.
+6. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered LaunchPoint drafts.
+7. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered Ink Odyssey drafts.
 
 ----
 
@@ -267,6 +268,9 @@ A class which manually updates the draft stats of a user by processing the `lp/i
 #### MapGenerator
 
 A class which generates map lists.
+
+###### Instance Variables
+1. `Random numGenerator` - a random number generator for map generation.
 
 ----
 

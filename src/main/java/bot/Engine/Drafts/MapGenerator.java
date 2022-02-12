@@ -22,6 +22,17 @@ import java.util.Random;
  */
 public class MapGenerator implements Command {
 
+    /** A random number generator. */
+    private final Random numGenerator;
+
+    /**
+     * Loads the map generator's random number generator.
+     * @param r the random number generator to load.
+     */
+    public MapGenerator(Random r) {
+        numGenerator = r;
+    }
+
     /**
      * Resets the generator's available modes list.
      */
@@ -161,21 +172,20 @@ public class MapGenerator implements Command {
                 numModes = 4;
             }
 
-            Random r = new Random();
-            int rIndex = r.nextInt(numModes);
+            int rIndex = numGenerator.nextInt(numModes);
             String currMode = modes.get(rIndex);
             while (lastMode.equals(currMode)) {
-                rIndex = r.nextInt(numModes);
+                rIndex = numGenerator.nextInt(numModes);
                 currMode = modes.get(rIndex);
             }
             lastMode = modes.remove(rIndex);
             numModes--;
 
             ArrayList<String> modeMaps = legalMaps.get(currMode);
-            rIndex = r.nextInt(modeMaps.size());
+            rIndex = numGenerator.nextInt(modeMaps.size());
             String currMap = modeMaps.get(rIndex);
             while (pastMaps.contains(currMap)) {
-                rIndex = r.nextInt(modeMaps.size());
+                rIndex = numGenerator.nextInt(modeMaps.size());
                 currMap = modeMaps.get(rIndex);
             }
             pastMaps.add(modeMaps.remove(rIndex));
