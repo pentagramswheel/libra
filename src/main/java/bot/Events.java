@@ -183,11 +183,13 @@ public class Events extends ListenerAdapter {
         String lpDraftChannel = server.getTextChannelsByName(
                 "lp-looking-for-draft", false).get(0).getName();
         String lpReportsChannel = server.getTextChannelsByName(
-                "lp-staff-match-report", false).get(0).getName();
+//                "lp-staff-match-report", false).get(0).getName();
+                "lp-match-report", false).get(0).getName();
         String ioDraftChannel = server.getTextChannelsByName(
                 "io-looking-for-draft", false).get(0).getName();
         String ioReportsChannel = server.getTextChannelsByName(
-                "io-staff-match-report", false).get(0).getName();
+//                "io-staff-match-report", false).get(0).getName();
+                "io-match-report", false).get(0).getName();
         String testChannel = server.getTextChannelsByName(
                 "bot-testing", false).get(0).getName();
 
@@ -246,7 +248,7 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Checks whether a draft request expired or not.
+     * Checks whether a draft request expired or not (including ended drafts).
      * @param interaction the user interaction calling this method.
      * @param numDraft the number draft to analyze.
      * @param draft the actual draft to analyze.
@@ -258,7 +260,7 @@ public class Events extends ListenerAdapter {
                                  int numDraft, Draft draft,
                                  TreeMap<Integer, Draft> drafts,
                                  ArrayHeapMinPQ<Integer> queue) {
-        if (draft.timedOut(interaction)) {
+        if (draft.timedOut(interaction) && draft.hasEnded(null)) {
             drafts.remove(numDraft);
             queue.add(numDraft, numDraft);
             return true;
@@ -396,13 +398,14 @@ public class Events extends ListenerAdapter {
         }
 
         int numDraft = (int) args.get(0).getAsLong();
-        Draft draft = drafts.remove(numDraft);
+        Draft draft = drafts.get(numDraft);
         if (draft == null) {
             sc.reply("That number draft does not exist.")
                     .setEphemeral(true).queue();
-        } else {
-            draft.forceEnd(sc);
+        } else if (draft.forceEnd(sc)) {
+            drafts.remove(numDraft);
             queue.add(numDraft, numDraft);
+
             sc.reply("Draft ended. If any, please don't forget to delete the process "
                     + "interface in "
                     + draft.getDraftChannel().getAsMention() + ".").queue();
@@ -624,7 +627,7 @@ public class Events extends ListenerAdapter {
             case "join":
                 currDraft.attemptDraft(bc);
                 break;
-            case "refresh":
+            case "requestRefresh":
                 currDraft.refresh(bc);
                 break;
             case "reping":
@@ -635,6 +638,9 @@ public class Events extends ListenerAdapter {
                 break;
             case "requestSub":
                 currDraft.requestSub(bc);
+                break;
+            case "reassign":
+                currDraft.reassignCaptain(bc);
                 break;
             case "sub":
                 currDraft.addSub(bc);
@@ -652,10 +658,14 @@ public class Events extends ListenerAdapter {
                 currProcess.start(bc);
                 break;
             case "plusOne":
-                currProcess.addPointToTeam(bc, bc.getMember().getId());
+                currProcess.changePointsForTeam(bc, bc.getMember().getId(), true);
                 break;
             case "minusOne":
-                currProcess.subtractPointFromTeam(bc, bc.getMember().getId());
+                currProcess.changePointsForTeam(bc, bc.getMember().getId(), false);
+                break;
+            case "processRefresh":
+                bc.deferEdit().queue();
+                currDraft.getProcess().refresh(bc);
                 break;
             case "endDraftProcess":
                 currProcess.attemptEnd(bc);

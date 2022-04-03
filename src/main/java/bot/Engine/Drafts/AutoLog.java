@@ -37,12 +37,9 @@ public class AutoLog extends Section {
 
     /**
      * Updates the stringed list of players for the draft cycle match
-     * report summary
-     * @param draft the draft to report.
-     * @param bc a button click to analyze.
+     * report summary.
      * @param team the current team from the draft.
      * @param playerList a store for building the string of the team's players.
-     * @param subs the list of subs from the draft.
      * @param subList a store for building the string of the draft's subs.
      * @param playerTypes array of types for each player
      *                    (0 if an existing player, 1 if a new player).
@@ -51,16 +48,14 @@ public class AutoLog extends Section {
      * @param offset an index to offset the type arrays, based on the
      *               current team.
      */
-    private void updateLists(Draft draft, ButtonClickEvent bc,
-                             TreeMap<String, DraftPlayer> team,
-                             TreeMap<String, DraftPlayer> subs,
+    private void updateLists(DraftTeam team,
                              StringBuilder playerList, StringBuilder subList,
                              int[] playerTypes, int[] errorsFound, int offset) {
         int i = 0;
-        for (Map.Entry<String, DraftPlayer> player : team.entrySet()) {
+        for (Map.Entry<String, DraftPlayer> player : team.getPlayers().entrySet()) {
             String currID = player.getKey();
             DraftPlayer currPlayer = player.getValue();
-            Member user = draft.findMember(bc, currID);
+
             String completionSymbol = ":white_check_mark: ";
             if (errorsFound[offset + i] == 1) {
                 completionSymbol = ":no_entry: ";
@@ -68,22 +63,20 @@ public class AutoLog extends Section {
 
             StringBuilder list = playerList;
             String subScore = "";
-            if (subs.containsKey(currID)) {
+
+            if (currPlayer.isSub()) {
                 list = subList;
                 subScore = String.format(" [%s-%s]",
                         currPlayer.getWins(), currPlayer.getLosses());
             }
 
+            list.append(completionSymbol)
+                    .append(currPlayer.getAsMention(currID))
+                    .append(subScore);
             if (playerTypes[offset + i] == 0) {
-                list.append(completionSymbol)
-                        .append(user.getAsMention())
-                        .append(subScore)
-                        .append("\n");
+                list.append("\n");
             } else {
-                list.append(completionSymbol)
-                        .append(user.getAsMention())
-                        .append(subScore)
-                        .append(" (new)\n");
+                list.append(" (new)\n");
             }
 
             i++;
@@ -97,33 +90,29 @@ public class AutoLog extends Section {
      * @param bc a button click to analyze.
      * @param team1 the first team of the draft.
      * @param team2 the second team of the draft.
-     * @param subs the list of subs from the draft.
      * @param playerTypes array of types for each player
      *                    (0 if an existing player, 1 if a new player).
      * @param errorsFound array of errors found for each player, if any
      *                    (0 if no errors occurred, 1 otherwise).
      */
     private void sendReport(ManualLog log, Draft draft, ButtonClickEvent bc,
-                            TreeMap<String, DraftPlayer> team1,
-                            TreeMap<String, DraftPlayer> team2,
-                            TreeMap<String, DraftPlayer> subs,
+                            DraftTeam team1, DraftTeam team2,
                             int[] playerTypes, int[] errorsFound) {
         EmbedBuilder eb = new EmbedBuilder();
         StringBuilder teamList1 = new StringBuilder();
         StringBuilder teamList2 = new StringBuilder();
         StringBuilder subList = new StringBuilder();
 
-        updateLists(draft, bc, team1, subs, teamList1, subList,
-                playerTypes, errorsFound, 0);
-        updateLists(draft, bc, team2, subs, teamList2, subList,
-                playerTypes, errorsFound, team1.size());
+        updateLists(team1, teamList1, subList, playerTypes, errorsFound, 0);
+        updateLists(team2, teamList2, subList, playerTypes, errorsFound,
+                team1.getPlayers().size());
 
-        int wins = draft.getProcess().getScoreTeam1();
-        int losses = draft.getProcess().getScoreTeam2();
+        int wins = draft.getProcess().getTeam1().getScore();
+        int losses = draft.getProcess().getTeam2().getScore();
 
         if (wins < losses) {
-            wins = draft.getProcess().getScoreTeam2();
-            losses = draft.getProcess().getScoreTeam1();
+            wins = draft.getProcess().getTeam2().getScore();
+            losses = draft.getProcess().getTeam1().getScore();
 
             StringBuilder tempList = teamList1;
             teamList1 = teamList2;
@@ -134,10 +123,8 @@ public class AutoLog extends Section {
                 .setColor(getColor())
                 .addField("Score:", wins + " - " + losses, false)
                 .addField("Team 1:", teamList1.toString(), false)
-                .addField("Team 2:", teamList2.toString(), true);
-        if (subs.size() > 0) {
-            eb.addField("Subs:", subList.toString(), false);
-        }
+                .addField("Team 2:", teamList2.toString(), true)
+                .addField("Subs:", subList.toString(), false);
 
         if (log.sum(errorsFound, errorsFound.length - 1) == 0) {
             eb.addField("Status:", "COMPLETE", false);
@@ -158,7 +145,6 @@ public class AutoLog extends Section {
      * @param draft the draft to report.
      * @param bc a button click to analyze.
      * @param team the current team to report.
-     * @param subs the list of subs from the draft.
      * @param playerTypes array of types for each player
      *                    (0 if an existing player, 1 if a new player).
      * @param errorsFound array of errors found for each player, if any
@@ -171,14 +157,12 @@ public class AutoLog extends Section {
      * @param data a map of all rows of the spreadsheet.
      */
     private void updateSpreadsheet(ManualLog log, Draft draft,
-                                   ButtonClickEvent bc,
-                                   TreeMap<String, DraftPlayer> team,
-                                   TreeMap<String, DraftPlayer> subs,
+                                   ButtonClickEvent bc, DraftTeam team,
                                    int[] playerTypes, int[] errorsFound, int offset,
                                    GoogleAPI link, String tab, Values spreadsheet,
                                    TreeMap<Object, PlayerStats> data) {
         int i = 0;
-        for (Map.Entry<String, DraftPlayer> player : team.entrySet()) {
+        for (Map.Entry<String, DraftPlayer> player : team.getPlayers().entrySet()) {
             String currID = player.getKey();
             DraftPlayer currPlayer = player.getValue();
             Member user = draft.findMember(bc, currID);
@@ -187,11 +171,11 @@ public class AutoLog extends Section {
             int gamesPlayed = gameWins + currPlayer.getLosses();
 
             String cmd = "cycle";
-            if (subs.containsKey(currID)) {
+            if (currPlayer.isSub()) {
                 cmd = "sub";
             }
 
-            if (data.containsKey(user.getId())) {
+            if (data.containsKey(currID)) {
                 errorsFound[offset + i] = log.updateUser(
                         cmd, gamesPlayed, gameWins,
                         user, link, tab, spreadsheet, data);
@@ -226,21 +210,20 @@ public class AutoLog extends Section {
                 throw new IOException("The spreadsheet was empty.");
             }
 
-            TreeMap<String, DraftPlayer> team1 = draft.getProcess().getTeam1();
-            TreeMap<String, DraftPlayer> team2 = draft.getProcess().getTeam2();
-            TreeMap<String, DraftPlayer> subs = draft.getSubs();
+            DraftTeam team1 = draft.getProcess().getTeam1();
+            DraftTeam team2 = draft.getProcess().getTeam2();
 
-            int totalSize = team1.size() + team2.size();
+            int totalSize = team1.getPlayers().size() + team2.getPlayers().size();
             int[] playerTypes = new int[totalSize];
             int[] errorsFound = new int[totalSize];
 
             ManualLog log = new ManualLog(getPrefix());
-            updateSpreadsheet(log, draft, bc, team1, subs, playerTypes,
+            updateSpreadsheet(log, draft, bc, team1, playerTypes,
                     errorsFound, 0, link, tab, spreadsheet, data);
-            updateSpreadsheet(log, draft, bc, team2, subs, playerTypes,
-                    errorsFound, team1.size(), link, tab, spreadsheet, data);
+            updateSpreadsheet(log, draft, bc, team2, playerTypes,
+                    errorsFound, team1.getPlayers().size(), link, tab, spreadsheet, data);
 
-            sendReport(log, draft, bc, team1, team2, subs, playerTypes, errorsFound);
+            sendReport(log, draft, bc, team1, team2, playerTypes, errorsFound);
             draft.log(totalSize + " " + getPrefix().toUpperCase()
                     + " draft player(s) were automatically processed.", false);
         } catch (IOException | GeneralSecurityException e) {

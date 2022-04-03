@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -278,22 +277,6 @@ public interface Command {
     default void sendButton(GenericInteractionCreateEvent interaction,
                             String caption, Button button) {
         sendButtons(interaction, caption, Collections.singletonList(button));
-    }
-
-    /**
-     * Replaces a selection menu, by linking a new menu
-     * to the interaction.
-     * @param interaction the user interaction calling this method.
-     * @param caption the caption above the menu.
-     * @param menu the selection menu to link.
-     *
-     * Note: The interaction must have been acknowledged before
-     *       this method.
-     */
-    default void sendSelectionMenu(GenericInteractionCreateEvent interaction,
-                                   String caption, SelectionMenu menu) {
-        interaction.getHook().editOriginal(caption)
-                .setActionRow(menu).queue();
     }
 
     /**

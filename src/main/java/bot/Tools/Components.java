@@ -1,15 +1,16 @@
 package bot.Tools;
 
 import bot.Engine.Drafts.Draft;
-import bot.Engine.Drafts.DraftProcess;
+import bot.Engine.Drafts.DraftPlayer;
 
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author  Wil Aquino
@@ -37,16 +38,6 @@ public class Components {
         }
 
         /**
-         * Builds the "Refresh" button.
-         * @param suffix the button ID's suffix.
-         * @return said button.
-         */
-        public static Button refresh(String suffix) {
-            return new ButtonBuilder("refresh" + suffix,
-                    "Refresh", null, 2).getButton();
-        }
-
-        /**
          * Builds the "Reping" button.
          * @param suffix the button ID's suffix.
          * @return said button.
@@ -67,18 +58,23 @@ public class Components {
         }
 
         /**
-         * Builds the "Draft Channel" link button.
-         * @param serverID the ID of the server with the channel in it.
-         * @param channelID the ID of the channel to link to.
+         * Builds a captain reassignment button.
+         * @param suffix the menu ID's suffix.
+         * @return said menu.
+         */
+        public static Button reassignCaptain(String suffix) {
+            return new ButtonBuilder("reassign" + suffix,
+                    "Reassign", null, 0).getButton();
+        }
+
+        /**
+         * Builds the "Refresh" button.
          * @param suffix the button ID's suffix.
          * @return said button.
          */
-        public static Button draftLink(String serverID, String channelID,
-                                       String suffix) {
-            String url = String.format("https://discord.com/channels/%s/%s",
-                    serverID, channelID);
-            return new ButtonBuilder("draftLink" + suffix,
-                    "Draft Channel", url, 4).getButton();
+        public static Button refresh(String suffix) {
+            return new ButtonBuilder("requestRefresh" + suffix,
+                    "Refresh", null, 2).getButton();
         }
 
         /**
@@ -88,7 +84,7 @@ public class Components {
          */
         public static Button requestSub(String suffix) {
             return new ButtonBuilder("requestSub" + suffix,
-                    "Request Sub", null, 1).getButton();
+                    "Sub Out", null, 3).getButton();
         }
 
         /**
@@ -100,16 +96,6 @@ public class Components {
             return new ButtonBuilder("sub" + suffix,
                     "Join as Sub", null, 0).getButton();
         }
-
-        /**
-         * Builds the initial "End Draft" button.
-         * @param suffix the button ID's suffix.
-         * @return the button.
-         */
-        public static Button endDraft(String suffix) {
-            return new ButtonBuilder("endDraft" + suffix,
-                    "End Draft", null, 3).getButton();
-        }
     }
 
     /**
@@ -120,25 +106,27 @@ public class Components {
         /**
          * Builds the team selection menu.
          * @param suffix the menu ID's suffix.
-         * @param bc a button click to analyze.
-         * @param draft the draft pertaining to this menu.
-         * @param captainID1 the Discord ID of the first captain of the draft.
-         * @param captainID2 the Discord ID of the second captain of the draft.
+         * @param players the players of the draft.
          * @return said menu.
          */
         public static SelectionMenu teamSelectionMenu(
-                String suffix, ButtonClickEvent bc,
-                Draft draft, String captainID1, String captainID2) {
+                String suffix, TreeMap<String, DraftPlayer> players) {
             List<String> labels = new ArrayList<>();
             List<String> values = new ArrayList<>();
 
-            Member currPlayer = draft.findMember(bc, captainID1);
-            labels.add(currPlayer.getEffectiveName() + "'s Team");
-            values.add(captainID1);
+            for (Map.Entry<String, DraftPlayer> mapping : players.entrySet()) {
+                String id = mapping.getKey();
+                DraftPlayer player = mapping.getValue();
 
-            currPlayer = draft.findMember(bc, captainID2);
-            labels.add(currPlayer.getEffectiveName() + "'s Team");
-            values.add(captainID2);
+                if (player.isActive() && !player.isCaptainForTeam1()
+                        && !player.isCaptainForTeam2() && !player.hasTeam()) {
+                    labels.add(player.getName());
+                    values.add(id);
+                }
+            }
+
+            labels.add("<end>");
+            values.add("0");
 
             return new SelectionMenuBuilder("teamSelection" + suffix,
                     labels, values, null).getMenu();
@@ -169,7 +157,7 @@ public class Components {
          * @param suffix the button ID's suffix.
          * @return said button.
          */
-        public static Button plusOne(String suffix){
+        public static Button plusOne(String suffix) {
             return new ButtonBuilder("plusOne" + suffix,
                     "+1", null, 0).getButton();
         }
@@ -179,21 +167,32 @@ public class Components {
          * @param suffix the button ID's suffix.
          * @return said button.
          */
-        public static Button minusOne(String suffix){
+        public static Button minusOne(String suffix) {
             return new ButtonBuilder("minusOne" + suffix,
                     "-1", null, 0).getButton();
         }
 
         /**
-         * Builds the "Request Sub" link button.
-         * @param draft the draft request to link to.
+         * Builds the "Refresh" button.
+         * @param suffix the button ID's suffix.
          * @return said button.
          */
-        public static Button draftSubLink(ButtonClickEvent bc, String suffix,
-                                           bot.Engine.Drafts.Draft draft) {
-            String url = draft.getMessage(bc).getJumpUrl();
+        public static Button refresh(String suffix) {
+            return new ButtonBuilder("processRefresh" + suffix,
+                    "Refresh", null, 2).getButton();
+        }
+
+        /**
+         * Builds the "Request Sub" link button.
+         * @param interaction the user interaction calling this method.
+         * @param suffix the button ID's suffix.
+         * @param draft the draft request to link to.
+         */
+        public static Button draftSubLink(GenericInteractionCreateEvent interaction,
+                                          String suffix, Draft draft) {
+            String url = draft.getMessage(interaction).getJumpUrl();
             return new ButtonBuilder("requestSubLink" + suffix,
-                    "Leave/Request Sub", url, 4).getButton();
+                    "Request Sub", url, 4).getButton();
         }
 
         /**
