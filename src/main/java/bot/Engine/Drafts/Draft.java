@@ -58,7 +58,7 @@ public class Draft extends Section implements Command {
     /** The Discord message ID for this draft's initial interface. */
     private String messageID;
 
-    /** The number of players required to formally end the draft. */
+    /** The number of players required to formally start the draft. */
     public final static int NUM_PLAYERS_TO_START_DRAFT = 8;
 
     /** A random number generator. */

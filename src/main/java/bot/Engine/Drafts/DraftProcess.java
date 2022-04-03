@@ -37,8 +37,7 @@ public class DraftProcess {
     private final Draft draft;
 
     /** The teams of the draft. */
-    private final DraftTeam team1;
-    private final DraftTeam team2;
+    private final DraftTeam team1, team2;
 
     /** The max amount of won matches within a draft. */
     private final static int MAX_SCORE = 4;
