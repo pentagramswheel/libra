@@ -183,13 +183,13 @@ public class Events extends ListenerAdapter {
         String lpDraftChannel = server.getTextChannelsByName(
                 "lp-looking-for-draft", false).get(0).getName();
         String lpReportsChannel = server.getTextChannelsByName(
-//                "lp-staff-match-report", false).get(0).getName();
-                "lp-match-report", false).get(0).getName();
+                "lp-staff-match-report", false).get(0).getName();
+//                "lp-match-report", false).get(0).getName();
         String ioDraftChannel = server.getTextChannelsByName(
                 "io-looking-for-draft", false).get(0).getName();
         String ioReportsChannel = server.getTextChannelsByName(
-//                "io-staff-match-report", false).get(0).getName();
-                "io-match-report", false).get(0).getName();
+                "io-staff-match-report", false).get(0).getName();
+//                "io-match-report", false).get(0).getName();
         String testChannel = server.getTextChannelsByName(
                 "bot-testing", false).get(0).getName();
 

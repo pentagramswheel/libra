@@ -418,7 +418,9 @@ public class DraftProcess {
 
         DraftTeam team, otherTeam;
         if (getTeam1().needsPlayers() || getTeam2().needsPlayers()) {
-            draft.sendResponse(bc, "Add your subs before continuing.", true);
+            draft.sendResponse(bc,
+                    "Add your subs before continuing (Check the "
+                            + "the selection menu).", true);
             refresh(bc);
             updateReport(bc);
             return;
