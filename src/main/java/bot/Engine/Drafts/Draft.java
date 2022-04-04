@@ -187,16 +187,11 @@ public class Draft extends Section implements Command {
 
         if (!isInitialized() && messageID != null
                 && currentTime - startTime > timeLimit) {
-            ArrayList<Button> buttons = new ArrayList<>();
-            String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-            buttons.add(Components.ForDraft.joinDraft(idSuffix)
-                    .withStyle(ButtonStyle.SECONDARY).asDisabled());
-            buttons.add(Components.ForDraft.leave(idSuffix)
-                    .withStyle(ButtonStyle.SECONDARY).asDisabled());
-
             getMessage(interaction)
                     .editMessage("This draft has expired.")
-                    .setActionRow(buttons).queue();
+                    .setActionRow(Components.ForDraft.refresh(
+                                    getPrefix() + getNumDraft())
+                            .asDisabled()).queue();
 
             String update = "A " + getPrefix().toUpperCase()
                     + " draft request has timed out.";

@@ -32,7 +32,7 @@
     - [DraftPlayer](#draftplayer)
     - [DraftProcess](#draftprocess)
     - [DraftTeam](#draftteam)
-    - [ManualLog](#manualog)
+    - [ManualLog](#manuallog)
     - [MapGenerator](#mapgenerator)
     - [Undo](#undo)
 * [Persistence](#persistence)
@@ -40,7 +40,7 @@
 
 
 ## Introduction
-[ TBD ]
+Libra is a multi-functional Discord bot designed to handle many tasks, with respect to the Mulloway Institute of Turfing (MIT), a draft server for Nintendo's competitive shooter IP, Splatoon. Her main goal is to keep track of a player database, implement convenience features for running tournaments, and most importantly, host an automated draft system from beginning (queuing players) to end (reporting scores).
 
 
 ## How to Install
@@ -258,6 +258,17 @@ A class which manages and processes drafts.
 5. `int NUM_PLAYERS_TO_END_DRAFT` - The number of players required to formally end the draft.
 6. `List<String> endButtonClicked` - The players who have clicked the "End Draft" button consecutively.
 7. `String messageID` - the Discord message ID of the draft request.
+
+----
+
+#### DraftTeam
+
+A class which represents teams within a draft.
+
+###### Instance Variables
+1. `TreeMap<String, DraftPlayer> players` - the players of the team.
+2. `int score` - the team's total score.
+3. `int playersNeeded` - the amount of active players a team needs, at any given time.
 
 ----
 
