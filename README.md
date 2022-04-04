@@ -3,7 +3,7 @@
 
 **Date:** February 17, 2021
 
-**Last Updated:** April 3, 2022
+**Last Updated:** April 4, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -11,9 +11,9 @@
 * [Command Usage](#command-usage)
 * [Classes and Data Structures](#classes-and-data-structures)
   - [Main](#main)
-  - [Discord](#discord)
+  - [Config](#config)
   - [Events](#events)
-  - [Commands](#commands)
+  - [Command](#command)
   + [Tools](#tools)
     - [ArrayHeapMinPQ](#arrayheapminpq)
     - [ButtonBuilder](#buttonbuilder)
