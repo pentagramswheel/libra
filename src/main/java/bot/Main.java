@@ -90,7 +90,7 @@ public class Main {
         sub.addOptions(matches, won);
 
         OptionData leaderboardAward = new OptionData(OptionType.INTEGER, "role",
-                "The leaderboard role to give.", true);
+                "The leaderboard role to give", true);
         leaderboardAward.addChoice("1st Place", 1);
         leaderboardAward.addChoice("2nd Place", 2);
         leaderboardAward.addChoice("3rd Place", 3);

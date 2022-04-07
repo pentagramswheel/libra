@@ -141,7 +141,8 @@ public class Events extends ListenerAdapter {
      *         False otherwise.
      */
     private boolean isStaffCommand(SlashCommandEvent sc) {
-        String[] staffCmds = {"forceend", "cycle", "sub", "undo", "add", "grad"};
+        String[] staffCmds = {"forceend", "cycle", "sub", "undo",
+                "add", "grad", "award"};
 
         try {
             Guild server = sc.getGuild();
@@ -179,18 +180,18 @@ public class Events extends ListenerAdapter {
             return false;
         }
 
+        String helpdesk = server.getTextChannelsByName(
+                "helpdesk", false).get(0).getName();
         String entryChannel = server.getTextChannelsByName(
                 "mit-entry-confirmation", false).get(0).getName();
         String lpDraftChannel = server.getTextChannelsByName(
                 "lp-looking-for-draft", false).get(0).getName();
         String lpReportsChannel = server.getTextChannelsByName(
-                "lp-staff-match-report", false).get(0).getName();
-//                "lp-match-report", false).get(0).getName();
+                "lp-match-report", false).get(0).getName();
         String ioDraftChannel = server.getTextChannelsByName(
                 "io-looking-for-draft", false).get(0).getName();
         String ioReportsChannel = server.getTextChannelsByName(
-                "io-staff-match-report", false).get(0).getName();
-//                "io-match-report", false).get(0).getName();
+                "io-match-report", false).get(0).getName();
         String testChannel = server.getTextChannelsByName(
                 "bot-testing", false).get(0).getName();
 
@@ -200,6 +201,7 @@ public class Events extends ListenerAdapter {
         boolean isReportCommand =
                 subCmd.equals("cycle") || subCmd.equals("sub") || subCmd.equals("undo");
 
+        boolean isHelpdesk = channel.equals(helpdesk);
         boolean inEntryChannel = (subCmd.equals("add") || subCmd.equals("grad"))
                 && channel.equals(entryChannel);
         boolean inLPChannel = prefix.equals("lp") && isDraftCommand
@@ -212,7 +214,7 @@ public class Events extends ListenerAdapter {
                 && channel.equals(ioReportsChannel);
         boolean inTestChannel = channel.equals(testChannel);
 
-        return !(inEntryChannel || inLPChannel || inIOChannel
+        return !(isHelpdesk || inEntryChannel || inLPChannel || inIOChannel
                 || inLPReportsChannel || inIOReportsChannel
                 || inTestChannel);
     }
@@ -237,7 +239,7 @@ public class Events extends ListenerAdapter {
         eb.addField("Automatic Draft System",
                 "(See the FAQ portion of `/mit draftdoc`)",
                 false);
-        eb.addField("Entering and Graduating Players [Staff]",
+        eb.addField("Adding Roles to Players [Staff]",
                 "If the role for a player isn't showing up or seemingly \n"
                         + "isn't being added, try *refreshing the roles* by opening \n"
                         + "`Server Settings > User Management > Members`. \n"

@@ -1,5 +1,5 @@
-bot/Main.java
- bot.Main
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
 bot/Engine/Drafts/DraftTeam.java
  bot.Engine.Drafts.DraftTeam
 bot/Engine/Drafts/Draft.java
@@ -32,8 +32,8 @@ bot/Tools/Components.java
  bot.Tools.Components$ForDraftProcess
 bot/ConfigExample.java
  bot.ConfigExample
-bot/Tools/GoogleAPI.java
- bot.Tools.GoogleAPI
+bot/Engine/Add.java
+ bot.Engine.Add
 bot/Tools/Command.java
  bot.Tools.Command
 bot/Engine/Drafts/DraftProcess.java
@@ -41,11 +41,11 @@ bot/Engine/Drafts/DraftProcess.java
 bot/Tools/ArrayHeapMinPQ.java
  bot.Tools.ArrayHeapMinPQ
  bot.Tools.ArrayHeapMinPQ$Node
-bot/Engine/Graduate.java
- bot.Engine.Graduate
-bot/Engine/Add.java
- bot.Engine.Add
 bot/Engine/Award.java
  bot.Engine.Award
 bot/Events.java
  bot.Events
+bot/Tools/GoogleAPI.java
+ bot.Tools.GoogleAPI
+bot/Main.java
+ bot.Main
