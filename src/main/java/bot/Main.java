@@ -73,9 +73,11 @@ public class Main {
                 "Manually reverts the previous draft command, once and only once.");
 
         SubcommandData add = new SubcommandData("add",
-                "Adds players into the designated within MIT (~7 sec/player).");
+                "Adds players into the designated area within MIT.");
+        SubcommandData deny = new SubcommandData("deny",
+                "Rejects players from a designated area within MIT.");
         SubcommandData grad = new SubcommandData("grad",
-                "Graduates players from the designated section within MIT (~7 sec/player).");
+                "Graduates players from the designated section within MIT.");
         SubcommandData award = new SubcommandData("award",
                 "Gives players leaderboard awards for the current MIT cycle.");
 
@@ -120,6 +122,7 @@ public class Main {
                 award.addOptions(newMention);
             }
             add.addOptions(newMention);
+            deny.addOptions(newMention);
             grad.addOptions(newMention);
         }
 
@@ -128,11 +131,11 @@ public class Main {
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
                 startdraft, forcesub, forceend,
-                cycle, sub, undo, add, grad,
+                cycle, sub, undo, add, deny, grad,
                 award);
         io.addSubcommands(
                 startdraft, forcesub, forceend,
-                cycle, sub, undo, add, grad,
+                cycle, sub, undo, add, deny, grad,
                 award);
 
         jda.updateCommands().addCommands(mit, lp, io).queue();

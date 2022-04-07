@@ -244,7 +244,8 @@ public class Events extends ListenerAdapter {
                         + "isn't being added, try *refreshing the roles* by opening \n"
                         + "`Server Settings > User Management > Members`. \n"
                         + "A second layer of refreshing can be done by \n"
-                        + "searching for a player's name in `... > Members`.",
+                        + "searching for a player's name in `... > Members`. \n"
+                        + "Note that it takes ~7 sec/player to add a role.",
                 false);
 
         sc.getHook().editOriginalEmbeds(eb.build()).queue();
@@ -532,6 +533,7 @@ public class Events extends ListenerAdapter {
 
         switch (subCmd) {
             case "add":
+            case "deny":
                 Add newcomer = new Add(prefix);
                 newcomer.runCmd(sc);
                 break;

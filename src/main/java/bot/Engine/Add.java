@@ -26,18 +26,24 @@ public class Add extends Section implements Command {
     }
 
     /**
-     * Allows a user entry into a section.
+     * Allows a user entry into a MIT section, if possible.
      * @param sc the user's inputted command.
      * @param playerID the Discord ID of the player to graduate.
      * @return the entrance welcome message.
      */
     private String enter(SlashCommandEvent sc, String playerID) {
-        addRole(sc, playerID, getRole(sc, getSection()));
-        String rulesChannelName = getPrefix() + "-draft-rules";
+        if (sc.getSubcommandName().equals("add")) {
+            addRole(sc, playerID, getRole(sc, getSection()));
+            String rulesChannelName = getPrefix() + "-draft-rules";
 
-        String rulesChannel = getChannel(sc, rulesChannelName).getAsMention();
-        return "Welcome to " + getSection() + "! Make sure to read "
-                + rulesChannel + " before playing in any drafts!";
+            String rulesChannel =
+                    getChannel(sc, rulesChannelName).getAsMention();
+            return "Welcome to " + getSection() + "! Make sure to read "
+                    + rulesChannel + " before playing in any drafts!";
+        } else {
+            return "Unfortunately, you have been denied entry into "
+                    + getSection() + " at this time.";
+        }
     }
 
     /**
@@ -65,7 +71,7 @@ public class Add extends Section implements Command {
         }
 
         sendResponse(sc, listOfUsers.toString(), false);
-        log(args.size() + " new " + getSection()
-                + " user(s) processed.", false);
+        log(args.size() + " " + getSection()
+                + " player(s) processed/denied.", false);
     }
 }

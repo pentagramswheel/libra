@@ -3,7 +3,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** April 4, 2022
+**Last Updated:** April 7, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -70,6 +70,7 @@ java src/main/java/bot/Main.java
 | lp/io sub | Manually updates subs' MIT draft stats through an affiliated spreadsheet. | 1. `matches` - the amount of games played in a set.<br />2. `won` - the amount of winning games of the set.<br />3. `players` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | lp/io undo | Reverts the previous MIT draft command, *once and only once*. |
 | lp/io add | Gives players a MIT draft area role. | 1. `players` - Discord users in the form of Discord pings. |
+| lp/io deny | Denies players a MIT draft area role. | 1. `players` - Discord users in the form of Discord pings. |
 | lp/io grad | Graduates players from a MIT draft area, logging their status on an affiliated spreadsheet and replacing their current draft role with its graduate role. | 1. `players` - Discord users in the form of Discord pings. |
 | lp/io award | Awards players within a MIT draft area with roles based on their leaderboard performance. | 1. `role` - the Discord role to award.<br />2. `players` - Discord users in the form of Discord pings. |
 
