@@ -50,18 +50,10 @@ public class Award extends Section implements Command {
 
             addRole(sc, playerID,
                     getRole(sc, String.format(role, getSection())));
-
-            Member finalPlayer = players.get(players.size() - 1).getAsMember();
-            if (player.equals(finalPlayer)) {
-                listOfUsers.append(player.getAsMention())
-                        .append("\n\n")
-                        .append("Congratulations on the awards!");
-            } else {
-                listOfUsers.append(player.getAsMention()).append(" ");
-            }
+            listOfUsers.append(player.getAsMention()).append(" ");
         }
 
-        sc.getHook().sendMessage(listOfUsers.toString()).queue();
+        sendReply(sc, "Award(s) given to " + listOfUsers + " !", true);
     }
 
     /**
@@ -70,7 +62,6 @@ public class Award extends Section implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
-        sc.deferReply().queue();
         List<OptionMapping> args = sc.getOptions();
         int award = (int) args.remove(0).getAsLong();
 
