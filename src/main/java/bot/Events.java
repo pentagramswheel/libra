@@ -1,6 +1,7 @@
 package bot;
 
 import bot.Engine.Add;
+import bot.Engine.Award;
 import bot.Engine.Drafts.*;
 import bot.Engine.Graduate;
 import bot.Tools.ArrayHeapMinPQ;
@@ -535,6 +536,10 @@ public class Events extends ListenerAdapter {
             case "grad":
                 Graduate grad = new Graduate(prefix);
                 grad.runCmd(sc);
+                break;
+            case "award":
+                Award award = new Award(prefix);
+                award.runCmd(sc);
                 break;
             case "startdraft":
                 processDrafts(sc, prefix, author);

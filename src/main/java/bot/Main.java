@@ -71,10 +71,13 @@ public class Main {
                 "Manually reports draft scores for up to four players who subbed.");
         SubcommandData undo = new SubcommandData("undo",
                 "Manually reverts the previous draft command, once and only once.");
+
         SubcommandData add = new SubcommandData("add",
                 "Adds players into the designated within MIT (~7 sec/player).");
         SubcommandData grad = new SubcommandData("grad",
                 "Graduates players from the designated section within MIT (~7 sec/player).");
+        SubcommandData award = new SubcommandData("award",
+                "Gives players leaderboard awards for the current MIT cycle.");
 
         int numMentions = 25;
         OptionData numDraft = new OptionData(
@@ -85,6 +88,16 @@ public class Main {
                 OptionType.INTEGER, "won", "Total games won", true);
         cycle.addOptions(matches, won);
         sub.addOptions(matches, won);
+
+        OptionData leaderboardAward = new OptionData(OptionType.INTEGER, "role",
+                "The leaderboard role to give.", true);
+        leaderboardAward.addChoice("1st Place", 1);
+        leaderboardAward.addChoice("2nd Place", 2);
+        leaderboardAward.addChoice("3rd Place", 3);
+        leaderboardAward.addChoice("Top 10", 4);
+        leaderboardAward.addChoice("Past Podium", 5);
+        leaderboardAward.addChoice("Past Top 10", 6);
+        award.addOptions(leaderboardAward);
 
         // adding user parameters to any commands
         for (int i = 1; i <= numMentions; i++) {
@@ -103,6 +116,9 @@ public class Main {
                 cycle.addOptions(newMention);
                 sub.addOptions(newMention);
             }
+            if (i <= 24) {
+                award.addOptions(newMention);
+            }
             add.addOptions(newMention);
             grad.addOptions(newMention);
         }
@@ -112,10 +128,12 @@ public class Main {
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
                 startdraft, forcesub, forceend,
-                cycle, sub, undo, add, grad);
+                cycle, sub, undo, add, grad,
+                award);
         io.addSubcommands(
                 startdraft, forcesub, forceend,
-                cycle, sub, undo, add, grad);
+                cycle, sub, undo, add, grad,
+                award);
 
         jda.updateCommands().addCommands(mit, lp, io).queue();
     }

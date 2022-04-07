@@ -35,10 +35,12 @@ version = '1.0'
 
 //jar {
 //    manifest {
-//        attributes "Main-Class": "$mainClassName"
+//        attributes (
+//                "Main-Class": "$Main"
+//        )
 //    }
 //
 //    from {
-//        configurations.runtimeClasspath { it.isDirectory() ? it : zipTree(it) }
+//        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 //    }
 //}

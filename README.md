@@ -24,6 +24,7 @@
     - [SelectionMenuBuilder](#selectionmenubuilder)
   + [Engine](#engine)
     - [Add](#add)
+    - [Award](#award)
     - [Graduate](#graduate)
     - [PlayerStats](#playerstats)
   + [Drafts (Engine)](#drafts-engine)
@@ -70,6 +71,7 @@ java src/main/java/bot/Main.java
 | lp/io undo | Reverts the previous MIT draft command, *once and only once*. |
 | lp/io add | Gives players a MIT draft area role. | 1. `players` - Discord users in the form of Discord pings. |
 | lp/io grad | Graduates players from a MIT draft area, logging their status on an affiliated spreadsheet and replacing their current draft role with its graduate role. | 1. `players` - Discord users in the form of Discord pings. |
+| lp/io award | Awards players within a MIT draft area with roles based on their leaderboard performance. | 1. `role` - the Discord role to award.<br />2. `players` - Discord users in the form of Discord pings. |
 
 ----
 
@@ -166,7 +168,13 @@ A class which builds a selection menu quickly.
 
 #### Add
 
-A class which gives roles to users in MIT, processing the command `lp/io add`.
+A class which enters players into MIT, processing the command `lp/io add`.
+
+----
+
+#### Award
+
+A class which awards players roles within MIT, processing the command `lp/io award`.
 
 ----
 
@@ -214,7 +222,7 @@ A class which automatically updates the draft stats of a user.
 
 #### Draft
 
-A class which forms and starts drafts.
+A class which forms and starts drafts, processing the command `lp/io startdraft` and handling other commands such as `lp/io forcesub`, etc..
 
 ###### Instance Variables
 1. `boolean initialized` - a flag for checking if a draft has been initialized.

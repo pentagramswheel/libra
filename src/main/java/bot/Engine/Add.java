@@ -13,7 +13,7 @@ import java.util.List;
  * Date:    April 26, 2021
  * Project: Libra
  * Module:  Add.java
- * Purpose: Adds roles to users in LaunchPoint.
+ * Purpose: Adds users into sections within MIT.
  */
 public class Add extends Section implements Command {
 
@@ -41,7 +41,7 @@ public class Add extends Section implements Command {
     }
 
     /**
-     * Runs any role commands.
+     * Runs the enter command.
      * @param sc the inputted slash command.
      */
     @Override
