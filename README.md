@@ -1,7 +1,7 @@
 # Libra Design Documentation
 **Contributors:** Wil Aquino, Turtle#1504
 
-**Date:** February 17, 2021
+**Creation Date:** February 17, 2021
 
 **Last Updated:** April 4, 2022
 

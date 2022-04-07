@@ -46,17 +46,10 @@ public class DraftProcess {
     private final static int NUM_PLAYERS_TO_END_DRAFT = 3;
 
     /** The players who have clicked the 'End Draft` button consecutively. */
-    private HashSet<String> endButtonClicked;
+    private final HashSet<String> endButtonClicked;
 
     /** The Discord message ID for this draft's processing interface. */
     private String messageID;
-
-    /**
-     * Resets who have clicked the 'End Draft' button.
-     */
-    private void resetEndDraftButton() {
-        endButtonClicked = new HashSet<>();
-    }
 
     /**
      * Assigns the corresponding instance variables from the Draft class.
@@ -69,7 +62,7 @@ public class DraftProcess {
         team1 = new DraftTeam();
         team2 = new DraftTeam();
 
-        resetEndDraftButton();
+        endButtonClicked = new HashSet<>();
     }
 
     /**
@@ -95,6 +88,13 @@ public class DraftProcess {
      */
     public DraftTeam getTeam2() {
         return team2;
+    }
+
+    /**
+     * Resets who have clicked the 'End Draft' button.
+     */
+    private void resetEndDraftButton() {
+        endButtonClicked.clear();
     }
 
     /**
@@ -149,15 +149,14 @@ public class DraftProcess {
     /**
      * Pin the processing interface at the start of the draft,
      * and unpin it at the end of it.
-     * @param interaction the user interaction calling this method.
      */
-    private void pinMessageIfNeeded(GenericInteractionCreateEvent interaction) {
+    private void pinMessageIfNeeded() {
         if (messageID == null) {
             return;
         }
         MessageChannel channel =
                 draft.getDraftChannel();
-//                draft.getChannel(interaction, "bot-testing");
+//                draft.getTestingChannel();
         Message msg = channel.retrieveMessageById(messageID).complete();
 
         if (draft.isInitialized()) {
@@ -234,6 +233,7 @@ public class DraftProcess {
         String idSuffix = draft.getPrefix().toUpperCase() + draft.getNumDraft();
         List<SelectionMenu> menus = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
+        resetEndDraftButton();
 
         menus.add(Components.ForDraftProcess.teamSelectionMenu(
                 idSuffix, draft.getPlayers()));
@@ -250,7 +250,7 @@ public class DraftProcess {
         }
 
         if (interaction != null) {
-            pinMessageIfNeeded(interaction);
+            pinMessageIfNeeded();
             interaction.getHook().editOriginal(getPing()).setActionRows(
                     ActionRow.of(menus), ActionRow.of(buttons)).queue();
             updateReport(interaction);
@@ -462,7 +462,7 @@ public class DraftProcess {
         if (numClicksLeft <= 0) {
             bc.deferEdit().queue();
             draft.toggleRequest(false);
-            pinMessageIfNeeded(bc);
+            pinMessageIfNeeded();
 
             String idSuffix = draft.getPrefix() + draft.getNumDraft();
             List<Button> buttons = new ArrayList<>();

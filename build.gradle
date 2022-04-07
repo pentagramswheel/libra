@@ -18,13 +18,13 @@ dependencies {
     implementation 'net.dv8tion:JDA:5.0.0-alpha.4'
 
     /** Update outdated reference to JDA's SLF4J binding to a better message logger */
-    implementation 'ch.qos.logback:logback-classic:1.2.10'
+    implementation 'ch.qos.logback:logback-classic:1.2.11'
 
     /** Google Sheets API */
-    implementation 'com.google.code.gson:gson:2.8.9'
-    implementation 'com.google.api-client:google-api-client:1.33.1'
-    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.33.0'
-    implementation 'com.google.apis:google-api-services-sheets:v4-rev20210629-1.32.1'
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.google.api-client:google-api-client:1.33.4'
+    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.33.1'
+    implementation 'com.google.apis:google-api-services-sheets:v4-rev20220308-1.32.1'
 }
 
 /** Google Sheets API information */
@@ -32,3 +32,13 @@ mainClassName = 'Main'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 version = '1.0'
+
+//jar {
+//    manifest {
+//        attributes "Main-Class": "$mainClassName"
+//    }
+//
+//    from {
+//        configurations.runtimeClasspath { it.isDirectory() ? it : zipTree(it) }
+//    }
+//}

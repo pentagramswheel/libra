@@ -107,10 +107,14 @@ public class AutoLog extends Section {
         updateLists(team2, teamList2, subList, playerTypes, errorsFound,
                 team1.getPlayers().size());
 
+        String winningTeam = "Team 1:";
+        String losingTeam = "Team 2:";
         int wins = draft.getProcess().getTeam1().getScore();
         int losses = draft.getProcess().getTeam2().getScore();
 
         if (wins < losses) {
+            winningTeam = "Team 2:";
+            losingTeam = "Team 1:";
             wins = draft.getProcess().getTeam2().getScore();
             losses = draft.getProcess().getTeam1().getScore();
 
@@ -122,8 +126,8 @@ public class AutoLog extends Section {
         eb.setTitle("Summary of Report")
                 .setColor(getColor())
                 .addField("Score:", wins + " - " + losses, false)
-                .addField("Team 1:", teamList1.toString(), false)
-                .addField("Team 2:", teamList2.toString(), true)
+                .addField(winningTeam, teamList1.toString(), false)
+                .addField(losingTeam, teamList2.toString(), true)
                 .addField("Subs:", subList.toString(), false);
 
         if (log.sum(errorsFound, errorsFound.length - 1) == 0) {
@@ -134,7 +138,7 @@ public class AutoLog extends Section {
         }
 
         TextChannel channel = draft.getChannel(bc, getPrefix() + "-match-report");
-//        TextChannel channel = draft.getChannel(bc, "bot-testing");
+//        TextChannel channel = draft.getTestingChannel();
         channel.sendMessageEmbeds(eb.build()).queue();
     }
 

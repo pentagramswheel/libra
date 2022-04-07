@@ -22,6 +22,8 @@ bot/Tools/SelectionMenuBuilder.java
  bot.Tools.SelectionMenuBuilder
 bot/Engine/Drafts/Undo.java
  bot.Engine.Drafts.Undo
+bot/Engine/Cycles.java
+ bot.Engine.Cycles
 bot/Tools/FileHandler.java
  bot.Tools.FileHandler
 bot/Tools/Components.java

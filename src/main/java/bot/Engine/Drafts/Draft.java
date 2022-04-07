@@ -172,7 +172,7 @@ public class Draft extends Section implements Command {
     public Message getMessage(GenericInteractionCreateEvent interaction) {
         MessageChannel channel =
                 getChannel(interaction, getPrefix() + "-looking-for-draft");
-//                getChannel(interaction, "bot-testing");
+//                botTesting;
         return channel.retrieveMessageById(messageID).complete();
     }
 
@@ -186,7 +186,7 @@ public class Draft extends Section implements Command {
         long currentTime = System.currentTimeMillis();
 
         if (!isInitialized() && messageID != null
-                && currentTime - startTime > timeLimit) {
+                && currentTime - startTime >= timeLimit) {
             getMessage(interaction)
                     .editMessage("This draft has expired.")
                     .setActionRow(Components.ForDraft.refresh(
@@ -338,8 +338,8 @@ public class Draft extends Section implements Command {
             sendReply(bc, "You are already in this draft!", true);
             return;
         } else if (getPlayers().size() > NUM_PLAYERS_TO_START_DRAFT / 2) {
-            // add 5 minutes
-            timeLimit += 1000 * 60 * 5;
+            // add 7 minutes
+            timeLimit += 1000 * 60 * 7;
         }
 
         DraftPlayer newPlayer = new DraftPlayer(
