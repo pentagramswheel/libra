@@ -1,4 +1,7 @@
 # Libra Design Documentation
+
+![Libra](src/mit_libra.png)
+
 **Contributors:** Wil Aquino, Turtle#1504
 
 **Creation Date:** February 17, 2021
