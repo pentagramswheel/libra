@@ -257,6 +257,9 @@ public class Draft extends Section implements Command {
                 log("A " + getPrefix().toUpperCase() + " draft was started with "
                         + logList + ".", false);
             }
+        } else {
+            long approxTime = (startTime + timeLimit) / 1000;
+            eb.addField("Expiration:", "<t:" + approxTime + ":R>", false);
         }
 
         sendEmbed(interaction, eb);
@@ -337,9 +340,11 @@ public class Draft extends Section implements Command {
         if (getPlayers().containsKey(playerID)) {
             sendReply(bc, "You are already in this draft!", true);
             return;
-        } else if (getPlayers().size() > NUM_PLAYERS_TO_START_DRAFT / 2) {
-            // add 7 minutes
-            timeLimit += 1000 * 60 * 7;
+        } else if (getPlayers().size() >= NUM_PLAYERS_TO_START_DRAFT / 2) {
+            // add a multiplier of 5 minutes
+            int multiplier = (getPlayers().size() + 1)
+                    % (NUM_PLAYERS_TO_START_DRAFT / 2);
+            timeLimit += 1000 * 60 * 5 * multiplier;
         }
 
         DraftPlayer newPlayer = new DraftPlayer(
