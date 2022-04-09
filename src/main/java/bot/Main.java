@@ -38,15 +38,8 @@ public class Main {
                 "Checks whether the bot is online or not.");
         SubcommandData help = new SubcommandData("help",
                 "Displays troubleshooting information for the commands.");
-        SubcommandData genmaps = new SubcommandData("genmaps",
-                "Generates a set map list.");
         SubcommandData draftdoc = new SubcommandData("draftdoc",
                 "Retrieves the documentation for the automated draft system.");
-
-        OptionData maps = new OptionData(
-                OptionType.INTEGER, "matches",
-                "Amount of maps to generate.", true);
-        genmaps.addOptions(maps);
 
         // profile commands
         SubcommandGroupData profile = new SubcommandGroupData("profile",
@@ -59,6 +52,9 @@ public class Main {
                 "Commands to use within LaunchPoint.");
         CommandData io = new CommandData("io",
                 "Commands to use within Ink Odyssey.");
+
+        SubcommandData genmaps = new SubcommandData("genmaps",
+                "Generates a set map list.");
         SubcommandData startdraft = new SubcommandData("startdraft",
                 "Requests an automatic draft with up to 8 players.");
         SubcommandData forcesub = new SubcommandData("forcesub",
@@ -90,6 +86,11 @@ public class Main {
                 OptionType.INTEGER, "won", "Total games won", true);
         cycle.addOptions(matches, won);
         sub.addOptions(matches, won);
+
+        OptionData maps = new OptionData(
+                OptionType.INTEGER, "matches",
+                "Amount of maps to generate.", true);
+        genmaps.addOptions(maps);
 
         OptionData leaderboardAward = new OptionData(OptionType.INTEGER, "role",
                 "The leaderboard role to give", true);
@@ -127,14 +128,14 @@ public class Main {
         }
 
         // implementing commands
-        mit.addSubcommands(status, help, genmaps, draftdoc);
+        mit.addSubcommands(status, help, draftdoc);
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
-                startdraft, forcesub, forceend,
+                genmaps, startdraft, forcesub, forceend,
                 cycle, sub, undo, add, deny, grad,
                 award);
         io.addSubcommands(
-                startdraft, forcesub, forceend,
+                genmaps, startdraft, forcesub, forceend,
                 cycle, sub, undo, add, deny, grad,
                 award);
 

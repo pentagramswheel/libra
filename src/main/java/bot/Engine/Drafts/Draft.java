@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 
 import java.util.TreeMap;
 import java.util.Random;

@@ -176,7 +176,7 @@ public class Events extends ListenerAdapter {
         Guild server = sc.getGuild();
         String prefix = sc.getName();
         String subCmd = sc.getSubcommandName();
-        if (prefix.equals("mit")) {
+        if (prefix.equals("mit") || subCmd.equals("genmaps")) {
             return false;
         }
 
@@ -487,12 +487,6 @@ public class Events extends ListenerAdapter {
             case "profile":
                 sc.reply("This command has not been implemented yet.").queue();
                 break;
-            case "genmaps":
-                if (mapsNeededValid(sc)) {
-                    MapGenerator maps = new MapGenerator(numGenerator);
-                    maps.runCmd(sc);
-                }
-                break;
             case "draftdoc":
                 String docLink =
                         "https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing";
@@ -544,6 +538,12 @@ public class Events extends ListenerAdapter {
             case "award":
                 Award award = new Award(prefix);
                 award.runCmd(sc);
+                break;
+            case "genmaps":
+                if (mapsNeededValid(sc)) {
+                    MapGenerator maps = new MapGenerator(prefix, numGenerator);
+                    maps.runCmd(sc);
+                }
                 break;
             case "startdraft":
                 processDrafts(sc, prefix, author);

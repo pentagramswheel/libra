@@ -1,12 +1,12 @@
 package bot.Engine.Drafts;
 
+import bot.Engine.Section;
 import bot.Tools.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
-import java.awt.Color;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.TreeMap;
@@ -18,18 +18,20 @@ import java.util.Random;
  * Date:    January 5, 2022
  * Project: Libra
  * Module:  MapGenerator.java
- * Purpose: Generates a map list.
+ * Purpose: Generates a map list for a MIT area.
  */
-public class MapGenerator implements Command {
+public class MapGenerator extends Section implements Command {
 
     /** A random number generator. */
     private final Random numGenerator;
 
     /**
      * Loads the map generator's random number generator.
+     * @param abbreviation the abbreviation of the section.
      * @param r the random number generator to load.
      */
-    public MapGenerator(Random r) {
+    public MapGenerator(String abbreviation, Random r) {
+        super(abbreviation);
         numGenerator = r;
     }
 
@@ -44,30 +46,71 @@ public class MapGenerator implements Command {
     }
 
     /**
-     * Retrieves the legal maps for each game mode.
+     * Retrieves the LaunchPoint legal maps for each
+     * game mode.
      * @return said legal maps.
      */
-    private TreeMap<String, ArrayList<String>> getLegalMaps() {
+    private TreeMap<String, ArrayList<String>> getLegalLPMaps() {
         TreeMap<String, ArrayList<String>> legalMaps = new TreeMap<>();
         ArrayList<String> szMaps = new ArrayList<>(Arrays.asList(
-                "Ancho-V Games", "Goby Arena", "Humpback Pump Track",
-                "MakoMart", "Manta Maria", "Musselforge Fitness",
-                "New Albacore Hotel", "Piranha Pit", "Skipper Pavilion",
-                "Starfish Mainstage", "Sturgeon Shipyard", "The Reef",
-                "Wahoo World"));
+                "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
+                "Sturgeon Shipyard", "Skipper Pavilion", "The Reef",
+                "Humpback Pump Track", "Starfish Mainstage", "Wahoo World",
+                "Piranha Pit", "Manta Maria", "New Albacore Hotel",
+                "Musselforge Fitness", "Snapper Canal", "Goby Arena"));
         ArrayList<String> tcMaps = new ArrayList<>(Arrays.asList(
-                "Ancho-V Games", "Inkblot Art Academy", "MakoMart",
-                "Manta Maria", "Piranha Pit", "Shellendorf Institute",
-                "Starfish Mainstage", "Sturgeon Shipyard", "The Reef"));
+                "Inkblot Art Academy", "Ancho-V Games", "Sturgeon Shipyard",
+                "Starfish Mainstage", "MakoMart", "The Reef", "Manta Maria",
+                "Piranha Pit", "Skipper Pavilion", "Snapper Canal",
+                "Humpback Pump Track"));
         ArrayList<String> rmMaps = new ArrayList<>(Arrays.asList(
-                "Ancho-V Games", "Blackbelly Skatepark", "Humpback Pump Track",
-                "Inkblot Art Academy", "MakoMart", "Manta Maria",
-                "Musselforge Fitness", "Snapper Canal", "Starfish Mainstage",
-                "Sturgeon Shipyard"));
+                "Humpback Pump Track", "Starfish Mainstage", "Manta Maria",
+                "Sturgeon Shipyard", "Snapper Canal", "Ancho-V Games",
+                "MakoMart", "The Reef", "Inkblot Art Academy",
+                "Blackbelly Skatepark", "Musselforge Fitness", "Piranha Pit"));
         ArrayList<String> cbMaps = new ArrayList<>(Arrays.asList(
-                "Humpback Pump Track", "Inkblot Art Academy", "MakoMart",
-                "New Albacore Hotel", "Piranha Pit", "Snapper Canal",
-                "The Reef"));
+                "Inkblot Art Academy", "The Reef", "MakoMart", "Piranha Pit",
+                "Snapper Canal", "Humpback Pump Track", "Sturgeon Shipyard",
+                "Starfish Mainstage", "Ancho-V Games", "New Albacore Hotel",
+                "Manta Maria"));
+
+        legalMaps.put("Splat Zones", szMaps);
+        legalMaps.put("Tower Control", tcMaps);
+        legalMaps.put("Rainmaker", rmMaps);
+        legalMaps.put("Clam Blitz", cbMaps);
+
+        return legalMaps;
+    }
+
+    /**
+     * Retrieves the Ink Odyssey legal maps for each
+     * game mode.
+     * @return said legal maps.
+     */
+    private TreeMap<String, ArrayList<String>> getLegalIOMaps() {
+        TreeMap<String, ArrayList<String>> legalMaps = new TreeMap<>();
+        ArrayList<String> szMaps = new ArrayList<>(Arrays.asList(
+                "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
+                "Sturgeon Shipyard", "The Reef", "Wahoo World",
+                "Humpback Pump Track", "Piranha Pit", "Starfish Mainstage",
+                "Manta Maria", "Skipper Pavilion", "New Albacore Hotel",
+                "Musselforge Fitness", "Snapper Canal", "Goby Arena",
+                "Camp Triggerfish"));
+        ArrayList<String> tcMaps = new ArrayList<>(Arrays.asList(
+                "Inkblot Art Academy", "Sturgeon Shipyard", "Ancho-V Games",
+                "MakoMart", "The Reef", "Starfish Mainstage", "Manta Maria",
+                "Piranha Pit", "Snapper Canal", "Shellendorf Institute",
+                "Musselforge Fitness"));
+        ArrayList<String> rmMaps = new ArrayList<>(Arrays.asList(
+                "Starfish Mainstage", "Manta Maria", "Blackbelly Skatepark",
+                "Sturgeon Shipyard", "Humpback Pump Track", "Ancho-V Games",
+                "The Reef", "Inkblot Art Academy", "Snapper Canal",
+                "MakoMart", "Musselforge Fitness", "Piranha Pit"));
+        ArrayList<String> cbMaps = new ArrayList<>(Arrays.asList(
+                "Inkblot Art Academy", "The Reef", "MakoMart", "Snapper Canal",
+                "Piranha Pit", "Sturgeon Shipyard", "Humpback Pump Track",
+                "Starfish Mainstage", "New Albacore Hotel", "Manta Maria",
+                "Ancho-V Games"));
 
         legalMaps.put("Splat Zones", szMaps);
         legalMaps.put("Tower Control", tcMaps);
@@ -140,7 +183,7 @@ public class MapGenerator implements Command {
      */
     private EmbedBuilder buildMatch(String mode, String map) {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(Color.BLUE)
+        eb.setColor(getColor())
                 .addField(mode, map, false)
                 .setThumbnail(findMapURL(map));
 
@@ -160,7 +203,10 @@ public class MapGenerator implements Command {
 
         int numModes = 0;
         ArrayList<String> modes = new ArrayList<>();
-        TreeMap<String, ArrayList<String>> legalMaps = getLegalMaps();
+        TreeMap<String, ArrayList<String>> legalMaps = getLegalLPMaps();
+        if (getSection().equals("io")) {
+            legalMaps = getLegalIOMaps();
+        }
 
         String lastMode = "";
         ArrayList<String> pastMaps = new ArrayList<>();
