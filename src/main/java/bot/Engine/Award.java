@@ -53,7 +53,7 @@ public class Award extends Section implements Command {
             listOfUsers.append(player.getAsMention()).append(" ");
         }
 
-        sendReply(sc, "Award(s) given to " + listOfUsers + " !", true);
+        sendReply(sc, "Award(s) given to " + listOfUsers + "!", true);
     }
 
     /**

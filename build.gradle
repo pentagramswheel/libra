@@ -33,14 +33,18 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 version = '1.0'
 
-//jar {
-//    manifest {
-//        attributes (
-//                "Main-Class": "$Main"
-//        )
-//    }
-//
-//    from {
-//        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-//    }
-//}
+/** JAR generator */
+jar {
+    manifest {
+        attributes (
+                "Main-Class": "bot.Main"
+        )
+
+        baseName 'libra'
+        project.version ''
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
