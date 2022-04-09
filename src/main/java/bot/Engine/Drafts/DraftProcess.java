@@ -136,7 +136,8 @@ public class DraftProcess {
         if (!hasStarted()) {
             ping.append("have the captains alternate choosing teammates in a ")
                     .append("`1-2-1-1-...` pattern. Approve of a maplist ")
-                    .append("using `/mit genmaps`, and begin the draft when ")
+                    .append("using `/").append(draft.getPrefix())
+                    .append(" genmaps`, and begin the draft when ")
                     .append("everyone is ready. The captains will reset the ")
                     .append("team selection as needed.");
         } else {
