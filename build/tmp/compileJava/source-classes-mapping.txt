@@ -1,11 +1,11 @@
-bot/Engine/Award.java
- bot.Engine.Award
+bot/Main.java
+ bot.Main
 bot/Engine/Drafts/DraftTeam.java
  bot.Engine.Drafts.DraftTeam
 bot/Engine/Drafts/Draft.java
  bot.Engine.Drafts.Draft
-bot/Events.java
- bot.Events
+bot/Tools/ButtonBuilder.java
+ bot.Tools.ButtonBuilder
 bot/Engine/Drafts/MapGenerator.java
  bot.Engine.Drafts.MapGenerator
 bot/Engine/Drafts/AutoLog.java
@@ -45,7 +45,7 @@ bot/Engine/Graduate.java
  bot.Engine.Graduate
 bot/Engine/Add.java
  bot.Engine.Add
-bot/Tools/ButtonBuilder.java
- bot.Tools.ButtonBuilder
-bot/Main.java
- bot.Main
+bot/Engine/Award.java
+ bot.Engine.Award
+bot/Events.java
+ bot.Events
