@@ -165,7 +165,10 @@ public class DraftProcess {
                 msg.pin().queue();
                 draft.wait(1000);
                 channel.sendMessage(
-                        "I've attached the interface to the pins!").queue();
+                        "I've attached the interface to the pins! Make sure "
+                        + "captains click `Begin Draft` before you actually "
+                        + "start playing though, __otherwise no one will get "
+                        + "any points__ <:Wahoozones:766479174839173200>").queue();
             }
         } else if (msg.isPinned()) {
             msg.unpin().queue();

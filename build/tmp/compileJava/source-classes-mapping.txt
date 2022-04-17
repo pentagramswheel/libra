@@ -1,15 +1,15 @@
-bot/Main.java
- bot.Main
+bot/Engine/Award.java
+ bot.Engine.Award
 bot/Engine/Drafts/DraftTeam.java
  bot.Engine.Drafts.DraftTeam
-bot/Engine/Drafts/Draft.java
- bot.Engine.Drafts.Draft
+bot/Main.java
+ bot.Main
 bot/Tools/ButtonBuilder.java
  bot.Tools.ButtonBuilder
 bot/Engine/Drafts/MapGenerator.java
  bot.Engine.Drafts.MapGenerator
-bot/Engine/Drafts/AutoLog.java
- bot.Engine.Drafts.AutoLog
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
 bot/Config.java
  bot.Config
 bot/Engine/Section.java
@@ -26,26 +26,26 @@ bot/Engine/Drafts/Undo.java
  bot.Engine.Drafts.Undo
 bot/Tools/FileHandler.java
  bot.Tools.FileHandler
-bot/Tools/Components.java
- bot.Tools.Components
- bot.Tools.Components$ForDraft
- bot.Tools.Components$ForDraftProcess
+bot/Engine/Add.java
+ bot.Engine.Add
 bot/ConfigExample.java
  bot.ConfigExample
 bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Tools/Command.java
  bot.Tools.Command
-bot/Engine/Drafts/DraftProcess.java
- bot.Engine.Drafts.DraftProcess
 bot/Tools/ArrayHeapMinPQ.java
  bot.Tools.ArrayHeapMinPQ
  bot.Tools.ArrayHeapMinPQ$Node
-bot/Engine/Graduate.java
- bot.Engine.Graduate
-bot/Engine/Add.java
- bot.Engine.Add
-bot/Engine/Award.java
- bot.Engine.Award
+bot/Engine/Drafts/Draft.java
+ bot.Engine.Drafts.Draft
 bot/Events.java
  bot.Events
+bot/Tools/Components.java
+ bot.Tools.Components
+ bot.Tools.Components$ForDraft
+ bot.Tools.Components$ForDraftProcess
+bot/Engine/Drafts/AutoLog.java
+ bot.Engine.Drafts.AutoLog
+bot/Engine/Drafts/DraftProcess.java
+ bot.Engine.Drafts.DraftProcess

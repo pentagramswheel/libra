@@ -244,11 +244,12 @@ public class Draft extends Section implements Command {
 
         if (getPlayers().size() >= NUM_PLAYERS_TO_START_DRAFT) {
             String notice =
-                    "Go to (the pinged) " + getDraftChannel().getAsMention() + "\n"
-                            + "to begin the draft. Use the interface\n"
-                            + "above to sub out as needed, as well\n"
-                            + "as end the draft to allow others\n"
-                            + "others to queue more drafts.";
+                    "Go to (the pinged) "
+                            + getDraftChannel().getAsMention() + "\n"
+                            + "to begin the draft. Use this interface\n"
+                            + "to sub out as needed. __Before you\n"
+                            + "sub out -- make sure you got your\n"
+                            + "points in the draft chat!__";
             eb.addField("Notice:", notice, false);
 
             logList.deleteCharAt(logList.length() - 1);
@@ -340,10 +341,8 @@ public class Draft extends Section implements Command {
             sendReply(bc, "You are already in this draft!", true);
             return;
         } else if (getPlayers().size() >= NUM_PLAYERS_TO_START_DRAFT / 2) {
-            // add a multiplier of 5 minutes
-            int multiplier = (getPlayers().size() + 1)
-                    % (NUM_PLAYERS_TO_START_DRAFT / 2);
-            timeLimit += 1000 * 60 * 5 * multiplier;
+            // add 5 minutes
+            timeLimit += 1000 * 60 * 5;
         }
 
         DraftPlayer newPlayer = new DraftPlayer(
@@ -430,8 +429,9 @@ public class Draft extends Section implements Command {
         String authorID = bc.getMember().getId();
         messageID = bc.getMessageId();
 
+        // set timer to 15 minutes
         long currentTime = System.currentTimeMillis();
-        long waitTime = timeLimit / 3;
+        long waitTime = 1000 * 60 * 15;
 
         if (!getPlayers().containsKey(authorID)) {
             sendReply(bc, "You're not in this draft!", true);
