@@ -33,14 +33,14 @@ bot/ConfigExample.java
  bot.ConfigExample
 bot/Tools/ButtonBuilder.java
  bot.Tools.ButtonBuilder
+bot/Engine/Drafts/DraftProcess.java
+ bot.Engine.Drafts.DraftProcess
 bot/Events.java
  bot.Events
 bot/Tools/GoogleAPI.java
  bot.Tools.GoogleAPI
 bot/Engine/Cycles/AutoLog.java
  bot.Engine.Cycles.AutoLog
-bot/Engine/Drafts/DraftProcess.java
- bot.Engine.Drafts.DraftProcess
 bot/Engine/Graduate.java
  bot.Engine.Graduate
 bot/Engine/Cycles/ManualLog.java

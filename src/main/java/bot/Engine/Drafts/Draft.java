@@ -340,7 +340,7 @@ public class Draft extends Section implements Command {
         if (getPlayers().containsKey(playerID)) {
             sendReply(bc, "You are already in this draft!", true);
             return;
-        } else if (getPlayers().size() >= NUM_PLAYERS_TO_START_DRAFT / 2) {
+        } else if (getPlayers().size() >= (NUM_PLAYERS_TO_START_DRAFT / 2) - 1) {
             // add 5 minutes
             timeLimit += 1000 * 60 * 5;
         }
@@ -583,19 +583,6 @@ public class Draft extends Section implements Command {
 
         refresh(bc);
         sendResponse(bc, update, false);
-    }
-
-    /**
-     * Ends the draft is it is completed, via a button.
-     * @param bc a button click to analyze.
-     */
-    public boolean hasEnded(ButtonClickEvent bc) {
-        if (isInitialized()) {
-            sendReply(bc, "This draft hasn't finished yet.", true);
-            return false;
-        } else {
-            return true;
-        }
     }
 
     /**

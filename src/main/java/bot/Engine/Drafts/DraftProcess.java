@@ -452,13 +452,15 @@ public class DraftProcess {
     /**
      * Determines if the draft meets the requirements to be ended.
      * @param bc the button click to analyze.
+     * @return True if the draft has ended.
+     *         False otherwise.
      */
-    public void attemptEnd(ButtonClickEvent bc) {
+    public boolean hasEnded(ButtonClickEvent bc) {
         String authorID = bc.getMember().getId();
         if (!getTeam1().contains(authorID)
                 && !getTeam2().contains(authorID)) {
             draft.sendReply(bc, "You're not part of this draft!", true);
-            return;
+            return false;
         }
 
         endButtonClicked.add(authorID);
@@ -483,10 +485,14 @@ public class DraftProcess {
             updateReport(bc);
             AutoLog log = new AutoLog(draft.getPrefix());
             log.matchReport(bc, draft);
+
+            return true;
         } else {
             String reply = "You need " + numClicksLeft
                     + " other player(s) to end the draft.";
             draft.sendReply(bc, reply, true);
+
+            return false;
         }
     }
 }

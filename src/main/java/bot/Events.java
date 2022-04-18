@@ -143,7 +143,7 @@ public class Events extends ListenerAdapter {
      */
     private boolean isStaffCommand(SlashCommandEvent sc) {
         String[] staffCmds = {"forceend", "cycle", "sub", "undo",
-                "add", "grad", "award"};
+                "add", "grad", "award", "cycle calculate"};
 
         try {
             Guild server = sc.getGuild();
@@ -253,19 +253,20 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Checks whether a draft request expired or not (including ended drafts).
+     * Checks whether a draft request expired or not.
      * @param interaction the user interaction calling this method.
      * @param numDraft the number draft to analyze.
      * @param draft the actual draft to analyze.
      * @param drafts the source map of drafts.
      * @param queue the source queue of drafts.
      * @return True if the draft request ran out of time.
+     *         False otherwise.
      */
     private boolean draftExpired(GenericInteractionCreateEvent interaction,
                                  int numDraft, Draft draft,
                                  TreeMap<Integer, Draft> drafts,
                                  ArrayHeapMinPQ<Integer> queue) {
-        if (draft.timedOut(interaction) && draft.hasEnded(null)) {
+        if (draft.timedOut(interaction) && !draft.isInitialized()) {
             drafts.remove(numDraft);
             queue.add(numDraft, numDraft);
             return true;
@@ -632,6 +633,7 @@ public class Events extends ListenerAdapter {
                     .setEphemeral(true).queue();
             return;
         }
+
         DraftProcess currProcess = currDraft.getProcess();
         switch (btnName.substring(0, indexOfNum - 2)) {
             case "join":
@@ -655,12 +657,6 @@ public class Events extends ListenerAdapter {
             case "sub":
                 currDraft.addSub(bc);
                 break;
-            case "endDraft":
-                if (currDraft.hasEnded(bc)) {
-                    drafts.remove(numButton);
-                    queue.add(numButton, numButton);
-                }
-                break;
             case "resetTeams":
                 currProcess.resetTeams(bc);
                 break;
@@ -678,7 +674,10 @@ public class Events extends ListenerAdapter {
                 currDraft.getProcess().refresh(bc);
                 break;
             case "endDraftProcess":
-                currProcess.attemptEnd(bc);
+                if (currProcess.hasEnded(bc)) {
+                    drafts.remove(numButton);
+                    queue.add(numButton, numButton);
+                }
                 break;
         }
     }

@@ -38,6 +38,8 @@ public class Main {
                 "Checks whether the bot is online or not.");
         SubcommandData help = new SubcommandData("help",
                 "Displays troubleshooting information for the commands.");
+        SubcommandData cycleCalculate = new SubcommandData("cycle calculate",
+                "Calculates the points for MIT's current draft leaderboards.");
         SubcommandData draftdoc = new SubcommandData("draftdoc",
                 "Retrieves the documentation for the automated draft system.");
 
@@ -128,7 +130,7 @@ public class Main {
         }
 
         // implementing commands
-        mit.addSubcommands(status, help, draftdoc);
+        mit.addSubcommands(status, help, cycleCalculate, draftdoc);
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
                 genmaps, startdraft, forcesub, forceend,
