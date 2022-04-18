@@ -41,7 +41,7 @@ import java.security.GeneralSecurityException;
  */
 public class GoogleAPI {
 
-    /** Field for Google Sheets SDK. */
+    /** Field for a Google Sheets SDK link. */
     private final Sheets sheetsService;
 
     /** ID of the Google Sheet being used. */
@@ -109,11 +109,14 @@ public class GoogleAPI {
     }
 
     /**
-     * Retrieves the affiliated spreadsheet.
-     * @return said spreadsheet.
+     * Retrieves ALL of the spreadsheets' data (including all tabs).
+     * @return said values.
+     *
+     * Note: To retrieve a specific tab's spreadsheet data,
+     *       call this method's get(id, tab) method.
      */
-    public Sheets getSheet() {
-        return sheetsService;
+    public Values getSheetValues() {
+        return sheetsService.spreadsheets().values();
     }
 
     /**
@@ -125,18 +128,17 @@ public class GoogleAPI {
     }
 
     /**
-     * Retrieves a table section of the spreadsheet.
+     * Retrieves a specific tab of the spreadsheet, indexing
+     * by the first column.
      * @param interaction the user interaction calling this method.
      * @param tab the name of the spreadsheet section.
-     * @param spreadsheet the values of the spreadsheet section.
      * @return said section as a map, indexed by Discord ID.
      *         null otherwise.
      */
     public TreeMap<Object, PlayerStats> readSection(
-            GenericInteractionCreateEvent interaction,
-            String tab, Values spreadsheet) {
+            GenericInteractionCreateEvent interaction, String tab) {
         try {
-            ValueRange spreadSheetTable = spreadsheet.get(
+            ValueRange spreadSheetTable = getSheetValues().get(
                     getSpreadsheetID(), tab).execute();
             List<List<Object>> values = spreadSheetTable.getValues();
 
@@ -161,6 +163,87 @@ public class GoogleAPI {
         }
 
         return null;
+    }
+
+    public void sortByDescending(String tab, char column) throws IOException {
+//        System.out.println(0);
+//        Sheets sheetsService = getSheet();
+//        BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
+//        SortRangeRequest srr = new SortRangeRequest();
+//        GridRange gr = new GridRange();
+//        SortSpec ss = new SortSpec();
+//        Request req = new Request();
+//
+//        gr.setSheetId(586067344);
+//        gr.setStartRowIndex(1);
+//        gr.setEndRowIndex(1000);
+//        gr.setStartColumnIndex(0);
+//        gr.setEndColumnIndex(25);
+//
+//        srr.setRange(gr);
+//
+//        ss.setSortOrder("DESCENDING");
+//        int numCol = (column) - 'A';
+//        ss.setDimensionIndex(numCol);
+//
+//        srr.setSortSpecs(Collections.singletonList(ss));
+//
+//        req.setSortRange(srr);
+//
+//        busReq.setRequests(Collections.singletonList(req));
+//
+//        getSheet().spreadsheets().batchUpdate(getSpreadsheetID(), busReq).execute();
+
+
+//        SortSpec ss = new SortSpec();
+//        ss.setSortOrder("DESCENDING");
+//        int numCol = (column) - 'A';
+//        ss.setDimensionIndex(numCol);
+//
+//        SortRangeRequest srr = new SortRangeRequest();
+//        srr.setSortSpecs(Collections.singletonList(ss));
+//
+//        GridRange gr = new GridRange();
+////        gr.
+//
+////        BatchUpdateValuesByDataFilterRequest req = new BatchUpdateValuesByDataFilterRequest();
+////        req.set
+//
+//        ValueRange spreadSheetTable = getSheetValues().get(
+//                getSpreadsheetID(), tab).execute();
+////        getSheetValues().get(
+////                getSpreadsheetID(), tab).
+//
+//        BatchUpdateValuesRequest req = new BatchUpdateValuesRequest();
+//        req.setData(Collections.singletonList(spreadSheetTable));
+//        req.
+//        getSheetValues().batchUpdate(getSpreadsheetID(), req).execute();
+
+//        getSheetValues().batchUpdateByDataFilter(getSpreadsheetID(), srr).execute();
+
+//        getSheetValues().
+//
+//        SortSpec ss = new SortSpec();
+//        ss.setSortOrder("DESCENDING");
+//        int numCol = (column) - 'A';
+//        ss.setDimensionIndex(numCol);
+//
+//        SortRangeRequest srr = new SortRangeRequest();
+//        srr.setSortSpecs(Collections.singletonList(ss));
+//
+//        GridRange gr = new GridRange();
+//        gr.set
+//        ValueRange vr = new ValueRange();
+//
+//        Request req = new Request();
+//        req.setSortRange(srr);
+//        System.out.println(1);
+//
+//        BatchUpdateValuesRequest busReq = new BatchUpdateValuesRequest();
+//        busReq.set
+//        busReq.setRequests(Collections.singletonList(req));
+//        getSheetValues().batchUpdate(getSpreadsheetID(), busReq).execute();
+//        System.out.println(2);
     }
 
     /**
@@ -189,14 +272,13 @@ public class GoogleAPI {
     }
 
     /**
-     * Appends a row to the end of the spreadsheet section.
-     * @param tab the name of the spreadsheet section.
-     * @param spreadsheet the values of the spreadsheet section.
+     * Appends a row to the end of a spreadsheet.
+     * @param tab the name of the spreadsheet tab to add to.
      * @param row the row of values to append.
      */
-    public void appendRow(String tab, Values spreadsheet, ValueRange row)
+    public void appendRow(String tab, ValueRange row)
         throws IOException {
-        spreadsheet.append(getSpreadsheetID(), tab, row)
+        getSheetValues().append(getSpreadsheetID(), tab, row)
                 .setValueInputOption("USER_ENTERED")
                 .setInsertDataOption("INSERT_ROWS")
                 .setIncludeValuesInResponse(true).execute();
@@ -204,13 +286,12 @@ public class GoogleAPI {
 
     /**
      * Updates a row within the spreadsheet section.
-     * @param tab the name of the spreadsheet section.
-     * @param spreadsheet the values of the spreadsheet section.
+     * @param tab the name of the spreadsheet tab to update.
      * @param row the row of values to update to.
      */
-    public void updateRow(String tab, Values spreadsheet, ValueRange row)
+    public void updateRow(String tab, ValueRange row)
             throws IOException {
-        spreadsheet.update(getSpreadsheetID(), tab, row)
+        getSheetValues().update(getSpreadsheetID(), tab, row)
                 .setValueInputOption("USER_ENTERED")
                 .setIncludeValuesInResponse(true).execute();
     }

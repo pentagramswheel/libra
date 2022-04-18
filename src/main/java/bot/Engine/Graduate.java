@@ -60,9 +60,7 @@ public class Graduate extends Section implements Command {
             // tab name of the spreadsheet
             String tab = "'Graduates'";
 
-            Values spreadsheet = link.getSheet().spreadsheets().values();
-            TreeMap<Object, PlayerStats> data = link.readSection(
-                    sc, tab, spreadsheet);
+            TreeMap<Object, PlayerStats> data = link.readSection(sc, tab);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             } else if (!data.containsKey(playerID)) {
@@ -70,7 +68,7 @@ public class Graduate extends Section implements Command {
                 ValueRange newRow = link.buildRow(Arrays.asList(
                             playerID, player.getUser().getAsTag(),
                             player.getEffectiveName()));
-                link.appendRow(tab, spreadsheet, newRow);
+                link.appendRow(tab, newRow);
             }
 
             return exitMessage;

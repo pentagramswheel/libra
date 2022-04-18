@@ -2,6 +2,7 @@ package bot;
 
 import bot.Engine.Add;
 import bot.Engine.Award;
+import bot.Engine.Cycles.ManualLog;
 import bot.Engine.Drafts.*;
 import bot.Engine.Graduate;
 import bot.Tools.ArrayHeapMinPQ;

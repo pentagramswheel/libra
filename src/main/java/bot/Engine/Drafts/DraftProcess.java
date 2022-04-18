@@ -1,5 +1,6 @@
 package bot.Engine.Drafts;
 
+import bot.Engine.Cycles.AutoLog;
 import bot.Tools.Components;
 
 import net.dv8tion.jda.api.EmbedBuilder;

@@ -1,5 +1,6 @@
 package bot.Engine.Drafts;
 
+import bot.Engine.Cycles.ManualLog;
 import bot.Engine.PlayerStats;
 import bot.Tools.Command;
 import bot.Tools.GoogleAPI;
@@ -129,14 +130,13 @@ public class Undo extends ManualLog implements Command {
      * @param args the arguments of the command.
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
-     * @param tab the name of the spreadsheet section.
-     * @param spreadsheet the values of the spreadsheet section.
+     * @param tab the name of the spreadsheet tab to edit.
      * @param data a map of all rows of the spreadsheet.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
     private int undoUser(String[] args, GoogleAPI link,
-                         String user, String tab, Values spreadsheet,
+                         String user, String tab,
                          TreeMap<Object, PlayerStats> data) {
         String userID = user.substring(2, user.length() - 1);
         try {
@@ -178,7 +178,7 @@ public class Undo extends ManualLog implements Command {
                     player.getName(), player.getNickname(),
                     setWins, setLosses, setsPlayed, setWinrate,
                     gameWins, gameLosses, gamesPlayed, gameWinrate));
-            link.updateRow(updateRange, spreadsheet, newRow);
+            link.updateRow(updateRange, newRow);
 
             return 0;
         } catch (IOException e) {
@@ -203,9 +203,7 @@ public class Undo extends ManualLog implements Command {
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";
 
-            Values spreadsheet = link.getSheet().spreadsheets().values();
-            TreeMap<Object, PlayerStats> data = link.readSection(
-                    sc, tab, spreadsheet);
+            TreeMap<Object, PlayerStats> data = link.readSection(sc, tab);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
@@ -224,7 +222,7 @@ public class Undo extends ManualLog implements Command {
             int[] errorsFound = new int[userArgs];
             for (int i = 3; i < userArgs + 3; i++) {
                 errorsFound[i - 3] = undoUser(messageArgs, link,
-                        messageArgs[i], tab, spreadsheet, data);
+                        messageArgs[i], tab, data);
             }
 
             sendReport(sc, messageArgs, userArgs, errorsFound);

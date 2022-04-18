@@ -1,4 +1,4 @@
-package bot.Engine.Drafts;
+package bot.Engine.Cycles;
 
 import bot.Engine.PlayerStats;
 import bot.Engine.Section;
@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
-import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
 import java.awt.Color;
 import java.util.List;
@@ -148,14 +147,13 @@ public class ManualLog extends Section implements Command {
      * @param gameWins the total games won.
      * @param user the user to update the stats of.
      * @param link a connection to the spreadsheet.
-     * @param tab the name of the spreadsheet section.
-     * @param spreadsheet the values of the spreadsheet section.
+     * @param tab the name of the spreadsheet tab to edit.
      * @param data a map of all rows of the spreadsheet.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
-    public int updateUser(String cmd, int gamesPlayed, int gameWins, Member user,
-                           GoogleAPI link, String tab, Values spreadsheet,
+    public int updateUser(String cmd, int gamesPlayed, int gameWins,
+                           Member user, GoogleAPI link, String tab,
                            TreeMap<Object, PlayerStats> data) {
         try {
             String userTag = user.getUser().getAsTag();
@@ -195,7 +193,7 @@ public class ManualLog extends Section implements Command {
                             userTag, user.getEffectiveName(),
                             setWins, setLosses, setsPlayed, setWinrate,
                             gameWins, gameLosses, gamesPlayed, gameWinrate));
-            link.updateRow(updateRange, spreadsheet, newRow);
+            link.updateRow(updateRange, newRow);
 
             return 0;
         } catch (IOException e) {
@@ -212,15 +210,14 @@ public class ManualLog extends Section implements Command {
      * @param gameWins the total games won.
      * @param user the user to update the stats of.
      * @param link a connection to the spreadsheet.
-     * @param tab the name of the spreadsheet section.
-     * @param spreadsheet the values of the spreadsheet section.
+     * @param tab the name of the spreadsheet tab to edit.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      *
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
     public int addUser(String cmd, int gamesPlayed, int gameWins, Member user,
-                        GoogleAPI link, String tab, Values spreadsheet) {
+                        GoogleAPI link, String tab) {
         try {
             String userTag = user.getUser().getAsTag();
 
@@ -249,7 +246,7 @@ public class ManualLog extends Section implements Command {
                     user.getId(), userTag, user.getEffectiveName(),
                     setWins, setLosses, setsPlayed, setWinrate,
                     gameWins, gameLosses, gamesPlayed, gameWinrate));
-            link.appendRow(tab, spreadsheet, newRow);
+            link.appendRow(tab, newRow);
 
             return 0;
         } catch (IOException e) {
@@ -275,9 +272,7 @@ public class ManualLog extends Section implements Command {
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";
 
-            Values spreadsheet = link.getSheet().spreadsheets().values();
-            TreeMap<Object, PlayerStats> data = link.readSection(
-                    sc, tab, spreadsheet);
+            TreeMap<Object, PlayerStats> data = link.readSection(sc, tab);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
@@ -291,12 +286,12 @@ public class ManualLog extends Section implements Command {
                 if (data.containsKey(user.getId())) {
                     errorsFound[i] = updateUser(
                             cmd, getGamesPlayed(args), getGamesWon(args),
-                            user, link, tab, spreadsheet, data);
+                            user, link, tab, data);
                     playerTypes[i] = 0;
                 } else {
                     errorsFound[i] = addUser(
                             cmd, getGamesPlayed(args), getGamesWon(args),
-                            user, link, tab, spreadsheet);
+                            user, link, tab);
                     playerTypes[i] = 1;
                 }
             }

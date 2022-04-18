@@ -1,5 +1,8 @@
-package bot.Engine.Drafts;
+package bot.Engine.Cycles;
 
+import bot.Engine.Drafts.Draft;
+import bot.Engine.Drafts.DraftPlayer;
+import bot.Engine.Drafts.DraftTeam;
 import bot.Engine.PlayerStats;
 import bot.Engine.Section;
 import bot.Tools.GoogleAPI;
@@ -8,8 +11,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-
-import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
 import java.awt.Color;
 import java.util.Map;
@@ -156,14 +157,13 @@ public class AutoLog extends Section {
      * @param offset an index to offset the type arrays, based on the
      *               current team.
      * @param link a connection to the spreadsheet.
-     * @param tab the name of the spreadsheet section.
-     * @param spreadsheet the values of the spreadsheet section.
+     * @param tab the name of the spreadsheet tab to edit.
      * @param data a map of all rows of the spreadsheet.
      */
     private void updateSpreadsheet(ManualLog log, Draft draft,
                                    ButtonClickEvent bc, DraftTeam team,
                                    int[] playerTypes, int[] errorsFound, int offset,
-                                   GoogleAPI link, String tab, Values spreadsheet,
+                                   GoogleAPI link, String tab,
                                    TreeMap<Object, PlayerStats> data) {
         int i = 0;
         for (Map.Entry<String, DraftPlayer> player : team.getPlayers().entrySet()) {
@@ -182,12 +182,12 @@ public class AutoLog extends Section {
             if (data.containsKey(currID)) {
                 errorsFound[offset + i] = log.updateUser(
                         cmd, gamesPlayed, gameWins,
-                        user, link, tab, spreadsheet, data);
+                        user, link, tab, data);
                 playerTypes[offset + i] = 0;
             } else {
                 errorsFound[offset + i] = log.addUser(
                         cmd, gamesPlayed, gameWins,
-                        user, link, tab, spreadsheet);
+                        user, link, tab);
                 playerTypes[offset + i] = 1;
             }
 
@@ -207,9 +207,7 @@ public class AutoLog extends Section {
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";
 
-            Values spreadsheet = link.getSheet().spreadsheets().values();
-            TreeMap<Object, PlayerStats> data = link.readSection(
-                    bc, tab, spreadsheet);
+            TreeMap<Object, PlayerStats> data = link.readSection(bc, tab);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
@@ -223,9 +221,9 @@ public class AutoLog extends Section {
 
             ManualLog log = new ManualLog(getPrefix());
             updateSpreadsheet(log, draft, bc, team1, playerTypes,
-                    errorsFound, 0, link, tab, spreadsheet, data);
+                    errorsFound, 0, link, tab, data);
             updateSpreadsheet(log, draft, bc, team2, playerTypes,
-                    errorsFound, team1.getPlayers().size(), link, tab, spreadsheet, data);
+                    errorsFound, team1.getPlayers().size(), link, tab, data);
 
             sendReport(log, draft, bc, team1, team2, playerTypes, errorsFound);
             draft.log(totalSize + " " + getPrefix().toUpperCase()
