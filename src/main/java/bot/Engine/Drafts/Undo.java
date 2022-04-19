@@ -3,13 +3,12 @@ package bot.Engine.Drafts;
 import bot.Engine.Cycles.ManualLog;
 import bot.Engine.PlayerStats;
 import bot.Tools.Command;
-import bot.Tools.GoogleAPI;
+import bot.Tools.GoogleSheetsAPI;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
-import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
 import java.awt.Color;
 import java.util.Scanner;
@@ -135,7 +134,7 @@ public class Undo extends ManualLog implements Command {
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
-    private int undoUser(String[] args, GoogleAPI link,
+    private int undoUser(String[] args, GoogleSheetsAPI link,
                          String user, String tab,
                          TreeMap<Object, PlayerStats> data) {
         String userID = user.substring(2, user.length() - 1);
@@ -197,8 +196,9 @@ public class Undo extends ManualLog implements Command {
         sc.deferReply().queue();
 
         try {
-            GoogleAPI link = new GoogleAPI(cyclesSheetID());
-            File undoFile = new File("load" + getPrefix().toUpperCase() + ".txt");
+            GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
+            File undoFile = new File(
+                    "load" + getPrefix().toUpperCase() + ".txt");
 
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";

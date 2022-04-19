@@ -3,7 +3,7 @@ package bot.Engine.Cycles;
 import bot.Engine.PlayerStats;
 import bot.Engine.Section;
 import bot.Tools.Command;
-import bot.Tools.GoogleAPI;
+import bot.Tools.GoogleSheetsAPI;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -153,8 +153,8 @@ public class ManualLog extends Section implements Command {
      *         1 otherwise.
      */
     public int updateUser(String cmd, int gamesPlayed, int gameWins,
-                           Member user, GoogleAPI link, String tab,
-                           TreeMap<Object, PlayerStats> data) {
+                          Member user, GoogleSheetsAPI link, String tab,
+                          TreeMap<Object, PlayerStats> data) {
         try {
             String userTag = user.getUser().getAsTag();
             PlayerStats player = data.get(user.getId());
@@ -217,7 +217,7 @@ public class ManualLog extends Section implements Command {
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
     public int addUser(String cmd, int gamesPlayed, int gameWins, Member user,
-                        GoogleAPI link, String tab) {
+                       GoogleSheetsAPI link, String tab) {
         try {
             String userTag = user.getUser().getAsTag();
 
@@ -267,7 +267,7 @@ public class ManualLog extends Section implements Command {
         List<OptionMapping> args = sc.getOptions();
 
         try {
-            GoogleAPI link = new GoogleAPI(cyclesSheetID());
+            GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
 
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";

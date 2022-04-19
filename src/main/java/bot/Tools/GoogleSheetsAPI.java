@@ -15,7 +15,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.api.services.sheets.v4.model.*;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 
 import org.slf4j.Logger;
@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
@@ -69,8 +70,8 @@ public class GoogleAPI {
                 java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
         buggyLogger.setLevel(java.util.logging.Level.SEVERE);
 
-//        String resourcesPath = "src/main/resources";     // for local
-        String resourcesPath = "resources";              // for JAR
+        String resourcesPath = "src/main/resources";     // for local
+//        String resourcesPath = "resources";              // for JAR
         String credentialsPath = resourcesPath + "/credentials.json";
         String tokensPath = "tokens";
 
@@ -88,8 +89,8 @@ public class GoogleAPI {
                 .setAccessType("offline")
                 .build();
 
-//        LocalServerReceiver receiver = new LocalServerReceiver();                                   // for local
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();     // for JAR
+        LocalServerReceiver receiver = new LocalServerReceiver();                                   // for local
+//        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();     // for JAR
         AuthorizationCodeInstalledApp oAuth = new AuthorizationCodeInstalledApp(
                 flow, receiver);
 
@@ -138,9 +139,9 @@ public class GoogleAPI {
     public TreeMap<Object, PlayerStats> readSection(
             GenericInteractionCreateEvent interaction, String tab) {
         try {
-            ValueRange spreadSheetTable = getSheetValues().get(
+            ValueRange spreadSheetData = getSheetValues().get(
                     getSpreadsheetID(), tab).execute();
-            List<List<Object>> values = spreadSheetTable.getValues();
+            List<List<Object>> values = spreadSheetData.getValues();
 
             TreeMap<Object, PlayerStats> data = new TreeMap<>();
             if (values != null && !values.isEmpty()) {
@@ -167,14 +168,14 @@ public class GoogleAPI {
 
     public void sortByDescending(String tab, char column) throws IOException {
 //        System.out.println(0);
-//        Sheets sheetsService = getSheet();
 //        BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
 //        SortRangeRequest srr = new SortRangeRequest();
 //        GridRange gr = new GridRange();
 //        SortSpec ss = new SortSpec();
 //        Request req = new Request();
 //
-//        gr.setSheetId(586067344);
+//        gr.setSheetId(tab);
+//        gr.
 //        gr.setStartRowIndex(1);
 //        gr.setEndRowIndex(1000);
 //        gr.setStartColumnIndex(0);
@@ -187,63 +188,30 @@ public class GoogleAPI {
 //        ss.setDimensionIndex(numCol);
 //
 //        srr.setSortSpecs(Collections.singletonList(ss));
-//
 //        req.setSortRange(srr);
-//
 //        busReq.setRequests(Collections.singletonList(req));
-//
-//        getSheet().spreadsheets().batchUpdate(getSpreadsheetID(), busReq).execute();
+//        sheetsService.spreadsheets().batchUpdate(getSpreadsheetID(), busReq).execute();
 
 
-//        SortSpec ss = new SortSpec();
-//        ss.setSortOrder("DESCENDING");
-//        int numCol = (column) - 'A';
-//        ss.setDimensionIndex(numCol);
-//
-//        SortRangeRequest srr = new SortRangeRequest();
-//        srr.setSortSpecs(Collections.singletonList(ss));
-//
-//        GridRange gr = new GridRange();
-////        gr.
-//
-////        BatchUpdateValuesByDataFilterRequest req = new BatchUpdateValuesByDataFilterRequest();
-////        req.set
-//
-//        ValueRange spreadSheetTable = getSheetValues().get(
-//                getSpreadsheetID(), tab).execute();
-////        getSheetValues().get(
-////                getSpreadsheetID(), tab).
-//
-//        BatchUpdateValuesRequest req = new BatchUpdateValuesRequest();
-//        req.setData(Collections.singletonList(spreadSheetTable));
-//        req.
-//        getSheetValues().batchUpdate(getSpreadsheetID(), req).execute();
+//        System.out.println(getSheetValues().get(getSpreadsheetID(), tab)/);
+//        for (Sheet s : sheetsService.spreadsheets().get(getSpreadsheetID()).execute().getSheets()) {
+//            System.out.println(s.getProperties().getTitle());
+//            System.out.println(s.getProperties().getSheetId());
+//        }
 
-//        getSheetValues().batchUpdateByDataFilter(getSpreadsheetID(), srr).execute();
+        List<Sheet> sheets = sheetsService.spreadsheets().get(getSpreadsheetID()).execute().getSheets();
 
-//        getSheetValues().
-//
-//        SortSpec ss = new SortSpec();
-//        ss.setSortOrder("DESCENDING");
-//        int numCol = (column) - 'A';
-//        ss.setDimensionIndex(numCol);
-//
-//        SortRangeRequest srr = new SortRangeRequest();
-//        srr.setSortSpecs(Collections.singletonList(ss));
-//
-//        GridRange gr = new GridRange();
-//        gr.set
-//        ValueRange vr = new ValueRange();
-//
+        for (int i = 0; i < sheets.size(); i++) {
+            System.out.println(sheets.get(i).getProperties().getTitle());
+            System.out.println(sheets.get(i).getProperties().getSheetId());
+        }
+
+
+//        BatchUpdateSpreadsheetRequest update = new BatchUpdateSpreadsheetRequest();
+//        ValueRange spreadSheetData = getSheetValues().get(
+//                getSpreadsheetID(), tab).execute().;
 //        Request req = new Request();
-//        req.setSortRange(srr);
-//        System.out.println(1);
-//
-//        BatchUpdateValuesRequest busReq = new BatchUpdateValuesRequest();
-//        busReq.set
-//        busReq.setRequests(Collections.singletonList(req));
-//        getSheetValues().batchUpdate(getSpreadsheetID(), busReq).execute();
-//        System.out.println(2);
+//        req.set
     }
 
     /**

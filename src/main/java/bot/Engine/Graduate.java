@@ -1,14 +1,13 @@
 package bot.Engine;
 
 import bot.Tools.Command;
-import bot.Tools.GoogleAPI;
+import bot.Tools.GoogleSheetsAPI;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
-import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
 
 import java.util.List;
 import java.util.Arrays;
@@ -42,7 +41,7 @@ public class Graduate extends Section implements Command {
     private String graduate(SlashCommandEvent sc, String playerID) {
         try {
             String exitMessage;
-            GoogleAPI link = new GoogleAPI(gradSheetID());
+            GoogleSheetsAPI link = new GoogleSheetsAPI(gradSheetID());
 
             removeRole(sc, playerID, getRole(sc, getSection()));
             addRole(sc, playerID, getRole(sc, getSection() + " Graduate"));

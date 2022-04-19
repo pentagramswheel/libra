@@ -38,7 +38,7 @@ public class Main {
                 "Checks whether the bot is online or not.");
         SubcommandData help = new SubcommandData("help",
                 "Displays troubleshooting information for the commands.");
-        SubcommandData cycleCalculate = new SubcommandData("cycle calculate",
+        SubcommandData cycleCalculate = new SubcommandData("cyclescalc",
                 "Calculates the points for MIT's current draft leaderboards.");
         SubcommandData draftdoc = new SubcommandData("draftdoc",
                 "Retrieves the documentation for the automated draft system.");

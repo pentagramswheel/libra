@@ -5,7 +5,7 @@ import bot.Engine.Drafts.DraftPlayer;
 import bot.Engine.Drafts.DraftTeam;
 import bot.Engine.PlayerStats;
 import bot.Engine.Section;
-import bot.Tools.GoogleAPI;
+import bot.Tools.GoogleSheetsAPI;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -163,7 +163,7 @@ public class AutoLog extends Section {
     private void updateSpreadsheet(ManualLog log, Draft draft,
                                    ButtonClickEvent bc, DraftTeam team,
                                    int[] playerTypes, int[] errorsFound, int offset,
-                                   GoogleAPI link, String tab,
+                                   GoogleSheetsAPI link, String tab,
                                    TreeMap<Object, PlayerStats> data) {
         int i = 0;
         for (Map.Entry<String, DraftPlayer> player : team.getPlayers().entrySet()) {
@@ -202,7 +202,7 @@ public class AutoLog extends Section {
      */
     public void matchReport(ButtonClickEvent bc, Draft draft) {
         try {
-            GoogleAPI link = new GoogleAPI(cyclesSheetID());
+            GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
 
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";
