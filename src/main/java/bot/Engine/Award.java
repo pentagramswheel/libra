@@ -27,7 +27,7 @@ public class Award extends Section implements Command {
 
     /**
      * Awards players a leaderboard role.
-     * @param sc the inputted slash command.
+     * @param sc the user's inputted command.
      * @param role the leaderboard role to give.
      * @param players the players to give the role to.
      */

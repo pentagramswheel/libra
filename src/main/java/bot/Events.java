@@ -2,7 +2,7 @@ package bot;
 
 import bot.Engine.Add;
 import bot.Engine.Award;
-import bot.Engine.Cycles.ManualLog;
+import bot.Engine.Cycles.*;
 import bot.Engine.Drafts.*;
 import bot.Engine.Graduate;
 import bot.Tools.ArrayHeapMinPQ;
@@ -61,24 +61,6 @@ public class Events extends ListenerAdapter {
      */
     public Events(Random generator) {
         numGenerator = generator;
-    }
-
-    /**
-     * Checks whether a part of an input string can be found
-     * in a list of strings.
-     * @param input the input string to compare.
-     * @param lst the list of strings to search.
-     * @return True if the input string was in the list.
-     *         False otherwise.
-     */
-    private boolean isSimilar(String input, String[] lst) {
-        for (String item : lst) {
-            if (input.contains(item)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -143,7 +125,7 @@ public class Events extends ListenerAdapter {
      */
     private boolean isStaffCommand(SlashCommandEvent sc) {
         String[] staffCmds = {"forceend", "cycle", "sub", "undo",
-                "add", "grad", "award", "cycle calculate"};
+                "add", "grad", "award", "cyclescalc"};
 
         try {
             Guild server = sc.getGuild();
@@ -156,7 +138,11 @@ public class Events extends ListenerAdapter {
             Role staffRole = server.getRolesByName("Staff", true).get(0);
 
             if (author != null && !author.getRoles().contains(staffRole)) {
-                return isSimilar(subCmd, staffCmds);
+                for (String cmd : staffCmds) {
+                    if (subCmd.equals(cmd)) {
+                        return true;
+                    }
+                }
             }
         } catch (NullPointerException | IndexOutOfBoundsException e) {
             Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -488,6 +474,10 @@ public class Events extends ListenerAdapter {
                 break;
             case "profile":
                 sc.reply("This command has not been implemented yet.").queue();
+                break;
+            case "cyclescalc":
+                PointsCalculator calculator = new PointsCalculator();
+                calculator.runCmd(sc);
                 break;
             case "draftdoc":
                 String docLink =

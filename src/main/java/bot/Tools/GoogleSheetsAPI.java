@@ -40,7 +40,7 @@ import java.security.GeneralSecurityException;
  * Purpose: Establishes a connection with a Google Sheet
  *          through the Google API.
  */
-public class GoogleAPI {
+public class GoogleSheetsAPI {
 
     /** Field for a Google Sheets SDK link. */
     private final Sheets sheetsService;
@@ -53,7 +53,7 @@ public class GoogleAPI {
      * Google Sheet's ID.
      * @param id the ID of the Google Sheet.
      */
-    public GoogleAPI(String id) throws IOException, GeneralSecurityException {
+    public GoogleSheetsAPI(String id) throws IOException, GeneralSecurityException {
         sheetsService = getSheetsService();
         spreadsheetID = id;
     }
@@ -70,8 +70,8 @@ public class GoogleAPI {
                 java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
         buggyLogger.setLevel(java.util.logging.Level.SEVERE);
 
-        String resourcesPath = "src/main/resources";     // for local
-//        String resourcesPath = "resources";              // for JAR
+//        String resourcesPath = "src/main/resources";     // for local
+        String resourcesPath = "resources";              // for JAR
         String credentialsPath = resourcesPath + "/credentials.json";
         String tokensPath = "tokens";
 
@@ -89,8 +89,8 @@ public class GoogleAPI {
                 .setAccessType("offline")
                 .build();
 
-        LocalServerReceiver receiver = new LocalServerReceiver();                                   // for local
-//        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();     // for JAR
+//        LocalServerReceiver receiver = new LocalServerReceiver();                                   // for local
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();     // for JAR
         AuthorizationCodeInstalledApp oAuth = new AuthorizationCodeInstalledApp(
                 flow, receiver);
 
@@ -112,12 +112,20 @@ public class GoogleAPI {
     /**
      * Retrieves ALL of the spreadsheets' data (including all tabs).
      * @return said values.
-     *
-     * Note: To retrieve a specific tab's spreadsheet data,
-     *       call this method's get(id, tab) method.
      */
-    public Values getSheetValues() {
+    public Values getSheet() {
         return sheetsService.spreadsheets().values();
+    }
+
+    /**
+     * Retrieves a tab's data from the spreadsheet.
+     * @param tab the tab to retrieve data from.
+     * @return said list of values.
+     */
+    public List<List<Object>> getSheetValues(String tab) throws IOException {
+        return getSheet().get(getSpreadsheetID(), tab)
+                .setValueRenderOption("UNFORMATTED_VALUE")
+                .execute().getValues();
     }
 
     /**
@@ -126,6 +134,27 @@ public class GoogleAPI {
      */
     public String getSpreadsheetID() {
         return spreadsheetID;
+    }
+
+    /**
+     * Retrieves the sheet ID for the spreadsheet's tab.
+     * @param tab the specific tab of the spreadsheet.
+     * @return said ID.
+     *         -1, otherwise.
+     */
+    private int getSheetID(String tab) throws IOException {
+        List<Sheet> allSheets = sheetsService.spreadsheets()
+                .get(getSpreadsheetID()).execute().getSheets();
+
+        for (Sheet sheet : allSheets) {
+            SheetProperties properties = sheet.getProperties();
+            String title = "'" + properties.getTitle() + "'";
+            if (title.equals(tab)) {
+                return properties.getSheetId();
+            }
+        }
+
+        return -1;
     }
 
     /**
@@ -139,9 +168,7 @@ public class GoogleAPI {
     public TreeMap<Object, PlayerStats> readSection(
             GenericInteractionCreateEvent interaction, String tab) {
         try {
-            ValueRange spreadSheetData = getSheetValues().get(
-                    getSpreadsheetID(), tab).execute();
-            List<List<Object>> values = spreadSheetData.getValues();
+            List<List<Object>> values = getSheetValues(tab);
 
             TreeMap<Object, PlayerStats> data = new TreeMap<>();
             if (values != null && !values.isEmpty()) {
@@ -149,7 +176,7 @@ public class GoogleAPI {
                     List<Object> row = values.get(i);
                     Object id = row.remove(0);
                     PlayerStats rowStats = new PlayerStats(
-                            interaction, Integer.toString(i + 1), row);
+                            interaction, i + 1, row);
 
                     data.put(id, rowStats);
                 }
@@ -166,52 +193,44 @@ public class GoogleAPI {
         return null;
     }
 
-    public void sortByDescending(String tab, char column) throws IOException {
-//        System.out.println(0);
-//        BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
-//        SortRangeRequest srr = new SortRangeRequest();
-//        GridRange gr = new GridRange();
-//        SortSpec ss = new SortSpec();
-//        Request req = new Request();
-//
-//        gr.setSheetId(tab);
-//        gr.
-//        gr.setStartRowIndex(1);
-//        gr.setEndRowIndex(1000);
-//        gr.setStartColumnIndex(0);
-//        gr.setEndColumnIndex(25);
-//
-//        srr.setRange(gr);
-//
-//        ss.setSortOrder("DESCENDING");
-//        int numCol = (column) - 'A';
-//        ss.setDimensionIndex(numCol);
-//
-//        srr.setSortSpecs(Collections.singletonList(ss));
-//        req.setSortRange(srr);
-//        busReq.setRequests(Collections.singletonList(req));
-//        sheetsService.spreadsheets().batchUpdate(getSpreadsheetID(), busReq).execute();
+    /**
+     * Sorts a spreadsheet by descending values.
+     * @param tab the spreadsheet tab to sort.
+     * @param column the column to sort by.
+     * @param numRows the number of rows to sort.
+     */
+    public void sortByDescending(String tab, String column, int numRows)  {
+        int numCol = (column.charAt(0)) - 'A';
 
+        try {
+            SortSpec ss = new SortSpec();
+            ss.setSortOrder("DESCENDING");
+            ss.setDimensionIndex(numCol);
 
-//        System.out.println(getSheetValues().get(getSpreadsheetID(), tab)/);
-//        for (Sheet s : sheetsService.spreadsheets().get(getSpreadsheetID()).execute().getSheets()) {
-//            System.out.println(s.getProperties().getTitle());
-//            System.out.println(s.getProperties().getSheetId());
-//        }
+            GridRange gr = new GridRange();
+            int sheetID = getSheetID(tab);
+            if (sheetID == -1) {
+                throw new IOException();
+            }
+            gr.setSheetId(getSheetID(tab));
+            gr.setStartRowIndex(1);
+            gr.setEndRowIndex(numRows);
+            gr.setStartColumnIndex(0);
+            gr.setEndColumnIndex(25);
 
-        List<Sheet> sheets = sheetsService.spreadsheets().get(getSpreadsheetID()).execute().getSheets();
+            SortRangeRequest srr = new SortRangeRequest();
+            srr.setRange(gr);
+            srr.setSortSpecs(Collections.singletonList(ss));
 
-        for (int i = 0; i < sheets.size(); i++) {
-            System.out.println(sheets.get(i).getProperties().getTitle());
-            System.out.println(sheets.get(i).getProperties().getSheetId());
+            Request req = new Request();
+            req.setSortRange(srr);
+
+            BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
+            busReq.setRequests(Collections.singletonList(req));
+            sheetsService.spreadsheets().batchUpdate(getSpreadsheetID(), busReq).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-
-//        BatchUpdateSpreadsheetRequest update = new BatchUpdateSpreadsheetRequest();
-//        ValueRange spreadSheetData = getSheetValues().get(
-//                getSpreadsheetID(), tab).execute().;
-//        Request req = new Request();
-//        req.set
     }
 
     /**
@@ -223,20 +242,34 @@ public class GoogleAPI {
      * @param endRow the row to end the edit range at.
      * @return the formatted range.
      */
-    public String buildRange(String tab, String startColumn, String startRow,
-                      String endColumn, String endRow) {
+    public String buildRange(String tab, String startColumn, int startRow,
+                      String endColumn, int endRow) {
         String updateFormat = "%s" + "!%s%s" + ":%s%s";
         return String.format(updateFormat,
                 tab, startColumn, startRow, endColumn, endRow);
     }
 
     /**
-     * Builds the row consisting of items from a list.
-     * @param lst the list of items to build the row with.
+     * Builds a row consisting of items from a list.
+     * @param lst the list of items to populate the row with.
      * @return the built row.
      */
     public ValueRange buildRow(List<Object> lst) {
         return new ValueRange().setValues(Collections.singletonList(lst));
+    }
+
+    /**
+     * Builds a column consisting of items from a list.
+     * @param lst the list of items to populate the column with.
+     * @return the built column.
+     */
+    public ValueRange buildColumn(List<Object> lst) {
+        List<List<Object>> values = new ArrayList<>();
+        for (Object item : lst) {
+            values.add(Collections.singletonList(item));
+        }
+
+        return new ValueRange().setValues(values);
     }
 
     /**
@@ -246,20 +279,20 @@ public class GoogleAPI {
      */
     public void appendRow(String tab, ValueRange row)
         throws IOException {
-        getSheetValues().append(getSpreadsheetID(), tab, row)
+        getSheet().append(getSpreadsheetID(), tab, row)
                 .setValueInputOption("USER_ENTERED")
                 .setInsertDataOption("INSERT_ROWS")
                 .setIncludeValuesInResponse(true).execute();
     }
 
     /**
-     * Updates a row within the spreadsheet section.
-     * @param tab the name of the spreadsheet tab to update.
-     * @param row the row of values to update to.
+     * Updates a range of values within a spreadsheet.
+     * @param range the range of values to update.
+     * @param values the values to update to.
      */
-    public void updateRow(String tab, ValueRange row)
+    public void updateRange(String range, ValueRange values)
             throws IOException {
-        getSheetValues().update(getSpreadsheetID(), tab, row)
+        getSheet().update(getSpreadsheetID(), range, values)
                 .setValueInputOption("USER_ENTERED")
                 .setIncludeValuesInResponse(true).execute();
     }

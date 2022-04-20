@@ -177,7 +177,7 @@ public class Undo extends ManualLog implements Command {
                     player.getName(), player.getNickname(),
                     setWins, setLosses, setsPlayed, setWinrate,
                     gameWins, gameLosses, gamesPlayed, gameWinrate));
-            link.updateRow(updateRange, newRow);
+            link.updateRange(updateRange, newRow);
 
             return 0;
         } catch (IOException e) {

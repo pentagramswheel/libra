@@ -24,7 +24,7 @@ import java.security.GeneralSecurityException;
  * Date:    February 17, 2021
  * Project: Libra
  * Module:  ManualLog.java
- * Purpose: Logs cycle information via command.
+ * Purpose: Logs MIT leaderboard information via command.
  */
 public class ManualLog extends Section implements Command {
 
@@ -193,7 +193,7 @@ public class ManualLog extends Section implements Command {
                             userTag, user.getEffectiveName(),
                             setWins, setLosses, setsPlayed, setWinrate,
                             gameWins, gameLosses, gamesPlayed, gameWinrate));
-            link.updateRow(updateRange, newRow);
+            link.updateRange(updateRange, newRow);
 
             return 0;
         } catch (IOException e) {

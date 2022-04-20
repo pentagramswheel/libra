@@ -23,8 +23,8 @@ import java.security.GeneralSecurityException;
  * Date:    January 18, 2022
  * Project: Libra
  * Module:  AutoLog.java
- * Purpose: Logs cycle information via the automatic
- *          draft system.
+ * Purpose: Logs MIT leaderboard information via the
+ *          automatic draft system.
  */
 public class AutoLog extends Section {
 

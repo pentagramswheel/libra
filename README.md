@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** April 11, 2022
+**Last Updated:** April 19, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -29,13 +29,15 @@
     - [Award](#award)
     - [Graduate](#graduate)
     - [PlayerStats](#playerstats)
-  + [Drafts (Engine)](#drafts-engine)
+  + [Cycles (Engine)](#cycles-engine)
     - [AutoLog](#autolog)
+    - [ManualLog](#manuallog)
+    - [PointsCalculator](#pointscalculator)
+  + [Drafts (Engine)](#drafts-engine)
     - [Draft](#draft)
     - [DraftPlayer](#draftplayer)
     - [DraftProcess](#draftprocess)
     - [DraftTeam](#draftteam)
-    - [ManualLog](#manuallog)
     - [MapGenerator](#mapgenerator)
     - [Undo](#undo)
 * [Persistence](#persistence)
@@ -148,7 +150,7 @@ A class which handles files (currently only for saving text).
 
 ----
 
-#### GoogleAPI
+#### GoogleSheetsAPI
 
 A class which navigates a Google Sheet (spreadsheet).
 
@@ -192,7 +194,7 @@ A class which graduates a user in a section within MIT, processing the command `
 A class for storing information about a Discord user.
 
 ###### Instance Variables
-1. `String draftPosition` - the row position of the user's data within their associated draft spreadsheet.
+1. `int draftPosition` - the row position of the user's data within their associated draft spreadsheet.
 2. `String name` - the user's Discord tag.
 3. `String nickname` - the user's nickname on the server.
 4. `int setWins` - the user's amount of won sets in a cycle.
@@ -217,11 +219,32 @@ A class for parenting MIT section-specific commands.
 
 ----
 
-### Drafts (Engine)
+### Cycles (Engine)
 
 #### AutoLog
 
 A class which automatically updates the draft stats of a user.
+
+----
+
+#### ManualLog
+
+A class which manually updates the draft stats of a user by processing the `lp/io cycle` and `lp/io sub` commands.
+
+----
+
+#### PointsCalculator
+
+A class which calculates MIT leaderboard points for cycle changes.
+
+###### Instance Variables
+1. `int MAX_CATGEORY_POINTS` - the maximum amount of points per scoring category.
+2. `int NUM_TOTAL_SCORES` - the total scoring categories to calculate.
+3. `char SCORE_COLUMNS_START` - the first column where points are inputted.
+
+----
+
+### Drafts (Engine)
 
 #### Draft
 
@@ -280,12 +303,6 @@ A class which represents teams within a draft.
 1. `TreeMap<String, DraftPlayer> players` - the players of the team.
 2. `int score` - the team's total score.
 3. `int playersNeeded` - the amount of active players a team needs, at any given time.
-
-----
-
-#### ManualLog
-
-A class which manually updates the draft stats of a user by processing the `lp/io cycle` and `lp/io sub` commands.
 
 ----
 

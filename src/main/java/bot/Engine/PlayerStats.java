@@ -17,7 +17,7 @@ import java.util.List;
 public class PlayerStats {
 
     /** Row position within their associated draft spreadsheet. */
-    private String draftPosition;
+    private int draftPosition;
 
     /** The formal name of the player. */
     private String name;
@@ -44,7 +44,7 @@ public class PlayerStats {
      * @param vals the row data.
      */
     public PlayerStats(GenericInteractionCreateEvent interaction,
-                       String pos, List<Object> vals) {
+                       int pos, List<Object> vals) {
         try {
             draftPosition = pos;
             name = vals.get(0).toString();
@@ -69,7 +69,7 @@ public class PlayerStats {
      * in their associated draft spreadsheet.
      * @return said row.
      */
-    public String getDraftPosition() {
+    public int getDraftPosition() {
         return draftPosition;
     }
 

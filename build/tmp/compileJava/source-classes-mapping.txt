@@ -1,51 +1,53 @@
 bot/Engine/Award.java
  bot.Engine.Award
-bot/Engine/Drafts/DraftTeam.java
- bot.Engine.Drafts.DraftTeam
-bot/Engine/Drafts/Draft.java
- bot.Engine.Drafts.Draft
-bot/Tools/Command.java
- bot.Tools.Command
+bot/Tools/ButtonBuilder.java
+ bot.Tools.ButtonBuilder
 bot/Engine/Drafts/MapGenerator.java
  bot.Engine.Drafts.MapGenerator
 bot/Config.java
  bot.Config
 bot/Engine/Section.java
  bot.Engine.Section
-bot/Engine/Drafts/DraftPlayer.java
- bot.Engine.Drafts.DraftPlayer
-bot/Engine/PlayerStats.java
- bot.Engine.PlayerStats
 bot/Tools/SelectionMenuBuilder.java
  bot.Tools.SelectionMenuBuilder
-bot/Tools/ArrayHeapMinPQ.java
- bot.Tools.ArrayHeapMinPQ
- bot.Tools.ArrayHeapMinPQ$Node
-bot/Engine/Add.java
- bot.Engine.Add
+bot/ConfigExample.java
+ bot.ConfigExample
 bot/Tools/FileHandler.java
  bot.Tools.FileHandler
+bot/Engine/Add.java
+ bot.Engine.Add
 bot/Tools/Components.java
  bot.Tools.Components
  bot.Tools.Components$ForDraft
  bot.Tools.Components$ForDraftProcess
-bot/ConfigExample.java
- bot.ConfigExample
-bot/Tools/ButtonBuilder.java
- bot.Tools.ButtonBuilder
+bot/Tools/ArrayHeapMinPQ.java
+ bot.Tools.ArrayHeapMinPQ
+ bot.Tools.ArrayHeapMinPQ$Node
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
+bot/Tools/Command.java
+ bot.Tools.Command
+bot/Main.java
+ bot.Main
+bot/Engine/Drafts/DraftTeam.java
+ bot.Engine.Drafts.DraftTeam
+bot/Engine/Drafts/Draft.java
+ bot.Engine.Drafts.Draft
+bot/Engine/Drafts/DraftPlayer.java
+ bot.Engine.Drafts.DraftPlayer
+bot/Engine/PlayerStats.java
+ bot.Engine.PlayerStats
+bot/Tools/GoogleSheetsAPI.java
+ bot.Tools.GoogleSheetsAPI
+bot/Engine/Drafts/Undo.java
+ bot.Engine.Drafts.Undo
+bot/Engine/Cycles/ManualLog.java
+ bot.Engine.Cycles.ManualLog
+bot/Engine/Cycles/AutoLog.java
+ bot.Engine.Cycles.AutoLog
 bot/Engine/Drafts/DraftProcess.java
  bot.Engine.Drafts.DraftProcess
 bot/Events.java
  bot.Events
-bot/Tools/GoogleAPI.java
- bot.Tools.GoogleAPI
-bot/Engine/Cycles/AutoLog.java
- bot.Engine.Cycles.AutoLog
-bot/Engine/Graduate.java
- bot.Engine.Graduate
-bot/Engine/Cycles/ManualLog.java
- bot.Engine.Cycles.ManualLog
-bot/Engine/Drafts/Undo.java
- bot.Engine.Drafts.Undo
-bot/Main.java
- bot.Main
+bot/Engine/Cycles/PointsCalculator.java
+ bot.Engine.Cycles.PointsCalculator

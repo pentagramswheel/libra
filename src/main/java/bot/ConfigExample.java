@@ -22,6 +22,12 @@ public final class ConfigExample {
     /** LaunchPoint Cycles Google Sheets ID. */
     public final static String lpCyclesSheetID = "ID";
 
+    /** LaunchPoint Cycles Calculations Google Sheets ID. */
+    public final static String lpCyclesCalculationSheetID = "ID";
+
     /** Ink Odyssey Cycles Google Sheets ID */
-    public final static String ioCyclesSheetID ="ID";
+    public final static String ioCyclesSheetID = "ID";
+
+    /** Ink Odyssey Cycles Calculations Google Sheets ID. */
+    public final static String ioCyclesCalculationSheetID = "ID";
 }
