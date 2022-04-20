@@ -11,11 +11,7 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author  Wil Aquino
@@ -97,6 +93,8 @@ public class PointsCalculator implements Command {
                     String.valueOf(SCORE_COLUMNS_START), 2 + (table.size() - 1));
             ValueRange newColumn = link.buildColumn(pointsPerPlayer);
             link.updateRange(updateRange, newColumn);
+
+            link.sortByDescending(tab, String.valueOf(SCORE_COLUMNS_START), table.size());
         } catch (IOException e) {
             sendResponse(sc, "An error occurred while updating leaderboard.",
                     true);
@@ -147,7 +145,7 @@ public class PointsCalculator implements Command {
                     String placement = String.format("%s) @.%s\n",
                             placing, playerTag);
                     topTen.append(placement);
-                } else if (currScore != lastScore && placing < 11) {
+                } else if (currScore != lastScore && placing < 10) {
                     lastScore = currScore;
                     placing++;
 
@@ -263,12 +261,18 @@ public class PointsCalculator implements Command {
                 }
 
                 wait(2000);
-                double setWinrate = (double) setWins / setsPlayed;
+                double setWinrate = 0.0;
+                if (setsPlayed > 0) {
+                    setWinrate = (double) setWins / setsPlayed;
+                }
 
                 int gameWins = player.getGamesWon();
                 int gameLosses = player.getGamesLost();
                 int gamesPlayed = gameWins + gameLosses;
-                double gameWinrate = (double) gameWins / gamesPlayed;
+                double gameWinrate = 0.0;
+                if (gamesPlayed > 0) {
+                    gameWinrate =  (double) gameWins / gamesPlayed;
+                }
 
                 String updateRange = toLink.buildRange(tab,
                         "A", size + 2,
@@ -300,7 +304,7 @@ public class PointsCalculator implements Command {
     public void runCmd(SlashCommandEvent sc) {
         sc.deferReply().queue();
 
-        // tab name of the spreadsheets
+        // tab name of the spreadsheet
         String tab = "'Current Cycle'";
 
         try {

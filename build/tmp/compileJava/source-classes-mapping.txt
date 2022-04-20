@@ -1,7 +1,7 @@
 bot/Engine/Award.java
  bot.Engine.Award
-bot/Events.java
- bot.Events
+bot/Engine/Drafts/Undo.java
+ bot.Engine.Drafts.Undo
 bot/Engine/Drafts/MapGenerator.java
  bot.Engine.Drafts.MapGenerator
 bot/Config.java
@@ -10,22 +10,23 @@ bot/Engine/Section.java
  bot.Engine.Section
 bot/Tools/SelectionMenuBuilder.java
  bot.Tools.SelectionMenuBuilder
-bot/Engine/Drafts/Undo.java
- bot.Engine.Drafts.Undo
+bot/ConfigExample.java
+ bot.ConfigExample
 bot/Tools/FileHandler.java
  bot.Tools.FileHandler
-bot/Engine/Cycles/PointsCalculator.java
- bot.Engine.Cycles.PointsCalculator
+bot/Tools/ButtonBuilder.java
+ bot.Tools.ButtonBuilder
 bot/Tools/Components.java
  bot.Tools.Components
  bot.Tools.Components$ForDraft
  bot.Tools.Components$ForDraftProcess
-bot/Engine/Cycles/AutoLog.java
- bot.Engine.Cycles.AutoLog
+bot/Engine/Add.java
+ bot.Engine.Add
 bot/Engine/Drafts/DraftProcess.java
  bot.Engine.Drafts.DraftProcess
-bot/Engine/Graduate.java
- bot.Engine.Graduate
+bot/Tools/ArrayHeapMinPQ.java
+ bot.Tools.ArrayHeapMinPQ
+ bot.Tools.ArrayHeapMinPQ$Node
 bot/Main.java
  bot.Main
 bot/Engine/Drafts/DraftTeam.java
@@ -36,18 +37,17 @@ bot/Engine/Drafts/DraftPlayer.java
  bot.Engine.Drafts.DraftPlayer
 bot/Engine/PlayerStats.java
  bot.Engine.PlayerStats
-bot/Tools/GoogleSheetsAPI.java
- bot.Tools.GoogleSheetsAPI
-bot/Engine/Cycles/ManualLog.java
- bot.Engine.Cycles.ManualLog
-bot/ConfigExample.java
- bot.ConfigExample
 bot/Tools/Command.java
  bot.Tools.Command
-bot/Tools/ArrayHeapMinPQ.java
- bot.Tools.ArrayHeapMinPQ
- bot.Tools.ArrayHeapMinPQ$Node
-bot/Engine/Add.java
- bot.Engine.Add
-bot/Tools/ButtonBuilder.java
- bot.Tools.ButtonBuilder
+bot/Engine/Cycles/ManualLog.java
+ bot.Engine.Cycles.ManualLog
+bot/Engine/Cycles/AutoLog.java
+ bot.Engine.Cycles.AutoLog
+bot/Engine/Graduate.java
+ bot.Engine.Graduate
+bot/Tools/GoogleSheetsAPI.java
+ bot.Tools.GoogleSheetsAPI
+bot/Events.java
+ bot.Events
+bot/Engine/Cycles/PointsCalculator.java
+ bot.Engine.Cycles.PointsCalculator

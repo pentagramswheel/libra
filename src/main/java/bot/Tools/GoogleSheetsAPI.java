@@ -214,7 +214,7 @@ public class GoogleSheetsAPI {
             }
             gr.setSheetId(getSheetID(tab));
             gr.setStartRowIndex(1);
-            gr.setEndRowIndex(numRows);
+            gr.setEndRowIndex(numRows + 1);
             gr.setStartColumnIndex(0);
             gr.setEndColumnIndex(25);
 
