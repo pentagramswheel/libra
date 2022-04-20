@@ -305,20 +305,18 @@ public class PointsCalculator implements Command {
 
         try {
             ArrayList<Integer> minimumSets = new ArrayList<>(
-                    Arrays.asList(3));
-//                    Arrays.asList(3, 0));
+                    Arrays.asList(3, 0));
 
             ArrayList<GoogleSheetsAPI> leaderboards = new ArrayList<>(
-                    Arrays.asList(new GoogleSheetsAPI(Config.lpCyclesSheetID)));
-//                    Arrays.asList(new GoogleSheetsAPI(Config.lpCyclesSheetID),
-//                            new GoogleSheetsAPI(Config.ioCyclesSheetID)));
+                    Arrays.asList(new GoogleSheetsAPI(Config.lpCyclesSheetID),
+                            new GoogleSheetsAPI(Config.ioCyclesSheetID)));
 
             ArrayList<GoogleSheetsAPI> points = new ArrayList<>(
-                    Arrays.asList(new GoogleSheetsAPI(Config.lpCyclesCalculationSheetID)));
-//                    Arrays.asList(new GoogleSheetsAPI(Config.lpCyclesCalculationSheetID),
-//                            new GoogleSheetsAPI(Config.ioCyclesCalculationSheetID)));
+                    Arrays.asList(new GoogleSheetsAPI(Config.lpCyclesCalculationSheetID),
+                            new GoogleSheetsAPI(Config.ioCyclesCalculationSheetID)));
 
             for (int i = 0; i < leaderboards.size(); i++) {
+                wait(10000);
                 String update = "Copying spreadsheet " + (i + 1) + " over...";
                 editMessage(sc, update);
 

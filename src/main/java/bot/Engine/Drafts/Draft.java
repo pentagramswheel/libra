@@ -131,6 +131,18 @@ public class Draft extends Section implements Command {
     }
 
     /**
+     * Checks whether a player can access a draft, according
+     * to their draft section.
+     * @param interaction the user interaction calling this method.
+     * @return True if they are in the wrong section.
+     *         False otherwise.
+     */
+    public boolean inWrongSection(GenericInteractionCreateEvent interaction) {
+        return !interaction.getMember().getRoles().contains(
+                getRole(interaction, getSection()));
+    }
+
+    /**
      * Retrieves the field for executing the draft.
      * @return said execution.
      */
@@ -337,7 +349,11 @@ public class Draft extends Section implements Command {
      */
     public void attemptDraft(ButtonClickEvent bc) {
         String playerID = bc.getMember().getId();
-        if (getPlayers().containsKey(playerID)) {
+
+        if (inWrongSection(bc)) {
+            sendReply(bc, "You don't have access to this section's drafts!", true);
+            return;
+        } else if (getPlayers().containsKey(playerID)) {
             sendReply(bc, "You are already in this draft!", true);
             return;
         } else if (getPlayers().size() >= (NUM_PLAYERS_TO_START_DRAFT / 2) - 1) {
@@ -557,7 +573,10 @@ public class Draft extends Section implements Command {
         int activePlayers = players.size() - numInactive;
 
         String update;
-        if (getPlayers().containsKey(player.getId())) {
+        if (inWrongSection(bc)) {
+            sendReply(bc, "You don't have access to this section's drafts!", true);
+            return;
+        } else if (getPlayers().containsKey(player.getId())) {
             sendReply(bc, "You are already in this draft!", true);
             return;
         } else if (activePlayers == NUM_PLAYERS_TO_START_DRAFT) {
@@ -614,6 +633,11 @@ public class Draft extends Section implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
+        if (inWrongSection(sc)) {
+            sendReply(sc, "You don't have access to this section's drafts!", true);
+            return;
+        }
+
         ArrayList<Button> buttons = new ArrayList<>();
         String idSuffix = getPrefix().toUpperCase() + getNumDraft();
         buttons.add(Components.ForDraft.joinDraft(idSuffix));
