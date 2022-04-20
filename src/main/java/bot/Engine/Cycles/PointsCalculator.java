@@ -145,7 +145,11 @@ public class PointsCalculator implements Command {
                     String placement = String.format("%s) @.%s\n",
                             placing, playerTag);
                     topTen.append(placement);
-                } else if (currScore != lastScore && placing < 10) {
+                } else if (currScore == lastScore) {
+                    String placement = String.format("%s) @.%s\n",
+                            placing, playerTag);
+                    topTen.append(placement);
+                } else if (placing < 10) {
                     lastScore = currScore;
                     placing++;
 
