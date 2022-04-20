@@ -66,6 +66,7 @@ java src/main/java/bot/Main.java
 | mit status | Checks to see if the bot is online. |
 | mit help | Outputs troubleshooting information for the bot. |
 | mit genmaps | Generates a map list for a draft. | 1. `matches` - the amount of maps needed for the amount of matches going to be played. |
+| mit cyclescalc | Calculates the final leaderboard points and finds the Top 10 players of all MIT draft areas. |
 | mit draftdoc | Retrieves the automated draft system documentation. |
 | lp/io startdraft | Starts an automatic MIT draft. |
 | lp/io forcesub | Forces a player within a MIT draft to become a sub. | 1. `numdraft` - the numbered draft to consider.<br />2. `player` - the player to sub out. |
