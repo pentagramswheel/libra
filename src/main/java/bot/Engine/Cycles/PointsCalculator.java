@@ -120,9 +120,9 @@ public class PointsCalculator implements Command {
 
         String totalColumn = intToColumn(SCORE_COLUMNS_START + NUM_TOTAL_SCORES);
         int numTotalColumn = columnToInt(totalColumn);
-        link.sortByDescending(tab, totalColumn, size);
 
         try {
+            link.sortByDescending(tab, totalColumn, size);
             editMessage(sc, "Calculating Top 10...");
 
             int placing = 1;
@@ -136,25 +136,21 @@ public class PointsCalculator implements Command {
                 int currScore =
                         Integer.parseInt(row.get(numTotalColumn).toString());
 
-                Member player = findMember(sc, String.valueOf(id));
-                String playerTag = player.getUser().getAsTag();
+//                Member player = findMember(sc, String.valueOf(id));
+//                String playerTag = player.getUser().getAsTag();
+                String playerTag = String.valueOf(row.get(1));
+                String placement = String.format("%s) @.%s\n",
+                        placing, playerTag);
 
                 if (lastScore == -1) {
                     lastScore = currScore;
-
-                    String placement = String.format("%s) @.%s\n",
-                            placing, playerTag);
                     topTen.append(placement);
                 } else if (currScore == lastScore) {
-                    String placement = String.format("%s) @.%s\n",
-                            placing, playerTag);
                     topTen.append(placement);
                 } else if (placing < 10) {
                     lastScore = currScore;
                     placing++;
 
-                    String placement = String.format("%s) @.%s\n",
-                            placing, playerTag);
                     topTen.append(placement);
                 }
 
@@ -244,6 +240,7 @@ public class PointsCalculator implements Command {
      * @param fromLink a connection to the leaderboard spreadsheet.
      * @param toLink a connection to the points spreadsheet.
      * @return the amount of players eligible for points.
+     *         -1 if an error occurred.
      */
     public int initializeCopy(SlashCommandEvent sc, String tab, int minimumSets,
                                GoogleSheetsAPI fromLink, GoogleSheetsAPI toLink) {
@@ -308,22 +305,26 @@ public class PointsCalculator implements Command {
     public void runCmd(SlashCommandEvent sc) {
         sc.deferReply().queue();
 
-        // tab name of the spreadsheet
+        // tab names of the spreadsheet
         String tab = "'Current Cycle'";
+        String templateTab = "'Blank'";
 
         try {
-            ArrayList<Integer> minimumSets = new ArrayList<>(
+            List<Integer> minimumSets = new ArrayList<>(
                     Arrays.asList(3, 0));
 
-            ArrayList<GoogleSheetsAPI> leaderboards = new ArrayList<>(
+            List<GoogleSheetsAPI> leaderboards = new ArrayList<>(
                     Arrays.asList(new GoogleSheetsAPI(Config.lpCyclesSheetID),
                             new GoogleSheetsAPI(Config.ioCyclesSheetID)));
 
-            ArrayList<GoogleSheetsAPI> points = new ArrayList<>(
+            List<GoogleSheetsAPI> points = new ArrayList<>(
                     Arrays.asList(new GoogleSheetsAPI(Config.lpCyclesCalculationSheetID),
                             new GoogleSheetsAPI(Config.ioCyclesCalculationSheetID)));
 
             for (int i = 0; i < leaderboards.size(); i++) {
+                String actualTabName = tab.substring(1, tab.length() - 1);
+                points.get(i).duplicateTab(templateTab, actualTabName);
+
                 wait(10000);
                 String update = "Copying spreadsheet " + (i + 1) + " over...";
                 editMessage(sc, update);
@@ -350,6 +351,8 @@ public class PointsCalculator implements Command {
                 update = "(Cycle Change) Updating public leaderboard...";
                 log(update, false);
                 updateLeaderboard(sc, scores, tab, leaderboards.get(i));
+                leaderboards.get(i).renameTab(tab, "Previous Cycle");
+                leaderboards.get(i).duplicateTab(templateTab, actualTabName);
 
                 update = "(Cycle Change) Top 10 for Section "
                         + (i + 1) + " completed.";

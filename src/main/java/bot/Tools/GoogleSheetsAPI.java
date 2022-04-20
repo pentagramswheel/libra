@@ -194,43 +194,96 @@ public class GoogleSheetsAPI {
     }
 
     /**
+     * Renames a tab within the spreadsheet.
+     * @param tab the tab to rename.
+     * @param name the new name of the tab.
+     */
+    public void renameTab(String tab, String name)
+            throws IOException, GeneralSecurityException {
+        List<Sheet> allSheets = sheetsService.spreadsheets()
+                .get(getSpreadsheetID()).execute().getSheets();
+
+        for (Sheet sheet : allSheets) {
+            String title = "'" + sheet.getProperties().getTitle() + "'";
+            if (title.equals(tab)) {
+                SheetProperties properties = sheet.getProperties();
+                properties.setTitle(name);
+
+                UpdateSheetPropertiesRequest updateReq = new UpdateSheetPropertiesRequest();
+                updateReq.setFields("*").setProperties(properties);
+
+                Request req = new Request();
+                req.setUpdateSheetProperties(updateReq);
+
+                BatchUpdateSpreadsheetRequest batchReq = new BatchUpdateSpreadsheetRequest();
+                batchReq.setRequests(Collections.singletonList(req));
+                getSheetsService().spreadsheets()
+                        .batchUpdate(getSpreadsheetID(), batchReq).execute();
+                break;
+            }
+        }
+    }
+
+    /**
+     * Duplicates a tab within the spreadsheet.
+     * @param tab the tab to duplicate.
+     * @param name the name of the duplicated tab.
+     */
+    public void duplicateTab(String tab, String name)
+            throws IOException, GeneralSecurityException {
+        int sheetID = getSheetID(tab);
+        if (sheetID == -1) {
+            throw new IOException();
+        }
+
+        DuplicateSheetRequest dupeReq = new DuplicateSheetRequest();
+        dupeReq.setNewSheetName(name)
+                .setSourceSheetId(sheetID);
+
+        Request req = new Request();
+        req.setDuplicateSheet(dupeReq);
+
+        BatchUpdateSpreadsheetRequest batchReq = new BatchUpdateSpreadsheetRequest();
+        batchReq.setRequests(Collections.singletonList(req));
+        getSheetsService().spreadsheets()
+                .batchUpdate(getSpreadsheetID(), batchReq).execute();
+    }
+
+    /**
      * Sorts a spreadsheet by descending values.
      * @param tab the spreadsheet tab to sort.
      * @param column the column to sort by.
      * @param numRows the number of rows to sort.
      */
-    public void sortByDescending(String tab, String column, int numRows)  {
+    public void sortByDescending(String tab, String column, int numRows)
+            throws IOException {
         int numCol = (column.charAt(0)) - 'A';
 
-        try {
-            SortSpec ss = new SortSpec();
-            ss.setSortOrder("DESCENDING");
-            ss.setDimensionIndex(numCol);
+        SortSpec ss = new SortSpec();
+        ss.setSortOrder("DESCENDING");
+        ss.setDimensionIndex(numCol);
 
-            GridRange gr = new GridRange();
-            int sheetID = getSheetID(tab);
-            if (sheetID == -1) {
-                throw new IOException();
-            }
-            gr.setSheetId(getSheetID(tab));
-            gr.setStartRowIndex(1);
-            gr.setEndRowIndex(numRows + 1);
-            gr.setStartColumnIndex(0);
-            gr.setEndColumnIndex(25);
-
-            SortRangeRequest srr = new SortRangeRequest();
-            srr.setRange(gr);
-            srr.setSortSpecs(Collections.singletonList(ss));
-
-            Request req = new Request();
-            req.setSortRange(srr);
-
-            BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
-            busReq.setRequests(Collections.singletonList(req));
-            sheetsService.spreadsheets().batchUpdate(getSpreadsheetID(), busReq).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
+        GridRange gr = new GridRange();
+        int sheetID = getSheetID(tab);
+        if (sheetID == -1) {
+            throw new IOException();
         }
+        gr.setSheetId(getSheetID(tab));
+        gr.setStartRowIndex(1);
+        gr.setEndRowIndex(numRows + 1);
+        gr.setStartColumnIndex(0);
+        gr.setEndColumnIndex(25);
+
+        SortRangeRequest srr = new SortRangeRequest();
+        srr.setRange(gr);
+        srr.setSortSpecs(Collections.singletonList(ss));
+
+        Request req = new Request();
+        req.setSortRange(srr);
+
+        BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
+        busReq.setRequests(Collections.singletonList(req));
+        sheetsService.spreadsheets().batchUpdate(getSpreadsheetID(), busReq).execute();
     }
 
     /**
