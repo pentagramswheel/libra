@@ -106,15 +106,16 @@ public class PointsCalculator implements Command {
     /**
      * Calculates the Top 10 players of the leaderboard.
      * @param sc the user's inputted command.
+     * @param section the designated MIT section for this Top 10.
      * @param size the amount of players eligible
      * @param tab the name of the spreadsheet tab to edit.
      * @param link a connection to the leaderboard spreadsheet.
-     * @param section the designated MIT section for this Top 10.
      * @return a map of final scores for all players who were eligible
      *         for the Top 10.
      */
-    public TreeMap<Object, Integer> findTopTen(SlashCommandEvent sc, int size,
-                            String tab, GoogleSheetsAPI link, int section) {
+    public TreeMap<Object, Integer> findTopTen(SlashCommandEvent sc,
+                                               String section, int size,
+                                               String tab, GoogleSheetsAPI link) {
         StringBuilder topTen = new StringBuilder();
         TreeMap<Object, Integer> finalScores = new TreeMap<>();
 
@@ -136,9 +137,9 @@ public class PointsCalculator implements Command {
                 int currScore =
                         Integer.parseInt(row.get(numTotalColumn).toString());
 
-//                Member player = findMember(sc, String.valueOf(id));
-//                String playerTag = player.getUser().getAsTag();
-                String playerTag = String.valueOf(row.get(1));
+                Member player = findMember(sc, String.valueOf(id));
+                String playerTag = player.getUser().getAsTag();
+//                String playerTag = String.valueOf(row.get(1));
                 String placement = String.format("%s) @.%s\n",
                         placing, playerTag);
 
@@ -162,7 +163,7 @@ public class PointsCalculator implements Command {
             log("An error occurred with the Top 10 calculation.", true);
         }
 
-        String output = "Top 10 for Section " + (section + 1) + "\n```"
+        String output = "Top 10 for " + section + ":\n```"
                 + topTen + "```";
         sendResponse(sc, output, false);
         return finalScores;
@@ -310,58 +311,54 @@ public class PointsCalculator implements Command {
         String templateTab = "'Blank'";
 
         try {
-            List<Integer> minimumSets = new ArrayList<>(
-                    Arrays.asList(3, 0));
+            String[] sections = {"LaunchPoint", "Ink Odyssey"};
+            int[] minimumSets = {3, 0};
 
-            List<GoogleSheetsAPI> leaderboards = new ArrayList<>(
-                    Arrays.asList(new GoogleSheetsAPI(Config.lpCyclesSheetID),
-                            new GoogleSheetsAPI(Config.ioCyclesSheetID)));
+            GoogleSheetsAPI[] leaderboards = {
+                    new GoogleSheetsAPI(Config.lpCyclesSheetID),
+                    new GoogleSheetsAPI(Config.ioCyclesSheetID)};
 
-            List<GoogleSheetsAPI> points = new ArrayList<>(
-                    Arrays.asList(new GoogleSheetsAPI(Config.lpCyclesCalculationSheetID),
-                            new GoogleSheetsAPI(Config.ioCyclesCalculationSheetID)));
+            GoogleSheetsAPI[] points = {
+                    new GoogleSheetsAPI(Config.lpCyclesCalculationSheetID),
+                    new GoogleSheetsAPI(Config.ioCyclesCalculationSheetID)};
 
-            for (int i = 0; i < leaderboards.size(); i++) {
+            for (int i = 0; i < leaderboards.length; i++) {
                 String actualTabName = tab.substring(1, tab.length() - 1);
-                points.get(i).duplicateTab(templateTab, actualTabName);
+                points[i].duplicateTab(templateTab, actualTabName);
 
                 wait(10000);
-                String update = "Copying spreadsheet " + (i + 1) + " over...";
-                editMessage(sc, update);
+                editMessage(sc, "Copying " + sections[i] + " spreadsheet...");
 
-                update = "(Cycle Change) A leaderboard is being copied "
-                        + "to points spreadsheet..." + (i + 1);
-                log(update, false);
+                log("(Cycle Change) A leaderboard is being copied to the"
+                        + "to the " + sections[i] + " points spreadsheet.", false);
                 int totalPlayers = initializeCopy(
-                        sc, tab, minimumSets.get(i),
-                        leaderboards.get(i), points.get(i));
+                        sc, tab, minimumSets[i],
+                        leaderboards[i], points[i]);
                 if (totalPlayers == -1) {
                     throw new IOException("Total players invalid.");
                 }
 
-                update = "(Cycle Change) Points are being calculated...";
-                log(update, false);
-                calculatePoints(sc, totalPlayers, tab, points.get(i));
+                points[i].renameTab(tab, "Previous Cycle");
 
-                update = "(Cycle Change) Retrieving Top 10 players...";
-                log(update, false);
+                log("(Cycle Change) Points are being calculated...", false);
+                calculatePoints(sc, totalPlayers, tab, points[i]);
+
+                log("(Cycle Change) Retrieving Top 10 players...", false);
                 TreeMap<Object, Integer> scores =
-                        findTopTen(sc, totalPlayers, tab, points.get(i), i);
+                        findTopTen(sc, sections[i], totalPlayers, tab,
+                                points[i]);
 
-                update = "(Cycle Change) Updating public leaderboard...";
-                log(update, false);
-                updateLeaderboard(sc, scores, tab, leaderboards.get(i));
-                leaderboards.get(i).renameTab(tab, "Previous Cycle");
-                leaderboards.get(i).duplicateTab(templateTab, actualTabName);
+                log("(Cycle Change) Updating public leaderboard...", false);
+                updateLeaderboard(sc, scores, tab, leaderboards[i]);
 
-                update = "(Cycle Change) Top 10 for Section "
-                        + (i + 1) + " completed.";
-                log(update, false);
+                leaderboards[i].renameTab(tab, "Previous Cycle");
+                leaderboards[i].duplicateTab(templateTab, actualTabName);
+
+                log("(Cycle Change) Top 10 for " + sections[i] + " completed.", false);
             }
 
+            editMessage(sc, "Here are your Cycle Top 10s!");
             log("Cycle change has been completed.", false);
-            sendResponse(sc,
-                    "\n```Sections:\nSection 1 - LP\nSection 2 - IO```", false);
         } catch (GeneralSecurityException | IOException e) {
             sendResponse(sc, "A spreadsheet could not load.", true);
             log("A spreadsheet during calculations could not load.", true);

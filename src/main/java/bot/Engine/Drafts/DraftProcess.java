@@ -44,7 +44,8 @@ public class DraftProcess {
     private final static int MAX_SCORE = 4;
 
     /** The number of players required to formally end the draft. */
-    private final static int NUM_PLAYERS_TO_END_DRAFT = 3;
+    private final static int NUM_PLAYERS_TO_END_DRAFT_BEFORE_START = 6;
+    private final static int NUM_PLAYERS_TO_END_DRAFT_AFTER_START = 3;
 
     /** The players who have clicked the 'End Draft` button consecutively. */
     private final HashSet<String> endButtonClicked;
@@ -220,8 +221,6 @@ public class DraftProcess {
             eb.addField("Status:", "IN PROGRESS", false);
         } else {
             eb.addField("Status:", "FINISHED", false);
-            eb.addField("Notice:", "Please end the the original draft request\n"
-                    + "to allow others to queue more drafts.", false);
         }
 
         eb.addField("Team 1:", buildTeamString(getTeam1()), false);
@@ -247,12 +246,12 @@ public class DraftProcess {
             buttons.add(Components.ForDraftProcess.minusOne(idSuffix));
             buttons.add(Components.ForDraftProcess.refresh(idSuffix));
             buttons.add(Components.ForDraftProcess.draftSubLink(interaction, idSuffix, draft));
-            buttons.add(Components.ForDraftProcess.endDraftProcess(idSuffix));
         } else {
             buttons.add(Components.ForDraftProcess.resetTeams(idSuffix));
             buttons.add(Components.ForDraftProcess.refresh(idSuffix));
             buttons.add(Components.ForDraftProcess.beginDraft(idSuffix));
         }
+        buttons.add(Components.ForDraftProcess.endDraftProcess(idSuffix));
 
         if (interaction != null) {
             pinMessageIfNeeded();
@@ -326,6 +325,7 @@ public class DraftProcess {
     public void resetTeams(ButtonClickEvent bc) {
         DraftPlayer author = draft.getPlayers().get(bc.getMember().getId());
         messageID = bc.getMessageId();
+        resetEndDraftButton();
 
         if (author == null) {
             draft.sendReply(bc, "You are not in this draft!", true);
@@ -349,6 +349,7 @@ public class DraftProcess {
     public void start(ButtonClickEvent bc) {
         DraftPlayer author = draft.getPlayers().get(bc.getMember().getId());
         messageID = bc.getMessageId();
+        resetEndDraftButton();
 
         if (author == null) {
             draft.sendReply(bc, "You are not in this draft!", true);
@@ -457,6 +458,7 @@ public class DraftProcess {
      */
     public boolean hasEnded(ButtonClickEvent bc) {
         String authorID = bc.getMember().getId();
+        messageID = bc.getMessageId();
         if (!getTeam1().contains(authorID)
                 && !getTeam2().contains(authorID)) {
             draft.sendReply(bc, "You're not part of this draft!", true);
@@ -464,7 +466,12 @@ public class DraftProcess {
         }
 
         endButtonClicked.add(authorID);
-        int numClicksLeft = NUM_PLAYERS_TO_END_DRAFT - endButtonClicked.size();
+        int numClicksLeft =
+                NUM_PLAYERS_TO_END_DRAFT_BEFORE_START - endButtonClicked.size();
+        if (hasStarted()) {
+            numClicksLeft =
+                    NUM_PLAYERS_TO_END_DRAFT_AFTER_START - endButtonClicked.size();
+        }
 
         if (numClicksLeft <= 0) {
             bc.deferEdit().queue();
@@ -476,20 +483,25 @@ public class DraftProcess {
             buttons.add(Components.ForDraftProcess.endDraftProcess(idSuffix)
                     .withStyle(ButtonStyle.SECONDARY).asDisabled());
 
-            draft.sendButtons(bc, "This draft has ended.", buttons);
-            draft.getMessage(bc).editMessage("This draft has ended.")
+            String caption = "This draft ended early.";
+            if (hasStarted()) {
+                AutoLog log = new AutoLog(draft.getPrefix());
+                log.matchReport(bc, draft);
+
+                caption =  "This draft has ended.";
+            }
+
+            draft.sendButtons(bc, caption, buttons);
+            draft.getMessage(bc).editMessage(caption)
                             .setActionRow(Components.ForDraft.refresh(
                                     draft.getPrefix() + draft.getNumDraft())
                                     .asDisabled()).queue();
-
             updateReport(bc);
-            AutoLog log = new AutoLog(draft.getPrefix());
-            log.matchReport(bc, draft);
 
             return true;
         } else {
-            String reply = "You need " + numClicksLeft
-                    + " other player(s) to end the draft.";
+            String reply = "You need `" + numClicksLeft
+                    + "` other player(s) to end the draft.";
             draft.sendReply(bc, reply, true);
 
             return false;

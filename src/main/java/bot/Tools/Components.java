@@ -139,7 +139,7 @@ public class Components {
          */
         public static Button resetTeams(String suffix) {
             return new ButtonBuilder("resetTeams" + suffix,
-                    "Reset Teams", null, 3).getButton();
+                    "Reset Teams", null, 0).getButton();
         }
 
         /**

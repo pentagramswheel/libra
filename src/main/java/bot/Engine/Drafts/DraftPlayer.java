@@ -73,10 +73,11 @@ public class DraftPlayer {
     }
 
     /**
-     * Sets the player to be inactive.
+     * Sets whether this player is active or not.
+     * @param status their current activity status.
      */
-    public void setInactive() {
-        active = false;
+    public void setActiveStatus(boolean status) {
+        active = status;
     }
 
     /**
@@ -138,9 +139,12 @@ public class DraftPlayer {
         return subStatus;
     }
 
-    /** Changes this player into a sub. */
-    public void makeSub() {
-        subStatus = true;
+    /**
+     * Sets whether this player is a sub or not.
+     * @param status their current sub status.
+     */
+    public void setSubStatus(boolean status) {
+        subStatus = status;
     }
 
     /**

@@ -67,15 +67,9 @@ public class DraftTeam {
     }
 
     /**
-     * Substitutes a player out of the active players of the team.
-     * @param id the Discord ID of the player.
+     * Increments the amount of players this team needs.
      */
-    public void subOut(String id) {
-        DraftPlayer player = getPlayers().get(id);
-
-        player.makeSub();
-        player.setInactive();
-
+    public void requestSub() {
         playersNeeded++;
     }
 
@@ -85,11 +79,9 @@ public class DraftTeam {
      * @param player the player to add.
      */
     public void add(String id, DraftPlayer player) {
-        if (!contains(id)) {
-            getPlayers().put(id, player);
-            player.setTeamStatus(true);
-            playersNeeded--;
-        }
+        getPlayers().put(id, player);
+        player.setTeamStatus(true);
+        playersNeeded--;
     }
 
     /** Clears the team of its players. */

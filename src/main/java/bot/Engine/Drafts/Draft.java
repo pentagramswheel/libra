@@ -502,20 +502,19 @@ public class Draft extends Section implements Command {
         } else if (!player.isActive()) {
             sendResponse(interaction, subbedTwiceString, true);
             return false;
-        } else if (!draftStarted()) {
-            player.makeSub();
-            player.setInactive();
+        } else if (getProcess().getTeam1().contains(playerID)) {
+            getProcess().getTeam1().requestSub();
+        } else if (getProcess().getTeam2().contains(playerID)) {
+            getProcess().getTeam2().requestSub();
+        }
 
+        player.setSubStatus(true);
+        player.setActiveStatus(false);
+
+        if (!draftStarted()) {
             player.setCaptainForTeam1(false);
             player.setCaptainForTeam2(false);
             determineCaptains(playerID);
-        } else if (getProcess().getTeam1().contains(playerID)) {
-            getProcess().getTeam1().subOut(playerID);
-        } else if (getProcess().getTeam2().contains(playerID)) {
-            getProcess().getTeam2().subOut(playerID);
-        } else {
-            player.makeSub();
-            player.setInactive();
         }
 
         return true;
@@ -565,6 +564,34 @@ public class Draft extends Section implements Command {
     }
 
     /**
+     * Subs a player into the draft.
+     * @param playerID the Discord ID of the player.
+     * @param name the name of the player.
+     * @return an update string based on their addition.
+     */
+    private String subIn(String playerID, String name) {
+        DraftPlayer player;
+        String statement;
+
+        if (getPlayers().containsKey(playerID)) {
+            player = getPlayers().get(playerID);
+            player.setActiveStatus(true);
+            player.setSubStatus(draftStarted());
+
+            statement = "will be coming back to sub";
+        } else {
+            player = new DraftPlayer(name, draftStarted());
+            getPlayers().put(playerID, player);
+
+            statement = "will be subbing";
+        }
+
+        return player.getAsMention(playerID) + " "
+                + statement + " for this draft in "
+                + getDraftChannel().getAsMention() + ".";
+    }
+
+    /**
      * Adds a player to the draft's subs, if possible, via a button.
      * @param bc a button click to analyze.
      */
@@ -572,36 +599,18 @@ public class Draft extends Section implements Command {
         Member player = bc.getMember();
         int activePlayers = players.size() - numInactive;
 
-        String update;
         if (inWrongSection(bc)) {
             sendReply(bc, "You don't have access to this section's drafts!", true);
-            return;
-        } else if (getPlayers().containsKey(player.getId())) {
-            sendReply(bc, "You are already in this draft!", true);
-            return;
         } else if (activePlayers == NUM_PLAYERS_TO_START_DRAFT) {
             sendReply(bc, "This draft hasn't requested any subs yet.", true);
-            return;
-        } else if (!draftStarted()) {
-            getPlayers().put(
-                    player.getId(),
-                    new DraftPlayer(player.getEffectiveName(), false));
-
-            update = player.getAsMention()
-                    + " will be replacing a player for this draft in "
-                    + getDraftChannel().getAsMention() + ".";
+        } else if (getPlayers().containsKey(player.getId())
+                && getPlayers().get(player.getId()).isActive()) {
+            sendReply(bc, "You are already in this draft!", true);
         } else {
-            getPlayers().put(
-                    player.getId(),
-                    new DraftPlayer(player.getEffectiveName(), true));
-
-            update = player.getAsMention()
-                    + " will be subbing for this draft in "
-                    + getDraftChannel().getAsMention() + ".";
+            String update = subIn(player.getId(), player.getEffectiveName());
+            refresh(bc);
+            sendResponse(bc, update, false);
         }
-
-        refresh(bc);
-        sendResponse(bc, update, false);
     }
 
     /**

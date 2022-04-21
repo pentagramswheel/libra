@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** April 19, 2022
+**Last Updated:** April 20, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -287,12 +287,13 @@ A class which manages and processes drafts.
 
 ###### Instance Variables
 1. `boolean started` - a flag for checking if the draft has started.
-2. `Draft draft` - The draft which is to be processed.
-3. `DraftTeam team1, team2` - The teams of the draft.
-4. `int MAX_SCORE` - The maximum score for a team.
-5. `int NUM_PLAYERS_TO_END_DRAFT` - The number of players required to formally end the draft.
-6. `List<String> endButtonClicked` - The players who have clicked the "End Draft" button consecutively.
-7. `String messageID` - the Discord message ID of the draft request.
+2. `Draft draft` - the draft which is to be processed.
+3. `DraftTeam team1, team2` - the teams of the draft.
+4. `int MAX_SCORE` - the maximum score for a team.
+5. `int NUM_PLAUERS_TO_END_DRAFT_BEFORE_START` - the number of players required to formally end the draft, if it hasn't actually started yet.
+6. `int NUM_PLAYERS_TO_END_DRAFT_AFTER_START` - the number of players required to formally end the draft, if it has started already.
+7. `List<String> endButtonClicked` - the players who have clicked the "End Draft" button consecutively.
+8. `String messageID` - the Discord message ID of the draft request.
 
 ----
 
