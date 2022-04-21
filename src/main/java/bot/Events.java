@@ -80,7 +80,7 @@ public class Events extends ListenerAdapter {
                     .setEphemeral(true).queue();
             return false;
         } else if (gamesPlayed < 0 || gamesWon < 0) {
-            sc.reply("The amount games played can't be negative.")
+            sc.reply("The amount games played cannot be negative.")
                     .setEphemeral(true).queue();
             return false;
         } else if (gamesPlayed > 19) {
@@ -248,11 +248,14 @@ public class Events extends ListenerAdapter {
     private boolean notInAnotherDraft(GenericInteractionCreateEvent interaction,
                                    TreeMap<Integer, Draft> drafts) {
         String playerID = interaction.getMember().getId();
+        if (drafts == null) {
+            return true;
+        }
 
         for (Draft draft : drafts.values()) {
             if (draft.getPlayers().containsKey(playerID)
                     && draft.getPlayers().get(playerID).isActive()) {
-                interaction.reply("You're still in another draft!")
+                interaction.reply("You are already in a draft!")
                         .setEphemeral(true).queue();
 
                 return false;
@@ -421,10 +424,6 @@ public class Events extends ListenerAdapter {
         } else if (draft.forceEnd(sc)) {
             drafts.remove(numDraft);
             queue.add(numDraft, numDraft);
-
-            sc.reply("Draft ended. If any, please don't forget to delete the process "
-                    + "interface in "
-                    + draft.getDraftChannel().getAsMention() + ".").queue();
         }
     }
 
@@ -673,7 +672,9 @@ public class Events extends ListenerAdapter {
                 currDraft.reassignCaptain(bc);
                 break;
             case "sub":
-                currDraft.addSub(bc);
+                if (notInAnotherDraft(bc, drafts)) {
+                    currDraft.addSub(bc);
+                }
                 break;
             case "resetTeams":
                 currProcess.resetTeams(bc);

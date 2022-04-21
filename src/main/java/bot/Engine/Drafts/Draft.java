@@ -475,11 +475,33 @@ public class Draft extends Section implements Command {
         messageID = bc.getMessageId();
 
         if (!getPlayers().containsKey(playerID)) {
-            sendReply(bc, "You're not in this draft!", true);
+            sendReply(bc, "You are not in this draft!", true);
         } else {
             getPlayers().remove(playerID);
             refresh(bc);
         }
+    }
+
+    /**
+     * Checks whether a player is in Team 1 or not.
+     * @param playerID the Discord ID of the player to check.
+     * @return True if they are in Team 1.
+     *         False otherwise.
+     */
+    private boolean teamOneContains(String playerID) {
+        return getProcess() != null
+                && getProcess().getTeam1().contains(playerID);
+    }
+
+    /**
+     * Checks whether a player is in Team 2 or not.
+     * @param playerID the Discord ID of the player to check.
+     * @return True if they are in Team 2.
+     *         False otherwise.
+     */
+    private boolean teamTwoContains(String playerID) {
+        return getProcess() != null
+                && getProcess().getTeam2().contains(playerID);
     }
 
     /**
@@ -502,9 +524,9 @@ public class Draft extends Section implements Command {
         } else if (!player.isActive()) {
             sendResponse(interaction, subbedTwiceString, true);
             return false;
-        } else if (getProcess().getTeam1().contains(playerID)) {
+        } else if (teamOneContains(playerID)) {
             getProcess().getTeam1().requestSub();
-        } else if (getProcess().getTeam2().contains(playerID)) {
+        } else if (teamTwoContains(playerID)) {
             getProcess().getTeam2().requestSub();
         }
 
@@ -529,7 +551,7 @@ public class Draft extends Section implements Command {
         DraftPlayer foundPlayer = getPlayers().get(playerID);
 
         boolean subSuccessful = subOut(bc, playerID, foundPlayer,
-                "You're not in this draft!",
+                "You are not in this draft!",
                 "You have already been subbed out of the draft!");
 
         if (subSuccessful) {
@@ -552,6 +574,8 @@ public class Draft extends Section implements Command {
         String authorID = sc.getMember().getId();
         if (!getPlayers().containsKey(authorID)) {
             sendReply(sc, "You don't have access to that draft!", true);
+        } else if (!isInitialized()) {
+            sendReply(sc, "There's no point in subbing people out currently!", true);
         } else if (subOut(sc, playerID, getPlayers().get(playerID),
                 "That player is not part of the draft.",
                 "That player has already been subbed out of the draft!")) {
@@ -578,6 +602,12 @@ public class Draft extends Section implements Command {
             player.setActiveStatus(true);
             player.setSubStatus(draftStarted());
 
+            if (teamOneContains(playerID)) {
+                getProcess().getTeam1().add(playerID, player);
+            } else if (teamTwoContains(playerID)) {
+                getProcess().getTeam2().add(playerID, player);
+            }
+
             statement = "will be coming back to sub";
         } else {
             player = new DraftPlayer(name, draftStarted());
@@ -603,9 +633,6 @@ public class Draft extends Section implements Command {
             sendReply(bc, "You don't have access to this section's drafts!", true);
         } else if (activePlayers == NUM_PLAYERS_TO_START_DRAFT) {
             sendReply(bc, "This draft hasn't requested any subs yet.", true);
-        } else if (getPlayers().containsKey(player.getId())
-                && getPlayers().get(player.getId()).isActive()) {
-            sendReply(bc, "You are already in this draft!", true);
         } else {
             String update = subIn(player.getId(), player.getEffectiveName());
             refresh(bc);
@@ -631,6 +658,16 @@ public class Draft extends Section implements Command {
                     .setActionRow(Components.ForDraft.refresh(
                                     getPrefix() + getNumDraft())
                             .asDisabled()).queue();
+
+            if (getProcess() != null && getProcess().getMessageID() != null) {
+                getProcess().getMessage().delete().queue();
+                sendResponse(sc, "Draft ended.", false);
+            } else {
+                String update = "Draft ended. **Check** "
+                        + getDraftChannel().getAsMention() + " **to delete the "
+                        + "teams interface. It may be pinned.**";
+                sendResponse(sc, update, false);
+            }
 
             return true;
         }

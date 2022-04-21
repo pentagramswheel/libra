@@ -100,6 +100,25 @@ public class DraftProcess {
     }
 
     /**
+     * Retrieves the message ID of this teams interface.
+     * @return said ID.
+     */
+    public String getMessageID() {
+        return messageID;
+    }
+
+    /**
+     * Retrieves the teams interface of the draft.
+     * @return said message.
+     */
+    public Message getMessage() {
+        MessageChannel channel =
+                draft.getDraftChannel();
+//                draft.getTestingChannel();
+        return channel.retrieveMessageById(getMessageID()).complete();
+    }
+
+    /**
      * Retrieves the caption ping of the draft process.
      * @return said caption.
      */
@@ -154,19 +173,18 @@ public class DraftProcess {
      * and unpin it at the end of it.
      */
     private void pinMessageIfNeeded() {
-        if (messageID == null) {
+        if (getMessageID() == null) {
             return;
         }
-        MessageChannel channel =
-                draft.getDraftChannel();
-//                draft.getTestingChannel();
-        Message msg = channel.retrieveMessageById(messageID).complete();
 
+        Message msg = getMessage();
         if (draft.isInitialized()) {
             if (!msg.isPinned()) {
                 msg.pin().queue();
                 draft.wait(1000);
-                channel.sendMessage(
+
+                draft.getDraftChannel().sendMessage(
+//                draft.getTestingChannel().sendMessage(
                         "I've attached the interface to the pins! Make sure "
                         + "captains click `Begin Draft` before you actually "
                         + "start playing though, __otherwise no one will get "
@@ -437,7 +455,7 @@ public class DraftProcess {
             team = getTeam2();
             otherTeam = getTeam1();
         } else {
-            draft.sendResponse(bc, "You're not part of this draft!", true);
+            draft.sendResponse(bc, "You are not part of this draft!", true);
             return;
         }
 
@@ -461,7 +479,7 @@ public class DraftProcess {
         messageID = bc.getMessageId();
         if (!getTeam1().contains(authorID)
                 && !getTeam2().contains(authorID)) {
-            draft.sendReply(bc, "You're not part of this draft!", true);
+            draft.sendReply(bc, "You are not part of this draft!", true);
             return false;
         }
 
@@ -476,27 +494,27 @@ public class DraftProcess {
         if (numClicksLeft <= 0) {
             bc.deferEdit().queue();
             draft.toggleRequest(false);
-            pinMessageIfNeeded();
 
-            String idSuffix = draft.getPrefix() + draft.getNumDraft();
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Components.ForDraftProcess.endDraftProcess(idSuffix)
-                    .withStyle(ButtonStyle.SECONDARY).asDisabled());
-
-            String caption = "This draft ended early.";
             if (hasStarted()) {
+                pinMessageIfNeeded();
+
+                String idSuffix = draft.getPrefix() + draft.getNumDraft();
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Components.ForDraftProcess.endDraftProcess(idSuffix)
+                        .withStyle(ButtonStyle.SECONDARY).asDisabled());
+
+                draft.sendButtons(bc, "This draft has ended.", buttons);
+                draft.getMessage(bc).editMessage("This draft has ended.")
+                        .setActionRow(Components.ForDraft.refresh(
+                                        draft.getPrefix() + draft.getNumDraft())
+                                .asDisabled()).queue();
+
+                updateReport(bc);
                 AutoLog log = new AutoLog(draft.getPrefix());
                 log.matchReport(bc, draft);
-
-                caption =  "This draft has ended.";
+            } else {
+                getMessage().delete().queue();
             }
-
-            draft.sendButtons(bc, caption, buttons);
-            draft.getMessage(bc).editMessage(caption)
-                            .setActionRow(Components.ForDraft.refresh(
-                                    draft.getPrefix() + draft.getNumDraft())
-                                    .asDisabled()).queue();
-            updateReport(bc);
 
             return true;
         } else {
