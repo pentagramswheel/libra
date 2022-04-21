@@ -239,6 +239,30 @@ public class Events extends ListenerAdapter {
     }
 
     /**
+     * Checks whether a player is in another draft or not.
+     * @param interaction the user interaction calling this method.
+     * @param drafts the list of drafts to check.
+     * @return True if they are not found in another draft.
+     *         False otherwise.
+     */
+    private boolean notInAnotherDraft(GenericInteractionCreateEvent interaction,
+                                   TreeMap<Integer, Draft> drafts) {
+        String playerID = interaction.getMember().getId();
+
+        for (Draft draft : drafts.values()) {
+            if (draft.getPlayers().containsKey(playerID)
+                    && draft.getPlayers().get(playerID).isActive()) {
+                interaction.reply("You're still in another draft!")
+                        .setEphemeral(true).queue();
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Checks whether a draft request expired or not.
      * @param interaction the user interaction calling this method.
      * @param numDraft the number draft to analyze.
@@ -538,7 +562,9 @@ public class Events extends ListenerAdapter {
                 }
                 break;
             case "startdraft":
-                processDrafts(sc, prefix, author);
+                if (notInAnotherDraft(sc, drafts)) {
+                    processDrafts(sc, prefix, author);
+                }
                 break;
             case "forcesub":
                 attemptForceSub(sc, drafts, args);
@@ -627,7 +653,9 @@ public class Events extends ListenerAdapter {
         DraftProcess currProcess = currDraft.getProcess();
         switch (btnName.substring(0, indexOfNum - 2)) {
             case "join":
-                currDraft.attemptDraft(bc);
+                if (notInAnotherDraft(bc, drafts)) {
+                    currDraft.attemptDraft(bc);
+                }
                 break;
             case "requestRefresh":
                 currDraft.refresh(bc);
