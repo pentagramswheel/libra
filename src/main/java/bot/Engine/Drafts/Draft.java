@@ -127,7 +127,7 @@ public class Draft extends Section implements Command {
      *         False otherwise.
      */
     private boolean draftStarted() {
-        return getProcess() != null && getProcess().hasStarted();
+        return isInitialized() && getProcess().hasStarted();
     }
 
     /**
@@ -489,8 +489,7 @@ public class Draft extends Section implements Command {
      *         False otherwise.
      */
     private boolean teamOneContains(String playerID) {
-        return getProcess() != null
-                && getProcess().getTeam1().contains(playerID);
+        return isInitialized() && getProcess().getTeam1().contains(playerID);
     }
 
     /**
@@ -500,8 +499,7 @@ public class Draft extends Section implements Command {
      *         False otherwise.
      */
     private boolean teamTwoContains(String playerID) {
-        return getProcess() != null
-                && getProcess().getTeam2().contains(playerID);
+        return isInitialized() && getProcess().getTeam2().contains(playerID);
     }
 
     /**
@@ -659,14 +657,14 @@ public class Draft extends Section implements Command {
                                     getPrefix() + getNumDraft())
                             .asDisabled()).queue();
 
-            if (getProcess() != null && getProcess().getMessageID() != null) {
+            if (isInitialized() && getProcess().getMessageID() != null) {
                 getProcess().getMessage().delete().queue();
-                sendResponse(sc, "Draft ended.", false);
+                sendReply(sc, "Draft ended.", false);
             } else {
                 String update = "Draft ended. **Check** "
                         + getDraftChannel().getAsMention() + " **to delete the "
                         + "teams interface. It may be pinned.**";
-                sendResponse(sc, update, false);
+                sendReply(sc, update, false);
             }
 
             return true;
