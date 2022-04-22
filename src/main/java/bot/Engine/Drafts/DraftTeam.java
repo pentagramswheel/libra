@@ -58,6 +58,17 @@ public class DraftTeam {
     }
 
     /**
+     * Checks whether the team currently has no
+     * active players.
+     * @return True if the team is empty or is full of
+     *              inactive players.
+     *         False otherwise.
+     */
+    public boolean isEmpty() {
+        return playersNeeded == Draft.NUM_PLAYERS_TO_START_DRAFT / 2;
+    }
+
+    /**
      * Checks whether the team needs a sub or not.
      * @return True if a sub is needed.
      *         False otherwise.

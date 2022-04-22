@@ -143,9 +143,9 @@ public class DraftProcess {
             if (!player.isActive()) {
                 continue;
             } else if (!hasStarted()) {
-                if (player.isCaptainForTeam1()) {
+                if (player.isCaptainForTeam1() && getTeam1().isEmpty()) {
                     getTeam1().add(id, player);
-                } else if (player.isCaptainForTeam2()) {
+                } else if (player.isCaptainForTeam2() && getTeam2().isEmpty()) {
                     getTeam2().add(id, player);
                 }
             }
