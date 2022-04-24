@@ -1,7 +1,8 @@
 package bot.Tools;
 
+import bot.Engine.PlayerInfo;
 import bot.Main;
-import bot.Engine.PlayerStats;
+import bot.Engine.Cycles.PlayerStats;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -171,7 +172,8 @@ public class GoogleSheetsAPI {
             return new PlayerStats(
                     interaction, i + 1, row);
         } else if (tab.equals("'Profiles'")) {
-            return null;
+            return new PlayerInfo(
+                    interaction, i + 1, row);
         }
 
         return null;

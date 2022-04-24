@@ -1,4 +1,4 @@
-package bot.Engine;
+package bot.Engine.Cycles;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 
@@ -41,19 +41,19 @@ public class PlayerStats {
      * Construct the object by storing row data.
      * @param interaction the user interaction calling this method.
      * @param pos the row of the player within the cycle spreadsheet.
-     * @param vals the row data.
+     * @param row the row data.
      */
     public PlayerStats(GenericInteractionCreateEvent interaction,
-                       int pos, List<Object> vals) {
+                       int pos, List<Object> row) {
         try {
             draftPosition = pos;
-            name = vals.get(0).toString();
-            nickname = vals.get(1).toString();
-            if (vals.size() > 2) {
-                setWins = Integer.parseInt(vals.get(2).toString());
-                setLosses = Integer.parseInt(vals.get(3).toString());
-                gamesWon = Integer.parseInt(vals.get(6).toString());
-                gamesLost = Integer.parseInt(vals.get(7).toString());
+            name = row.get(0).toString();
+            nickname = row.get(1).toString();
+            if (row.size() > 2) {
+                setWins = Integer.parseInt(row.get(2).toString());
+                setLosses = Integer.parseInt(row.get(3).toString());
+                gamesWon = Integer.parseInt(row.get(6).toString());
+                gamesLost = Integer.parseInt(row.get(7).toString());
             }
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
             Logger logger = LoggerFactory.getLogger(this.getClass());
