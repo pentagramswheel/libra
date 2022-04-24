@@ -70,8 +70,8 @@ public class GoogleSheetsAPI {
                 java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
         buggyLogger.setLevel(java.util.logging.Level.SEVERE);
 
-//        String resourcesPath = "src/main/resources";     // for local
-        String resourcesPath = "resources";              // for JAR
+        String resourcesPath = "src/main/resources";     // for local
+//        String resourcesPath = "resources";              // for JAR
         String credentialsPath = resourcesPath + "/credentials.json";
         String tokensPath = "tokens";
 
@@ -89,8 +89,8 @@ public class GoogleSheetsAPI {
                 .setAccessType("offline")
                 .build();
 
-//        LocalServerReceiver receiver = new LocalServerReceiver();                                   // for local
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();     // for JAR
+        LocalServerReceiver receiver = new LocalServerReceiver();                                   // for local
+//        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();     // for JAR
         AuthorizationCodeInstalledApp oAuth = new AuthorizationCodeInstalledApp(
                 flow, receiver);
 
@@ -158,6 +158,26 @@ public class GoogleSheetsAPI {
     }
 
     /**
+     * Retrieves a specific type of row from the spreadsheet.
+     * @param interaction the user interaction calling this method.
+     * @param tab the specific tab of the spreadsheet.
+     * @param i the current row in the spreadsheet, offset by 1.
+     * @param row the actual row of this entry.
+     *
+     */
+    private Object getSpecificRow(GenericInteractionCreateEvent interaction,
+                           String tab, int i, List<Object> row) {
+        if (tab.equals("'Current Cycle'")) {
+            return new PlayerStats(
+                    interaction, i + 1, row);
+        } else if (tab.equals("'Profiles'")) {
+            return null;
+        }
+
+        return null;
+    }
+
+    /**
      * Retrieves a specific tab of the spreadsheet, indexing
      * by the first column.
      * @param interaction the user interaction calling this method.
@@ -165,20 +185,19 @@ public class GoogleSheetsAPI {
      * @return said section as a map, indexed by Discord ID.
      *         null otherwise.
      */
-    public TreeMap<Object, PlayerStats> readSection(
+    public TreeMap<Object, Object> readSection(
             GenericInteractionCreateEvent interaction, String tab) {
         try {
             List<List<Object>> values = getSheetValues(tab);
 
-            TreeMap<Object, PlayerStats> data = new TreeMap<>();
+            TreeMap<Object, Object> data = new TreeMap<>();
             if (values != null && !values.isEmpty()) {
                 for (int i = 1; i < values.size(); i++) {
                     List<Object> row = values.get(i);
                     Object id = row.remove(0);
-                    PlayerStats rowStats = new PlayerStats(
-                            interaction, i + 1, row);
+                    Object rowType = getSpecificRow(interaction, tab, i, row);
 
-                    data.put(id, rowStats);
+                    data.put(id, rowType);
                 }
 
                 return data;

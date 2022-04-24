@@ -246,14 +246,14 @@ public class PointsCalculator implements Command {
     public int initializeCopy(SlashCommandEvent sc, String tab, int minimumSets,
                                GoogleSheetsAPI fromLink, GoogleSheetsAPI toLink) {
         try {
-            TreeMap<Object, PlayerStats> data = fromLink.readSection(sc, tab);
+            TreeMap<Object, Object> data = fromLink.readSection(sc, tab);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
 
             int size = 0;
-            for (Map.Entry<Object, PlayerStats> mapping : data.entrySet()) {
-                PlayerStats player = mapping.getValue();
+            for (Map.Entry<Object, Object> mapping : data.entrySet()) {
+                PlayerStats player = (PlayerStats) mapping.getValue();
 
                 int setWins = player.getSetWins();
                 int setLosses = player.getSetLosses();

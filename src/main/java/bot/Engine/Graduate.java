@@ -59,7 +59,7 @@ public class Graduate extends Section implements Command {
             // tab name of the spreadsheet
             String tab = "'Graduates'";
 
-            TreeMap<Object, PlayerStats> data = link.readSection(sc, tab);
+            TreeMap<Object, Object> data = link.readSection(sc, tab);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             } else if (!data.containsKey(playerID)) {

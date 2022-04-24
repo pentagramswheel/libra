@@ -145,24 +145,23 @@ public class ManualLog extends Section implements Command {
      * @param cmd the formal name of the command.
      * @param gamesPlayed the total games played.
      * @param gameWins the total games won.
-     * @param user the user to update the stats of.
+     * @param user the player to update the stats of.
      * @param link a connection to the spreadsheet.
      * @param tab the name of the spreadsheet tab to edit.
-     * @param data a map of all rows of the spreadsheet.
+     * @param stats the stats of the player.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
     public int updateUser(String cmd, int gamesPlayed, int gameWins,
                           Member user, GoogleSheetsAPI link, String tab,
-                          TreeMap<Object, PlayerStats> data) {
+                          PlayerStats stats) {
         try {
             String userTag = user.getUser().getAsTag();
-            PlayerStats player = data.get(user.getId());
 
             int gameLosses = gamesPlayed - gameWins;
 
-            int setWins = player.getSetWins();
-            int setLosses = player.getSetLosses();
+            int setWins = stats.getSetWins();
+            int setLosses = stats.getSetLosses();
             int setsPlayed = setWins + setLosses;
             double setWinrate = 0.0;
             if (notSub(cmd) && gamesPlayed > 0) {
@@ -178,8 +177,8 @@ public class ManualLog extends Section implements Command {
                 setWinrate = (double) setWins / setsPlayed;
             }
 
-            gameWins += player.getGamesWon();
-            gameLosses += player.getGamesLost();
+            gameWins += stats.getGamesWon();
+            gameLosses += stats.getGamesLost();
             gamesPlayed = gameWins + gameLosses;
             double gameWinrate = 0.0;
             if (gamesPlayed > 0) {
@@ -187,8 +186,8 @@ public class ManualLog extends Section implements Command {
             }
 
             String updateRange = link.buildRange(tab,
-                    "B", player.getDraftPosition(),
-                    "K", player.getDraftPosition());
+                    "B", stats.getDraftPosition(),
+                    "K", stats.getDraftPosition());
             ValueRange newRow = link.buildRow(Arrays.asList(
                             userTag, user.getEffectiveName(),
                             setWins, setLosses, setsPlayed, setWinrate,
@@ -208,7 +207,7 @@ public class ManualLog extends Section implements Command {
      * @param cmd the formal name of the command.
      * @param gamesPlayed the total games played.
      * @param gameWins the total games won.
-     * @param user the user to update the stats of.
+     * @param user the player to update the stats of.
      * @param link a connection to the spreadsheet.
      * @param tab the name of the spreadsheet tab to edit.
      * @return 0 if the player could be found in the spreadsheet.
@@ -272,7 +271,7 @@ public class ManualLog extends Section implements Command {
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";
 
-            TreeMap<Object, PlayerStats> data = link.readSection(sc, tab);
+            TreeMap<Object, Object> data = link.readSection(sc, tab);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
@@ -284,9 +283,10 @@ public class ManualLog extends Section implements Command {
             for (int i = 0; i < numUsers; i++) {
                 Member user = userArgs.get(i).getAsMember();
                 if (data.containsKey(user.getId())) {
+                    PlayerStats stats = (PlayerStats) data.get(user.getId());
                     errorsFound[i] = updateUser(
                             cmd, getGamesPlayed(args), getGamesWon(args),
-                            user, link, tab, data);
+                            user, link, tab, stats);
                     playerTypes[i] = 0;
                 } else {
                     errorsFound[i] = addUser(

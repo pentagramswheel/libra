@@ -1,4 +1,4 @@
-package bot.Engine.Drafts;
+package bot.Engine.Cycles;
 
 import bot.Engine.Cycles.ManualLog;
 import bot.Engine.PlayerStats;
@@ -130,24 +130,23 @@ public class Undo extends ManualLog implements Command {
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
      * @param tab the name of the spreadsheet tab to edit.
-     * @param data a map of all rows of the spreadsheet.
+     * @param stats the stats of the player.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
     private int undoUser(String[] args, GoogleSheetsAPI link,
                          String user, String tab,
-                         TreeMap<Object, PlayerStats> data) {
+                         PlayerStats stats) {
         String userID = user.substring(2, user.length() - 1);
-        try {
-            PlayerStats player = data.get(userID);
 
+        try {
             int gamesPlayed = getGamesPlayed(args);
             int gameWins = getGamesWon(args);
             int gameLosses = gamesPlayed - gameWins;
             double gameWinrate = 0.0;
 
-            int setWins = player.getSetWins();
-            int setLosses = player.getSetLosses();
+            int setWins = stats.getSetWins();
+            int setLosses = stats.getSetLosses();
             int setsPlayed = setWins + setLosses;
             double setWinrate = 0.0;
             if (notSub(args)) {
@@ -163,18 +162,18 @@ public class Undo extends ManualLog implements Command {
                 setWinrate = (double) setWins / setsPlayed;
             }
 
-            gameWins = player.getGamesWon() - gameWins;
-            gameLosses = player.getGamesLost() - gameLosses;
+            gameWins = stats.getGamesWon() - gameWins;
+            gameLosses = stats.getGamesLost() - gameLosses;
             gamesPlayed = gameWins + gameLosses;
             if (gamesPlayed > 0) {
                 gameWinrate = (double) gameWins / gamesPlayed;
             }
 
             String updateRange = link.buildRange(tab,
-                    "B", player.getDraftPosition(),
-                    "K", player.getDraftPosition());
+                    "B", stats.getDraftPosition(),
+                    "K", stats.getDraftPosition());
             ValueRange newRow = link.buildRow(Arrays.asList(
-                    player.getName(), player.getNickname(),
+                    stats.getName(), stats.getNickname(),
                     setWins, setLosses, setsPlayed, setWinrate,
                     gameWins, gameLosses, gamesPlayed, gameWinrate));
             link.updateRange(updateRange, newRow);
@@ -203,7 +202,7 @@ public class Undo extends ManualLog implements Command {
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";
 
-            TreeMap<Object, PlayerStats> data = link.readSection(sc, tab);
+            TreeMap<Object, Object> data = link.readSection(sc, tab);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
@@ -221,8 +220,11 @@ public class Undo extends ManualLog implements Command {
 
             int[] errorsFound = new int[userArgs];
             for (int i = 3; i < userArgs + 3; i++) {
+                String userID = messageArgs[i].substring(
+                        2, messageArgs[i].length() - 1);
+                PlayerStats stats = (PlayerStats) data.get(userID);
                 errorsFound[i - 3] = undoUser(messageArgs, link,
-                        messageArgs[i], tab, data);
+                        messageArgs[i], tab, stats);
             }
 
             sendReport(sc, messageArgs, userArgs, errorsFound);

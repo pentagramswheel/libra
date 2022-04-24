@@ -164,7 +164,7 @@ public class AutoLog extends Section {
                                    ButtonClickEvent bc, DraftTeam team,
                                    int[] playerTypes, int[] errorsFound, int offset,
                                    GoogleSheetsAPI link, String tab,
-                                   TreeMap<Object, PlayerStats> data) {
+                                   TreeMap<Object, Object> data) {
         int i = 0;
         for (Map.Entry<String, DraftPlayer> player : team.getPlayers().entrySet()) {
             String currID = player.getKey();
@@ -180,9 +180,10 @@ public class AutoLog extends Section {
             }
 
             if (data.containsKey(currID)) {
+                PlayerStats stats = (PlayerStats) data.get(currID);
                 errorsFound[offset + i] = log.updateUser(
                         cmd, gamesPlayed, gameWins,
-                        user, link, tab, data);
+                        user, link, tab, stats);
                 playerTypes[offset + i] = 0;
             } else {
                 errorsFound[offset + i] = log.addUser(
@@ -207,7 +208,7 @@ public class AutoLog extends Section {
             // tab name of the spreadsheet
             String tab = "'Current Cycle'";
 
-            TreeMap<Object, PlayerStats> data = link.readSection(bc, tab);
+            TreeMap<Object, Object> data = link.readSection(bc, tab);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
