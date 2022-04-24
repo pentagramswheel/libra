@@ -46,7 +46,7 @@ public class Main {
         // profile commands
         SubcommandGroupData profile = new SubcommandGroupData("profile",
                 "Finds profile information on a player within MIT.");
-        // edit in subcommand data in here Robbinson
+        // edit in subcommand data in here Turtle
 //        profile.addSubcommands(...)
 
         // section commands
@@ -130,7 +130,8 @@ public class Main {
         }
 
         // implementing commands
-        mit.addSubcommands(status, help, cycleCalculate, draftdoc);
+        mit.addSubcommands(status, help,
+                cycleCalculate, draftdoc);
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
                 genmaps, startdraft, forcesub, forceend,

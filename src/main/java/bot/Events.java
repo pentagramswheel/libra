@@ -1,10 +1,8 @@
 package bot;
 
-import bot.Engine.Add;
-import bot.Engine.Award;
+import bot.Engine.*;
 import bot.Engine.Cycles.*;
 import bot.Engine.Drafts.*;
-import bot.Engine.Graduate;
 import bot.Tools.ArrayHeapMinPQ;
 import bot.Tools.FileHandler;
 
@@ -507,6 +505,12 @@ public class Events extends ListenerAdapter {
                         "https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing";
                 sc.reply(docLink).queue();
                 break;
+        }
+
+        switch (subGroup) {
+            case "profile":
+                Profile profile = new Profile();
+                profile.runCmd(sc);
         }
     }
 
