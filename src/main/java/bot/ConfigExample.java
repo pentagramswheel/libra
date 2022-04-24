@@ -13,6 +13,9 @@ public final class ConfigExample {
     /** MIT bot token. */
     public final static String botToken = "TOKEN";
 
+    /** MIT profiles Google Sheets ID. */
+    public final static String mitProfilesSheetID = "ID";
+
     /** LaunchPoint graduates Google Sheets ID. */
     public final static String lpGradSheetID ="ID";
 
