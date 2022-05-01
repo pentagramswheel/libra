@@ -575,7 +575,7 @@ public class Events extends ListenerAdapter {
             case "forceend":
                 attemptForceEnd(sc, drafts, queue, args);
                 break;
-            case "cycle":
+            case "log":
             case "sub":
                 if (gamesPlayedValid(sc)) {
                     ManualLog log = new ManualLog(prefix);

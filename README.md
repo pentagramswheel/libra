@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** April 20, 2022
+**Last Updated:** May 1, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -71,7 +71,7 @@ java src/main/java/bot/Main.java
 | lp/io startdraft | Starts an automatic MIT draft. |
 | lp/io forcesub | Forces a player within a MIT draft to become a sub. | 1. `numdraft` - the numbered draft to consider.<br />2. `player` - the player to sub out. |
 | lp/io forceend | Forces a MIT draft to end. | 1. `numdraft` - the numbered draft to consider. |
-| lp/io cycle | Manually updates players' MIT draft stats through an affiliated spreadsheet. | 1. `matches` - the amount of games played in a set.<br />2. `won` - the amount of winning games of the set.<br />3. `players` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
+| lp/io log | Manually updates players' MIT draft stats through an affiliated spreadsheet. | 1. `matches` - the amount of games played in a set.<br />2. `won` - the amount of winning games of the set.<br />3. `players` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | lp/io sub | Manually updates subs' MIT draft stats through an affiliated spreadsheet. | 1. `matches` - the amount of games played in a set.<br />2. `won` - the amount of winning games of the set.<br />3. `players` - a list of Discord users in the form of Discord pings; up to four users can be given.<br /> |
 | lp/io undo | Reverts the previous MIT draft command, *once and only once*. |
 | lp/io add | Gives players a MIT draft area role. | 1. `players` - Discord users in the form of Discord pings. |
@@ -230,7 +230,7 @@ A class which automatically updates the draft stats of a user.
 
 #### ManualLog
 
-A class which manually updates the draft stats of a user by processing the `lp/io cycle` and `lp/io sub` commands.
+A class which manually updates the draft stats of a user by processing the `lp/io log` and `lp/io sub` commands.
 
 ----
 

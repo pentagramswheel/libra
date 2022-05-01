@@ -42,7 +42,7 @@ public class ManualLog extends Section implements Command {
      *         False if a sub command was called.
      */
     public boolean notSub(String cmd) {
-        return cmd.contains("cycle");
+        return cmd.contains("log");
     }
 
     /**

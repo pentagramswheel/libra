@@ -17,6 +17,7 @@ tokens/
 *.MF
 
 logback_jar.xml
+gradle/
 src/main/java/bot/Config.java
 src/main/resources/credentials.json
 

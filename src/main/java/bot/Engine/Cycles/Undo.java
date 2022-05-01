@@ -58,7 +58,7 @@ public class Undo extends ManualLog implements Command {
      *         False if a sub command was called.
      */
     public boolean notSub(String[] args) {
-        return args[0].contains("cycle");
+        return args[0].contains("log");
     }
 
     /**

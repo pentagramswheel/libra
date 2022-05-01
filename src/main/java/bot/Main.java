@@ -63,7 +63,7 @@ public class Main {
                 "Forces a player within a draft to become a sub.");
         SubcommandData forceend = new SubcommandData("forceend",
                 "Forces a draft to end.");
-        SubcommandData cycle = new SubcommandData("cycle",
+        SubcommandData log = new SubcommandData("log",
                 "Manually reports draft scores for up to four players.");
         SubcommandData sub = new SubcommandData("sub",
                 "Manually reports draft scores for up to four players who subbed.");
@@ -86,7 +86,7 @@ public class Main {
                 OptionType.INTEGER, "matches", "Total games played", true);
         OptionData won = new OptionData(
                 OptionType.INTEGER, "won", "Total games won", true);
-        cycle.addOptions(matches, won);
+        log.addOptions(matches, won);
         sub.addOptions(matches, won);
 
         OptionData maps = new OptionData(
@@ -118,7 +118,7 @@ public class Main {
             }
 
             if (i <= 4) {
-                cycle.addOptions(newMention);
+                log.addOptions(newMention);
                 sub.addOptions(newMention);
             }
             if (i <= 24) {
@@ -135,11 +135,11 @@ public class Main {
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
                 genmaps, startdraft, forcesub, forceend,
-                cycle, sub, undo, add, deny, grad,
+                log, sub, undo, add, deny, grad,
                 award);
         io.addSubcommands(
                 genmaps, startdraft, forcesub, forceend,
-                cycle, sub, undo, add, deny, grad,
+                log, sub, undo, add, deny, grad,
                 award);
 
         jda.updateCommands().addCommands(mit, lp, io).queue();

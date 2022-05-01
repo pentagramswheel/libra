@@ -173,7 +173,7 @@ public class AutoLog extends Section {
             int gameWins = currPlayer.getWins();
             int gamesPlayed = gameWins + currPlayer.getLosses();
 
-            String cmd = "cycle";
+            String cmd = "log";
             if (currPlayer.isSub()) {
                 cmd = "sub";
             }

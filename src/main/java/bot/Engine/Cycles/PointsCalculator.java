@@ -103,6 +103,16 @@ public class PointsCalculator implements Command {
     }
 
     /**
+     * Retrieves the placement string of a player's Top 10 standing.
+     * @param tag the Discord tag of the player.
+     * @param placing the standing of the player.
+     * @return the formatted placement string.
+     */
+    private String placement(String tag, int placing) {
+        return String.format("@.%s (%s)\n", tag, placing);
+    }
+
+    /**
      * Calculates the Top 10 players of the leaderboard.
      * @param sc the user's inputted command.
      * @param section the designated MIT section for this Top 10.
@@ -125,7 +135,9 @@ public class PointsCalculator implements Command {
             link.sortByDescending(tab, totalColumn, size);
             editMessage(sc, "Calculating Top 10...");
 
-            int placing = 1;
+            int placing, offset;
+            placing = offset = 1;
+
             int lastScore = -1;
 
             List<List<Object>> table = link.getSheetValues(tab);
@@ -133,25 +145,22 @@ public class PointsCalculator implements Command {
 
             for (List<Object> row : table) {
                 Object id = row.get(0);
+                String playerTag = String.valueOf(row.get(1));
                 int currScore =
                         Integer.parseInt(row.get(numTotalColumn).toString());
 
-                Member player = findMember(sc, String.valueOf(id));
-                String playerTag = player.getUser().getAsTag();
-//                String playerTag = String.valueOf(row.get(1));
-                String placement = String.format("%s) @.%s\n",
-                        placing, playerTag);
-
                 if (lastScore == -1) {
                     lastScore = currScore;
-                    topTen.append(placement);
+                    topTen.append(placement(playerTag, placing));
                 } else if (currScore == lastScore) {
-                    topTen.append(placement);
+                    offset++;
+                    topTen.append(placement(playerTag, placing));
                 } else if (placing < 10) {
                     lastScore = currScore;
-                    placing++;
+                    placing += offset;
+                    offset = 1;
 
-                    topTen.append(placement);
+                    topTen.append(placement(playerTag, placing));
                 }
 
                 finalScores.put(id, currScore);
@@ -321,23 +330,21 @@ public class PointsCalculator implements Command {
                     new GoogleSheetsAPI(Config.lpCyclesCalculationSheetID),
                     new GoogleSheetsAPI(Config.ioCyclesCalculationSheetID)};
 
-            for (int i = 0; i < leaderboards.length; i++) {
+            for (int i = 0; i < sections.length; i++) {
                 String actualTabName = tab.substring(1, tab.length() - 1);
                 points[i].duplicateTab(templateTab, actualTabName);
 
                 wait(10000);
                 editMessage(sc, "Copying " + sections[i] + " spreadsheet...");
 
-                log("(Cycle Change) A leaderboard is being copied to the"
-                        + "to the " + sections[i] + " points spreadsheet.", false);
+                log("(Cycle Change) A leaderboard is being copied to the "
+                        + sections[i] + " points spreadsheet.", false);
                 int totalPlayers = initializeCopy(
                         sc, tab, minimumSets[i],
                         leaderboards[i], points[i]);
                 if (totalPlayers == -1) {
                     throw new IOException("Total players invalid.");
                 }
-
-                points[i].renameTab(tab, "Previous Cycle");
 
                 log("(Cycle Change) Points are being calculated...", false);
                 calculatePoints(sc, totalPlayers, tab, points[i]);
@@ -350,6 +357,7 @@ public class PointsCalculator implements Command {
                 log("(Cycle Change) Updating public leaderboard...", false);
                 updateLeaderboard(sc, scores, tab, leaderboards[i]);
 
+                points[i].renameTab(tab, "Previous Cycle");
                 leaderboards[i].renameTab(tab, "Previous Cycle");
                 leaderboards[i].duplicateTab(templateTab, actualTabName);
 
