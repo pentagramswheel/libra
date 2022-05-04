@@ -123,7 +123,7 @@ public class Events extends ListenerAdapter {
      */
     private boolean isStaffCommand(SlashCommandEvent sc) {
         String[] staffCmds = {"forceend", "cycle", "sub", "undo",
-                "add", "grad", "award", "cyclescalc"};
+                "add", "deny", "grad", "award", "cyclescalc"};
 
         try {
             Guild server = sc.getGuild();
@@ -187,7 +187,7 @@ public class Events extends ListenerAdapter {
                 subCmd.equals("cycle") || subCmd.equals("sub") || subCmd.equals("undo");
 
         boolean isHelpdesk = channel.equals(helpdesk);
-        boolean inEntryChannel = (subCmd.equals("add") || subCmd.equals("grad"))
+        boolean inEntryChannel = (subCmd.equals("add") || subCmd.equals("deny") || subCmd.equals("grad"))
                 && channel.equals(entryChannel);
         boolean inLPChannel = prefix.equals("lp") && isDraftCommand
                 && channel.equals(lpDraftChannel);
