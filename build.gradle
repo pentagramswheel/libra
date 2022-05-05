@@ -40,10 +40,11 @@ jar {
                 "Main-Class": "bot.Main"
         )
 
-        baseName 'libra'
+        archiveBaseName.set('libra')
         project.version ''
     }
 
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
