@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** May 1, 2022
+**Last Updated:** May 4, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -94,7 +94,7 @@ The entry point of the bot. It constructs the bot and prepares it for processing
 
 #### Config
 
-A class consisting of credential-specific information, pertaining to Discord and the bot's persistence. Due to the credentials of this class, the secrets have been redacted. See ConfigExample.java for a template.
+A class consisting of credential-specific information, pertaining to Discord and the bot's persistence. Due to the credentials of this class, the secrets have been redacted. See `ConfigExample.java` for a template.
 
 ----
 
