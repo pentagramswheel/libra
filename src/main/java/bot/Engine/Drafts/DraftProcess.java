@@ -114,7 +114,6 @@ public class DraftProcess {
     public Message getMessage() {
         MessageChannel channel =
                 draft.getDraftChannel();
-//                draft.getTestingChannel();
         return channel.retrieveMessageById(getMessageID()).complete();
     }
 
@@ -166,33 +165,6 @@ public class DraftProcess {
         }
 
         return ping.toString();
-    }
-
-    /**
-     * Pin the processing interface at the start of the draft,
-     * and unpin it at the end of it.
-     */
-    private void pinMessageIfNeeded() {
-        if (getMessageID() == null) {
-            return;
-        }
-
-        Message msg = getMessage();
-        if (draft.isInitialized()) {
-            if (!msg.isPinned()) {
-                msg.pin().queue();
-                draft.wait(1000);
-
-                draft.getDraftChannel().sendMessage(
-//                draft.getTestingChannel().sendMessage(
-                        "I've attached the interface to the pins! Make sure "
-                        + "captains click `Begin Draft` before you actually "
-                        + "start playing though, __otherwise no one will get "
-                        + "any points__ <:Wahoozones:766479174839173200>").queue();
-            }
-        } else if (msg.isPinned()) {
-            msg.unpin().queue();
-        }
     }
 
     /**
@@ -272,15 +244,25 @@ public class DraftProcess {
         buttons.add(Components.ForDraftProcess.endDraftProcess(idSuffix));
 
         if (interaction != null) {
-            pinMessageIfNeeded();
             interaction.getHook().editOriginal(getPing()).setActionRows(
                     ActionRow.of(menus), ActionRow.of(buttons)).queue();
             updateReport(interaction);
         } else {
             TextChannel channel = draft.getDraftChannel();
-//            TextChannel channel = draft.getTestingChannel();
             channel.sendMessage(getPing()).setActionRows(
-                    ActionRow.of(menus), ActionRow.of(buttons)).queue();
+                    ActionRow.of(menus), ActionRow.of(buttons)).queue(
+                            (message) -> {
+                                message.pin().queue();
+                                draft.wait(1000);
+
+                                draft.getDraftChannel().sendMessage(
+                                        "I've attached the interface to the pins! "
+                                                + "Make sure captains click `Begin "
+                                                + "Draft` before you actually start "
+                                                + "playing though, __otherwise no "
+                                                + "one will get any points__ "
+                                                + "<:Wahoozones:766479174839173200>").queue();
+                            });
         }
     }
 
@@ -479,7 +461,7 @@ public class DraftProcess {
         messageID = bc.getMessageId();
         if (!getTeam1().contains(authorID)
                 && !getTeam2().contains(authorID)) {
-            draft.sendReply(bc, "You are not part of this draft!", true);
+            draft.sendReply(bc, "You are not on one of the teams!", true);
             return false;
         }
 
@@ -496,7 +478,7 @@ public class DraftProcess {
             draft.toggleRequest(false);
 
             if (hasStarted()) {
-                pinMessageIfNeeded();
+                getMessage().unpin().queue();
 
                 String idSuffix = draft.getPrefix() + draft.getNumDraft();
                 List<Button> buttons = new ArrayList<>();

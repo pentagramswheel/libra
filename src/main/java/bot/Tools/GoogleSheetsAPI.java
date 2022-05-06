@@ -63,6 +63,11 @@ public class GoogleSheetsAPI {
      * Creates an OAuth exchange to grant application access to Google Sheets.
      * @param httpTransport the HTTP link to use in the authorization.
      * @return the authorization credential.
+     *
+     * Note: For this method to work, the project must have a "resources"
+     *       directory, in src/main if local, consisting of a credentials.json file
+     *       made using Google Sheets. See the following link for more information:
+     *       <a href="https://developers.google.com/workspace/guides/create-credentials"></a>
      */
     private Credential getCredential(NetHttpTransport httpTransport)
             throws IOException {

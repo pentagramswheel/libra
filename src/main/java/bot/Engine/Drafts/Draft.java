@@ -52,7 +52,6 @@ public class Draft extends Section implements Command {
 
     /** The draft chat channel this draft is occurring in. */
     private final TextChannel draftChat;
-//    private final TextChannel botTesting;
 
     /** The Discord message ID for this draft's initial interface. */
     private String messageID;
@@ -91,8 +90,6 @@ public class Draft extends Section implements Command {
         players.put(initialPlayer.getId(), newPlayer);
 
         draftChat = getChannel(sc, getPrefix() + "-draft-chat-" + draft);
-//        botTesting = getChannel(sc, "bot-testing");
-
         numGenerator = generator;
     }
 
@@ -167,14 +164,6 @@ public class Draft extends Section implements Command {
         return draftChat;
     }
 
-//    /**
-//     * Retrieves the bot testing channel.
-//     * @return said channel.
-//     */
-//    public TextChannel getTestingChannel() {
-//        return botTesting;
-//    }
-
     /**
      * Retrieves the request interface of the draft.
      * @param interaction the user interaction calling this method.
@@ -183,7 +172,6 @@ public class Draft extends Section implements Command {
     public Message getMessage(GenericInteractionCreateEvent interaction) {
         MessageChannel channel =
                 getChannel(interaction, getPrefix() + "-looking-for-draft");
-//                botTesting;
         return channel.retrieveMessageById(messageID).complete();
     }
 
