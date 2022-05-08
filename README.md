@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** May 4, 2022
+**Last Updated:** May 8, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -249,7 +249,7 @@ A class which calculates MIT leaderboard points for cycle changes.
 
 #### Draft
 
-A class which forms and starts drafts, processing the command `lp/io startdraft` and handling other commands such as `lp/io forcesub`, etc..
+A class which forms and starts drafts, processing the command `lp/io startdraft` and handling other commands such as `lp/io forcesub`, etc.
 
 ###### Instance Variables
 1. `boolean initialized` - a flag for checking if a draft has been initialized.
@@ -257,12 +257,13 @@ A class which forms and starts drafts, processing the command `lp/io startdraft`
 3. `long startTime` - the starting time of the draft's initialization.
 4. `int numDraft` - the formal number of the draft, with respect to the draft maps in `Events`.
 5. `DraftProcess draftProcess` - the formal process for the draft's execution.
-6. `List<DraftPlayer> players` - the original core players of the draft.
-7. `int numInactive` - the number of inactive players within the draft.
-8. `TextChannel draftChat` - the draft chat which this draft is linked to.
-9. `String messageID` - the Discord message ID of the draft request.
-10. `int NUM_PLAYERS_TO_START_DRAFT` - the number of players to start the draft.
-11. `Random numGenerator` - a random number generator.
+6. `TreeMap<String, DraftPlayer> players` - the players of the draft.
+7. `HashSet<String> playerHistory` - a history of players which have entered the draft queue at any point.
+8. `int numInactive` - the number of inactive players within the draft.
+9. `TextChannel draftChat` - the draft chat which this draft is linked to.
+10. `String messageID` - the Discord message ID of the draft request.
+11. `int NUM_PLAYERS_TO_START_DRAFT` - the number of players to start the draft.
+12. `Random numGenerator` - a random number generator.
 
 ----
 
@@ -276,8 +277,9 @@ A class which represents a player within a draft.
 3. `boolean captainStatus1, captainStatus2` - flags for checking captaincy with respect to the two teams of the draft.
 4. `boolean teamStatus` - a flag for checking the player's team status.
 5. `boolean subStatus` - a flag for checking the player's sub status.
-6. `int matchWins` - the player's match wins during the draft.
-7. `int matchLosses` - the player's match losses during the draft.
+6. `int subs` - the number of times the player subbed out.
+7. `int matchWins` - the player's match wins during the draft.
+8. `int matchLosses` - the player's match losses during the draft.
 
 ----
 
@@ -292,7 +294,7 @@ A class which manages and processes drafts.
 4. `int MAX_SCORE` - the maximum score for a team.
 5. `int NUM_PLAUERS_TO_END_DRAFT_BEFORE_START` - the number of players required to formally end the draft, if it hasn't actually started yet.
 6. `int NUM_PLAYERS_TO_END_DRAFT_AFTER_START` - the number of players required to formally end the draft, if it has started already.
-7. `List<String> endButtonClicked` - the players who have clicked the "End Draft" button consecutively.
+7. `HashSet<String> endButtonClicked` - the players who have clicked the "End Draft" button consecutively.
 8. `String messageID` - the Discord message ID of the draft request.
 
 ----

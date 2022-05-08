@@ -2,8 +2,8 @@ package bot.Engine.Drafts;
 
 import bot.Engine.Section;
 import bot.Tools.Command;
-
 import bot.Tools.Components;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -15,10 +15,11 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 import java.util.TreeMap;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * @author  Wil Aquino, Turtle#1504
@@ -46,6 +47,7 @@ public class Draft extends Section implements Command {
 
     /** The players of this draft. */
     private final TreeMap<String, DraftPlayer> players;
+    private final HashSet<String> playerHistory;
 
     /** The amount of inactive players within the draft. */
     private int numInactive;
@@ -77,12 +79,13 @@ public class Draft extends Section implements Command {
 
         initialized = false;
 
-        // time limit is 45 minutes initially
-        timeLimit = 1000 * 60 * 45;
+        // time limit is 50 minutes initially
+        timeLimit = 1000 * 60 * 50;
         startTime = System.currentTimeMillis();
 
         numDraft = draft;
         players = new TreeMap<>();
+        playerHistory = new HashSet<>();
         numInactive = 0;
 
         DraftPlayer newPlayer = new DraftPlayer(
@@ -344,7 +347,8 @@ public class Draft extends Section implements Command {
         } else if (getPlayers().containsKey(playerID)) {
             sendReply(bc, "You are already in this draft!", true);
             return;
-        } else if (getPlayers().size() >= (NUM_PLAYERS_TO_START_DRAFT / 2) - 1) {
+        } else if (!playerHistory.contains(playerID)
+                && getPlayers().size() >= (NUM_PLAYERS_TO_START_DRAFT / 2) - 1) {
             // add 5 minutes
             timeLimit += 1000 * 60 * 5;
         }
@@ -352,6 +356,7 @@ public class Draft extends Section implements Command {
         DraftPlayer newPlayer = new DraftPlayer(
                 bc.getMember().getEffectiveName(), false);
         getPlayers().put(playerID, newPlayer);
+        playerHistory.add(playerID);
 
         if (getPlayers().size() == NUM_PLAYERS_TO_START_DRAFT) {
             draftProcess = new DraftProcess(this);
@@ -518,6 +523,7 @@ public class Draft extends Section implements Command {
 
         player.setSubStatus(true);
         player.setActiveStatus(false);
+        player.incrementSubs();
 
         if (!draftStarted()) {
             player.setCaptainForTeam1(false);
@@ -545,6 +551,10 @@ public class Draft extends Section implements Command {
                     + getNumDraft();
             sendResponse(bc, update, false);
 
+            getDraftChannel().sendMessage(
+                    "`" + foundPlayer.getName()
+                            + "` has been subbed out.").queue();
+
             numInactive++;
         }
 
@@ -569,6 +579,10 @@ public class Draft extends Section implements Command {
                     + getNumDraft() + " (see above draft after refreshing)";
             sendReply(sc, update, false);
 
+            getDraftChannel().sendMessage(
+                    "`" + getPlayers().get(playerID).getName()
+                            + "` has been subbed out.").queue();
+
             numInactive++;
         }
     }
@@ -577,14 +591,20 @@ public class Draft extends Section implements Command {
      * Subs a player into the draft.
      * @param playerID the Discord ID of the player.
      * @param name the name of the player.
-     * @return an update string based on their addition.
      */
-    private String subIn(String playerID, String name) {
+    private void subIn(ButtonClickEvent bc, String playerID, String name) {
         DraftPlayer player;
         String statement;
 
         if (getPlayers().containsKey(playerID)) {
             player = getPlayers().get(playerID);
+            if (player.getSubAmount() == 2) {
+                sendResponse(bc,
+                        "You have already been subbed out twice! "
+                        + "You cannot sub anymore for this draft.", true);
+                return;
+            }
+
             player.setActiveStatus(true);
             player.setSubStatus(draftStarted());
 
@@ -594,17 +614,20 @@ public class Draft extends Section implements Command {
                 getProcess().getTeam2().add(playerID, player);
             }
 
+            numInactive--;
             statement = "will be coming back to sub";
         } else {
             player = new DraftPlayer(name, draftStarted());
             getPlayers().put(playerID, player);
+            playerHistory.add(playerID);
 
             statement = "will be subbing";
         }
 
-        return player.getAsMention(playerID) + " "
+        getDraftChannel().sendMessage(
+                player.getAsMention(playerID) + " "
                 + statement + " for this draft in "
-                + getDraftChannel().getAsMention() + ".";
+                + getDraftChannel().getAsMention() + ".").queue();
     }
 
     /**
@@ -620,9 +643,8 @@ public class Draft extends Section implements Command {
         } else if (activePlayers == NUM_PLAYERS_TO_START_DRAFT) {
             sendReply(bc, "This draft hasn't requested any subs yet.", true);
         } else {
-            String update = subIn(player.getId(), player.getEffectiveName());
+            subIn(bc, player.getId(), player.getEffectiveName());
             refresh(bc);
-            sendResponse(bc, update, false);
         }
     }
 
@@ -666,7 +688,6 @@ public class Draft extends Section implements Command {
     @Override
     public void runCmd(SlashCommandEvent sc) {
         if (inWrongSection(sc)) {
-            sendReply(sc, "You don't have access to this section's drafts!", true);
             return;
         }
 

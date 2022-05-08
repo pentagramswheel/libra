@@ -330,6 +330,14 @@ public class Events extends ListenerAdapter {
 
             ongoingDrafts.put(draftButton, newDraft);
             newDraft.runCmd(sc);
+
+            if (!sc.isAcknowledged()) {
+                sc.reply("You don't have access to this section's drafts!")
+                        .setEphemeral(true).queue();
+
+                ongoingDrafts.remove(draftButton);
+                queue.add(draftButton, draftButton);
+            }
         }
     }
 

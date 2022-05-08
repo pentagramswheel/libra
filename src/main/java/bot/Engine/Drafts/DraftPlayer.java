@@ -24,6 +24,9 @@ public class DraftPlayer {
     /** Flag for checking whether this player is a sub or not. */
     private boolean subStatus;
 
+    /** The amount of times this player has subbed out. */
+    private int subs;
+
     /** The player's amount of won matches during the draft. */
     private int matchWins;
 
@@ -41,7 +44,9 @@ public class DraftPlayer {
         active = true;
         captainStatus1 = captainStatus2 = false;
         teamStatus = false;
+
         subStatus = isSub;
+        subs = 0;
 
         matchWins = matchLosses = 0;
     }
@@ -145,6 +150,21 @@ public class DraftPlayer {
      */
     public void setSubStatus(boolean status) {
         subStatus = status;
+    }
+
+    /**
+     * Increases the amount of times this player has subbed out by one.
+     */
+    public void incrementSubs() {
+        subs++;
+    }
+
+    /**
+     * Retrieves the amount of times this player has subbed out.
+     * @return said times.
+     */
+    public int getSubAmount() {
+        return subs;
     }
 
     /**
