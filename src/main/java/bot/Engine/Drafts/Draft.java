@@ -347,10 +347,14 @@ public class Draft extends Section implements Command {
         } else if (getPlayers().containsKey(playerID)) {
             sendReply(bc, "You are already in this draft!", true);
             return;
-        } else if (!playerHistory.contains(playerID)
-                && getPlayers().size() >= (NUM_PLAYERS_TO_START_DRAFT / 2) - 1) {
-            // add 5 minutes
-            timeLimit += 1000 * 60 * 5;
+        } else if (!playerHistory.contains(playerID)) {
+            if (getPlayers().size() == NUM_PLAYERS_TO_START_DRAFT - 2) {
+                // add 10 minutes
+                timeLimit += 1000 * 60 * 10;
+            } else if (getPlayers().size() >= (NUM_PLAYERS_TO_START_DRAFT / 2) - 1) {
+                // add 5 minutes
+                timeLimit += 1000 * 60 * 5;
+            }
         }
 
         DraftPlayer newPlayer = new DraftPlayer(

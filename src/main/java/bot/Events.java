@@ -122,7 +122,7 @@ public class Events extends ListenerAdapter {
      *         False otherwise.
      */
     private boolean isStaffCommand(SlashCommandEvent sc) {
-        String[] staffCmds = {"forceend", "cycle", "sub", "undo",
+        String[] staffCmds = {"forceend", "log", "sub", "undo",
                 "add", "deny", "grad", "award", "cyclescalc"};
 
         try {
@@ -184,7 +184,7 @@ public class Events extends ListenerAdapter {
         boolean isDraftCommand =
                 subCmd.equals("startdraft") || subCmd.equals("forcesub") || subCmd.equals("forceend");
         boolean isReportCommand =
-                subCmd.equals("cycle") || subCmd.equals("sub") || subCmd.equals("undo");
+                subCmd.equals("log") || subCmd.equals("sub") || subCmd.equals("undo");
 
         boolean isHelpdesk = channel.equals(helpdesk);
         boolean inEntryChannel = (subCmd.equals("add") || subCmd.equals("deny") || subCmd.equals("grad"))
