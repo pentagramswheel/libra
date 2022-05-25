@@ -239,28 +239,30 @@ public class Events extends ListenerAdapter {
     /**
      * Checks whether a player is in another draft or not.
      * @param interaction the user interaction calling this method.
+     * @param generator a number generator for error messaging.
      * @param drafts the list of drafts to check.
-     * @return True if they are not found in another draft.
-     *         False otherwise.
+     * @return their found draft, null otherwise.
      */
-    private boolean notInAnotherDraft(GenericInteractionCreateEvent interaction,
-                                   TreeMap<Integer, Draft> drafts) {
+    private Draft notInAnotherDraft(GenericInteractionCreateEvent interaction,
+                                    Random generator,
+                                    TreeMap<Integer, Draft> drafts) {
         String playerID = interaction.getMember().getId();
         if (drafts == null) {
-            return true;
+            return null;
         }
 
         for (Draft draft : drafts.values()) {
             if (draft.getPlayers().containsKey(playerID)
                     && draft.getPlayers().get(playerID).isActive()) {
-                interaction.reply("You are already in a draft!")
-                        .setEphemeral(true).queue();
-
-                return false;
+                if (generator == null) {
+                    interaction.reply("You are already in a draft!")
+                            .setEphemeral(true).queue();
+                }
+                return draft;
             }
         }
 
-        return true;
+        return null;
     }
 
     /**
@@ -568,12 +570,13 @@ public class Events extends ListenerAdapter {
                 break;
             case "genmaps":
                 if (mapsNeededValid(sc)) {
-                    MapGenerator maps = new MapGenerator(prefix, numGenerator);
+                    MapGenerator maps = new MapGenerator(prefix, numGenerator,
+                            notInAnotherDraft(sc, numGenerator, drafts));
                     maps.runCmd(sc);
                 }
                 break;
             case "startdraft":
-                if (notInAnotherDraft(sc, drafts)) {
+                if (notInAnotherDraft(sc, null, drafts) == null) {
                     processDrafts(sc, prefix, author);
                 }
                 break;
@@ -664,7 +667,7 @@ public class Events extends ListenerAdapter {
         DraftProcess currProcess = currDraft.getProcess();
         switch (btnName.substring(0, indexOfNum - 2)) {
             case "join":
-                if (notInAnotherDraft(bc, drafts)) {
+                if (notInAnotherDraft(bc, null, drafts) == null) {
                     currDraft.attemptDraft(bc);
                 }
                 break;
@@ -684,7 +687,7 @@ public class Events extends ListenerAdapter {
                 currDraft.reassignCaptain(bc);
                 break;
             case "sub":
-                if (notInAnotherDraft(bc, drafts)) {
+                if (notInAnotherDraft(bc, numGenerator, drafts) == null) {
                     currDraft.addSub(bc);
                 }
                 break;

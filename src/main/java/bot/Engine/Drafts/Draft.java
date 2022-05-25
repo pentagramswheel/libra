@@ -64,6 +64,9 @@ public class Draft extends Section implements Command {
     /** A random number generator. */
     private final Random numGenerator;
 
+    /** The number of map generations made for this draft. */
+    private int mapGens;
+
     /**
      * Constructs a draft template and initializes the
      * draft start attributes.
@@ -176,6 +179,21 @@ public class Draft extends Section implements Command {
         MessageChannel channel =
                 getChannel(interaction, getPrefix() + "-looking-for-draft");
         return channel.retrieveMessageById(messageID).complete();
+    }
+
+    /**
+     * Increases this draft's amount of map generations by one.
+     */
+    public void incrementMapGens() {
+        mapGens++;
+    }
+
+    /**
+     * Retrieves this draft's amount of map generations.
+     * @return said amount.
+     */
+    public int getMapGens() {
+        return mapGens;
     }
 
     /**

@@ -25,14 +25,39 @@ public class MapGenerator extends Section implements Command {
     /** A random number generator. */
     private final Random numGenerator;
 
+    /** The draft associated with this map generation, if any. */
+    private final Draft foundDraft;
+
+    /** The maximum number of maplists which a draft can generate. */
+    private final static int MAX_DRAFT_MAPLISTS = 2;
+
     /**
      * Loads the map generator's random number generator.
      * @param abbreviation the abbreviation of the section.
      * @param r the random number generator to load.
+     * @param draft a found draft.
      */
-    public MapGenerator(String abbreviation, Random r) {
+    public MapGenerator(String abbreviation, Random r, Draft draft) {
         super(abbreviation);
         numGenerator = r;
+        foundDraft = draft;
+    }
+
+    /**
+     * Checks if the map generation can occur
+     * @param sc the user's inputted command.
+     * @return True if the map generation can proceed.
+     *         False otherwise.
+     */
+    private boolean mapGenerationLimitHit(SlashCommandEvent sc) {
+        if (foundDraft == null) {
+            return false;
+        } else if (foundDraft.getMapGens() >= MAX_DRAFT_MAPLISTS) {
+            return true;
+        } else {
+            foundDraft.incrementMapGens();
+            return false;
+        }
     }
 
     /**
@@ -196,9 +221,14 @@ public class MapGenerator extends Section implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
+        if (mapGenerationLimitHit(sc)) {
+            sc.reply("You can only generate two maplists per draft!")
+                    .setEphemeral(true).queue();
+            return;
+        }
         sc.deferReply().queue();
-        List<OptionMapping> args = sc.getOptions();
 
+        List<OptionMapping> args = sc.getOptions();
         int numMaps = (int) args.get(0).getAsLong();
 
         int numModes = 0;

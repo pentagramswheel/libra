@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** May 8, 2022
+**Last Updated:** May 25, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -264,6 +264,7 @@ A class which forms and starts drafts, processing the command `lp/io startdraft`
 10. `String messageID` - the Discord message ID of the draft request.
 11. `int NUM_PLAYERS_TO_START_DRAFT` - the number of players to start the draft.
 12. `Random numGenerator` - a random number generator.
+13. `int mapGens` - the amount of times a map generation has occurred for the draft.
 
 ----
 
@@ -316,6 +317,8 @@ A class which generates map lists.
 
 ###### Instance Variables
 1. `Random numGenerator` - a random number generator for map generation.
+2. `Draft foundDraft` - a draft associated with the map generator.
+3. `int MAX_DRAFT_MAPLISTS` - the maximum number of map generations for a draft.
 
 ----
 
