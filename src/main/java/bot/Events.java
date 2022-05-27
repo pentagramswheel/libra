@@ -101,11 +101,11 @@ public class Events extends ListenerAdapter {
         List<OptionMapping> args = sc.getOptions();
 
         int numMaps = (int) args.get(0).getAsLong();
-        if (numMaps > 7) {
+        if (numMaps > DraftPlayer.MAXIMUM_POINTS) {
             sc.reply("Too many maps requested. The set would be too long!")
                     .setEphemeral(true).queue();
             return false;
-        } else if (numMaps < 1) {
+        } else if (numMaps < DraftPlayer.MINIMUM_POINTS + 1) {
             sc.reply("Why would you request zero or less maps?")
                     .setEphemeral(true).queue();
             return false;

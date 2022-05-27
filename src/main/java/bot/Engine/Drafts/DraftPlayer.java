@@ -27,6 +27,10 @@ public class DraftPlayer {
     /** The amount of times this player has subbed out. */
     private int subs;
 
+    /** Point thresholds for this player. */
+    public static int MINIMUM_POINTS = 0;
+    public static int MAXIMUM_POINTS = 7;
+
     /** The player's amount of won matches during the draft. */
     private int matchWins;
 
@@ -184,17 +188,36 @@ public class DraftPlayer {
     }
 
     /**
+     * Checks whether a player's points can be increased or not.
+     * @return True if they can be increased.
+     *         False otherwise.
+     */
+    private boolean incrementable() {
+        return isActive() && getWins() + getLosses() < MAXIMUM_POINTS;
+    }
+
+    /**
+     * Checks whether a player's points can be decreased or not.
+     * @param points the points to check.
+     * @return True if they can be increased.
+     *         False otherwise.
+     */
+    private boolean decrementable(int points) {
+        return isActive() && points > MINIMUM_POINTS;
+    }
+
+    /**
      * Increases the player's amount of wins by one.
      */
     public void incrementWins() {
-        if (isActive()) {
+        if (incrementable()) {
             matchWins++;
         }
     }
 
     /** Decreases the player's amount of wins by one. */
     public void decrementWins() {
-        if (isActive()) {
+        if (decrementable(getWins())) {
             matchWins--;
         }
     }
@@ -203,14 +226,14 @@ public class DraftPlayer {
      * Increases the player's amount of losses by one.
      */
     public void incrementLosses() {
-        if (isActive()) {
+        if (incrementable()) {
             matchLosses++;
         }
     }
 
     /** Decreases the player's amount of wins by one. */
     public void decrementLosses() {
-        if (isActive()) {
+        if (decrementable(getLosses())) {
             matchLosses--;
         }
     }

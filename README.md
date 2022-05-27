@@ -279,8 +279,10 @@ A class which represents a player within a draft.
 4. `boolean teamStatus` - a flag for checking the player's team status.
 5. `boolean subStatus` - a flag for checking the player's sub status.
 6. `int subs` - the number of times the player subbed out.
-7. `int matchWins` - the player's match wins during the draft.
-8. `int matchLosses` - the player's match losses during the draft.
+7. `int MINIMUM_POINTS` - the minimum amount of points a player can have.
+8. `int MAXIMUM_POINTS` - the maximum amount of points a player can have.
+9. `int matchWins` - the player's match wins during the draft.
+10. `int matchLosses` - the player's match losses during the draft.
 
 ----
 
