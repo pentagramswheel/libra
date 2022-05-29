@@ -177,7 +177,7 @@ public class Draft extends Section implements Command {
      */
     public Message getMessage(GenericInteractionCreateEvent interaction) {
         MessageChannel channel =
-                getChannel(interaction, getPrefix() + "-looking-for-draft");
+                getChannel(interaction, "\uD83D\uDCCD" + getPrefix() + "-looking-for-draft");
         return channel.retrieveMessageById(messageID).complete();
     }
 
@@ -682,7 +682,7 @@ public class Draft extends Section implements Command {
                     + "try again.", true);
             return false;
         } else {
-            getChannel(sc, getPrefix() + "-looking-for-draft")
+            getChannel(sc, "\uD83D\uDCCD" + getPrefix() + "-looking-for-draft")
                     .retrieveMessageById(messageID).complete()
                     .editMessage("This draft has forcibly ended.")
                     .setActionRow(Components.ForDraft.refresh(

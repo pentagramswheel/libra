@@ -6,6 +6,7 @@ import bot.Tools.GoogleSheetsAPI;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.io.IOException;
@@ -64,6 +65,102 @@ public class PointsCalculator implements Command {
 
         return pointsColumns;
     }
+
+    private void replaceRoles(SlashCommandEvent sc, String section,
+                              Role firstPlace, Role secondPlace, Role thirdPlace,
+                              Role top10, String playerID) {
+        Role pastPodium = getRole(sc, "Past " + section + " Leaderboard Podium");
+        Role pastTop10 = getRole(sc, "Past " + section + " Leaderboard Top 10");
+
+        Member player = findMember(sc, playerID);
+        if (player == null) {
+            return;
+        }
+
+        List<Role> roles = player.getRoles();
+        Role[] podiumRoles = {firstPlace, secondPlace, thirdPlace};
+        for (Role podiumRole : podiumRoles) {
+            if (roles.contains(podiumRole)) {
+                removeRole(sc, playerID, podiumRole);
+                addRole(sc, playerID, pastPodium);
+                return;
+            }
+        }
+
+        if (roles.contains(top10)) {
+            removeRole(sc, playerID, top10);
+            addRole(sc, playerID, pastTop10);
+        }
+    }
+
+//    private void updateRoles(SlashCommandEvent sc, String section,
+//                             String currentTab, String previousTab,
+//                             GoogleSheetsAPI link) {
+//        Role firstPlace = getRole(sc, "1st " + section + " Leaderboard");
+//        Role secondPlace = getRole(sc, "2nd " + section + " Leaderboard");
+//        Role thirdPlace = getRole(sc, "3rd " + section + " Leaderboard");
+//        Role top10 = getRole(sc, section + " Leaderboard Top 10");
+//
+//        int counter = 0;
+//        int previousPoints = -1;
+//
+//        try {
+//            int offset = 0;
+//            for (List<Object> row : link.getSheetValues(currentTab)) {
+//                String id = row.get(columnToInt("A")).toString();
+//                Member player = findMember(sc, id);
+//                if (player == null) {
+//                    continue;
+//                }
+//
+//                int currentPoints = Integer.parseInt(
+//                        row.get(columnToInt("Q")).toString());
+//
+//                if (previousPoints == -1 && counter == 0) {
+//                    offset++;
+//                    previousPoints = currentPoints;
+//                    addRole(sc, id, firstPlace);
+//                } else if (currentPoints == )
+//                } else if (currentPoints == previousPoints) {
+//                    offset++;
+//                    if (counter == 0) {
+//                        addRole(sc, id, firstPlace);
+//                    } else if (counter == 1) {
+//                        addRole(sc, id, secondPlace);
+//                    } else if (counter == 2) {
+//                        addRole(sc, id, thirdPlace);
+//                    } else {
+//                        addRole(sc, id, top10);
+//                    }
+//                }
+//            }
+//
+//            counter = 0;
+//            previousPoints = -1;
+//
+//            for (List<Object> row : link.getSheetValues(previousTab)) {
+//                String id = row.get(columnToInt("A")).toString();
+//                int currentPoints = Integer.parseInt(
+//                        row.get(columnToInt("Q")).toString());
+//
+//                if (previousPoints == -1 || currentPoints < previousPoints) {
+//                    counter++;
+//                    previousPoints = currentPoints;
+//                    if (counter == 11) {
+//                        break;
+//                    }
+//
+//                    replaceRoles(sc, currentTab, firstPlace, secondPlace,
+//                            thirdPlace, top10, id);
+//                } else if (currentPoints == previousPoints) {
+//                    replaceRoles(sc, currentTab, firstPlace, secondPlace,
+//                            thirdPlace, top10, id);
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * Updates the public leaderboard with points for each player.
@@ -357,7 +454,10 @@ public class PointsCalculator implements Command {
                 log("(Cycle Change) Updating public leaderboard...", false);
                 updateLeaderboard(sc, scores, tab, leaderboards[i]);
 
+                points[i].renameTab("Previous Cycle", "2 Cycles Ago");
                 points[i].renameTab(tab, "Previous Cycle");
+
+                leaderboards[i].renameTab("Previous Cycle", "2 Cycles Ago");
                 leaderboards[i].renameTab(tab, "Previous Cycle");
                 leaderboards[i].duplicateTab(templateTab, actualTabName);
 

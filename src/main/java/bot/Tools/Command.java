@@ -55,6 +55,7 @@ public interface Command {
      * @param interaction the user interaction calling this method.
      * @param id the Discord IO of the user.
      * @return the user.
+     *         Null otherwise.
      */
     default Member findMember(GenericInteractionCreateEvent interaction,
                               String id) {
@@ -64,9 +65,14 @@ public interface Command {
                 throw new NullPointerException("Server link disconnected.");
             }
 
-            return server.retrieveMemberById(id).complete();
-        } catch (NullPointerException | IndexOutOfBoundsException e) {
-            log("The user could not be found.", true);
+            Member foundMember = server.retrieveMemberById(id).complete();
+            if (foundMember == null) {
+                throw new NullPointerException("A member could not be found.");
+            }
+
+            return foundMember;
+        } catch (NullPointerException e) {
+            log("A user could not be found.", true);
             return null;
         }
     }
@@ -107,6 +113,10 @@ public interface Command {
             }
 
             Member user = server.retrieveMemberById(id).complete();
+            if (user == null) {
+                throw new NullPointerException("Could not find user.");
+            }
+
             List<Role> roleList = user.getRoles();
             while (!roleList.contains(role)) {
                 server.addRoleToMember(id, role).queue();
@@ -138,6 +148,10 @@ public interface Command {
             }
 
             Member user = server.retrieveMemberById(id).complete();
+            if (user == null) {
+                throw new NullPointerException("Could not find user.");
+            }
+
             List<Role> roleList = user.getRoles();
             while (roleList.contains(role)) {
                 server.removeRoleFromMember(id, role).queue();
