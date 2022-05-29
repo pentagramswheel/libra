@@ -46,8 +46,23 @@ public class Main {
         // profile commands
         SubcommandGroupData profile = new SubcommandGroupData("profile",
                 "Finds profile information on a player within MIT.");
-        // edit in subcommand data in here Turtle
-//        profile.addSubcommands(...)
+        SubcommandData create = new SubcommandData("create", "Creates a new profile for yourself.");
+        SubcommandData delete = new SubcommandData("delete", "Deletes your profile.");
+        SubcommandData view = new SubcommandData("view", "View your own or someone else's profile.");
+        SubcommandData edit = new SubcommandData("edit", "Edits your profile.");
+        OptionData person  = new OptionData(
+                OptionType.USER, "person", "The user that you wish to view. Leave blank to view your own.", false);
+        view.addOptions(person);
+        OptionData nickname  = new OptionData(
+                OptionType.STRING, "nickname", "Your preferred nickname.", false);
+        OptionData pronoun  = new OptionData(
+                OptionType.STRING, "pronoun", "Your preferred pronoun(s).", false);
+        OptionData playstyle  = new OptionData(
+                OptionType.STRING, "playstyle", "Your preferred play style. Examples: Slayer, Skirmisher, Support, Anchor, Flex.", false);
+        OptionData weapon  = new OptionData(
+                OptionType.STRING, "weapon", "Your preferred weapon(s).", false);
+        edit.addOptions(nickname, pronoun, playstyle, weapon);
+        profile.addSubcommands(create, delete, view, edit);
 
         // section commands
         CommandData lp = new CommandData("lp",
