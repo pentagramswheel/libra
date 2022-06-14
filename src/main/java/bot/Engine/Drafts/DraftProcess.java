@@ -313,7 +313,6 @@ public class DraftProcess {
             DraftPlayer foundPlayer = draft.getPlayers().get(playerID);
             determineTeam(sm, authorID, playerID, foundPlayer);
 
-            updateReport(sm);
             refresh(sm);
         }
     }
@@ -337,7 +336,6 @@ public class DraftProcess {
             getTeam1().clear();
             getTeam2().clear();
 
-            updateReport(bc);
             refresh(bc);
         }
     }
@@ -362,7 +360,6 @@ public class DraftProcess {
 
             started = true;
             refresh(bc);
-            updateReport(bc);
         }
     }
 
@@ -428,7 +425,6 @@ public class DraftProcess {
                     "Add your subs before continuing (Check the "
                             + "the selection menu).", true);
             refresh(bc);
-            updateReport(bc);
             return;
         } else if (getTeam1().contains(authorID)) {
             team = getTeam1();
@@ -447,7 +443,7 @@ public class DraftProcess {
             revertPoints(bc, team, otherTeam);
         }
 
-        updateReport(bc);
+        refresh(bc);
     }
 
     /**

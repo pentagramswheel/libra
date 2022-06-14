@@ -2,6 +2,7 @@ package bot.Engine;
 
 import bot.Tools.Command;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -29,31 +30,45 @@ public class Award extends Section implements Command {
      * Awards players a leaderboard role.
      * @param sc the user's inputted command.
      * @param role the leaderboard role to give.
-     * @param players the players to give the role to.
+     * @param newPlacings the players to give the role to.
      */
     private void giveAward(SlashCommandEvent sc, String role,
-                           List<OptionMapping> players) {
-        StringBuilder listOfUsers = new StringBuilder();
-        for (OptionMapping om : players) {
-            Member player = om.getAsMember();
-            String playerID = player.getId();
-            if (role.startsWith("Past")) {
-                removeRole(sc, playerID,
-                        getRole(sc, "1st " + getSection() + " Leaderboard"));
-                removeRole(sc, playerID,
-                        getRole(sc, "2nd " + getSection() + " Leaderboard"));
-                removeRole(sc, playerID,
-                        getRole(sc, "3rd " + getSection() + " Leaderboard"));
-                removeRole(sc, playerID,
-                        getRole(sc, getSection() + " Leaderboard Top 10"));
+                           List<OptionMapping> newPlacings) {
+        try {
+            Guild server = sc.getGuild();
+            role = String.format(role, getSection());
+            if (server == null) {
+                throw new NullPointerException("Server link disconnected.");
             }
 
-            addRole(sc, playerID,
-                    getRole(sc, String.format(role, getSection())));
-            listOfUsers.append(player.getAsMention()).append(" ");
-        }
+            List<Member> oldPlacings = server.getMembersWithRoles(getRole(sc, role));
+            for (Member player : oldPlacings) {
+                String playerID = player.getId();
+                if (role.startsWith("1st") || role.startsWith("2nd")
+                        || role.startsWith("3rd")) {
+                    removeRole(sc, playerID, getRole(sc, role));
+                    addRole(sc, playerID,
+                            getRole(sc, "Past " + getSection() + " Leaderboard Podium"));
+                }
 
-        sendReply(sc, "Award(s) given to " + listOfUsers + "!", true);
+                addRole(sc, playerID,
+                        getRole(sc, "Past " + getSection() + " Leaderboard Top 10"));
+            }
+
+            StringBuilder listOfUsers = new StringBuilder();
+            for (OptionMapping om : newPlacings) {
+                Member player = om.getAsMember();
+                String playerID = player.getId();
+
+                addRole(sc, playerID,
+                        getRole(sc, String.format(role, getSection())));
+                listOfUsers.append(player.getAsMention()).append(" ");
+            }
+
+            sendReply(sc, "Award(s) given to " + listOfUsers + "!", true);
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
+            log("The role, " + role + ", could not be found.", true);
+        }
     }
 
     /**
@@ -77,12 +92,6 @@ public class Award extends Section implements Command {
                 break;
             case 4:
                 giveAward(sc, "%s Leaderboard Top 10", args);
-                break;
-            case 5:
-                giveAward(sc, "Past %s Leaderboard Podium", args);
-                break;
-            case 6:
-                giveAward(sc, "Past %s Leaderboard Top 10", args);
                 break;
         }
 

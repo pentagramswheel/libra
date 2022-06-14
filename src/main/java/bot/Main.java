@@ -115,8 +115,6 @@ public class Main {
         leaderboardAward.addChoice("2nd Place", 2);
         leaderboardAward.addChoice("3rd Place", 3);
         leaderboardAward.addChoice("Top 10", 4);
-        leaderboardAward.addChoice("Past Podium", 5);
-        leaderboardAward.addChoice("Past Top 10", 6);
         award.addOptions(leaderboardAward);
 
         // adding user parameters to any commands

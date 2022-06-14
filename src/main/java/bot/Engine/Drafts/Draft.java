@@ -553,6 +553,7 @@ public class Draft extends Section implements Command {
             determineCaptains(playerID);
         }
 
+        numInactive--;
         return true;
     }
 
@@ -564,11 +565,9 @@ public class Draft extends Section implements Command {
         String playerID = bc.getMember().getId();
         DraftPlayer foundPlayer = getPlayers().get(playerID);
 
-        boolean subSuccessful = subOut(bc, playerID, foundPlayer,
+        if (subOut(bc, playerID, foundPlayer,
                 "You are not in this draft!",
-                "You have already been subbed out of the draft!");
-
-        if (subSuccessful) {
+                "You have already been subbed out of the draft!")) {
             String update = getSectionRole() + " sub requested for Queue "
                     + getNumDraft();
             sendResponse(bc, update, false);
@@ -576,8 +575,6 @@ public class Draft extends Section implements Command {
             getDraftChannel().sendMessage(
                     "`" + foundPlayer.getName()
                             + "` has been subbed out.").queue();
-
-            numInactive++;
         }
 
         refresh(bc);
@@ -604,8 +601,6 @@ public class Draft extends Section implements Command {
             getDraftChannel().sendMessage(
                     "`" + getPlayers().get(playerID).getName()
                             + "` has been subbed out.").queue();
-
-            numInactive++;
         }
     }
 
@@ -625,10 +620,14 @@ public class Draft extends Section implements Command {
                         "You have already been subbed out twice! "
                         + "You cannot sub anymore for this draft.", true);
                 return;
+            } else if ((teamOneContains(playerID) && !getProcess().getTeam1().needsPlayers())
+                || (teamTwoContains(playerID) && !getProcess().getTeam2().needsPlayers())) {
+                sendResponse(bc, "Someone has already replaced you.", true);
+                return;
             }
 
-            player.setActiveStatus(true);
             player.setSubStatus(draftStarted());
+            player.setActiveStatus(true);
 
             if (teamOneContains(playerID)) {
                 getProcess().getTeam1().add(playerID, player);
@@ -636,7 +635,6 @@ public class Draft extends Section implements Command {
                 getProcess().getTeam2().add(playerID, player);
             }
 
-            numInactive--;
             statement = "will be coming back to sub";
         } else {
             player = new DraftPlayer(name, draftStarted());
@@ -645,6 +643,8 @@ public class Draft extends Section implements Command {
 
             statement = "will be subbing";
         }
+
+        numInactive--;
 
         getDraftChannel().sendMessage(
                 player.getAsMention(playerID) + " "
