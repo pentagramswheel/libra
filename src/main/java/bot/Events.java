@@ -687,7 +687,7 @@ public class Events extends ListenerAdapter {
                 currDraft.reassignCaptain(bc);
                 break;
             case "sub":
-                if (notInAnotherDraft(bc, numGenerator, drafts) == null) {
+                if (notInAnotherDraft(bc, null, drafts) == null) {
                     currDraft.addSub(bc);
                 }
                 break;

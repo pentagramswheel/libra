@@ -156,12 +156,12 @@ public class DraftProcess {
         if (!hasStarted()) {
             ping.append("have the captains alternate choosing teammates in a ")
                     .append("`1-2-1-1-...` pattern. Approve of a maplist ")
-                    .append("using `/").append(draft.getPrefix())
-                    .append(" genmaps`, and begin the draft when ")
-                    .append("everyone is ready. The captains will reset the ")
-                    .append("team selection as needed.");
+                    .append("using `/").append(draft.getPrefix()).append(" ")
+                    .append("genmaps`, and begin the draft when everyone ")
+                    .append("is ready. __If any problems occur with teams, ")
+                    .append("captains should reset the teams!__");
         } else {
-            ping.append("make sure everyone is on a team before continuing.");
+            ping.append("make sure everyone is on a team before continuing!");
         }
 
         return ping.toString();
@@ -259,8 +259,8 @@ public class DraftProcess {
                                         "I've attached the interface to the pins! "
                                                 + "Make sure captains click `Begin "
                                                 + "Draft` before you actually start "
-                                                + "playing though, __otherwise no "
-                                                + "one will get any points__ "
+                                                + "playing though, **otherwise no "
+                                                + "one will get any points.** "
                                                 + "<:Wahoozones:766479174839173200>").queue();
                             });
         }
