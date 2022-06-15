@@ -643,8 +643,6 @@ public class Draft extends Section implements Command {
             statement = "will be subbing";
         }
 
-        numInactive--;
-
         getDraftChannel().sendMessage(
                 player.getAsMention(playerID) + " " + statement + " "
                 + "for this draft. __Refresh the pinned interface "
