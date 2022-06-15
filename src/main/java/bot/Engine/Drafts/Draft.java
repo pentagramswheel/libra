@@ -553,7 +553,7 @@ public class Draft extends Section implements Command {
             determineCaptains(playerID);
         }
 
-        numInactive--;
+        numInactive++;
         return true;
     }
 
@@ -568,8 +568,7 @@ public class Draft extends Section implements Command {
         if (subOut(bc, playerID, foundPlayer,
                 "You are not in this draft!",
                 "You have already been subbed out of the draft!")) {
-            String update = getSectionRole() + " sub requested for Queue "
-                    + getNumDraft();
+            String update = getSectionRole() + " +1 (sub)";
             sendResponse(bc, update, false);
 
             getDraftChannel().sendMessage(
@@ -594,8 +593,7 @@ public class Draft extends Section implements Command {
         } else if (subOut(sc, playerID, getPlayers().get(playerID),
                 "That player is not part of the draft.",
                 "That player has already been subbed out of the draft!")) {
-            String update = getSectionRole() + " sub requested for Queue "
-                    + getNumDraft() + " (see above draft after refreshing)";
+            String update = getSectionRole() + " +1 (sub, refresh the draft)";
             sendReply(sc, update, false);
 
             getDraftChannel().sendMessage(
