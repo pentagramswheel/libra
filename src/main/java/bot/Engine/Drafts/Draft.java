@@ -696,6 +696,10 @@ public class Draft extends Section implements Command {
                 sendReply(sc, update, false);
             }
 
+            getDraftChannel().sendMessage(
+                    "The draft has been ended by staff. Sorry about the "
+                            + "early stop! Feel free to request a new one!").queue();
+
             return true;
         }
     }
