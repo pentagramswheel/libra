@@ -627,6 +627,7 @@ public class Draft extends Section implements Command {
 
             player.setSubStatus(draftStarted());
             player.setActiveStatus(true);
+            numInactive--;
 
             if (teamOneContains(playerID)) {
                 getProcess().getTeam1().add(playerID, player);
@@ -699,6 +700,7 @@ public class Draft extends Section implements Command {
             getDraftChannel().sendMessage(
                     "The draft has been ended by staff. Sorry about the "
                             + "early stop! Feel free to request a new one!").queue();
+            log("A draft was forcibly ended.", false);
 
             return true;
         }
