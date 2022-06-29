@@ -29,7 +29,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 /**
- * @author  Wil Aquino, Turtle#1504
+ * @author  Wil Aquino
  * Date:    February 17, 2021
  * Project: Libra
  * Module:  Events.java
@@ -503,9 +503,6 @@ public class Events extends ListenerAdapter {
             case "help":
                 printTroubleshootString(sc);
                 break;
-            case "profile":
-                sc.reply("This command has not been implemented yet.").queue();
-                break;
             case "cyclescalc":
                 PointsCalculator calculator = new PointsCalculator();
                 calculator.runCmd(sc);
@@ -517,10 +514,9 @@ public class Events extends ListenerAdapter {
                 break;
         }
 
-        switch (subGroup) {
-            case "profile":
-                Profile profile = new Profile();
-                profile.runCmd(sc);
+        if (subGroup.equals("profile")) {
+            Profile profile = new Profile();
+            profile.runCmd(sc);
         }
     }
 
@@ -531,26 +527,27 @@ public class Events extends ListenerAdapter {
     private void parseSectionCommands(SlashCommandEvent sc) {
         Member author = sc.getMember();
         String prefix = sc.getName();
-        String subGroup = sc.getSubcommandGroup();
         String subCmd = sc.getSubcommandName();
         List<OptionMapping> args = sc.getOptions();
-        if (subGroup == null) {
-            subGroup = "";
-        }
         if (subCmd == null) {
             subCmd = "";
         }
 
         TreeMap<Integer, Draft> drafts;
         ArrayHeapMinPQ<Integer> queue;
+        String leaderboardLink;
         switch (prefix) {
             case "lp":
                 drafts = lpDrafts;
                 queue = lpQueue;
+                leaderboardLink =
+                        "https://docs.google.com/spreadsheets/d/13_ndOyR7MDpgNk_MektNE1Mc6hW2wwctZieWCQ6ex_M/edit?usp=sharing";
                 break;
             default:
                 drafts = ioDrafts;
                 queue = ioQueue;
+                leaderboardLink =
+                        "https://docs.google.com/spreadsheets/d/1_Onv35V74U5SsODdkSMBqLVCwbkW6damsHzVoz1qWEg/edit?usp=sharing";
                 break;
         }
 
@@ -574,6 +571,9 @@ public class Events extends ListenerAdapter {
                             notInAnotherDraft(sc, numGenerator, drafts));
                     maps.runCmd(sc);
                 }
+                break;
+            case "leaderboard":
+                sc.reply(leaderboardLink).queue();
                 break;
             case "startdraft":
                 if (notInAnotherDraft(sc, null, drafts) == null) {

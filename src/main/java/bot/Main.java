@@ -45,24 +45,57 @@ public class Main {
 
         // profile commands
         SubcommandGroupData profile = new SubcommandGroupData("profile",
-                "Finds profile information on a player within MIT.");
-        SubcommandData create = new SubcommandData("create", "Creates a new profile for yourself.");
-        SubcommandData delete = new SubcommandData("delete", "Deletes your profile.");
-        SubcommandData view = new SubcommandData("view", "View your own or someone else's profile.");
-        SubcommandData edit = new SubcommandData("edit", "Edits your profile.");
-        OptionData person  = new OptionData(
-                OptionType.USER, "person", "The user that you wish to view. Leave blank to view your own.", false);
-        view.addOptions(person);
-        OptionData nickname  = new OptionData(
-                OptionType.STRING, "nickname", "Your preferred nickname.", false);
-        OptionData pronoun  = new OptionData(
-                OptionType.STRING, "pronoun", "Your preferred pronoun(s).", false);
-        OptionData playstyle  = new OptionData(
-                OptionType.STRING, "playstyle", "Your preferred play style. Examples: Slayer, Skirmisher, Support, Anchor, Flex.", false);
-        OptionData weapon  = new OptionData(
-                OptionType.STRING, "weapon", "Your preferred weapon(s).", false);
-        edit.addOptions(nickname, pronoun, playstyle, weapon);
-        profile.addSubcommands(create, delete, view, edit);
+                "Finds or enters information about a player within MIT.");
+        SubcommandData fc = new SubcommandData("fc",
+                "Creates your profile by adding your friend code to it.");
+        SubcommandData view = new SubcommandData("genmaps",
+                "Looks up the profile of another user, if provided.");
+        SubcommandData nickname = new SubcommandData("nickname",
+                "Modifies the nickname of your profile.");
+        SubcommandData rank = new SubcommandData("rank",
+                "Modifies the average rank of your profile.");
+        SubcommandData team = new SubcommandData("team",
+                "Modifies the competitive team of your profile.");
+        SubcommandData playstyle = new SubcommandData("playstyle",
+                "Modifies the playstyle of your profile.");
+        SubcommandData weapons = new SubcommandData("weapons",
+                "Modifies the main weapons of your profile.");
+        SubcommandData delete = new SubcommandData("delete",
+                "Deletes your profile.");
+
+        fc.addOptions(new OptionData(
+                OptionType.STRING, "code", "Your friend code", true));
+        view.addOptions(new OptionData(
+                OptionType.STRING, "player", "The player to look up", false));
+        nickname.addOptions(new OptionData(
+                OptionType.STRING, "name", "Your nickname", true));
+
+        OptionData rankChoices = new OptionData(
+                OptionType.STRING, "rank", "Your average rank", true);
+        String[] ranks = {"C", "B", "A", "S", "S+", "X 2000",
+                "X 2100-2200", "X 2300-2400", "X2500-2600", "X 2700+"};
+        for (int i = 1; i <= ranks.length; i++) {
+            rankChoices.addChoice(ranks[i], i);
+        }
+        rank.addOptions(rankChoices);
+
+        team.addOptions(new OptionData(
+                OptionType.STRING, "name", "Your team's name", true));
+
+        OptionData playstyleChoices = new OptionData(
+                OptionType.STRING, "position", "Your playstyle", true);
+        String[] playstyles = {"Slayer", "Skirmisher", "Anchor", "Flex"};
+        for (int i = 1; i <= playstyles.length; i++) {
+            playstyleChoices.addChoice(playstyles[i], i);
+        }
+        playstyle.addOptions(playstyleChoices);
+
+        weapons.addOptions(new OptionData(
+                OptionType.STRING, "pool", "Your weapon pool", true));
+
+        profile.addSubcommands(fc, view, nickname,
+                rank, team, playstyle, weapons,
+                delete);
 
         // section commands
         CommandData lp = new CommandData("lp",
@@ -72,12 +105,16 @@ public class Main {
 
         SubcommandData genmaps = new SubcommandData("genmaps",
                 "Generates a set map list.");
+        SubcommandData leaderboard = new SubcommandData("leaderboard",
+                "Retrieves the leaderboard for the section.");
+
         SubcommandData startdraft = new SubcommandData("startdraft",
                 "Requests an automatic draft with up to 8 players.");
         SubcommandData forcesub = new SubcommandData("forcesub",
                 "Forces a player within a draft to become a sub.");
         SubcommandData forceend = new SubcommandData("forceend",
                 "Forces a draft to end.");
+
         SubcommandData log = new SubcommandData("log",
                 "Manually reports draft scores for up to four players.");
         SubcommandData sub = new SubcommandData("sub",
@@ -111,10 +148,10 @@ public class Main {
 
         OptionData leaderboardAward = new OptionData(OptionType.INTEGER, "role",
                 "The leaderboard role to give", true);
-        leaderboardAward.addChoice("1st Place", 1);
-        leaderboardAward.addChoice("2nd Place", 2);
-        leaderboardAward.addChoice("3rd Place", 3);
-        leaderboardAward.addChoice("Top 10", 4);
+        String[] leaderboardChoices = {"1st Place", "2nd Place", "3rd Place", "Top 10"};
+        for (int i = 1; i <= leaderboardChoices.length; i++) {
+            leaderboardAward.addChoice(leaderboardChoices[i], i);
+        }
         award.addOptions(leaderboardAward);
 
         // adding user parameters to any commands
@@ -147,13 +184,15 @@ public class Main {
                 cycleCalculate, draftdoc);
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
-                genmaps, startdraft, forcesub, forceend,
-                log, sub, undo, add, deny, grad,
-                award);
+                genmaps, leaderboard,
+                startdraft, forcesub, forceend,
+                log, sub, undo,
+                add, deny, grad, award);
         io.addSubcommands(
-                genmaps, startdraft, forcesub, forceend,
-                log, sub, undo, add, deny, grad,
-                award);
+                genmaps, leaderboard,
+                startdraft, forcesub, forceend,
+                log, sub, undo,
+                add, deny, grad, award);
 
         jda.updateCommands().addCommands(mit, lp, io).queue();
     }
