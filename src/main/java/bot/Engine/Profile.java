@@ -1,6 +1,7 @@
 package bot.Engine;
 
 import bot.Config;
+import bot.Engine.Cycles.PlayerStats;
 import bot.Tools.Command;
 import bot.Tools.GoogleSheetsAPI;
 
@@ -10,9 +11,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
- * @author Turtle#1504
+ * @author Wil Aquino
  * Date: May 7, 2022
  * Project: Libra
  * Module: Profile.java
@@ -30,15 +32,6 @@ public class Profile implements Command {
         spreadsheetID = Config.mitProfilesSheetID;
     }
 
-    private GoogleSheetsAPI getSpreadsheet() {
-        try {
-            return new GoogleSheetsAPI(spreadsheetID);
-        } catch (GeneralSecurityException | IOException e) {
-            log("The MIT profiles spreadsheet could not load.", true);
-            return null;
-        }
-    }
-
     /**
      * Runs the profile command.
      * @param sc the user's inputted command.
@@ -50,13 +43,39 @@ public class Profile implements Command {
             subCmd = "";
         }
 
-        // tab name of the spreadsheet
-        String tab = "'Profiles'";
-        List<OptionMapping> args = sc.getOptions();
+        try {
+            GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
 
-        switch (subCmd) {
-            case "create":
-                break;
+            // tab name of the spreadsheet
+            String tab = "'Profiles'";
+
+            TreeMap<Object, Object> data = link.readSection(sc, tab);
+            if (data == null) {
+                throw new IOException("The spreadsheet was empty.");
+            }
+            List<OptionMapping> args = sc.getOptions();
+
+            switch (subCmd) {
+                case "fc":
+                    break;
+                case "view":
+                    break;
+                case "nickname":
+                    break;
+                case "rank":
+                    break;
+                case "team":
+                    break;
+                case "playstyle":
+                    break;
+                case "weapons":
+                    break;
+                case "delete":
+                    break;
+            }
+        } catch (IOException | GeneralSecurityException e) {
+            sendResponse(sc, "The spreadsheet could not load.", true);
+            log("The MIT profiles spreadsheet could not load.", true);
         }
     }
 }

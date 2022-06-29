@@ -48,7 +48,7 @@ public class Main {
                 "Finds or enters information about a player within MIT.");
         SubcommandData fc = new SubcommandData("fc",
                 "Creates your profile by adding your friend code to it.");
-        SubcommandData view = new SubcommandData("genmaps",
+        SubcommandData view = new SubcommandData("view",
                 "Looks up the profile of another user, if provided.");
         SubcommandData nickname = new SubcommandData("nickname",
                 "Modifies the nickname of your profile.");
@@ -71,11 +71,11 @@ public class Main {
                 OptionType.STRING, "name", "Your nickname", true));
 
         OptionData rankChoices = new OptionData(
-                OptionType.STRING, "rank", "Your average rank", true);
+                OptionType.INTEGER, "rank", "Your average rank", true);
         String[] ranks = {"C", "B", "A", "S", "S+", "X 2000",
-                "X 2100-2200", "X 2300-2400", "X2500-2600", "X 2700+"};
+                "X 2100-2200", "X 2300-2400", "X 2500-2600", "X 2700+"};
         for (int i = 1; i <= ranks.length; i++) {
-            rankChoices.addChoice(ranks[i], i);
+            rankChoices.addChoice(ranks[i - 1], i);
         }
         rank.addOptions(rankChoices);
 
@@ -83,10 +83,10 @@ public class Main {
                 OptionType.STRING, "name", "Your team's name", true));
 
         OptionData playstyleChoices = new OptionData(
-                OptionType.STRING, "position", "Your playstyle", true);
+                OptionType.INTEGER, "position", "Your playstyle", true);
         String[] playstyles = {"Slayer", "Skirmisher", "Anchor", "Flex"};
         for (int i = 1; i <= playstyles.length; i++) {
-            playstyleChoices.addChoice(playstyles[i], i);
+            playstyleChoices.addChoice(playstyles[i - 1], i);
         }
         playstyle.addOptions(playstyleChoices);
 
@@ -150,7 +150,7 @@ public class Main {
                 "The leaderboard role to give", true);
         String[] leaderboardChoices = {"1st Place", "2nd Place", "3rd Place", "Top 10"};
         for (int i = 1; i <= leaderboardChoices.length; i++) {
-            leaderboardAward.addChoice(leaderboardChoices[i], i);
+            leaderboardAward.addChoice(leaderboardChoices[i - 1], i);
         }
         award.addOptions(leaderboardAward);
 
