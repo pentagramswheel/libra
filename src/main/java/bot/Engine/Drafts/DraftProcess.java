@@ -77,16 +77,14 @@ public class DraftProcess {
     }
 
     /**
-     * Retrieves team 1.
-     * @return said team.
+     * Retrieves Team 1.
      */
     public DraftTeam getTeam1() {
         return team1;
     }
 
     /**
-     * Retrieves team 2.
-     * @return said team.
+     * Retrieves Team 2.
      */
     public DraftTeam getTeam2() {
         return team2;
@@ -101,7 +99,6 @@ public class DraftProcess {
 
     /**
      * Retrieves the message ID of this teams interface.
-     * @return said ID.
      */
     public String getMessageID() {
         return messageID;
@@ -109,7 +106,6 @@ public class DraftProcess {
 
     /**
      * Retrieves the teams interface of the draft.
-     * @return said message.
      */
     public Message getMessage() {
         MessageChannel channel =
@@ -119,7 +115,6 @@ public class DraftProcess {
 
     /**
      * Retrieves the caption ping of the draft process.
-     * @return said caption.
      */
     private String getPing() {
         StringBuilder ping = new StringBuilder();
@@ -170,7 +165,7 @@ public class DraftProcess {
     /**
      * Gets the team members and formats it into mentionable text.
      * @param team the draft team to use.
-     * @return the team's mentions of the players
+     * @return the team's mentions of the players.
      */
     public String buildTeamString(DraftTeam team) {
         StringBuilder teamBuilder = new StringBuilder();

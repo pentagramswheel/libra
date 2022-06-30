@@ -156,14 +156,12 @@ public class AutoLog extends Section {
      * @param offset an index to offset the type arrays, based on the
      *               current team.
      * @param link a connection to the spreadsheet.
-     * @param tab the name of the spreadsheet tab to edit.
      * @param data a map of all rows of the spreadsheet.
      */
     private void updateSpreadsheet(ManualLog log, Draft draft,
                                    ButtonClickEvent bc, DraftTeam team,
                                    int[] playerTypes, int[] errorsFound, int offset,
-                                   GoogleSheetsAPI link, String tab,
-                                   TreeMap<Object, Object> data) {
+                                   GoogleSheetsAPI link, TreeMap<Object, Object> data) {
         int i = 0;
         for (Map.Entry<String, DraftPlayer> player : team.getPlayers().entrySet()) {
             String currID = player.getKey();
@@ -181,13 +179,11 @@ public class AutoLog extends Section {
             if (data.containsKey(currID)) {
                 PlayerStats stats = (PlayerStats) data.get(currID);
                 errorsFound[offset + i] = log.updateUser(
-                        cmd, gamesPlayed, gameWins,
-                        user, link, tab, stats);
+                        cmd, gamesPlayed, gameWins, user, link, stats);
                 playerTypes[offset + i] = 0;
             } else {
                 errorsFound[offset + i] = log.addUser(
-                        cmd, gamesPlayed, gameWins,
-                        user, link, tab);
+                        cmd, gamesPlayed, gameWins, user, link);
                 playerTypes[offset + i] = 1;
             }
 
@@ -204,10 +200,7 @@ public class AutoLog extends Section {
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
 
-            // tab name of the spreadsheet
-            String tab = "'Current Cycle'";
-
-            TreeMap<Object, Object> data = link.readSection(bc, tab);
+            TreeMap<Object, Object> data = link.readSection(bc, CYCLES_TAB);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
@@ -221,15 +214,15 @@ public class AutoLog extends Section {
 
             ManualLog log = new ManualLog(getPrefix());
             updateSpreadsheet(log, draft, bc, team1, playerTypes,
-                    errorsFound, 0, link, tab, data);
+                    errorsFound, 0, link, data);
             updateSpreadsheet(log, draft, bc, team2, playerTypes,
-                    errorsFound, team1.getPlayers().size(), link, tab, data);
+                    errorsFound, team1.getPlayers().size(), link, data);
 
             sendReport(log, draft, bc, team1, team2, playerTypes, errorsFound);
             draft.log(totalSize + " " + getPrefix().toUpperCase()
                     + " draft player(s) were automatically processed.", false);
         } catch (IOException | GeneralSecurityException e) {
-            draft.sendResponse(bc, "The spreadsheet could not load.", true);
+            draft.sendResponse(bc, "The leaderboard could not load.", true);
             draft.log("The " + getSection()
                     + " cycles spreadsheet could not load.", true);
         }

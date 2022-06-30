@@ -127,14 +127,12 @@ public class Undo extends ManualLog implements Command {
      * @param args the arguments of the command.
      * @param link a connection to the spreadsheet.
      * @param user the user to revert the stats of.
-     * @param tab the name of the spreadsheet tab to edit.
      * @param stats the stats of the player.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
     private int undoUser(String[] args, GoogleSheetsAPI link,
-                         String user, String tab,
-                         PlayerStats stats) {
+                         String user, PlayerStats stats) {
         String userID = user.substring(2, user.length() - 1);
 
         try {
@@ -167,9 +165,9 @@ public class Undo extends ManualLog implements Command {
                 gameWinrate = (double) gameWins / gamesPlayed;
             }
 
-            String updateRange = link.buildRange(tab,
-                    "B", stats.getDraftPosition(),
-                    "K", stats.getDraftPosition());
+            String updateRange = link.buildRange(CYCLES_TAB,
+                    CYCLES_START_COLUMN, stats.getSpreadsheetPosition(),
+                    CYCLES_END_COLUMN, stats.getSpreadsheetPosition());
             ValueRange newRow = link.buildRow(Arrays.asList(
                     stats.getName(), stats.getNickname(),
                     setWins, setLosses, setsPlayed, setWinrate,
@@ -197,10 +195,7 @@ public class Undo extends ManualLog implements Command {
             File undoFile = new File(
                     "load" + getPrefix().toUpperCase() + ".txt");
 
-            // tab name of the spreadsheet
-            String tab = "'Current Cycle'";
-
-            TreeMap<Object, Object> data = link.readSection(sc, tab);
+            TreeMap<Object, Object> data = link.readSection(sc, CYCLES_TAB);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
@@ -222,7 +217,7 @@ public class Undo extends ManualLog implements Command {
                         2, messageArgs[i].length() - 1);
                 PlayerStats stats = (PlayerStats) data.get(userID);
                 errorsFound[i - 3] = undoUser(messageArgs, link,
-                        messageArgs[i], tab, stats);
+                        messageArgs[i], stats);
             }
 
             sendReport(sc, messageArgs, userArgs, errorsFound);

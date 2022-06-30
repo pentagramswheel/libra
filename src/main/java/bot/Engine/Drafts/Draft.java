@@ -118,7 +118,6 @@ public class Draft extends Section implements Command {
 
     /**
      * Retrieves which draft number this is.
-     * @return said number.
      */
     public int getNumDraft() {
         return numDraft;
@@ -147,7 +146,6 @@ public class Draft extends Section implements Command {
 
     /**
      * Retrieves the field for executing the draft.
-     * @return said execution.
      */
     public DraftProcess getProcess() {
         return draftProcess;
@@ -155,7 +153,6 @@ public class Draft extends Section implements Command {
 
     /**
      * Retrieves the players of the draft.
-     * @return said players.
      */
     public TreeMap<String, DraftPlayer> getPlayers() {
         return players;
@@ -164,7 +161,6 @@ public class Draft extends Section implements Command {
     /**
      * Retrieves the draft chat channel which this draft
      * is occurring in.
-     * @return said channel.
      */
     public TextChannel getDraftChannel() {
         return draftChat;
@@ -173,7 +169,6 @@ public class Draft extends Section implements Command {
     /**
      * Retrieves the request interface of the draft.
      * @param interaction the user interaction calling this method.
-     * @return said message.
      */
     public Message getMessage(GenericInteractionCreateEvent interaction) {
         MessageChannel channel =
@@ -190,7 +185,6 @@ public class Draft extends Section implements Command {
 
     /**
      * Retrieves this draft's amount of map generations.
-     * @return said amount.
      */
     public int getMapGens() {
         return mapGens;

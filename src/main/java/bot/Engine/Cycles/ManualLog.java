@@ -146,18 +146,23 @@ public class ManualLog extends Section implements Command {
      * @param gameWins the total games won.
      * @param user the player to update the stats of.
      * @param link a connection to the spreadsheet.
-     * @param tab the name of the spreadsheet tab to edit.
      * @param stats the stats of the player.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      */
     public int updateUser(String cmd, int gamesPlayed, int gameWins,
-                          Member user, GoogleSheetsAPI link, String tab,
+                          Member user, GoogleSheetsAPI link,
                           PlayerStats stats) {
         try {
-            String userTag = user.getUser().getAsTag();
-
             int gameLosses = gamesPlayed - gameWins;
+
+            gameWins += stats.getGamesWon();
+            gameLosses += stats.getGamesLost();
+            gamesPlayed = gameWins + gameLosses;
+            double gameWinrate = 0.0;
+            if (gamesPlayed > 0) {
+                gameWinrate =  (double) gameWins / gamesPlayed;
+            }
 
             int setWins = stats.getSetWins();
             int setLosses = stats.getSetLosses();
@@ -176,21 +181,13 @@ public class ManualLog extends Section implements Command {
                 setWinrate = (double) setWins / setsPlayed;
             }
 
-            gameWins += stats.getGamesWon();
-            gameLosses += stats.getGamesLost();
-            gamesPlayed = gameWins + gameLosses;
-            double gameWinrate = 0.0;
-            if (gamesPlayed > 0) {
-               gameWinrate =  (double) gameWins / gamesPlayed;
-            }
-
-            String updateRange = link.buildRange(tab,
-                    "B", stats.getDraftPosition(),
-                    "K", stats.getDraftPosition());
+            String updateRange = link.buildRange(CYCLES_TAB,
+                    CYCLES_START_COLUMN, stats.getSpreadsheetPosition(),
+                    CYCLES_END_COLUMN, stats.getSpreadsheetPosition());
             ValueRange newRow = link.buildRow(Arrays.asList(
-                            userTag, user.getEffectiveName(),
-                            setWins, setLosses, setsPlayed, setWinrate,
-                            gameWins, gameLosses, gamesPlayed, gameWinrate));
+                    user.getUser().getAsTag(), user.getEffectiveName(),
+                    setWins, setLosses, setsPlayed, setWinrate,
+                    gameWins, gameLosses, gamesPlayed, gameWinrate));
             link.updateRange(updateRange, newRow);
 
             return 0;
@@ -208,17 +205,14 @@ public class ManualLog extends Section implements Command {
      * @param gameWins the total games won.
      * @param user the player to update the stats of.
      * @param link a connection to the spreadsheet.
-     * @param tab the name of the spreadsheet tab to edit.
      * @return 0 if the player could be found in the spreadsheet.
      *         1 otherwise.
      *
      * Note: Users will be added at the next EMPTY row in the spreadsheet.
      */
-    public int addUser(String cmd, int gamesPlayed, int gameWins, Member user,
-                       GoogleSheetsAPI link, String tab) {
+    public int addUser(String cmd, int gamesPlayed, int gameWins,
+                       Member user, GoogleSheetsAPI link) {
         try {
-            String userTag = user.getUser().getAsTag();
-
             int gameLosses = gamesPlayed - gameWins;
             double gameWinrate = 0.0;
             if (gamesPlayed > 0) {
@@ -241,10 +235,10 @@ public class ManualLog extends Section implements Command {
             }
 
             ValueRange newRow = link.buildRow(Arrays.asList(
-                    user.getId(), userTag, user.getEffectiveName(),
+                    user.getId(), user.getUser().getAsTag(), user.getEffectiveName(),
                     setWins, setLosses, setsPlayed, setWinrate,
                     gameWins, gameLosses, gamesPlayed, gameWinrate));
-            link.appendRow(tab, newRow);
+            link.appendRow(CYCLES_TAB, newRow);
 
             return 0;
         } catch (IOException e) {
@@ -261,16 +255,14 @@ public class ManualLog extends Section implements Command {
     @Override
     public void runCmd(SlashCommandEvent sc) {
         sc.deferReply().queue();
+
         String cmd = sc.getSubcommandName();
         List<OptionMapping> args = sc.getOptions();
 
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
 
-            // tab name of the spreadsheet
-            String tab = "'Current Cycle'";
-
-            TreeMap<Object, Object> data = link.readSection(sc, tab);
+            TreeMap<Object, Object> data = link.readSection(sc, CYCLES_TAB);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
             }
@@ -285,12 +277,12 @@ public class ManualLog extends Section implements Command {
                     PlayerStats stats = (PlayerStats) data.get(user.getId());
                     errorsFound[i] = updateUser(
                             cmd, getGamesPlayed(args), getGamesWon(args),
-                            user, link, tab, stats);
+                            user, link, stats);
                     playerTypes[i] = 0;
                 } else {
                     errorsFound[i] = addUser(
                             cmd, getGamesPlayed(args), getGamesWon(args),
-                            user, link, tab);
+                            user, link);
                     playerTypes[i] = 1;
                 }
             }
@@ -299,7 +291,7 @@ public class ManualLog extends Section implements Command {
             log(userArgs.size() + " " + getPrefix().toUpperCase()
                     + " draft player(s) were manually processed.", false);
         } catch (IOException | GeneralSecurityException e) {
-            sendResponse(sc, "The spreadsheet could not load.", true);
+            sendResponse(sc, "The leaderboard could not load.", true);
             log("The " + getSection()
                     + " cycles spreadsheet could not load.", true);
         }

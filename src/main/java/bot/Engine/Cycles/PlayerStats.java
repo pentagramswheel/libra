@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class PlayerStats {
 
-    /** Row position within their associated draft spreadsheet. */
-    private int draftPosition;
+    /** Row within their associated draft spreadsheet. */
+    private int numRow;
 
     /** The formal name of the player. */
     private String name;
@@ -46,7 +46,8 @@ public class PlayerStats {
     public PlayerStats(GenericInteractionCreateEvent interaction,
                        int pos, List<Object> row) {
         try {
-            draftPosition = pos;
+            numRow = pos;
+
             name = row.get(0).toString();
             nickname = row.get(1).toString();
             if (row.size() > 2) {
@@ -67,15 +68,13 @@ public class PlayerStats {
     /**
      * Retrieve the row number of the player's stats
      * in their associated draft spreadsheet.
-     * @return said row.
      */
-    public int getDraftPosition() {
-        return draftPosition;
+    public int getSpreadsheetPosition() {
+        return numRow;
     }
 
     /**
      * Retrieve the name of the player on Discord.
-     * @return said name.
      */
     public String getName() {
         return name;
@@ -83,7 +82,6 @@ public class PlayerStats {
 
     /**
      * Retrieve the nickname of the player on Discord.
-     * @return said nickname.
      */
     public String getNickname() {
         return nickname;
@@ -91,7 +89,6 @@ public class PlayerStats {
 
     /**
      * Retrieve the player's amount of won sets.
-     * @return said wins.
      */
     public int getSetWins() {
         return setWins;
@@ -99,7 +96,6 @@ public class PlayerStats {
 
     /**
      * Retrieve the player's amount of lost sets.
-     * @return said losses.
      */
     public int getSetLosses() {
         return setLosses;
@@ -107,7 +103,6 @@ public class PlayerStats {
 
     /**
      * Retrieve the player's amount of won games.
-     * @return said wins.
      */
     public int getGamesWon() {
         return gamesWon;
@@ -115,7 +110,6 @@ public class PlayerStats {
 
     /**
      * Retrieve the player's amount of lost games.
-     * @return said losses.
      */
     public int getGamesLost() {
         return gamesLost;

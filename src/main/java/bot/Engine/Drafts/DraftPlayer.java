@@ -57,7 +57,6 @@ public class DraftPlayer {
 
     /**
      * Retrieves the name of the player.
-     * @return said name.
      */
     public String getName() {
         return name;
@@ -66,7 +65,6 @@ public class DraftPlayer {
     /**
      * Retrieves the player as a ping.
      * @param id the Discord ID of the player.
-     * @return said ping.
      */
     public String getAsMention(String id) {
         return String.format("<@%s>", id);
@@ -165,7 +163,6 @@ public class DraftPlayer {
 
     /**
      * Retrieves the amount of times this player has subbed out.
-     * @return said times.
      */
     public int getSubAmount() {
         return subs;
@@ -173,7 +170,6 @@ public class DraftPlayer {
 
     /**
      * Retrieves the player's draft wins.
-     * @return said wins.
      */
     public int getWins() {
         return matchWins;
@@ -181,7 +177,6 @@ public class DraftPlayer {
 
     /**
      * Retrieves the player's draft losses.
-     * @return said losses.
      */
     public int getLosses() {
         return matchLosses;
