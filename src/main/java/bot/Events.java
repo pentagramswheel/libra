@@ -513,6 +513,10 @@ public class Events extends ListenerAdapter {
                         "https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing";
                 sc.reply(docLink).queue();
                 break;
+            case "qprofile":
+                Profile profile = new Profile();
+                profile.runCmd(sc);
+                break;
         }
 
         if (subGroup.equals("profile")) {

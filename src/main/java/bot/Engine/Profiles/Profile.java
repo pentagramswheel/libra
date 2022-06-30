@@ -62,9 +62,57 @@ public class Profile implements Command {
         if (args.isEmpty()) {
             return null;
         } else if (isMember) {
-            return args.get(0).getAsMember().getId();
+            return args.remove(0).getAsMember().getId();
         } else {
-            return args.get(0).getAsString();
+            return args.remove(0).getAsString();
+        }
+    }
+
+    /**
+     * Quickly registers a new player into the database by
+     * loading multiple parameters
+     * @param sc the user's inputted command.
+     */
+    private void quickRegister(SlashCommandEvent sc) {
+        sc.deferReply(true).queue();
+
+        List<OptionMapping> args = sc.getOptions();
+        String fc = getParameter(args, false);
+        String playstyle = getParameter(args, false);
+        String weapons = getParameter(args, false);
+        String rank = getParameter(args, false);
+
+        try {
+            GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
+            TreeMap<Object, Object> database = link.readSection(sc, TAB);
+            if (database == null) {
+                sendResponse(sc, "The profiles database could not load.", false);
+                return;
+            }
+
+            Member user = sc.getMember();
+            if (!fc.matches("\\d{4}-\\d{4}-\\d{4}")) {
+                sendResponse(sc,
+                        "Friend code should be in the format: "
+                                + "`8888-8888-8888`", false);
+            } else if (database.containsKey(user.getId())) {
+                sendResponse(sc,
+                        "You cannot use `qprofile`, because your profile "
+                                + "already exists. Use the other `profile` "
+                                + "commands as needed.", false);
+            } else {
+                String discordTag = user.getUser().getAsTag();
+
+                ValueRange newRow = link.buildRow(Arrays.asList(
+                        user.getId(), discordTag, user.getEffectiveName(),
+                        fc, playstyle, weapons, rank, "N/A"));
+                link.appendRow(TAB, newRow);
+
+                sendResponse(sc, "Your MIT profile has been created!", false);
+                log("Profile created for " + discordTag + ".", false);
+            }
+        } catch (IOException | GeneralSecurityException e) {
+            log("The profiles spreadsheet could not load.", true);
         }
     }
 
@@ -364,6 +412,9 @@ public class Profile implements Command {
         List<OptionMapping> args = sc.getOptions();
 
         switch (subCmd) {
+            case "qprofile":
+                quickRegister(sc);
+                break;
             case "fc":
                 register(sc, getParameter(args, false));
                 break;
