@@ -186,7 +186,7 @@ public class Main {
 
         // implementing commands
         mit.addSubcommands(status, help,
-                cycleCalculate, draftdoc);
+                cycleCalculate, draftdoc, qprofile);
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
                 genmaps, leaderboard,
