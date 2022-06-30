@@ -541,13 +541,13 @@ public class Events extends ListenerAdapter {
                 drafts = lpDrafts;
                 queue = lpQueue;
                 leaderboardLink =
-                        "https://docs.google.com/spreadsheets/d/13_ndOyR7MDpgNk_MektNE1Mc6hW2wwctZieWCQ6ex_M/edit?usp=sharing";
+                        "https://docs.google.com/spreadsheets/d/1_Onv35V74U5SsODdkSMBqLVCwbkW6damsHzVoz1qWEg/edit?usp=sharing";
                 break;
             default:
                 drafts = ioDrafts;
                 queue = ioQueue;
                 leaderboardLink =
-                        "https://docs.google.com/spreadsheets/d/1_Onv35V74U5SsODdkSMBqLVCwbkW6damsHzVoz1qWEg/edit?usp=sharing";
+                        "https://docs.google.com/spreadsheets/d/13_ndOyR7MDpgNk_MektNE1Mc6hW2wwctZieWCQ6ex_M/edit?usp=sharing";
                 break;
         }
 

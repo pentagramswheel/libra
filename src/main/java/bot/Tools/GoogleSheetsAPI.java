@@ -212,8 +212,6 @@ public class GoogleSheetsAPI {
         } catch (IOException e) {
             Logger logger = LoggerFactory.getLogger(this.getClass());
             logger.error("The data could not load.");
-            interaction.getHook().sendMessage(
-                    "The data could not load.").setEphemeral(true).queue();
         }
 
         return null;
@@ -243,6 +241,7 @@ public class GoogleSheetsAPI {
 
                 BatchUpdateSpreadsheetRequest batchReq = new BatchUpdateSpreadsheetRequest();
                 batchReq.setRequests(Collections.singletonList(req));
+
                 getSheetsService().spreadsheets()
                         .batchUpdate(getSpreadsheetID(), batchReq).execute();
                 break;
@@ -374,5 +373,29 @@ public class GoogleSheetsAPI {
         getSheet().update(getSpreadsheetID(), range, values)
                 .setValueInputOption("USER_ENTERED")
                 .setIncludeValuesInResponse(true).execute();
+    }
+
+    /**
+     * Deletes a row of values within a spreadsheet.
+     * @param tab the name of the spreadsheet tab to delete from.
+     * @param row the numbered row to delete.
+     */
+    public void deleteRow(String tab, int row)
+            throws IOException, GeneralSecurityException {
+        DeleteDimensionRequest deleteReq = new DeleteDimensionRequest();
+        deleteReq.setRange(new DimensionRange()
+                .setSheetId(getSheetID(tab))
+                .setDimension("ROWS")
+                .setStartIndex(row - 1)
+                .setEndIndex(row));
+
+        Request req = new Request();
+        req.setDeleteDimension(deleteReq);
+
+        BatchUpdateSpreadsheetRequest batchReq = new BatchUpdateSpreadsheetRequest();
+        batchReq.setRequests(Collections.singletonList(req));
+
+        getSheetsService().spreadsheets()
+                .batchUpdate(getSpreadsheetID(), batchReq).execute();
     }
 }

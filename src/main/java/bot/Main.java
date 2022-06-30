@@ -50,8 +50,6 @@ public class Main {
                 "Creates your profile by adding your friend code to it.");
         SubcommandData view = new SubcommandData("view",
                 "Looks up the profile of another user, if provided.");
-        SubcommandData nickname = new SubcommandData("nickname",
-                "Modifies the nickname of your profile.");
         SubcommandData rank = new SubcommandData("rank",
                 "Modifies the average rank of your profile.");
         SubcommandData team = new SubcommandData("team",
@@ -66,34 +64,32 @@ public class Main {
         fc.addOptions(new OptionData(
                 OptionType.STRING, "code", "Your friend code", true));
         view.addOptions(new OptionData(
-                OptionType.STRING, "player", "The player to look up", false));
-        nickname.addOptions(new OptionData(
-                OptionType.STRING, "name", "Your nickname", true));
-
-        OptionData rankChoices = new OptionData(
-                OptionType.INTEGER, "rank", "Your average rank", true);
-        String[] ranks = {"C", "B", "A", "S", "S+", "X 2000",
-                "X 2100-2200", "X 2300-2400", "X 2500-2600", "X 2700+"};
-        for (int i = 1; i <= ranks.length; i++) {
-            rankChoices.addChoice(ranks[i - 1], i);
-        }
-        rank.addOptions(rankChoices);
-
-        team.addOptions(new OptionData(
-                OptionType.STRING, "name", "Your team's name", true));
+                OptionType.USER, "player", "The player to look up", false));
 
         OptionData playstyleChoices = new OptionData(
-                OptionType.INTEGER, "position", "Your playstyle", true);
-        String[] playstyles = {"Slayer", "Skirmisher", "Anchor", "Flex"};
+                OptionType.STRING, "position", "Your playstyle", true);
+        String[] playstyles = {"Slayer", "Skirmisher", "Support", "Anchor", "Flex"};
         for (int i = 1; i <= playstyles.length; i++) {
-            playstyleChoices.addChoice(playstyles[i - 1], i);
+            playstyleChoices.addChoice(playstyles[i - 1], playstyles[i - 1]);
         }
         playstyle.addOptions(playstyleChoices);
 
         weapons.addOptions(new OptionData(
                 OptionType.STRING, "pool", "Your weapon pool", true));
 
-        profile.addSubcommands(fc, view, nickname,
+        OptionData rankChoices = new OptionData(
+                OptionType.STRING, "rank", "Your average rank", true);
+        String[] ranks = {"C", "B", "A", "S", "S+", "X 2000",
+                "X 2100-2200", "X 2300-2400", "X 2500-2600", "X 2700+"};
+        for (int i = 1; i <= ranks.length; i++) {
+            rankChoices.addChoice(ranks[i - 1], ranks[i - 1]);
+        }
+        rank.addOptions(rankChoices);
+
+        team.addOptions(new OptionData(
+                OptionType.STRING, "name", "Your team's name", true));
+
+        profile.addSubcommands(fc, view,
                 rank, team, playstyle, weapons,
                 delete);
 
