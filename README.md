@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** May 25, 2022
+**Last Updated:** June 30, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -22,7 +22,7 @@
     - [Command](#command)
     - [Components](#components)
     - [FileHandler](#filehandler)
-    - [GoogleAPI](#googleapi)
+    - [GoogleSheetsAPI](#googlesheetsapi)
     - [SelectionMenuBuilder](#selectionmenubuilder)
   + [Engine](#engine)
     - [Add](#add)
@@ -40,12 +40,17 @@
     - [DraftTeam](#draftteam)
     - [MapGenerator](#mapgenerator)
     - [Undo](#undo)
+  + [Profiles (Engine)](#profiles-engine)
+    - [PlayerInfo](#playerinfo)
+    - [Profile](#profile)
 * [Persistence](#persistence)
 * [Licensing and Rights](#licensing-and-rights)
 
 
+
 ## Introduction
 Libra is a multi-functional Discord bot designed to handle many tasks, with respect to the Mulloway Institute of Turfing (MIT), a draft server for Nintendo's competitive shooter IP, Splatoon. Her main goal is to keep track of a player database, implement convenience features for running tournaments, and most importantly, host an automated draft system from beginning (queuing players) to end (reporting scores).
+
 
 
 ## How to Install
@@ -58,6 +63,7 @@ The main module to run is `Main.java` but to start the bot from the console, run
 javac *
 java src/main/java/bot/Main.java
 ```
+
 
 
 ## Command Usage
@@ -80,6 +86,7 @@ java src/main/java/bot/Main.java
 | lp/io award | Awards players within a MIT draft area with roles based on their leaderboard performance. | 1. `role` - the Discord role to award.<br />2. `players` - Discord users in the form of Discord pings. |
 
 ----
+
 
 
 ## Classes and Data Structures
@@ -192,16 +199,17 @@ A class which graduates a user in a section within MIT, processing the command `
 
 #### PlayerStats
 
-A class for storing information about a Discord user.
+A class for storing information about a player within MIT.
 
 ###### Instance Variables
-1. `int draftPosition` - the row position of the user's data within their associated draft spreadsheet.
-2. `String name` - the user's Discord tag.
-3. `String nickname` - the user's nickname on the server.
-4. `int setWins` - the user's amount of won sets in a cycle.
-5. `int setLosses` - the user's amount of lost sets in a cycle.
-6. `int gamesWon` - the user's amount of won games in a cycle.
-7. `int gamesLost` - the user's amount of lost games in a cycle.
+1. `int numRow` - the numbered row of the player's data within their associated draft spreadsheet.
+2. `String tag` - the player's Discord tag.
+3. `String nickname` - the player's nickname on the server.
+4. `String friendcode` - the player's Nintendo Switch friend code.
+5. `String playstyle` - the player's preferred playstyle in-game.
+6. `String weapons` - the player's preferred weapons in-game.
+7. `String rank` - the player's average rank in-game.
+8. `String team` - the player's competitive team, if any.
 
 ----
 
@@ -216,7 +224,10 @@ A class for parenting MIT section-specific commands.
 4. `String emote` - the emote of this section.
 5. `Color color` - the color of this section.
 6. `String gradSheetID` - the graduates spreadsheet ID for this section.
-7. `String cyclesSheetID` - the graduates spreadsheet ID for this section.
+7. `String cyclesSheetID` - the cycles spreadsheet ID for this section.
+8. `String CYCLES_TAB` - the tab to reference within the cycles spreadsheet.
+9. `String CYCLES_START_COLUMN` - the cycles spreadsheet column that starts the needed information.
+10. `String CYCLES_END_COLUMN` - the cycles spreadsheet column that ends the needed information.
 
 ----
 
@@ -329,6 +340,34 @@ A class which generates map lists.
 A class which reverts draft commands, processing the command `lp/io undo`.
 
 ----
+
+### Profiles (Engine)
+
+#### PlayerInfo
+
+A class for storing information about a player within MIT.
+
+###### Instance Variables
+1. `int numRow` - the numbered row of the player's data within their associated draft spreadsheet.
+2. `String tag` - the player's Discord tag.
+3. `String nickname` - the player's nickname on the server.
+4. `int setWins` - the player's amount of won sets in a cycle.
+5. `int setLosses` - the player's amount of lost sets in a cycle.
+6. `int gamesWon` - the player's amount of won games in a cycle.
+7. `int gamesLost` - the player's amount of lost games in a cycle.
+
+----
+
+#### DraftPlayer
+
+A class which manages the profile database of MIT.
+
+###### Instance Variables
+1. `String spreadsheetID` - the profiles spreadsheet ID.
+2. `String START_COLUMN` - the starting information column of the profiles spreadsheet.
+3. `String END_COLUMN` - the ending information column of the profiles spreadsheet.
+4. `String TAB` - the tab to reference within the profiles spreadsheet.
+
 
 
 ## Persistence

@@ -3,6 +3,7 @@ package bot;
 import bot.Engine.*;
 import bot.Engine.Cycles.*;
 import bot.Engine.Drafts.*;
+import bot.Engine.Profiles.Profile;
 import bot.Tools.ArrayHeapMinPQ;
 import bot.Tools.FileHandler;
 

@@ -38,10 +38,10 @@ public class Section {
     public static final String CYCLES_TAB = "'Current Cycle'";
 
     /** The spreadsheet's starting column with leaderboard information. */
-    public final static String CYCLES_START_COLUMN = "B";
+    public static final String CYCLES_START_COLUMN = "B";
 
     /** The spreadsheet's ending column with leaderboard information. */
-    public final static String CYCLES_END_COLUMN = "K";
+    public static final String CYCLES_END_COLUMN = "K";
 
     /**
      * Constructs the section attributes.

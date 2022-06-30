@@ -261,7 +261,6 @@ public class ManualLog extends Section implements Command {
 
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
-
             TreeMap<Object, Object> data = link.readSection(sc, CYCLES_TAB);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");

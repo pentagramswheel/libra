@@ -1,6 +1,6 @@
 package bot.Tools;
 
-import bot.Engine.PlayerInfo;
+import bot.Engine.Profiles.PlayerInfo;
 import bot.Main;
 import bot.Engine.Cycles.PlayerStats;
 

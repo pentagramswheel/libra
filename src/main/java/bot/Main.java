@@ -43,6 +43,31 @@ public class Main {
         SubcommandData draftdoc = new SubcommandData("draftdoc",
                 "Retrieves the documentation for the automated draft system.");
 
+        // quick profile commands
+        SubcommandData qprofile = new SubcommandData("qprofile",
+                "Creates a quick profile within MIT.");
+
+        OptionData fcParam = new OptionData(
+                OptionType.STRING, "friendcode", "Your friend code", true);
+        OptionData playstyleChoices = new OptionData(
+                OptionType.STRING, "playstyle", "Your preferred playstyle/position", true);
+        String[] playstyles = {"Slayer", "Skirmisher", "Support", "Anchor", "Flex"};
+        for (int i = 1; i <= playstyles.length; i++) {
+            playstyleChoices.addChoice(playstyles[i - 1], playstyles[i - 1]);
+        }
+
+        OptionData weaponsParam = new OptionData(
+                OptionType.STRING, "weapons", "Your weapon pool", true);
+        OptionData rankChoices = new OptionData(
+                OptionType.STRING, "rank", "Your average rank", true);
+        String[] ranks = {"C", "B", "A", "S", "S+", "X 2000",
+                "X 2100-2200", "X 2300-2400", "X 2500-2600", "X 2700+"};
+        for (int i = 1; i <= ranks.length; i++) {
+            rankChoices.addChoice(ranks[i - 1], ranks[i - 1]);
+        }
+
+        qprofile.addOptions(fcParam, playstyleChoices, weaponsParam, rankChoices);
+
         // profile commands
         SubcommandGroupData profile = new SubcommandGroupData("profile",
                 "Finds or enters information about a player within MIT.");
@@ -61,33 +86,17 @@ public class Main {
         SubcommandData delete = new SubcommandData("delete",
                 "Deletes your profile.");
 
-        fc.addOptions(new OptionData(
-                OptionType.STRING, "code", "Your friend code", true));
-        view.addOptions(new OptionData(
-                OptionType.USER, "player", "The player to look up", false));
+        OptionData viewParam = new OptionData(
+                OptionType.USER, "player", "The player to look up", false);
+        OptionData teamParam = new OptionData(
+                OptionType.STRING, "name", "Your team's name", true);
 
-        OptionData playstyleChoices = new OptionData(
-                OptionType.STRING, "position", "Your playstyle", true);
-        String[] playstyles = {"Slayer", "Skirmisher", "Support", "Anchor", "Flex"};
-        for (int i = 1; i <= playstyles.length; i++) {
-            playstyleChoices.addChoice(playstyles[i - 1], playstyles[i - 1]);
-        }
+        fc.addOptions(fcParam);
+        view.addOptions(viewParam);
         playstyle.addOptions(playstyleChoices);
-
-        weapons.addOptions(new OptionData(
-                OptionType.STRING, "pool", "Your weapon pool", true));
-
-        OptionData rankChoices = new OptionData(
-                OptionType.STRING, "rank", "Your average rank", true);
-        String[] ranks = {"C", "B", "A", "S", "S+", "X 2000",
-                "X 2100-2200", "X 2300-2400", "X 2500-2600", "X 2700+"};
-        for (int i = 1; i <= ranks.length; i++) {
-            rankChoices.addChoice(ranks[i - 1], ranks[i - 1]);
-        }
+        weapons.addOptions(weaponsParam);
         rank.addOptions(rankChoices);
-
-        team.addOptions(new OptionData(
-                OptionType.STRING, "name", "Your team's name", true));
+        team.addOptions(teamParam);
 
         profile.addSubcommands(fc, view,
                 rank, team, playstyle, weapons,

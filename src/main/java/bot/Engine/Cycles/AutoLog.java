@@ -199,7 +199,6 @@ public class AutoLog extends Section {
     public void matchReport(ButtonClickEvent bc, Draft draft) {
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
-
             TreeMap<Object, Object> data = link.readSection(bc, CYCLES_TAB);
             if (data == null) {
                 throw new IOException("The spreadsheet was empty.");
