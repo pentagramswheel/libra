@@ -1,7 +1,7 @@
 package bot.Tools;
 
-import bot.Engine.Profiles.PlayerInfo;
 import bot.Main;
+import bot.Engine.Profiles.PlayerInfo;
 import bot.Engine.Cycles.PlayerStats;
 
 import com.google.api.client.auth.oauth2.Credential;
