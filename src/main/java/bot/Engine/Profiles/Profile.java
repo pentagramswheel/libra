@@ -223,9 +223,9 @@ public class Profile implements Command {
                             String id, List<Role> roles) {
         String leaderboardID;
         if (roles.contains(getRole(interaction, "Ink Odyssey"))) {
-            leaderboardID = Config.lpCyclesSheetID;
-        } else if (roles.contains(getRole(interaction, "LaunchPoint"))) {
             leaderboardID = Config.ioCyclesSheetID;
+        } else if (roles.contains(getRole(interaction, "LaunchPoint"))) {
+            leaderboardID = Config.lpCyclesSheetID;
         } else {
             return "N/A";
         }
