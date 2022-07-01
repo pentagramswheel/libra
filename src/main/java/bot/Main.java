@@ -73,6 +73,8 @@ public class Main {
                 "Finds or enters information about a player within MIT.");
         SubcommandData fc = new SubcommandData("fc",
                 "Creates your profile by adding your friend code to it.");
+        SubcommandData getfc = new SubcommandData("getfc",
+                "Retrieves the friend code of another user, if provided.");
         SubcommandData view = new SubcommandData("view",
                 "Looks up the profile of another user, if provided.");
         SubcommandData rank = new SubcommandData("rank",
@@ -92,13 +94,14 @@ public class Main {
                 OptionType.STRING, "name", "Your team's name", true);
 
         fc.addOptions(fcParam);
+        getfc.addOptions(viewParam);
         view.addOptions(viewParam);
         playstyle.addOptions(playstyleChoices);
         weapons.addOptions(weaponsParam);
         rank.addOptions(rankChoices);
         team.addOptions(teamParam);
 
-        profile.addSubcommands(fc, view,
+        profile.addSubcommands(fc, getfc, view,
                 rank, team, playstyle, weapons,
                 delete);
 

@@ -176,6 +176,43 @@ public class Profile implements Command {
     }
 
     /**
+     * Retrieves only the friend code of a player.
+     * @param sc the user's inputted command.
+     * @param id a player's Discord ID.
+     */
+    private void onlyGetFC(SlashCommandEvent sc, String id) {
+        sc.deferReply(false).queue();
+
+        try {
+            GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
+            TreeMap<Object, Object> database = link.readSection(sc, TAB);
+            String pronoun = "Their";
+
+            if (database == null) {
+                sendResponse(sc, "The profiles database could not load.", false);
+                return;
+            } else if (id == null) {
+                id = sc.getMember().getId();
+                pronoun = "Your";
+            }
+
+            if (database.containsKey(id)) {
+                PlayerInfo profile = (PlayerInfo) database.get(id);
+
+                sendResponse(sc, pronoun + " friend code is `SW-"
+                        + profile.getFC() + "`.", false);
+                log("Profile FC retrieved for "
+                        + profile.getAsTag() + ".", false);
+            } else {
+                sendResponse(sc, pronoun + " MIT profile does not exist yet. Register with "
+                        + "`/mit profile fc` to proceed.", true);
+            }
+        } catch (IOException | GeneralSecurityException e) {
+            log("The profiles spreadsheet could not load.", true);
+        }
+    }
+
+    /**
      * Retrieves the win-loss score of a player within their
      * draft section, if it exists.
      * @param interaction the user interaction calling this method.
@@ -216,6 +253,7 @@ public class Profile implements Command {
     /**
      * Builds a player's profile into a nice summary.
      * @param interaction the user interaction calling this method.
+     * @param pronoun the player's neutral pronoun.
      * @param id the player's Discord ID.
      * @param profile the player's profile.
      * @param fullDisplay a flag for knowing whether to display
@@ -223,7 +261,7 @@ public class Profile implements Command {
      * @return the pre-built summary.
      */
     private EmbedBuilder buildProfile(GenericInteractionCreateEvent interaction,
-                                      String id, PlayerInfo profile,
+                                      String pronoun, String id, PlayerInfo profile,
                                       boolean fullDisplay) {
         EmbedBuilder eb = new EmbedBuilder();
         Member player = findMember(interaction, id);
@@ -232,7 +270,7 @@ public class Profile implements Command {
         if (profile == null) {
             eb.setTitle(player.getEffectiveName()
                     + " [" + player.getUser().getAsTag() + "]");
-            eb.setDescription("MIT profile does not exist. Register with "
+            eb.setDescription(pronoun + " MIT profile does not exist. Register with "
                     + "`/mit profile fc` to proceed.");
         } else {
             eb.setTitle(profile.getNickname() + " [" + profile.getAsTag() + "]");
@@ -261,7 +299,7 @@ public class Profile implements Command {
     /**
      * Views a player's profile.
      * @param interaction the user interaction calling this method.
-     * @param id the player's Discord ID.
+     * @param id a player's Discord ID.
      * @param fullDisplay a flag for knowing whether to display
      *                    the entire profile or not.
      * @return a built summary of the player's profile.
@@ -281,11 +319,16 @@ public class Profile implements Command {
             } else if (id == null) {
                 String userID = interaction.getMember().getId();
                 PlayerInfo profile = (PlayerInfo) database.get(userID);
+                String pronoun = "Your";
 
-                return buildProfile(interaction, userID, profile, fullDisplay).build();
+                return buildProfile(interaction, pronoun,
+                        userID, profile, fullDisplay).build();
             } else {
                 PlayerInfo profile = (PlayerInfo) database.get(id);
-                return buildProfile(interaction, id, profile, fullDisplay).build();
+                String pronoun = "Their";
+
+                return buildProfile(interaction, pronoun,
+                        id, profile, fullDisplay).build();
             }
         } catch (IOException | GeneralSecurityException e) {
             log("The profiles spreadsheet could not load.", true);
@@ -354,16 +397,16 @@ public class Profile implements Command {
                 throw new IOException("The database could not load.");
             }
 
-            Member user = sc.getMember();
-            if (database.containsKey(user.getId())) {
-                PlayerInfo profile = (PlayerInfo) database.get(user.getId());
+            String userID = sc.getMember().getId();
+            if (database.containsKey(userID)) {
+                PlayerInfo profile = (PlayerInfo) database.get(userID);
 
                 String updateRange = link.buildRange(TAB,
                         "B", profile.getSpreadsheetPosition(),
                         "H", profile.getSpreadsheetPosition());
                 List<Object> updatedRow = withNewInfo(profile, playstyle, weapons, rank, team);
                 String changedField = (String) updatedRow.remove(0);
-                
+
                 ValueRange newRow = link.buildRow(updatedRow);
                 link.updateRange(updateRange, newRow);
 
@@ -395,9 +438,9 @@ public class Profile implements Command {
                 sendResponse(sc, "The profiles database could not load.", false);
             }
 
-            Member user = sc.getMember();
-            if (database.containsKey(user.getId())) {
-                PlayerInfo profile = (PlayerInfo) database.get(user.getId());
+            String userID = sc.getMember().getId();
+            if (database.containsKey(userID)) {
+                PlayerInfo profile = (PlayerInfo) database.get(userID);
                 link.deleteRow(TAB, profile.getSpreadsheetPosition());
 
                 sendResponse(sc, "Your MIT profile has been deleted.", false);
@@ -426,6 +469,9 @@ public class Profile implements Command {
                 break;
             case "fc":
                 register(sc, getParameter(args, false));
+                break;
+            case "getfc":
+                onlyGetFC(sc, getParameter(args, true));
                 break;
             case "view":
                 view(sc, getParameter(args, true), true);
