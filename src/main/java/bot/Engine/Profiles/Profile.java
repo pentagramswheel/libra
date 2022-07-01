@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import java.awt.Color;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
@@ -108,7 +109,8 @@ public class Profile implements Command {
                         fc, playstyle, weapons, rank, "N/A"));
                 link.appendRow(TAB, newRow);
 
-                sendResponse(sc, "Your MIT profile has been created!", false);
+                sendResponse(sc, "Your MIT profile has been created! "
+                        + "Use `/mit profile view` to view your profile.", false);
                 log("Profile created for " + discordTag + ".", false);
             }
         } catch (IOException | GeneralSecurityException e) {
@@ -164,7 +166,8 @@ public class Profile implements Command {
                         "N/A"));
                 link.appendRow(TAB, newRow);
 
-                sendResponse(sc, "Your MIT profile has been created!", false);
+                sendResponse(sc, "Your MIT profile has been created! "
+                        + "Use `/mit profile view` to view your profile.", false);
                 log("Profile created for " + discordTag + ".", false);
             }
         } catch (IOException | GeneralSecurityException e) {
@@ -228,17 +231,17 @@ public class Profile implements Command {
         eb.setColor(Color.blue);
         if (profile == null) {
             eb.setTitle(player.getEffectiveName()
-                    + " (" + player.getUser().getAsTag() + ")");
+                    + " [" + player.getUser().getAsTag() + "]");
             eb.setDescription("MIT profile does not exist. Register with "
                     + "`/mit profile fc` to proceed.");
         } else {
-            eb.setTitle(profile.getNickname() + " (" + profile.getAsTag() + ")");
+            eb.setTitle(profile.getNickname() + " [" + profile.getAsTag() + "]");
             eb.setThumbnail(player.getEffectiveAvatarUrl());
             eb.setFooter("FC SW-" + profile.getFC(),
                     "https://images.squarespace-cdn.com/content/v1/5ce2bf96d2bf17000192fe2c/1596048502214-WL5LU68IOLM8WILBA57N/Friends+Icon.png?format=1000w");
 
-            eb.addField("Playstyle", profile.getPlaystyle(), true);
-            eb.addField("Weapon Pool", profile.getWeaponPool(), true);
+            eb.addField("Playstyle", "`" + profile.getPlaystyle() + "`", true);
+            eb.addField("Weapon Pool", "`" + profile.getWeaponPool() + "`", true);
         }
 
         if (fullDisplay) {
@@ -265,7 +268,9 @@ public class Profile implements Command {
      */
     public MessageEmbed view(GenericInteractionCreateEvent interaction,
                              String id, boolean fullDisplay) {
-        interaction.deferReply(false).queue();
+        if (!interaction.isAcknowledged()) {
+            interaction.deferReply(false).queue();
+        }
 
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
@@ -296,33 +301,35 @@ public class Profile implements Command {
      * @param newWeapons the weapon pool to change to, if any.
      * @param newRank the rank to change to, if any.
      * @param newTeam the team to change to, if any.
-     * @return the built row.
+     * @return the built row, with the actual change in the first slot.
      */
     private List<Object> withNewInfo(PlayerInfo profile, String newPlaystyle,
                                String newWeapons, String newRank, String newTeam) {
+        String foundNewInfo = null;
+
         String playstyle = profile.getPlaystyle();
         if (newPlaystyle != null) {
-            playstyle = newPlaystyle;
+            playstyle = foundNewInfo = newPlaystyle;
         }
 
         String weapons = profile.getWeaponPool();
         if (newWeapons != null) {
-            weapons = newWeapons;
+            weapons = foundNewInfo = newWeapons;
         }
 
         String rank = profile.getRank();
         if (newRank != null) {
-            rank = newRank;
+            rank = foundNewInfo = newRank;
         }
 
         String team = profile.getTeam();
         if (newTeam != null) {
-            team = newTeam;
+            team = foundNewInfo = newTeam;
         }
 
-        return Arrays.asList(
+        return new ArrayList<>(Arrays.asList(foundNewInfo,
                 profile.getAsTag(), profile.getNickname(), profile.getFC(),
-                playstyle, weapons, rank, team);
+                playstyle, weapons, rank, team));
     }
 
     /**
@@ -354,13 +361,15 @@ public class Profile implements Command {
                 String updateRange = link.buildRange(TAB,
                         "B", profile.getSpreadsheetPosition(),
                         "H", profile.getSpreadsheetPosition());
-                ValueRange newRow = link.buildRow(
-                        withNewInfo(profile, playstyle, weapons, rank, team));
+                List<Object> updatedRow = withNewInfo(profile, playstyle, weapons, rank, team);
+                String changedField = (String) updatedRow.remove(0);
+                
+                ValueRange newRow = link.buildRow(updatedRow);
                 link.updateRange(updateRange, newRow);
 
                 String cmd = sc.getSubcommandName();
                 sendResponse(sc, "Your " + cmd + " has been updated to `"
-                        + getParameter(sc.getOptions(), false) + "`.", false);
+                        + changedField + "`.", false);
                 log(sc.getUser().getAsTag() + "'s " + cmd + " was updated.", false);
             } else {
                 sendResponse(sc, "Your MIT profile does not exist yet. Register with "

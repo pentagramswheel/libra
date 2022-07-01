@@ -44,7 +44,7 @@ public class DraftProcess {
     private final static int MAX_SCORE = 4;
 
     /** The number of players required to formally end the draft. */
-    private final static int NUM_PLAYERS_TO_END_DRAFT_BEFORE_START = 6;
+    private final static int NUM_PLAYERS_TO_END_DRAFT_BEFORE_START = 5;
     private final static int NUM_PLAYERS_TO_END_DRAFT_AFTER_START = 3;
 
     /** The players who have clicked the 'End Draft` button consecutively. */

@@ -232,16 +232,16 @@ public class MapGenerator extends Section implements Command {
         int numMaps = (int) args.get(0).getAsLong();
 
         int numModes = 0;
-        ArrayList<String> modes = new ArrayList<>();
+        List<String> modes = new ArrayList<>();
         TreeMap<String, ArrayList<String>> legalMaps = getLegalLPMaps();
         if (getSection().equals("io")) {
             legalMaps = getLegalIOMaps();
         }
 
         String lastMode = "";
-        ArrayList<String> pastMaps = new ArrayList<>();
+        List<String> pastMaps = new ArrayList<>();
 
-        ArrayList<EmbedBuilder> matches = new ArrayList<>();
+        List<EmbedBuilder> matches = new ArrayList<>();
         for (int i = 0; i < numMaps; i++) {
             if (numModes == 0) {
                 resetModes(modes);

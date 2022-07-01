@@ -1,14 +1,16 @@
 package bot.Engine.Drafts;
 
+import bot.Engine.Profiles.Profile;
 import bot.Engine.Section;
 import bot.Tools.Command;
 import bot.Tools.Components;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -347,6 +349,21 @@ public class Draft extends Section implements Command {
     }
 
     /**
+     * Prints the profile summaries of all players
+     * within the draft.
+     * @param bc a button click to analyze.
+     */
+    private void printProfiles(ButtonClickEvent bc) {
+        List<MessageEmbed> profiles = new ArrayList<>();
+        for (String playerID : getPlayers().keySet()) {
+            Profile profile = new Profile();
+            profiles.add(profile.view(bc, playerID, false));
+        }
+
+        getDraftChannel().sendMessageEmbeds(profiles).queue();
+    }
+
+    /**
      * Attempts to start a draft.
      * @param bc a button click to analyze.
      */
@@ -392,6 +409,9 @@ public class Draft extends Section implements Command {
             refresh(bc);
 
             getProcess().refresh(null);
+
+//            wait(2000);
+//            printProfiles(bc);
         } else {
             refresh(bc);
             messageID = bc.getMessageId();
@@ -642,6 +662,10 @@ public class Draft extends Section implements Command {
                 player.getAsMention(playerID) + " " + statement + " "
                 + "for this draft. __Refresh the pinned interface "
                 + "to add them to a team!__").queue();
+
+//        Profile profile = new Profile();
+//        getDraftChannel().sendMessageEmbeds(
+//                profile.view(bc, playerID, false)).queue();
     }
 
     /**
