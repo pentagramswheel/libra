@@ -24,10 +24,12 @@ import org.slf4j.LoggerFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * @author  Wil Aquino
@@ -123,8 +125,9 @@ public class Events extends ListenerAdapter {
      *         False otherwise.
      */
     private boolean isStaffCommand(SlashCommandEvent sc) {
-        String[] staffCmds = {"forceend", "log", "sub", "undo",
-                "add", "deny", "grad", "award", "cyclescalc"};
+        List<String> staffCmds = new ArrayList<>(Arrays.asList(
+                "forceend", "log", "sub", "undo",
+                "add", "deny", "grad", "award", "cyclescalc"));
 
         try {
             Guild server = sc.getGuild();
@@ -137,11 +140,7 @@ public class Events extends ListenerAdapter {
             Role staffRole = server.getRolesByName("Staff", true).get(0);
 
             if (author != null && !author.getRoles().contains(staffRole)) {
-                for (String cmd : staffCmds) {
-                    if (subCmd.equals(cmd)) {
-                        return true;
-                    }
-                }
+                return staffCmds.stream().anyMatch(subCmd::contains);
             }
         } catch (NullPointerException | IndexOutOfBoundsException e) {
             Logger logger = LoggerFactory.getLogger(this.getClass());

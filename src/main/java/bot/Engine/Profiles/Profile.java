@@ -70,6 +70,22 @@ public class Profile implements Command {
     }
 
     /**
+     * Checks whether a name is inappropriate or not.
+     * @param name the name to check.
+     * @return True if it is inappropriate.
+     *         False otherwise.
+     */
+    private boolean blacklistedName(String name) {
+        name = name.toLowerCase();
+        List<String> bannedWords = new ArrayList<>(Arrays.asList(
+                "shit", "fuck", "fuk", "fk", "fck", "bitch", "whore",
+                "nigga", "chigga", "ching", "chong", "chink", "cholo",
+                "cracker", "nigger"));
+
+        return bannedWords.stream().anyMatch(name::contains);
+    }
+
+    /**
      * Reformats weapon pool entry into lines of set length.
      * @param weapons the pool to format.
      * @return the formatted pool.
@@ -122,11 +138,15 @@ public class Profile implements Command {
                 sendResponse(sc,
                         "You cannot use `qprofile`, because your profile "
                                 + "already exists. Use the other `profile` "
-                                + "commands as needed.", false);
+                                + "commands as needed.", true);
             } else if (!fc.matches("\\d{4}-\\d{4}-\\d{4}")) {
                 sendResponse(sc,
                         "Friend code should be in the format: "
-                                + "`8888-8888-8888`", false);
+                                + "`8888-8888-8888`", true);
+            } else if (blacklistedName(nickname)) {
+                sendResponse(sc,
+                        "Inappropriate nickname detected. "
+                        + "Please use another one.", true);
             } else {
                 String discordTag = user.getUser().getAsTag();
 
@@ -136,7 +156,7 @@ public class Profile implements Command {
                 link.appendRow(TAB, newRow);
 
                 sendResponse(sc, "Your MIT profile has been created! "
-                        + "Use `/mit profile view` to view your profile.", false);
+                        + "Use `/mit profile view` to view your profile.", true);
                 log("Profile created for " + discordTag + ".", false);
             }
         } catch (IOException | GeneralSecurityException e) {
@@ -434,7 +454,11 @@ public class Profile implements Command {
             }
 
             String userID = sc.getMember().getId();
-            if (database.containsKey(userID)) {
+            if (nickname != null && blacklistedName(nickname)) {
+                sendResponse(sc,
+                        "Inappropriate nickname detected. "
+                                + "Please use another one.", true);
+            } else if (database.containsKey(userID)) {
                 PlayerInfo profile = (PlayerInfo) database.get(userID);
 
                 String updateRange = link.buildRange(TAB,
