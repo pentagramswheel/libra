@@ -104,6 +104,7 @@ public class Profile implements Command {
 
         List<OptionMapping> args = sc.getOptions();
         String fc = getParameter(args, false);
+        String nickname = getParameter(args, false);
         String playstyle = getParameter(args, false);
         String weapons = getParameter(args, false);
         String rank = getParameter(args, false);
@@ -117,20 +118,20 @@ public class Profile implements Command {
             }
 
             Member user = sc.getMember();
-            if (!fc.matches("\\d{4}-\\d{4}-\\d{4}")) {
-                sendResponse(sc,
-                        "Friend code should be in the format: "
-                                + "`8888-8888-8888`", false);
-            } else if (database.containsKey(user.getId())) {
+            if (database.containsKey(user.getId())) {
                 sendResponse(sc,
                         "You cannot use `qprofile`, because your profile "
                                 + "already exists. Use the other `profile` "
                                 + "commands as needed.", false);
+            } else if (!fc.matches("\\d{4}-\\d{4}-\\d{4}")) {
+                sendResponse(sc,
+                        "Friend code should be in the format: "
+                                + "`8888-8888-8888`", false);
             } else {
                 String discordTag = user.getUser().getAsTag();
 
                 ValueRange newRow = link.buildRow(Arrays.asList(
-                        user.getId(), discordTag, user.getEffectiveName(),
+                        user.getId(), discordTag, nickname,
                         fc, playstyle, reformatWeapons(weapons), rank, "N/A"));
                 link.appendRow(TAB, newRow);
 
@@ -229,8 +230,9 @@ public class Profile implements Command {
                 log("Profile FC retrieved for "
                         + profile.getAsTag() + ".", false);
             } else {
-                sendResponse(sc, pronoun + " MIT profile does not exist yet. Register with "
-                        + "`/mit profile fc` to proceed.", true);
+                sendResponse(sc, pronoun + " MIT profile does not exist yet. "
+                        + "Register with `/mit profile fc` "
+                        + "or `/mit qprofile ...` to proceed.", true);
             }
         } catch (IOException | GeneralSecurityException e) {
             log("The profiles spreadsheet could not load.", true);
@@ -295,8 +297,9 @@ public class Profile implements Command {
         if (profile == null) {
             eb.setTitle(player.getEffectiveName()
                     + " [" + player.getUser().getAsTag() + "]");
-            eb.setDescription(pronoun + " MIT profile does not exist. Register with "
-                    + "`/mit profile fc` to proceed.");
+            eb.setDescription(pronoun + " MIT profile does not exist. "
+                    + "Register with `/mit profile fc`\n"
+                    + "or `/mit qprofile ...` to proceed.");
         } else {
             eb.setTitle(profile.getNickname() + " [" + profile.getAsTag() + "]");
             eb.setThumbnail(player.getEffectiveAvatarUrl());
@@ -449,8 +452,9 @@ public class Profile implements Command {
                         + changedField.replaceAll("\n", " ") + "`.", false);
                 log(sc.getUser().getAsTag() + "'s " + cmd + " was updated.", false);
             } else {
-                sendResponse(sc, "Your MIT profile does not exist yet. Register with "
-                        + "`/mit profile fc` to proceed.", true);
+                sendResponse(sc, "Your MIT profile does not exist yet. "
+                        + "Register with `/mit profile fc`\n"
+                        + "or `/mit qprofile ...` to proceed.", true);
             }
         } catch (IOException | GeneralSecurityException e) {
             log("The profiles spreadsheet could not load.", true);

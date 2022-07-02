@@ -49,6 +49,8 @@ public class Main {
 
         OptionData fcParam = new OptionData(
                 OptionType.STRING, "friendcode", "Your friend code", true);
+        OptionData nicknameParam = new OptionData(
+                OptionType.STRING, "name", "Your nickname", true);
         OptionData playstyleChoices = new OptionData(
                 OptionType.STRING, "playstyle", "Your preferred playstyle/position", true);
         String[] playstyles = {"Slayer", "Skirmisher", "Support", "Anchor", "Flex"};
@@ -66,7 +68,7 @@ public class Main {
             rankChoices.addChoice(ranks[i - 1], ranks[i - 1]);
         }
 
-        qprofile.addOptions(fcParam, playstyleChoices, weaponsParam, rankChoices);
+        qprofile.addOptions(fcParam, nicknameParam, playstyleChoices, weaponsParam, rankChoices);
 
         // profile commands
         SubcommandGroupData profile = new SubcommandGroupData("profile",
@@ -92,8 +94,6 @@ public class Main {
 
         OptionData viewParam = new OptionData(
                 OptionType.USER, "player", "The player to look up", false);
-        OptionData nicknameParam = new OptionData(
-                OptionType.STRING, "name", "Your nickname", true);
         OptionData teamParam = new OptionData(
                 OptionType.STRING, "name", "Your team's name", true);
 
