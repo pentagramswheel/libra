@@ -34,8 +34,11 @@ public class Section {
     /** Public Cycles Google Sheets ID. */
     private final String cyclesSheetID;
 
+    /** Private Top 10 Calculation Google Sheets ID. */
+    private final String calculationsSheetID;
+
     /** The tab to reference on the Cycles Google Sheet. */
-    public static final String CYCLES_TAB = "'Current Cycle'";
+    public static final String CYCLES_TAB = "Current Cycle";
 
     /** The spreadsheet's starting column with leaderboard information. */
     public static final String CYCLES_START_COLUMN = "B";
@@ -57,6 +60,7 @@ public class Section {
             color = Color.GREEN;
             gradSheetID = Config.lpGradSheetID;
             cyclesSheetID = Config.lpCyclesSheetID;
+            calculationsSheetID = Config.lpCyclesCalculationSheetID;
         } else {
             name = "Ink Odyssey";
             role = "<@&918181354284408882>";
@@ -64,12 +68,12 @@ public class Section {
             color = Color.MAGENTA;
             gradSheetID = Config.ioGradSheetID;
             cyclesSheetID = Config.ioCyclesSheetID;
+            calculationsSheetID = Config.ioCyclesSheetID;
         }
     }
 
     /**
      * Retrieves the MIT section name.
-     * @return said section.
      */
     public String getSection() {
         return name;
@@ -77,7 +81,6 @@ public class Section {
 
     /**
      * Retrieves the prefix of the MIT section.
-     * @return said prefix.
      */
     public String getPrefix() {
         return prefix;
@@ -85,7 +88,6 @@ public class Section {
 
     /**
      * Retrieves the role of this section.
-     * @return said role.
      */
     public String getSectionRole() {
         return role;
@@ -93,7 +95,6 @@ public class Section {
 
     /**
      * Retrieves the emote of the MIT section.
-     * @return said emote.
      */
     public String getEmote() {
         return emote;
@@ -101,7 +102,6 @@ public class Section {
 
     /**
      * Retrieves the designated color of the MIT section.
-     * @return said color.
      */
     public Color getColor() {
         return color;
@@ -109,7 +109,6 @@ public class Section {
 
     /**
      * Retrieves the section's graduates sheet ID.
-     * @return said ID.
      */
     public String gradSheetID() {
         return gradSheetID;
@@ -117,9 +116,15 @@ public class Section {
 
     /**
      * Retrieves the section's cycles sheet ID.
-     * @return said ID.
      */
     public String cyclesSheetID() {
         return cyclesSheetID;
+    }
+
+    /**
+     * Retrieves the section's Top 10 calculations sheet ID.
+     */
+    public String calculationsSheetID() {
+        return calculationsSheetID;
     }
 }

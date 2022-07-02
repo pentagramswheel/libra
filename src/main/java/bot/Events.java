@@ -503,10 +503,6 @@ public class Events extends ListenerAdapter {
             case "help":
                 printTroubleshootString(sc);
                 break;
-            case "cyclescalc":
-                PointsCalculator calculator = new PointsCalculator();
-                calculator.runCmd(sc);
-                break;
             case "draftdoc":
                 String docLink =
                         "https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing";
@@ -568,6 +564,10 @@ public class Events extends ListenerAdapter {
             case "award":
                 Award award = new Award(prefix);
                 award.runCmd(sc);
+                break;
+            case "cyclescalc":
+                PointsCalculator calculator = new PointsCalculator(prefix);
+                calculator.runCmd(sc);
                 break;
             case "genmaps":
                 if (mapsNeededValid(sc)) {

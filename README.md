@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** June 30, 2022
+**Last Updated:** July 2, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -225,9 +225,10 @@ A class for parenting MIT section-specific commands.
 5. `Color color` - the color of this section.
 6. `String gradSheetID` - the graduates spreadsheet ID for this section.
 7. `String cyclesSheetID` - the cycles spreadsheet ID for this section.
-8. `String CYCLES_TAB` - the tab to reference within the cycles spreadsheet.
-9. `String CYCLES_START_COLUMN` - the cycles spreadsheet column that starts the needed information.
-10. `String CYCLES_END_COLUMN` - the cycles spreadsheet column that ends the needed information.
+8. `String calculationsSheetID` - the calculations spreadsheet ID for this section.
+9. `String CYCLES_TAB` - the tab to reference within the cycles spreadsheet.
+10. `String CYCLES_START_COLUMN` - the cycles spreadsheet column that starts the needed information.
+11. `String CYCLES_END_COLUMN` - the cycles spreadsheet column that ends the needed information.
 
 ----
 
@@ -358,7 +359,7 @@ A class for storing information about a player within MIT.
 
 ----
 
-#### DraftPlayer
+#### Profile
 
 A class which manages the profile database of MIT.
 

@@ -38,8 +38,6 @@ public class Main {
                 "Checks whether the bot is online or not.");
         SubcommandData help = new SubcommandData("help",
                 "Displays troubleshooting information for the commands.");
-        SubcommandData cycleCalculate = new SubcommandData("cyclescalc",
-                "Calculates the points for MIT's current draft leaderboards.");
         SubcommandData draftdoc = new SubcommandData("draftdoc",
                 "Retrieves the documentation for the automated draft system.");
 
@@ -50,7 +48,7 @@ public class Main {
         OptionData fcParam = new OptionData(
                 OptionType.STRING, "friendcode", "Your friend code", true);
         OptionData nicknameParam = new OptionData(
-                OptionType.STRING, "name", "Your nickname", true);
+                OptionType.STRING, "name", "Your preferred nickname", true);
         OptionData playstyleChoices = new OptionData(
                 OptionType.STRING, "playstyle", "Your preferred playstyle/position", true);
         String[] playstyles = {"Slayer", "Skirmisher", "Support", "Anchor", "Flex"};
@@ -59,7 +57,7 @@ public class Main {
         }
 
         OptionData weaponsParam = new OptionData(
-                OptionType.STRING, "weapons", "Your weapon pool", true);
+                OptionType.STRING, "weapons", "Your preferred weapon pool", true);
         OptionData rankChoices = new OptionData(
                 OptionType.STRING, "rank", "Your average rank", true);
         String[] ranks = {"C", "B", "A", "S", "S+", "X 2000",
@@ -120,7 +118,7 @@ public class Main {
         SubcommandData genmaps = new SubcommandData("genmaps",
                 "Generates a set map list.");
         SubcommandData leaderboard = new SubcommandData("leaderboard",
-                "Retrieves the leaderboard for the section.");
+                "Retrieves the leaderboard for the MIT section.");
 
         SubcommandData startdraft = new SubcommandData("startdraft",
                 "Requests an automatic draft with up to 8 players.");
@@ -142,6 +140,9 @@ public class Main {
                 "Rejects players from a designated area within MIT.");
         SubcommandData grad = new SubcommandData("grad",
                 "Graduates players from the designated section within MIT.");
+
+        SubcommandData cycleCalculate = new SubcommandData("cyclescalc",
+                "Performs a cycle change for the MIT section.");
         SubcommandData award = new SubcommandData("award",
                 "Gives players leaderboard awards for the current MIT cycle.");
 
@@ -195,18 +196,20 @@ public class Main {
 
         // implementing commands
         mit.addSubcommands(status, help,
-                cycleCalculate, draftdoc, qprofile);
+                draftdoc, qprofile);
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
                 genmaps, leaderboard,
                 startdraft, forcesub, forceend,
                 log, sub, undo,
-                add, deny, grad, award);
+                add, deny, grad,
+                cycleCalculate, award);
         io.addSubcommands(
                 genmaps, leaderboard,
                 startdraft, forcesub, forceend,
                 log, sub, undo,
-                add, deny, grad, award);
+                add, deny, grad,
+                cycleCalculate, award);
 
         jda.updateCommands().addCommands(mit, lp, io).queue();
     }

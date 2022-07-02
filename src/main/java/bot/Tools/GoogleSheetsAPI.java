@@ -129,7 +129,7 @@ public class GoogleSheetsAPI {
      * @return said list of values.
      */
     public List<List<Object>> getSheetValues(String tab) throws IOException {
-        return getSheet().get(getSpreadsheetID(), tab)
+        return getSheet().get(getSpreadsheetID(), String.format("'%s'", tab))
                 .setValueRenderOption("UNFORMATTED_VALUE")
                 .execute().getValues();
     }
@@ -154,8 +154,7 @@ public class GoogleSheetsAPI {
 
         for (Sheet sheet : allSheets) {
             SheetProperties properties = sheet.getProperties();
-            String title = "'" + properties.getTitle() + "'";
-            if (title.equals(tab)) {
+            if (tab.equals(properties.getTitle())) {
                 return properties.getSheetId();
             }
         }
@@ -173,10 +172,10 @@ public class GoogleSheetsAPI {
      */
     private Object getSpecificRow(GenericInteractionCreateEvent interaction,
                            String tab, int i, List<Object> row) {
-        if (tab.equals("'Current Cycle'")) {
+        if (tab.equals("Current Cycle")) {
             return new PlayerStats(
                     interaction, i + 1, row);
-        } else if (tab.equals("'Profiles'")) {
+        } else if (tab.equals("Profiles")) {
             return new PlayerInfo(
                     interaction, i + 1, row);
         }
@@ -228,7 +227,7 @@ public class GoogleSheetsAPI {
                 .get(getSpreadsheetID()).execute().getSheets();
 
         for (Sheet sheet : allSheets) {
-            String title = "'" + sheet.getProperties().getTitle() + "'";
+            String title = sheet.getProperties().getTitle();
             if (title.equals(tab)) {
                 SheetProperties properties = sheet.getProperties();
                 properties.setTitle(name);
@@ -322,8 +321,8 @@ public class GoogleSheetsAPI {
      */
     public String buildRange(String tab, String startColumn, int startRow,
                       String endColumn, int endRow) {
-        String updateFormat = "%s" + "!%s%s" + ":%s%s";
-        return String.format(updateFormat,
+        String rangeFormat = "'%s'" + "!%s%s" + ":%s%s";
+        return String.format(rangeFormat,
                 tab, startColumn, startRow, endColumn, endRow);
     }
 
@@ -357,7 +356,7 @@ public class GoogleSheetsAPI {
      */
     public void appendRow(String tab, ValueRange row)
         throws IOException {
-        getSheet().append(getSpreadsheetID(), tab, row)
+        getSheet().append(getSpreadsheetID(), String.format("'%s'", tab), row)
                 .setValueInputOption("USER_ENTERED")
                 .setInsertDataOption("INSERT_ROWS")
                 .setIncludeValuesInResponse(true).execute();

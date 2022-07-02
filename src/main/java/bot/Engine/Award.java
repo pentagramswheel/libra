@@ -41,19 +41,19 @@ public class Award extends Section implements Command {
                 throw new NullPointerException("Server link disconnected.");
             }
 
-            List<Member> oldPlacings = server.getMembersWithRoles(getRole(sc, role));
-            for (Member player : oldPlacings) {
-                String playerID = player.getId();
-                if (role.startsWith("1st") || role.startsWith("2nd")
-                        || role.startsWith("3rd")) {
-                    removeRole(sc, playerID, getRole(sc, role));
-                    addRole(sc, playerID,
-                            getRole(sc, "Past " + getSection() + " Leaderboard Podium"));
-                }
-
-                addRole(sc, playerID,
-                        getRole(sc, "Past " + getSection() + " Leaderboard Top 10"));
-            }
+//            List<Member> oldPlacings = server.getMembersWithRoles(getRole(sc, role));
+//            for (Member player : oldPlacings) {
+//                String playerID = player.getId();
+//                if (role.startsWith("1st") || role.startsWith("2nd")
+//                        || role.startsWith("3rd")) {
+//                    removeRole(sc, playerID, getRole(sc, role));
+//                    addRole(sc, playerID,
+//                            getRole(sc, "Past " + getSection() + " Leaderboard Podium"));
+//                }
+//
+//                addRole(sc, playerID,
+//                        getRole(sc, "Past " + getSection() + " Leaderboard Top 10"));
+//            }
 
             StringBuilder listOfUsers = new StringBuilder();
             for (OptionMapping om : newPlacings) {

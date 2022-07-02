@@ -1,17 +1,19 @@
 package bot.Engine.Cycles;
 
-import bot.Config;
+import bot.Engine.Section;
 import bot.Tools.Command;
 import bot.Tools.GoogleSheetsAPI;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author  Wil Aquino
@@ -21,7 +23,7 @@ import java.util.*;
  * Purpose: Calculates points for each of the players
  *          within a Cycle.
  */
-public class PointsCalculator implements Command {
+public class PointsCalculator extends Section implements Command {
 
     /** Max score per category. */
     private final static int MAX_CATGEORY_POINTS = 10;
@@ -31,6 +33,14 @@ public class PointsCalculator implements Command {
 
     /** Beginning lettered column of the score columns. */
     private final static char SCORE_COLUMNS_START = 'L';
+
+    /**
+     * Constructs the calculator's attributes.
+     * @param abbreviation the abbreviation of the section.
+     */
+    public PointsCalculator(String abbreviation) {
+        super(abbreviation);
+    }
 
     /**
      * Converts character-formatted column to its
@@ -156,7 +166,7 @@ public class PointsCalculator implements Command {
                 } else if (currScore == lastScore) {
                     offset++;
                     topTen.append(placement(playerTag, placing));
-                } else if (placing < 10) {
+                } else if (placing + offset <= 10) {
                     lastScore = currScore;
                     placing += offset;
                     offset = 1;
@@ -271,7 +281,6 @@ public class PointsCalculator implements Command {
                     continue;
                 }
 
-                wait(2000);
                 double setWinrate = 0.0;
                 if (setsPlayed > 0) {
                     setWinrate = (double) setWins / setsPlayed;
@@ -294,6 +303,7 @@ public class PointsCalculator implements Command {
                         gameWins, gameLosses, gamesPlayed, gameWinrate));
                 toLink.updateRange(updateRange, newRow);
                 size++;
+                wait(2500);
             }
 
             editMessage(sc, "Calculating points...");
@@ -315,63 +325,60 @@ public class PointsCalculator implements Command {
     public void runCmd(SlashCommandEvent sc) {
         sc.deferReply().queue();
 
-        // tab names of the spreadsheet
-        String tab = "'Current Cycle'";
-        String templateTab = "'Blank'";
+        // tab names of the spreadsheets
+        String currentTab = CYCLES_TAB;
+        String previousTab = "Previous Cycle";
+        String templateTab = "Blank";
 
         try {
-            String[] sections = {"LaunchPoint", "Ink Odyssey"};
-            int[] minimumSets = {3, 0};
-
-            GoogleSheetsAPI[] leaderboards = {
-                    new GoogleSheetsAPI(Config.lpCyclesSheetID),
-                    new GoogleSheetsAPI(Config.ioCyclesSheetID)};
-
-            GoogleSheetsAPI[] points = {
-                    new GoogleSheetsAPI(Config.lpCyclesCalculationSheetID),
-                    new GoogleSheetsAPI(Config.ioCyclesCalculationSheetID)};
-
-            for (int i = 0; i < sections.length; i++) {
-                String actualTabName = tab.substring(1, tab.length() - 1);
-                points[i].duplicateTab(templateTab, actualTabName);
-
-                wait(10000);
-                editMessage(sc, "Copying " + sections[i] + " spreadsheet...");
-
-                log("(Cycle Change) A leaderboard is being copied to the "
-                        + sections[i] + " points spreadsheet.", false);
-                int totalPlayers = initializeCopy(
-                        sc, tab, minimumSets[i],
-                        leaderboards[i], points[i]);
-                if (totalPlayers == -1) {
-                    throw new IOException("Total players invalid.");
-                }
-
-                log("(Cycle Change) Points are being calculated...", false);
-                calculatePoints(sc, totalPlayers, tab, points[i]);
-
-                log("(Cycle Change) Retrieving Top 10 players...", false);
-                TreeMap<Object, Integer> scores =
-                        findTopTen(sc, sections[i], totalPlayers, tab,
-                                points[i]);
-
-                log("(Cycle Change) Updating public leaderboard...", false);
-                updateLeaderboard(sc, scores, tab, leaderboards[i]);
-
-                points[i].renameTab("Previous Cycle", "2 Cycles Ago");
-                points[i].renameTab(tab, "Previous Cycle");
-
-                leaderboards[i].renameTab("Previous Cycle", "2 Cycles Ago");
-                leaderboards[i].renameTab(tab, "Previous Cycle");
-                leaderboards[i].duplicateTab(templateTab, actualTabName);
-
-                log("(Cycle Change) Top 10 for " + sections[i] + " completed.", false);
+            int minimumSets = 3;
+            GoogleSheetsAPI leaderboard = new GoogleSheetsAPI(cyclesSheetID());
+            GoogleSheetsAPI points = new GoogleSheetsAPI(calculationsSheetID());
+            if (getSection().equals("Ink Odyssey")) {
+                minimumSets = 0;
             }
 
-            editMessage(sc, "Here are your Cycle Top 10s!");
+            points.duplicateTab(templateTab, currentTab);
+
+            wait(10000);
+            editMessage(sc, "Copying " + getSection() + " spreadsheet...");
+
+            log("(Cycle Change) A leaderboard is being copied to the "
+                    + getSection() + " points spreadsheet.", false);
+            int totalPlayers = initializeCopy(
+                    sc, currentTab, minimumSets, leaderboard, points);
+            if (totalPlayers == -1) {
+                throw new IOException("Total players invalid.");
+            }
+
+            log("(Cycle Change) Points are being calculated...", false);
+            calculatePoints(sc, totalPlayers, currentTab, points);
+
+            log("(Cycle Change) Retrieving Top 10 players...", false);
+            TreeMap<Object, Integer> scores =
+                    findTopTen(sc, getSection(), totalPlayers, currentTab, points);
+
+            log("(Cycle Change) Updating public leaderboard...", false);
+            updateLeaderboard(sc, scores, currentTab, leaderboard);
+
+            // update the points spreadsheet up to the previous cycle
+            points.renameTab(previousTab, "2 Cycles Ago");
+            points.renameTab(currentTab, previousTab);
+
+            // update the leaderboard spreadsheet up to the new cycle
+            leaderboard.renameTab(currentTab, previousTab);
+            leaderboard.duplicateTab(templateTab, currentTab);
+
+            log("(Cycle Change) Top 10 for " + getSection() + " completed.", false);
+            wait(2000);
+
+            editMessage(sc, "Here are your " + getSection() + " Cycle Top 10s!");
+            sendResponse(sc, "Please around one minute before performing "
+                    + "another cycle change. Thanks (:", true);
+
             log("Cycle change has been completed.", false);
         } catch (GeneralSecurityException | IOException e) {
-            sendResponse(sc, "A spreadsheet could not load.", true);
+            editMessage(sc, "A problem occurred during the calculation.");
             log("A spreadsheet during calculations could not load.", true);
         }
     }

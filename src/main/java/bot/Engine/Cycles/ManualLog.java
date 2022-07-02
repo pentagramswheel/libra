@@ -156,14 +156,6 @@ public class ManualLog extends Section implements Command {
         try {
             int gameLosses = gamesPlayed - gameWins;
 
-            gameWins += stats.getGamesWon();
-            gameLosses += stats.getGamesLost();
-            gamesPlayed = gameWins + gameLosses;
-            double gameWinrate = 0.0;
-            if (gamesPlayed > 0) {
-                gameWinrate =  (double) gameWins / gamesPlayed;
-            }
-
             int setWins = stats.getSetWins();
             int setLosses = stats.getSetLosses();
             int setsPlayed = setWins + setLosses;
@@ -179,6 +171,14 @@ public class ManualLog extends Section implements Command {
             }
             if (setsPlayed > 0) {
                 setWinrate = (double) setWins / setsPlayed;
+            }
+
+            gameWins += stats.getGamesWon();
+            gameLosses += stats.getGamesLost();
+            gamesPlayed = gameWins + gameLosses;
+            double gameWinrate = 0.0;
+            if (gamesPlayed > 0) {
+                gameWinrate =  (double) gameWins / gamesPlayed;
             }
 
             String updateRange = link.buildRange(CYCLES_TAB,

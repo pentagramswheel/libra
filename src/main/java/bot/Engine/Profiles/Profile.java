@@ -43,7 +43,7 @@ public class Profile implements Command {
     private static final String END_COLUMN = "H";
 
     /** The tab name of the spreadsheet. */
-    private static final String TAB = "'Profiles'";
+    private static final String TAB = "Profiles";
 
     /**
      * Sets the spreadsheet ID.
@@ -269,10 +269,10 @@ public class Profile implements Command {
     private String getScore(GenericInteractionCreateEvent interaction,
                             String id, List<Role> roles) {
         String leaderboardID;
-        if (roles.contains(getRole(interaction, "Ink Odyssey"))) {
-            leaderboardID = Config.ioCyclesSheetID;
-        } else if (roles.contains(getRole(interaction, "LaunchPoint"))) {
+        if (roles.contains(getRole(interaction, "LaunchPoint"))) {
             leaderboardID = Config.lpCyclesSheetID;
+        } else if (roles.contains(getRole(interaction, "Ink Odyssey"))) {
+            leaderboardID = Config.ioCyclesSheetID;
         } else {
             return "N/A";
         }
@@ -313,7 +313,7 @@ public class Profile implements Command {
         EmbedBuilder eb = new EmbedBuilder();
         Member player = findMember(interaction, id);
 
-        eb.setColor(Color.blue);
+        eb.setColor(new Color(17, 157, 247));
         if (profile == null) {
             eb.setTitle(player.getEffectiveName()
                     + " [" + player.getUser().getAsTag() + "]");
