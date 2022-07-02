@@ -77,6 +77,8 @@ public class Main {
                 "Retrieves the friend code of another user, if provided.");
         SubcommandData view = new SubcommandData("view",
                 "Looks up the profile of another user, if provided.");
+        SubcommandData nickname = new SubcommandData("nickname",
+                "Modifies the nickname of your profile.");
         SubcommandData rank = new SubcommandData("rank",
                 "Modifies the average rank of your profile.");
         SubcommandData team = new SubcommandData("team",
@@ -90,18 +92,22 @@ public class Main {
 
         OptionData viewParam = new OptionData(
                 OptionType.USER, "player", "The player to look up", false);
+        OptionData nicknameParam = new OptionData(
+                OptionType.STRING, "name", "Your nickname", true);
         OptionData teamParam = new OptionData(
                 OptionType.STRING, "name", "Your team's name", true);
 
         fc.addOptions(fcParam);
         getfc.addOptions(viewParam);
         view.addOptions(viewParam);
+        nickname.addOptions(nicknameParam);
+
         playstyle.addOptions(playstyleChoices);
         weapons.addOptions(weaponsParam);
         rank.addOptions(rankChoices);
         team.addOptions(teamParam);
 
-        profile.addSubcommands(fc, getfc, view,
+        profile.addSubcommands(fc, getfc, view, nickname,
                 rank, team, playstyle, weapons,
                 delete);
 

@@ -70,6 +70,31 @@ public class Profile implements Command {
     }
 
     /**
+     * Reformats weapon pool entry into lines of set length.
+     * @param weapons the pool to format.
+     * @return the formatted pool.
+     */
+    private String reformatWeapons(String weapons) {
+        String[] splitPool = weapons.split(", ");
+        StringBuilder formattedPool = new StringBuilder();
+
+        for (int i = 1; i <= splitPool.length; i++) {
+            formattedPool.append(splitPool[i - 1]);
+
+            if (i < splitPool.length) {
+                formattedPool.append(",");
+                if (i % 3 == 0) {
+                    formattedPool.append("\n");
+                } else {
+                    formattedPool.append(" ");
+                }
+            }
+        }
+
+        return formattedPool.toString();
+    }
+
+    /**
      * Quickly registers a new player into the database by
      * loading multiple parameters
      * @param sc the user's inputted command.
@@ -106,7 +131,7 @@ public class Profile implements Command {
 
                 ValueRange newRow = link.buildRow(Arrays.asList(
                         user.getId(), discordTag, user.getEffectiveName(),
-                        fc, playstyle, weapons, rank, "N/A"));
+                        fc, playstyle, reformatWeapons(weapons), rank, "N/A"));
                 link.appendRow(TAB, newRow);
 
                 sendResponse(sc, "Your MIT profile has been created! "
@@ -340,15 +365,22 @@ public class Profile implements Command {
     /**
      * Rebuilds a row within the profile database.
      * @param profile a player's profile.
+     * @param newNickname the nickname to change to, if any.
      * @param newPlaystyle the playstyle to change to, if any.
      * @param newWeapons the weapon pool to change to, if any.
      * @param newRank the rank to change to, if any.
      * @param newTeam the team to change to, if any.
      * @return the built row, with the actual change in the first slot.
      */
-    private List<Object> withNewInfo(PlayerInfo profile, String newPlaystyle,
-                               String newWeapons, String newRank, String newTeam) {
+    private List<Object> withNewInfo(PlayerInfo profile, String newNickname,
+                                     String newPlaystyle, String newWeapons,
+                                     String newRank, String newTeam) {
         String foundNewInfo = null;
+
+        String nickname = profile.getNickname();
+        if (newNickname != null) {
+            nickname = foundNewInfo = newNickname;
+        }
 
         String playstyle = profile.getPlaystyle();
         if (newPlaystyle != null) {
@@ -357,7 +389,7 @@ public class Profile implements Command {
 
         String weapons = profile.getWeaponPool();
         if (newWeapons != null) {
-            weapons = foundNewInfo = newWeapons;
+            weapons = foundNewInfo = reformatWeapons(newWeapons);
         }
 
         String rank = profile.getRank();
@@ -371,21 +403,22 @@ public class Profile implements Command {
         }
 
         return new ArrayList<>(Arrays.asList(foundNewInfo,
-                profile.getAsTag(), profile.getNickname(), profile.getFC(),
+                profile.getAsTag(), nickname, profile.getFC(),
                 playstyle, weapons, rank, team));
     }
 
     /**
      * Updates a single field within a player's profile.
      * @param sc the user's inputted command.
+     * @param nickname the new nickname to change to, if any.
      * @param playstyle the new playstyle to change to, if any.
      * @param weapons the new weapon pool to change to, if any.
      * @param rank the new rank to change to, if any.
      * @param team the new team to change to, if any.
      */
     private void setField(SlashCommandEvent sc,
-                         String playstyle, String weapons, String rank,
-                         String team) {
+                         String nickname, String playstyle, String weapons,
+                         String rank, String team) {
         sc.deferReply(true).queue();
 
         try {
@@ -404,7 +437,8 @@ public class Profile implements Command {
                 String updateRange = link.buildRange(TAB,
                         "B", profile.getSpreadsheetPosition(),
                         "H", profile.getSpreadsheetPosition());
-                List<Object> updatedRow = withNewInfo(profile, playstyle, weapons, rank, team);
+                List<Object> updatedRow = withNewInfo(profile, nickname,
+                        playstyle, weapons, rank, team);
                 String changedField = (String) updatedRow.remove(0);
 
                 ValueRange newRow = link.buildRow(updatedRow);
@@ -412,7 +446,7 @@ public class Profile implements Command {
 
                 String cmd = sc.getSubcommandName();
                 sendResponse(sc, "Your " + cmd + " has been updated to `"
-                        + changedField + "`.", false);
+                        + changedField.replaceAll("\n", " ") + "`.", false);
                 log(sc.getUser().getAsTag() + "'s " + cmd + " was updated.", false);
             } else {
                 sendResponse(sc, "Your MIT profile does not exist yet. Register with "
@@ -476,17 +510,25 @@ public class Profile implements Command {
             case "view":
                 view(sc, getParameter(args, true), true);
                 break;
+            case "nickname":
+                setField(sc, getParameter(args, false), null,
+                        null, null, null);
+                break;
             case "playstyle":
-                setField(sc, getParameter(args, false), null, null, null);
+                setField(sc, null, getParameter(args, false),
+                        null, null, null);
                 break;
             case "weapons":
-                setField(sc, null, getParameter(args, false), null, null);
+                setField(sc, null, null,
+                        getParameter(args, false), null, null);
                 break;
             case "rank":
-                setField(sc, null, null, getParameter(args, false), null);
+                setField(sc, null, null,
+                        null, getParameter(args, false), null);
                 break;
             case "team":
-                setField(sc, null, null, null, getParameter(args, false));
+                setField(sc, null, null,
+                        null, null, getParameter(args, false));
                 break;
             case "delete":
                 delete(sc);
