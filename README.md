@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** July 2, 2022
+**Last Updated:** July 3, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -96,6 +96,10 @@ The entry point of the bot. It constructs the bot and prepares it for processing
 
 ###### Instance Variables
 1. `String NAME` - the name of the bot.
+2. `Color mitColor` - the color of MIT.
+3. `Color launchpointColor` - the color of LaunchPoint.
+4. `Color inkodysseyColor` - the color of Ink Odyssey.
+5. `Color freshwatershoalsColor` - the color of Freshwater Shoals.
 
 ----
 

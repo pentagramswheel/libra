@@ -1,6 +1,7 @@
 package bot.Engine;
 
 import bot.Config;
+import bot.Main;
 
 import java.awt.Color;
 
@@ -57,7 +58,7 @@ public class Section {
             name = "LaunchPoint";
             role = "<@&732850504463286352>";
             emote = "<:LaunchPoint:918936266190512168>";
-            color = Color.GREEN;
+            color = Main.launchpointColor;
             gradSheetID = Config.lpGradSheetID;
             cyclesSheetID = Config.lpCyclesSheetID;
             calculationsSheetID = Config.lpCyclesCalculationSheetID;
@@ -65,10 +66,10 @@ public class Section {
             name = "Ink Odyssey";
             role = "<@&918181354284408882>";
             emote = "<:InkOdyssey:918936305788923944>";
-            color = Color.MAGENTA;
+            color = Main.inkodysseyColor;
             gradSheetID = Config.ioGradSheetID;
             cyclesSheetID = Config.ioCyclesSheetID;
-            calculationsSheetID = Config.ioCyclesSheetID;
+            calculationsSheetID = Config.ioCyclesCalculationSheetID;
         }
     }
 

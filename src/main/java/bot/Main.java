@@ -10,8 +10,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
+import java.awt.Color;
 import java.util.Random;
 
 /**
@@ -25,6 +27,12 @@ public class Main {
 
     /** Name of the bot and application. */
     public static String NAME = "Libra";
+
+    /** Colors for the bot to reference. */
+    public static Color mitColor = new Color(0, 154, 255);
+    public static Color launchpointColor = new Color(13, 255, 0);
+    public static Color inkodysseyColor = new Color(255, 0, 144);
+    public static Color freshwatershoalsColor = new Color(135, 0, 255);
 
     /**
      * Implement the bot's slash commands.
@@ -224,6 +232,7 @@ public class Main {
 
             System.out.println();
             JDA jda = JDABuilder.createLight(Config.botToken)
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_PRESENCES)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS)
                     .addEventListeners(new Events(rGen))

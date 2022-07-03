@@ -3,6 +3,7 @@ package bot.Engine.Profiles;
 import bot.Config;
 import bot.Engine.Cycles.PlayerStats;
 import bot.Engine.Section;
+import bot.Main;
 import bot.Tools.Command;
 import bot.Tools.GoogleSheetsAPI;
 
@@ -265,20 +266,35 @@ public class Profile implements Command {
     }
 
     /**
+     * Retrieves a section's spreadsheet ID to reference, if any.
+     * @param interaction the user interaction calling this method.
+     * @param eb the pre-built embed to reference.
+     * @param roles a player's roles.
+     */
+    private String getSpreadsheetID(GenericInteractionCreateEvent interaction,
+                              EmbedBuilder eb, List<Role> roles) {
+        if (roles.contains(getRole(interaction, "LaunchPoint"))) {
+            eb.setColor(Main.launchpointColor);
+            return Config.lpCyclesSheetID;
+        } else if (roles.contains(getRole(interaction, "Ink Odyssey"))) {
+            eb.setColor(Main.inkodysseyColor);
+            return Config.ioCyclesSheetID;
+        } else {
+            eb.setColor(Main.mitColor);
+            return null;
+        }
+    }
+
+    /**
      * Retrieves the win-loss score of a player within their
      * draft section, if it exists.
      * @param interaction the user interaction calling this method.
      * @param id the player's Discord ID.
-     * @param roles the player's server roles.
+     * @param leaderboardID the leaderboard spreadsheet ID to reference.
      */
     private String getScore(GenericInteractionCreateEvent interaction,
-                            String id, List<Role> roles) {
-        String leaderboardID;
-        if (roles.contains(getRole(interaction, "LaunchPoint"))) {
-            leaderboardID = Config.lpCyclesSheetID;
-        } else if (roles.contains(getRole(interaction, "Ink Odyssey"))) {
-            leaderboardID = Config.ioCyclesSheetID;
-        } else {
+                            String id, String leaderboardID) {
+        if (leaderboardID == null) {
             return "N/A";
         }
 
@@ -318,7 +334,8 @@ public class Profile implements Command {
         EmbedBuilder eb = new EmbedBuilder();
         Member player = findMember(interaction, id);
 
-        eb.setColor(new Color(17, 157, 247));
+        String leaderboardID = getSpreadsheetID(
+                interaction, eb, player.getRoles());
         if (profile == null) {
             eb.setTitle(player.getEffectiveName()
                     + " [" + player.getUser().getAsTag() + "]");
@@ -338,7 +355,7 @@ public class Profile implements Command {
         if (fullDisplay) {
             if (profile != null) {
                 eb.addField("Score",
-                        getScore(interaction, id, player.getRoles()), true);
+                        getScore(interaction, id, leaderboardID), true);
                 eb.addField("Team", profile.getTeam(), true);
                 eb.addField("Rank", profile.getRank(), true);
             }
