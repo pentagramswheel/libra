@@ -77,12 +77,17 @@ public class Profile implements Command {
      */
     private boolean blacklistedName(String name) {
         name = name.toLowerCase();
-        List<String> bannedWords = new ArrayList<>(Arrays.asList(
-                "shit", "fuck", "fuk", "fk", "fck", "bitch", "whore",
+        String[] bannedWords = {"shit", "fuck", "fuk", "fk", "fck", "bitch", "whore",
                 "nigga", "chigga", "ching", "chong", "chink", "cholo",
-                "cracker", "nigger"));
+                "cracker", "nigger"};
 
-        return bannedWords.stream().anyMatch(name::contains);
+        for (String word : bannedWords) {
+            if (name.equals(word)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

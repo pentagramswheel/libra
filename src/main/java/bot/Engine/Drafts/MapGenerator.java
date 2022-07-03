@@ -44,12 +44,11 @@ public class MapGenerator extends Section implements Command {
     }
 
     /**
-     * Checks if the map generation can occur
-     * @param sc the user's inputted command.
+     * Checks if the map generation can occur.
      * @return True if the map generation can proceed.
      *         False otherwise.
      */
-    private boolean mapGenerationLimitHit(SlashCommandEvent sc) {
+    private boolean mapGenerationLimitHit() {
         if (foundDraft == null) {
             return false;
         } else if (foundDraft.getMapGens() >= MAX_DRAFT_MAPLISTS) {
@@ -221,7 +220,7 @@ public class MapGenerator extends Section implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
-        if (mapGenerationLimitHit(sc)) {
+        if (mapGenerationLimitHit()) {
             sc.reply("You can only generate two maplists per draft!")
                     .setEphemeral(true).queue();
             return;

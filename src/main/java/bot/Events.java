@@ -125,9 +125,8 @@ public class Events extends ListenerAdapter {
      *         False otherwise.
      */
     private boolean isStaffCommand(SlashCommandEvent sc) {
-        List<String> staffCmds = new ArrayList<>(Arrays.asList(
-                "forceend", "log", "sub", "undo",
-                "add", "deny", "grad", "award", "cyclescalc"));
+        String[] staffCmds = {"forceend", "log", "sub", "undo",
+                "add", "deny", "grad", "award", "cyclescalc"};
 
         try {
             Guild server = sc.getGuild();
@@ -140,7 +139,11 @@ public class Events extends ListenerAdapter {
             Role staffRole = server.getRolesByName("Staff", true).get(0);
 
             if (author != null && !author.getRoles().contains(staffRole)) {
-                return staffCmds.stream().anyMatch(subCmd::contains);
+                for (String cmd : staffCmds) {
+                    if (subCmd.equals(cmd)) {
+                        return true;
+                    }
+                }
             }
         } catch (NullPointerException | IndexOutOfBoundsException e) {
             Logger logger = LoggerFactory.getLogger(this.getClass());
