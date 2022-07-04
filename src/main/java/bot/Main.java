@@ -57,10 +57,14 @@ public class Main {
                 OptionType.STRING, "friendcode", "Your friend code", true);
         OptionData nicknameParam = new OptionData(
                 OptionType.STRING, "name", "Your preferred nickname", true);
+        String[] pronounCombos = {"he/him", "she/her", "they/them", "xe/xem", "Just ask!"};
+        OptionData pronounChoices = new OptionData(
+                OptionType.STRING, "pronouns", "Your preferred pronouns", true);
         OptionData playstyleChoices = new OptionData(
                 OptionType.STRING, "playstyle", "Your preferred playstyle/position", true);
         String[] playstyles = {"Slayer", "Skirmisher", "Support", "Anchor", "Flex"};
-        for (int i = 1; i <= playstyles.length; i++) {
+        for (int i = 1; i <= pronounCombos.length; i++) {
+            pronounChoices.addChoice(pronounCombos[i - 1], pronounCombos[i - 1]);
             playstyleChoices.addChoice(playstyles[i - 1], playstyles[i - 1]);
         }
 
@@ -74,7 +78,8 @@ public class Main {
             rankChoices.addChoice(ranks[i - 1], ranks[i - 1]);
         }
 
-        qprofile.addOptions(fcParam, nicknameParam, playstyleChoices, weaponsParam, rankChoices);
+        qprofile.addOptions(fcParam, nicknameParam, pronounChoices,
+                playstyleChoices, weaponsParam, rankChoices);
 
         // profile commands
         SubcommandGroupData profile = new SubcommandGroupData("profile",
@@ -87,14 +92,16 @@ public class Main {
                 "Looks up the profile of another user, if provided.");
         SubcommandData nickname = new SubcommandData("nickname",
                 "Modifies the nickname of your profile.");
-        SubcommandData rank = new SubcommandData("rank",
-                "Modifies the average rank of your profile.");
-        SubcommandData team = new SubcommandData("team",
-                "Modifies the competitive team of your profile.");
+        SubcommandData pronouns = new SubcommandData("pronouns",
+                "Modifies the pronouns of your profile.");
         SubcommandData playstyle = new SubcommandData("playstyle",
                 "Modifies the playstyle of your profile.");
         SubcommandData weapons = new SubcommandData("weapons",
                 "Modifies the main weapons of your profile.");
+        SubcommandData rank = new SubcommandData("rank",
+                "Modifies the average rank of your profile.");
+        SubcommandData team = new SubcommandData("team",
+                "Modifies the competitive team of your profile.");
         SubcommandData delete = new SubcommandData("delete",
                 "Deletes your profile.");
 
@@ -107,14 +114,15 @@ public class Main {
         getfc.addOptions(viewParam);
         view.addOptions(viewParam);
         nickname.addOptions(nicknameParam);
+        pronouns.addOptions(pronounChoices);
 
         playstyle.addOptions(playstyleChoices);
         weapons.addOptions(weaponsParam);
         rank.addOptions(rankChoices);
         team.addOptions(teamParam);
 
-        profile.addSubcommands(fc, getfc, view, nickname,
-                rank, team, playstyle, weapons,
+        profile.addSubcommands(fc, getfc, view, nickname, pronouns,
+                playstyle, weapons, rank, team,
                 delete);
 
         // section commands

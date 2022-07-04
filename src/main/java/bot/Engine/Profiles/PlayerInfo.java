@@ -25,8 +25,11 @@ public class PlayerInfo {
     /** The nickname of the player. */
     private String nickname;
 
-    /** The preferred pronoun(s) of the player. */
+    /** The friend code of the player. */
     private String friendcode;
+
+    /** The preferred pronouns of the player. */
+    private String pronouns;
 
     /** The preferred playstyle of the player. */
     private String playstyle;
@@ -54,10 +57,11 @@ public class PlayerInfo {
             tag = row.get(0).toString();
             nickname = row.get(1).toString();
             friendcode = row.get(2).toString();
-            playstyle = row.get(3).toString();
-            weapons = row.get(4).toString();
-            rank = row.get(5).toString();
-            team = row.get(6).toString();
+            pronouns = row.get(3).toString();
+            playstyle = row.get(4).toString();
+            weapons = row.get(5).toString();
+            rank = row.get(6).toString();
+            team = row.get(7).toString();
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
             Logger logger = LoggerFactory.getLogger(this.getClass());
             logger.error("Spreadsheet formatting problem detected.");
@@ -94,6 +98,11 @@ public class PlayerInfo {
      */
     public String getFC() {
         return friendcode;
+    }
+
+    /** Retrieves the preferred pronouns of the player. */
+    public String getPronouns() {
+        return pronouns;
     }
 
     /**

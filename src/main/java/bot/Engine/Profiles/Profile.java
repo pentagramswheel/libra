@@ -35,23 +35,16 @@ import java.util.TreeMap;
 public class Profile implements Command {
 
     /** Google Sheets ID of the spreadsheet to save to. */
-    private final String spreadsheetID;
+    private static final String spreadsheetID = Config.mitProfilesSheetID;
 
     /** The spreadsheet's starting column with profile information. */
     private static final String START_COLUMN = "B";
 
     /** The spreadsheet's ending column with profile information. */
-    private static final String END_COLUMN = "H";
+    private static final String END_COLUMN = "I";
 
     /** The tab name of the spreadsheet. */
     private static final String TAB = "Profiles";
-
-    /**
-     * Sets the spreadsheet ID.
-     */
-    public Profile() {
-        spreadsheetID = Config.mitProfilesSheetID;
-    }
 
     /**
      * Retrieves the parameter of a command, if any.
@@ -127,6 +120,7 @@ public class Profile implements Command {
         List<OptionMapping> args = sc.getOptions();
         String fc = getParameter(args, false);
         String nickname = getParameter(args, false);
+        String pronouns = getParameter(args, false);
         String playstyle = getParameter(args, false);
         String weapons = getParameter(args, false);
         String rank = getParameter(args, false);
@@ -157,8 +151,8 @@ public class Profile implements Command {
                 String discordTag = user.getUser().getAsTag();
 
                 ValueRange newRow = link.buildRow(Arrays.asList(
-                        user.getId(), discordTag, nickname,
-                        fc, playstyle, reformatWeapons(weapons), rank, "N/A"));
+                        user.getId(), discordTag, nickname, fc, pronouns,
+                        playstyle, reformatWeapons(weapons), rank, "N/A"));
                 link.appendRow(TAB, newRow);
 
                 sendResponse(sc, "Your MIT profile has been created! "
@@ -214,8 +208,7 @@ public class Profile implements Command {
                 ValueRange newRow = link.buildRow(Arrays.asList(
                         user.getId(), discordTag, user.getEffectiveName(),
                         fc, "Unset",
-                        "Unset", "Unset",
-                        "N/A"));
+                        "Unset", "Unset", "Unset", "N/A"));
                 link.appendRow(TAB, newRow);
 
                 sendResponse(sc, "Your MIT profile has been created! "
@@ -348,6 +341,7 @@ public class Profile implements Command {
             eb.setFooter("FC SW-" + profile.getFC(),
                     "https://images.squarespace-cdn.com/content/v1/5ce2bf96d2bf17000192fe2c/1596048502214-WL5LU68IOLM8WILBA57N/Friends+Icon.png?format=1000w");
 
+            eb.addField("Pronouns", profile.getPronouns(), true);
             eb.addField("Playstyle", "`" + profile.getPlaystyle() + "`", true);
             eb.addField("Weapon Pool", "`" + profile.getWeaponPool() + "`", true);
         }
@@ -411,6 +405,7 @@ public class Profile implements Command {
      * Rebuilds a row within the profile database.
      * @param profile a player's profile.
      * @param newNickname the nickname to change to, if any.
+     * @param newPronouns the pronouns to change to, if any.
      * @param newPlaystyle the playstyle to change to, if any.
      * @param newWeapons the weapon pool to change to, if any.
      * @param newRank the rank to change to, if any.
@@ -418,13 +413,19 @@ public class Profile implements Command {
      * @return the built row, with the actual change in the first slot.
      */
     private List<Object> withNewInfo(PlayerInfo profile, String newNickname,
-                                     String newPlaystyle, String newWeapons,
-                                     String newRank, String newTeam) {
+                                     String newPronouns, String newPlaystyle,
+                                     String newWeapons, String newRank,
+                                     String newTeam) {
         String foundNewInfo = null;
 
         String nickname = profile.getNickname();
         if (newNickname != null) {
             nickname = foundNewInfo = newNickname;
+        }
+
+        String pronouns = profile.getPronouns();
+        if (newPronouns != null) {
+            pronouns = foundNewInfo = newPronouns;
         }
 
         String playstyle = profile.getPlaystyle();
@@ -448,7 +449,7 @@ public class Profile implements Command {
         }
 
         return new ArrayList<>(Arrays.asList(foundNewInfo,
-                profile.getAsTag(), nickname, profile.getFC(),
+                profile.getAsTag(), nickname, profile.getFC(), pronouns,
                 playstyle, weapons, rank, team));
     }
 
@@ -456,14 +457,15 @@ public class Profile implements Command {
      * Updates a single field within a player's profile.
      * @param sc the user's inputted command.
      * @param nickname the new nickname to change to, if any.
+     * @param pronouns the new pronouns to change to, if any.
      * @param playstyle the new playstyle to change to, if any.
      * @param weapons the new weapon pool to change to, if any.
      * @param rank the new rank to change to, if any.
      * @param team the new team to change to, if any.
      */
     private void setField(SlashCommandEvent sc,
-                         String nickname, String playstyle, String weapons,
-                         String rank, String team) {
+                          String nickname, String pronouns, String playstyle,
+                          String weapons, String rank, String team) {
         sc.deferReply(true).queue();
 
         try {
@@ -484,10 +486,10 @@ public class Profile implements Command {
                 PlayerInfo profile = (PlayerInfo) database.get(userID);
 
                 String updateRange = link.buildRange(TAB,
-                        "B", profile.getSpreadsheetPosition(),
-                        "H", profile.getSpreadsheetPosition());
+                        START_COLUMN, profile.getSpreadsheetPosition(),
+                        END_COLUMN, profile.getSpreadsheetPosition());
                 List<Object> updatedRow = withNewInfo(profile, nickname,
-                        playstyle, weapons, rank, team);
+                        pronouns, playstyle, weapons, rank, team);
                 String changedField = (String) updatedRow.remove(0);
 
                 ValueRange newRow = link.buildRow(updatedRow);
@@ -562,23 +564,28 @@ public class Profile implements Command {
                 break;
             case "nickname":
                 setField(sc, getParameter(args, false), null,
-                        null, null, null);
+                        null, null, null, null);
+                break;
+            case "pronouns":
+                setField(sc, null, getParameter(args, false),
+                        null, null, null, null);
                 break;
             case "playstyle":
-                setField(sc, null, getParameter(args, false),
-                        null, null, null);
+                setField(sc, null, null,
+                        getParameter(args, false), null, null, null);
                 break;
             case "weapons":
                 setField(sc, null, null,
-                        getParameter(args, false), null, null);
+                        null, getParameter(args, false), null, null);
                 break;
             case "rank":
                 setField(sc, null, null,
-                        null, getParameter(args, false), null);
+                        null, null, getParameter(args, false), null);
                 break;
+
             case "team":
                 setField(sc, null, null,
-                        null, null, getParameter(args, false));
+                        null, null, null, getParameter(args, false));
                 break;
             case "delete":
                 delete(sc);

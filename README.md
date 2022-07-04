@@ -356,10 +356,12 @@ A class for storing information about a player within MIT.
 1. `int numRow` - the numbered row of the player's data within their associated draft spreadsheet.
 2. `String tag` - the player's Discord tag.
 3. `String nickname` - the player's nickname on the server.
-4. `int setWins` - the player's amount of won sets in a cycle.
-5. `int setLosses` - the player's amount of lost sets in a cycle.
-6. `int gamesWon` - the player's amount of won games in a cycle.
-7. `int gamesLost` - the player's amount of lost games in a cycle.
+4. `String friendcode` - the player's Nintendo Switch friend code.
+5. `String pronouns` - the player's preferred pronouns.
+6. `String playstyle` - the player's preferred playstyle.
+7. `String weapons` - the player's preferred main weapons.
+8. `String rank` - the player's average rank in-game.
+9. `String team` - the player's competitive team, if any.
 
 ----
 
