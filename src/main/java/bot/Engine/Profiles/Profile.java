@@ -173,7 +173,7 @@ public class Profile implements Command {
 
                 ValueRange newRow = link.buildRow(Arrays.asList(
                         user.getId(), discordTag, nickname,
-                        fc, reformatPhrase(pronouns, 1),
+                        fc, reformatPhrase(pronouns.toLowerCase(), 1),
                         playstyle, reformatPhrase(weapons, 3), rank, "N/A"));
                 link.appendRow(TAB, newRow);
 
@@ -272,8 +272,8 @@ public class Profile implements Command {
                         + profile.getAsTag() + ".", false);
             } else {
                 sendResponse(sc, pronoun + " MIT profile does not exist yet. "
-                        + "Register with `/mit profile fc` "
-                        + "or `/mit qprofile ...` to proceed.", true);
+                        + "Register with `/mit qprofile ...`\n"
+                        + "or `/mit profile fc` to proceed.", true);
             }
         } catch (IOException | GeneralSecurityException e) {
             log("The profiles spreadsheet could not load.", true);
@@ -355,8 +355,8 @@ public class Profile implements Command {
             eb.setTitle(player.getEffectiveName()
                     + " [" + player.getUser().getAsTag() + "]");
             eb.setDescription(pronoun + " MIT profile does not exist. "
-                    + "Register with `/mit profile fc`\n"
-                    + "or `/mit qprofile ...` to proceed.");
+                    + "Register with `/mit qprofile ...`\n"
+                    + "or `/mit profile fc` to proceed.");
         } else {
             eb.setTitle(profile.getNickname() + " [" + profile.getAsTag() + "]");
             eb.setThumbnail(player.getEffectiveAvatarUrl());
@@ -392,10 +392,6 @@ public class Profile implements Command {
      */
     public MessageEmbed view(GenericInteractionCreateEvent interaction,
                              String id, boolean fullDisplay) {
-        if (!interaction.isAcknowledged()) {
-            interaction.deferReply(false).queue();
-        }
-
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
             TreeMap<Object, Object> database = link.readSection(interaction, TAB);
@@ -518,7 +514,7 @@ public class Profile implements Command {
                         START_COLUMN, profile.getSpreadsheetPosition(),
                         END_COLUMN, profile.getSpreadsheetPosition());
                 List<Object> updatedRow = withNewInfo(profile, nickname,
-                        pronouns, playstyle, weapons, rank, team);
+                        pronouns.toLowerCase(), playstyle, weapons, rank, team);
                 String changedField = (String) updatedRow.remove(0);
 
                 ValueRange newRow = link.buildRow(updatedRow);
@@ -530,8 +526,8 @@ public class Profile implements Command {
                 log(sc.getUser().getAsTag() + "'s " + cmd + " was updated.", false);
             } else {
                 sendResponse(sc, "Your MIT profile does not exist yet. "
-                        + "Register with `/mit profile fc`\n"
-                        + "or `/mit qprofile ...` to proceed.", true);
+                        + "Register with `/mit qprofile ...`\n"
+                        + "or `/mit profile fc` to proceed.", true);
             }
         } catch (IOException | GeneralSecurityException e) {
             log("The profiles spreadsheet could not load.", true);
@@ -589,6 +585,7 @@ public class Profile implements Command {
                 onlyGetFC(sc, getParameter(args, true));
                 break;
             case "view":
+                sc.deferReply(false).queue();
                 view(sc, getParameter(args, true), true);
                 break;
             case "nickname":
