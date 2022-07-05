@@ -64,19 +64,24 @@ public class Profile implements Command {
     }
 
     /**
-     * Checks whether a name is inappropriate or not.
-     * @param name the name to check.
+     * Checks whether a phrase is inappropriate or not.
+     * @param phrase the phrase to check.
      * @return True if it is inappropriate.
      *         False otherwise.
      */
-    private boolean blacklistedName(String name) {
-        name = name.toLowerCase();
-        String[] bannedWords = {"shit", "fuck", "fuk", "fk", "fck", "bitch", "whore",
-                "nigga", "chigga", "ching", "chong", "chink", "cholo",
-                "cracker", "nigger"};
+    private boolean blacklistedPhrase(String phrase) {
+        if (phrase == null) {
+            return false;
+        }
+
+        phrase = phrase.toLowerCase();
+        String[] bannedWords = {"shit", "fuck", "fuk", "fk", "fck", "bitch",
+                "whore", "nigga", "chigga", "ching", "chong", "chink", "cholo",
+                "cracker", "nigger", "vagina", "penis", "pussy", "dick",
+                "wanker", "bellend", "bastard"};
 
         for (String word : bannedWords) {
-            if (name.equals(word)) {
+            if (phrase.contains(word)) {
                 return true;
             }
         }
@@ -85,28 +90,43 @@ public class Profile implements Command {
     }
 
     /**
-     * Reformats weapon pool entry into lines of set length.
-     * @param weapons the pool to format.
-     * @return the formatted pool.
+     * Checks whether a phrase is too long or not.
+     * @param phrase the phrase to check.
+     * @return True if it is too long.
+     *         False otherwise.
      */
-    private String reformatWeapons(String weapons) {
-        String[] splitPool = weapons.split(", ");
-        StringBuilder formattedPool = new StringBuilder();
+    private boolean phraseTooLong(String phrase) {
+        if (phrase == null) {
+            return false;
+        }
 
-        for (int i = 1; i <= splitPool.length; i++) {
-            formattedPool.append(splitPool[i - 1]);
+        return phrase.length() > 35;
+    }
 
-            if (i < splitPool.length) {
-                formattedPool.append(",");
-                if (i % 3 == 0) {
-                    formattedPool.append("\n");
+    /**
+     * Reformats phrase into lines of set length.
+     * @param phrase the phrase to format.
+     * @param limit the number of items per line.
+     * @return the formatted pronouns.
+     */
+    private String reformatPhrase(String phrase, int limit) {
+        String[] splitPhrase = phrase.split(", ");
+        StringBuilder formattedPhrase = new StringBuilder();
+
+        for (int i = 1; i <= splitPhrase.length; i++) {
+            formattedPhrase.append(splitPhrase[i - 1]);
+
+            if (i < splitPhrase.length) {
+                formattedPhrase.append(",");
+                if (i % limit == 0) {
+                    formattedPhrase.append("\n");
                 } else {
-                    formattedPool.append(" ");
+                    formattedPhrase.append(" ");
                 }
             }
         }
 
-        return formattedPool.toString();
+        return formattedPhrase.toString();
     }
 
     /**
@@ -130,11 +150,7 @@ public class Profile implements Command {
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
             if (database == null) {
                 sendResponse(sc, "The profiles database could not load.", false);
-                return;
-            }
-
-            Member user = sc.getMember();
-            if (database.containsKey(user.getId())) {
+            } else if (database.containsKey(sc.getMember().getId())) {
                 sendResponse(sc,
                         "You cannot use `qprofile`, because your profile "
                                 + "already exists. Use the other `profile` "
@@ -143,16 +159,22 @@ public class Profile implements Command {
                 sendResponse(sc,
                         "Friend code should be in the format: "
                                 + "`8888-8888-8888`", true);
-            } else if (blacklistedName(nickname)) {
+            } else if (blacklistedPhrase(nickname) || blacklistedPhrase(pronouns)) {
                 sendResponse(sc,
-                        "Inappropriate nickname detected. "
-                        + "Please use another one.", true);
+                        "Inappropriate nickname/pronouns detected. "
+                                + "Please use another one.", true);
+            } else if (phraseTooLong(nickname) || phraseTooLong(pronouns)) {
+                sendResponse(sc,
+                        "Lengthy nickname/pronouns detected. "
+                                + "Please use another one.", true);
             } else {
+                Member user = sc.getMember();
                 String discordTag = user.getUser().getAsTag();
 
                 ValueRange newRow = link.buildRow(Arrays.asList(
-                        user.getId(), discordTag, nickname, fc, pronouns,
-                        playstyle, reformatWeapons(weapons), rank, "N/A"));
+                        user.getId(), discordTag, nickname,
+                        fc, reformatPhrase(pronouns, 1),
+                        playstyle, reformatPhrase(weapons, 3), rank, "N/A"));
                 link.appendRow(TAB, newRow);
 
                 sendResponse(sc, "Your MIT profile has been created! "
@@ -425,7 +447,7 @@ public class Profile implements Command {
 
         String pronouns = profile.getPronouns();
         if (newPronouns != null) {
-            pronouns = foundNewInfo = newPronouns;
+            pronouns = foundNewInfo = reformatPhrase(newPronouns, 1);
         }
 
         String playstyle = profile.getPlaystyle();
@@ -435,7 +457,7 @@ public class Profile implements Command {
 
         String weapons = profile.getWeaponPool();
         if (newWeapons != null) {
-            weapons = foundNewInfo = reformatWeapons(newWeapons);
+            weapons = foundNewInfo = reformatPhrase(newWeapons, 3);
         }
 
         String rank = profile.getRank();
@@ -475,15 +497,22 @@ public class Profile implements Command {
             if (database == null) {
                 sendResponse(sc, "The profiles database could not load.", false);
                 throw new IOException("The database could not load.");
-            }
-
-            String userID = sc.getMember().getId();
-            if (nickname != null && blacklistedName(nickname)) {
+            } else if (blacklistedPhrase(nickname) || blacklistedPhrase(pronouns)
+                || blacklistedPhrase(team) || blacklistedPhrase(weapons)) {
                 sendResponse(sc,
-                        "Inappropriate nickname detected. "
+                        "Inappropriate input detected. "
+                        + "Please use another one.", true);
+            } else if (phraseTooLong(nickname) || phraseTooLong(pronouns)) {
+                sendResponse(sc,
+                        "Lengthy input detected. "
                                 + "Please use another one.", true);
-            } else if (database.containsKey(userID)) {
-                PlayerInfo profile = (PlayerInfo) database.get(userID);
+            } else if (phraseTooLong(team)) {
+                sendResponse(sc,
+                        "Lengthy team name detected. Please use another one "
+                                + "or ask Technical Staff about it!", true);
+            } else if (database.containsKey(sc.getMember().getId())) {
+                PlayerInfo profile = (PlayerInfo) database.get(
+                        sc.getMember().getId());
 
                 String updateRange = link.buildRange(TAB,
                         START_COLUMN, profile.getSpreadsheetPosition(),

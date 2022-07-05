@@ -57,14 +57,12 @@ public class Main {
                 OptionType.STRING, "friendcode", "Your friend code", true);
         OptionData nicknameParam = new OptionData(
                 OptionType.STRING, "name", "Your preferred nickname", true);
-        String[] pronounCombos = {"he/him", "she/her", "they/them", "xe/xem", "Just ask!"};
         OptionData pronounChoices = new OptionData(
                 OptionType.STRING, "pronouns", "Your preferred pronouns", true);
         OptionData playstyleChoices = new OptionData(
                 OptionType.STRING, "playstyle", "Your preferred playstyle/position", true);
         String[] playstyles = {"Slayer", "Skirmisher", "Support", "Anchor", "Flex"};
-        for (int i = 1; i <= pronounCombos.length; i++) {
-            pronounChoices.addChoice(pronounCombos[i - 1], pronounCombos[i - 1]);
+        for (int i = 1; i <= playstyles.length; i++) {
             playstyleChoices.addChoice(playstyles[i - 1], playstyles[i - 1]);
         }
 

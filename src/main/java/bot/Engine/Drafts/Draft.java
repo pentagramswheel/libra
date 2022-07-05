@@ -485,6 +485,8 @@ public class Draft extends Section implements Command {
             sendReply(bc,
                     String.format("Wait until <t:%s:t> to reping!", approxTime),
                     true);
+        } else if (NUM_PLAYERS_TO_START_DRAFT - (players.size() - numInactive) >= 6) {
+            sendReply(bc,"Reping only when you need +5 or less!", true);
         } else {
             bc.deferEdit().queue();
 
