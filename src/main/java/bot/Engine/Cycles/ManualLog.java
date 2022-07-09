@@ -2,6 +2,7 @@ package bot.Engine.Cycles;
 
 import bot.Engine.Section;
 import bot.Tools.Command;
+import bot.Tools.FileHandler;
 import bot.Tools.GoogleSheetsAPI;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -33,6 +34,39 @@ public class ManualLog extends Section implements Command {
      */
     public ManualLog(String abbreviation) {
         super(abbreviation);
+    }
+
+    /**
+     * Structures a user into a mentionable ping, ignoring nicknames.
+     * @param om an argument from a command.
+     * @return the formatted ping.
+     */
+    private String mentionableFor(OptionMapping om) {
+        String id = om.getAsMember().getId();
+        return String.format("<@%s>", id);
+    }
+
+    /**
+     * Saves a cycle command to an undo file.
+     * @param cmd the formal name of the command.
+     * @param args the arguments of the command.
+     */
+    private void saveCycleCall(String cmd, List<OptionMapping> args) {
+        List<OptionMapping> userArgs = args.subList(2, args.size());
+        StringBuilder contents = new StringBuilder();
+        int lastIndex = userArgs.size() - 1;
+
+        contents.append(cmd).append(" ")
+                .append(args.get(0).getAsString()).append(" ")
+                .append(args.get(1).getAsString()).append(" ");
+        for (int i = 0; i < lastIndex; i++) {
+            contents.append(mentionableFor(userArgs.get(i))).append(" ");
+        }
+        contents.append(mentionableFor(userArgs.get(lastIndex)));
+
+        FileHandler save = new FileHandler(
+                "load" + getPrefix().toUpperCase() + ".txt");
+        save.writeContents(contents.toString());
     }
 
     /**
@@ -294,5 +328,7 @@ public class ManualLog extends Section implements Command {
             log("The " + getSection()
                     + " cycles spreadsheet could not load.", true);
         }
+
+        saveCycleCall(cmd, args);
     }
 }

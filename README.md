@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** July 3, 2022
+**Last Updated:** July 8, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -383,7 +383,9 @@ The project saves and loads data from four Google Sheets spreadsheets, two each 
 
 These spreadsheets are connected and interacted with using the Google Sheets API, linked through the Gradle components of this project. Feature summary updates are also sent, through the channel the user originally typed commands in, by the bot using the Discord JDA API, also linked through Gradle.
 
-Additionally, the `lp/io undo` commands allows a user to revert a cycle command, by saving and loading the previous cycle command, saved in text files.
+The `lp/io undo` commands allows a user to revert a cycle command, by saving and loading the previous cycle command, saved in text files.
+
+The `badwords.txt`, partially created by `nantonakos`, is referenced when finding profanity within phrases.
 
 ----
 

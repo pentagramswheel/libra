@@ -1,6 +1,7 @@
 package bot.Engine.Cycles;
 
 import bot.Tools.Command;
+import bot.Tools.FileHandler;
 import bot.Tools.GoogleSheetsAPI;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -9,9 +10,6 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.awt.Color;
-import java.util.Scanner;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.TreeMap;
 import java.util.Arrays;
 import java.io.IOException;
@@ -32,23 +30,6 @@ public class Undo extends ManualLog implements Command {
      */
     public Undo(String abbreviation) {
         super(abbreviation);
-    }
-
-    /**
-     * Retrieves the previous cycle command.
-     * @param save the undo file to analyze.
-     * @return said command.
-     */
-    private String retrieveLastMessage(File save) {
-        try {
-            Scanner load = new Scanner(save);
-            String message = load.nextLine();
-            load.close();
-
-            return message;
-        } catch (FileNotFoundException ioe) {
-            return null;
-        }
     }
 
     /**
@@ -192,7 +173,7 @@ public class Undo extends ManualLog implements Command {
 
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
-            File undoFile = new File(
+            FileHandler undoFile = new FileHandler(
                     "load" + getPrefix().toUpperCase() + ".txt");
 
             TreeMap<Object, Object> data = link.readSection(sc, CYCLES_TAB);
@@ -200,7 +181,7 @@ public class Undo extends ManualLog implements Command {
                 throw new IOException("The spreadsheet was empty.");
             }
 
-            String lastMessage = retrieveLastMessage(undoFile);
+            String lastMessage = undoFile.readFirstLine();
             if (lastMessage == null) {
                 throw new IOException("An error occurred with the undo file.");
             } else if (lastMessage.equals("REDACTED")) {
@@ -219,6 +200,8 @@ public class Undo extends ManualLog implements Command {
                 errorsFound[i - 3] = undoUser(messageArgs, link,
                         messageArgs[i], stats);
             }
+
+            undoFile.writeContents("REDACTED");
 
             sendReport(sc, messageArgs, userArgs, errorsFound);
             log(getPrefix().toUpperCase()

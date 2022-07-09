@@ -5,6 +5,7 @@ import bot.Engine.Cycles.PlayerStats;
 import bot.Engine.Section;
 import bot.Main;
 import bot.Tools.Command;
+import bot.Tools.FileHandler;
 import bot.Tools.GoogleSheetsAPI;
 
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -17,13 +18,14 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author  Wil Aquino
@@ -74,14 +76,14 @@ public class Profile implements Command {
             return false;
         }
 
+        FileHandler badWordFile = new FileHandler("badwords.txt");
         phrase = phrase.toLowerCase();
-        String[] bannedWords = {"shit", "fuck", "fuk", "fk", "fck", "bitch",
-                "whore", "nigga", "chigga", "ching", "chong", "chink", "cholo",
-                "cracker", "nigger", "vagina", "penis", "pussy", "dick",
-                "wanker", "bellend", "bastard"};
 
-        for (String word : bannedWords) {
-            if (phrase.contains(word)) {
+        for (String badRegex : badWordFile.readContents()) {
+            Pattern pattern = Pattern.compile(badRegex);
+            Matcher matcher = pattern.matcher(phrase);
+
+            if (matcher.find()) {
                 return true;
             }
         }
@@ -159,14 +161,16 @@ public class Profile implements Command {
                 sendResponse(sc,
                         "Friend code should be in the format: "
                                 + "`8888-8888-8888`", true);
-            } else if (blacklistedPhrase(nickname) || blacklistedPhrase(pronouns)) {
-                sendResponse(sc,
-                        "Inappropriate nickname/pronouns detected. "
-                                + "Please use another one.", true);
             } else if (phraseTooLong(nickname) || phraseTooLong(pronouns)) {
                 sendResponse(sc,
-                        "Lengthy nickname/pronouns detected. "
-                                + "Please use another one.", true);
+                        "Lengthy nickname/pronouns detected. Please use "
+                                + "another one or ask Technical Staff "
+                                + "about it!", true);
+            } else if (blacklistedPhrase(nickname) || blacklistedPhrase(pronouns)) {
+                sendResponse(sc,
+                        "Inappropriate nickname/pronouns detected. Please use "
+                                + "another one or ask Technical Staff "
+                                + "about it!", true);
             } else {
                 Member user = sc.getMember();
                 String discordTag = user.getUser().getAsTag();
@@ -179,7 +183,7 @@ public class Profile implements Command {
 
                 sendResponse(sc, "Your MIT profile has been created! "
                         + "Use `/mit profile view` to view your profile.", true);
-                log("Profile created for " + discordTag + ".", false);
+                log("Quick profile created for " + discordTag + ".", false);
             }
         } catch (IOException | GeneralSecurityException e) {
             log("The profiles spreadsheet could not load.", true);
@@ -467,8 +471,8 @@ public class Profile implements Command {
         }
 
         return new ArrayList<>(Arrays.asList(foundNewInfo,
-                profile.getAsTag(), nickname, profile.getFC(), pronouns,
-                playstyle, weapons, rank, team));
+                profile.getAsTag(), nickname, profile.getFC(),
+                pronouns.toLowerCase(), playstyle, weapons, rank, team));
     }
 
     /**
@@ -493,18 +497,15 @@ public class Profile implements Command {
             if (database == null) {
                 sendResponse(sc, "The profiles database could not load.", false);
                 throw new IOException("The database could not load.");
+            } else if (phraseTooLong(nickname) || phraseTooLong(pronouns)
+                    || phraseTooLong(team)) {
+                sendResponse(sc,
+                        "Lengthy team name detected. Please use another one "
+                                + "or ask Technical Staff about it!", true);
             } else if (blacklistedPhrase(nickname) || blacklistedPhrase(pronouns)
                 || blacklistedPhrase(team) || blacklistedPhrase(weapons)) {
                 sendResponse(sc,
-                        "Inappropriate input detected. "
-                        + "Please use another one.", true);
-            } else if (phraseTooLong(nickname) || phraseTooLong(pronouns)) {
-                sendResponse(sc,
-                        "Lengthy input detected. "
-                                + "Please use another one.", true);
-            } else if (phraseTooLong(team)) {
-                sendResponse(sc,
-                        "Lengthy team name detected. Please use another one "
+                        "Inappropriate input detected. Please use another one "
                                 + "or ask Technical Staff about it!", true);
             } else if (database.containsKey(sc.getMember().getId())) {
                 PlayerInfo profile = (PlayerInfo) database.get(
@@ -514,7 +515,7 @@ public class Profile implements Command {
                         START_COLUMN, profile.getSpreadsheetPosition(),
                         END_COLUMN, profile.getSpreadsheetPosition());
                 List<Object> updatedRow = withNewInfo(profile, nickname,
-                        pronouns.toLowerCase(), playstyle, weapons, rank, team);
+                        pronouns, playstyle, weapons, rank, team);
                 String changedField = (String) updatedRow.remove(0);
 
                 ValueRange newRow = link.buildRow(updatedRow);

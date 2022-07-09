@@ -439,51 +439,6 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Find the undo file to load.
-     * @param cmd the formal name of the command.
-     * @return said file.
-     */
-    private FileHandler findSave(String cmd) {
-        if (cmd.startsWith("lp")) {
-            return new FileHandler("loadLP.txt");
-        } else {
-            return new FileHandler("loadIO.txt");
-        }
-    }
-
-    /**
-     * Structures a user into a mentionable ping, ignoring nicknames.
-     * @param om an argument from a command.
-     * @return the formatted ping.
-     */
-    private String mentionableFor(OptionMapping om) {
-        String id = om.getAsMember().getId();
-        return String.format("<@%s>", id);
-    }
-
-    /**
-     * Saves a cycle command to an undo file.
-     * @param cmd the formal name of the command.
-     * @param args the arguments of the command, if they exist.
-     */
-    private void saveCycleCall(String cmd, List<OptionMapping> args) {
-        List<OptionMapping> userArgs = args.subList(2, args.size());
-        StringBuilder contents = new StringBuilder();
-        int lastIndex = userArgs.size() - 1;
-
-        contents.append(cmd).append(" ")
-                .append(args.get(0).getAsString()).append(" ")
-                .append(args.get(1).getAsString()).append(" ");
-        for (int i = 0; i < lastIndex; i++) {
-            contents.append(mentionableFor(userArgs.get(i))).append(" ");
-        }
-        contents.append(mentionableFor(userArgs.get(lastIndex)));
-
-        FileHandler save = findSave(cmd);
-        save.writeContents(contents.toString());
-    }
-
-    /**
      * Runs a general command.
      * @param sc the slash command to analyze.
      */
@@ -598,16 +553,11 @@ public class Events extends ListenerAdapter {
                 if (gamesPlayedValid(sc)) {
                     ManualLog log = new ManualLog(prefix);
                     log.runCmd(sc);
-
-                    saveCycleCall(prefix + subCmd, args);
                 }
                 break;
             case "undo":
                 Undo undo = new Undo(prefix);
                 undo.runCmd(sc);
-
-                FileHandler save = findSave(prefix);
-                save.writeContents("REDACTED");
                 break;
         }
     }

@@ -1,8 +1,12 @@
 package bot.Tools;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +50,42 @@ public class FileHandler {
         } catch (IOException ioe) {
             Logger logger = LoggerFactory.getLogger(this.getClass());
             logger.error("Could not write to " + file.getName());
+        }
+    }
+
+    /**
+     * Retrievs the first line of the file.
+     */
+    public String readFirstLine() {
+        try {
+            Scanner load = new Scanner(file);
+            String message = load.nextLine();
+            load.close();
+
+            return message;
+        } catch (FileNotFoundException ioe) {
+            Logger logger = LoggerFactory.getLogger(this.getClass());
+            logger.error("Could not read " + file.getName());
+            return null;
+        }
+    }
+
+    /** Retrieves all lines of text from the file. */
+    public List<String> readContents() {
+        List<String> lines = new ArrayList<>();
+
+        try {
+            Scanner load = new Scanner(file);
+            while (load.hasNext()) {
+                lines.add(load.nextLine());
+            }
+            load.close();
+
+            return lines;
+        } catch (FileNotFoundException ioe) {
+            Logger logger = LoggerFactory.getLogger(this.getClass());
+            logger.error("Could not read " + file.getName());
+            return null;
         }
     }
 }
