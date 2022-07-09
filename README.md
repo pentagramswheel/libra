@@ -385,7 +385,7 @@ These spreadsheets are connected and interacted with using the Google Sheets API
 
 The `lp/io undo` commands allows a user to revert a cycle command, by saving and loading the previous cycle command, saved in text files.
 
-The `badwords.txt`, partially created by `nantonakos`, is referenced when finding profanity within phrases.
+The `badwords.txt` text file, partially created by `nantonakos`, is referenced when finding profanity within phrases.
 
 ----
 
