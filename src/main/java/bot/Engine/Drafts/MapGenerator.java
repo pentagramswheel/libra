@@ -221,11 +221,10 @@ public class MapGenerator extends Section implements Command {
     @Override
     public void runCmd(SlashCommandEvent sc) {
         if (mapGenerationLimitHit()) {
-            sc.reply("You can only generate two maplists per draft!")
-                    .setEphemeral(true).queue();
+            sendReply(sc, "You can only generate two maplists per draft!", true);
             return;
         }
-        sc.deferReply().queue();
+        sc.deferReply(true).queue();
 
         List<OptionMapping> args = sc.getOptions();
         int numMaps = (int) args.get(0).getAsLong();

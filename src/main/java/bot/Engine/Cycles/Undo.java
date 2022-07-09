@@ -169,7 +169,7 @@ public class Undo extends ManualLog implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
-        sc.deferReply().queue();
+        sc.deferReply(false).queue();
 
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
@@ -185,7 +185,7 @@ public class Undo extends ManualLog implements Command {
             if (lastMessage == null) {
                 throw new IOException("An error occurred with the undo file.");
             } else if (lastMessage.equals("REDACTED")) {
-                sendResponse(sc, "There is nothing to revert.", true);
+                editMessage(sc, "There is nothing to revert.");
                 return;
             }
 
@@ -207,7 +207,7 @@ public class Undo extends ManualLog implements Command {
             log(getPrefix().toUpperCase()
                     + " draft undo was processed.", false);
         } catch (IOException | GeneralSecurityException e) {
-            sendResponse(sc, "The save could not load.", true);
+            editMessage(sc, "The save could not load.");
             log("The saved " + getPrefix().toUpperCase()
                     + " draft data could not load.", true);
         }

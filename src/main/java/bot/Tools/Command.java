@@ -197,7 +197,8 @@ public interface Command {
      *                    False otherwise.
      *
      * Note: The interaction must have been acknowledged before
-     *       this method.
+     *       this method. If the interaction has deferred its reply,
+     *       its ephemeral state follows the declared reply state.
      */
     default void sendResponse(GenericInteractionCreateEvent interaction,
                               String msg, boolean isEphemeral) {

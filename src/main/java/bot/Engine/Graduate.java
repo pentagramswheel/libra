@@ -85,7 +85,7 @@ public class Graduate extends Section implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
-        sc.deferReply().queue();
+        sc.deferReply(false).queue();
         List<OptionMapping> args = sc.getOptions();
 
         StringBuilder listOfUsers = new StringBuilder();
@@ -106,7 +106,7 @@ public class Graduate extends Section implements Command {
             }
         }
 
-        sendResponse(sc, listOfUsers.toString(), false);
+        editMessage(sc, listOfUsers.toString());
         log(args.size() + " " + getSection() + " graduate(s) processed.", false);
     }
 }

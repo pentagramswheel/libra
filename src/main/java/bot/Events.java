@@ -212,7 +212,7 @@ public class Events extends ListenerAdapter {
      * @param sc the user's inputted command.
      */
     private void printTroubleshootString(SlashCommandEvent sc) {
-        sc.deferReply().queue();
+        sc.deferReply(true).queue();
 
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Command Troubleshooting");

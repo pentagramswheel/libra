@@ -106,8 +106,7 @@ public class PointsCalculator extends Section implements Command {
 
             link.sortByDescending(tab, String.valueOf(SCORE_COLUMNS_START), table.size());
         } catch (IOException e) {
-            sendResponse(sc, "An error occurred while updating leaderboard.",
-                    true);
+            editMessage(sc, "An error occurred while updating the leaderboard.");
             log("An error occurred while updating the public leaderboard.",
                     true);
         }
@@ -177,8 +176,7 @@ public class PointsCalculator extends Section implements Command {
                 finalScores.put(id, currScore);
             }
         } catch (IOException e) {
-            sendResponse(sc, "An error occurred while calculating the Top 10 players.",
-                    true);
+            editMessage(sc, "An error occurred while calculating the Top 10 players.");
             log("An error occurred with the Top 10 calculation.", true);
         }
 
@@ -245,8 +243,7 @@ public class PointsCalculator extends Section implements Command {
 
             wait(5000);
         } catch (IOException e) {
-            sendResponse(sc, "An error occurred while calculating points.",
-                    true);
+            editMessage(sc, "An error occurred while calculating points.");
             log("An error occurred with the points calculation.", true);
         }
     }
@@ -309,9 +306,8 @@ public class PointsCalculator extends Section implements Command {
             editMessage(sc, "Calculating points...");
             return size;
         } catch (IOException e) {
-            sendResponse(sc, "An error occurred while copying over the "
-                    + "leaderboard data.",
-                    true);
+            editMessage(sc, "An error occurred while copying over the "
+                    + "leaderboard data.");
             log("The cycles data could not be copied over.", true);
             return -1;
         }
@@ -323,7 +319,7 @@ public class PointsCalculator extends Section implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
-        sc.deferReply().queue();
+        sc.deferReply(false).queue();
 
         // tab names of the spreadsheets
         String currentTab = CYCLES_TAB;
@@ -373,12 +369,12 @@ public class PointsCalculator extends Section implements Command {
             wait(2000);
 
             editMessage(sc, "Here are your " + getSection() + " Cycle Top 10s!");
-            sendResponse(sc, "Please around one minute before performing "
+            sendResponse(sc, "Please wait around one minute before performing "
                     + "another cycle change. Thanks (:", true);
 
             log("Cycle change has been completed.", false);
         } catch (GeneralSecurityException | IOException e) {
-            editMessage(sc, "A problem occurred during the calculation.");
+            sendResponse(sc, "A problem occurred during the calculation.", false);
             log("A spreadsheet during calculations could not load.", true);
         }
     }

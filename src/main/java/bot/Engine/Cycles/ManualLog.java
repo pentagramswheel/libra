@@ -288,7 +288,7 @@ public class ManualLog extends Section implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
-        sc.deferReply().queue();
+        sc.deferReply(false).queue();
 
         String cmd = sc.getSubcommandName();
         List<OptionMapping> args = sc.getOptions();
@@ -324,7 +324,7 @@ public class ManualLog extends Section implements Command {
             log(userArgs.size() + " " + getPrefix().toUpperCase()
                     + " draft player(s) were manually processed.", false);
         } catch (IOException | GeneralSecurityException e) {
-            sendResponse(sc, "The leaderboard could not load.", true);
+            editMessage(sc, "The leaderboard could not load.");
             log("The " + getSection()
                     + " cycles spreadsheet could not load.", true);
         }
