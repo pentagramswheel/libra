@@ -224,7 +224,7 @@ public class MapGenerator extends Section implements Command {
             sendReply(sc, "You can only generate two maplists per draft!", true);
             return;
         }
-        sc.deferReply(true).queue();
+        sc.deferReply(false).queue();
 
         List<OptionMapping> args = sc.getOptions();
         int numMaps = (int) args.get(0).getAsLong();
