@@ -5,7 +5,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** July 8, 2022
+**Last Updated:** July 10, 2022
 
 **Table of Contents:**
 * [Introduction](#introduction)
@@ -114,7 +114,7 @@ A class consisting of credential-specific information, pertaining to Discord and
 The class which parses through user-inputted commands, as referenced in `Usage`.
 
 ###### Instance Variables
-1. `Random rGen` - a random number generator for the bot.  
+1. `Random RANDOM_GENERATOR` - a random number generator for the bot.  
 2. `int MAX_LP_DRAFTS` - the maximum number of LaunchPoint drafts.
 3. `int MAX_IO_DRAFTS` - the maximum number of Ink Odyssey drafts.
 4. `TreeMap<Integer, Draft> lpDrafts` - a map of numbers/buttons to LaunchPoint drafts.
@@ -279,7 +279,6 @@ A class which forms and starts drafts, processing the command `lp/io startdraft`
 9. `TextChannel draftChat` - the draft chat which this draft is linked to.
 10. `String messageID` - the Discord message ID of the draft request.
 11. `int NUM_PLAYERS_TO_START_DRAFT` - the number of players to start the draft.
-12. `Random numGenerator` - a random number generator.
 13. `int mapGens` - the amount of times a map generation has occurred for the draft.
 
 ----
@@ -334,9 +333,8 @@ A class which represents teams within a draft.
 A class which generates map lists.
 
 ###### Instance Variables
-1. `Random numGenerator` - a random number generator for map generation.
-2. `Draft foundDraft` - a draft associated with the map generator.
-3. `int MAX_DRAFT_MAPLISTS` - the maximum number of map generations for a draft.
+1. `Draft foundDraft` - a draft associated with the map generator.
+2. `int MAX_DRAFT_MAPLISTS` - the maximum number of map generations for a draft.
 
 ----
 

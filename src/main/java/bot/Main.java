@@ -233,14 +233,12 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
-            Random rGen = new Random();
-
             System.out.println();
             JDA jda = JDABuilder.createLight(Config.botToken)
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_PRESENCES)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                    .addEventListeners(new Events(rGen))
+                    .addEventListeners(new Events())
                     .build();
 
             // run only if all slash commands have not been implemented yet

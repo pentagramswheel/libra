@@ -1,6 +1,7 @@
 package bot.Engine.Drafts;
 
 import bot.Engine.Section;
+import bot.Events;
 import bot.Tools.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Arrays;
-import java.util.Random;
 
 /**
  * @author  Wil Aquino
@@ -22,9 +22,6 @@ import java.util.Random;
  */
 public class MapGenerator extends Section implements Command {
 
-    /** A random number generator. */
-    private final Random numGenerator;
-
     /** The draft associated with this map generation, if any. */
     private final Draft foundDraft;
 
@@ -34,12 +31,10 @@ public class MapGenerator extends Section implements Command {
     /**
      * Loads the map generator's random number generator.
      * @param abbreviation the abbreviation of the section.
-     * @param r the random number generator to load.
      * @param draft a found draft.
      */
-    public MapGenerator(String abbreviation, Random r, Draft draft) {
+    public MapGenerator(String abbreviation, Draft draft) {
         super(abbreviation);
-        numGenerator = r;
         foundDraft = draft;
     }
 
@@ -246,20 +241,20 @@ public class MapGenerator extends Section implements Command {
                 numModes = 4;
             }
 
-            int rIndex = numGenerator.nextInt(numModes);
+            int rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
             String currMode = modes.get(rIndex);
             while (lastMode.equals(currMode)) {
-                rIndex = numGenerator.nextInt(numModes);
+                rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
                 currMode = modes.get(rIndex);
             }
             lastMode = modes.remove(rIndex);
             numModes--;
 
             ArrayList<String> modeMaps = legalMaps.get(currMode);
-            rIndex = numGenerator.nextInt(modeMaps.size());
+            rIndex = Events.RANDOM_GENERATOR.nextInt(modeMaps.size());
             String currMap = modeMaps.get(rIndex);
             while (pastMaps.contains(currMap)) {
-                rIndex = numGenerator.nextInt(modeMaps.size());
+                rIndex = Events.RANDOM_GENERATOR.nextInt(modeMaps.size());
                 currMap = modeMaps.get(rIndex);
             }
             pastMaps.add(modeMaps.remove(rIndex));

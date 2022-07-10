@@ -42,7 +42,7 @@ import java.util.Map;
 public class Events extends ListenerAdapter {
 
     /** A random number generator for the bot to use. */
-    private final Random numGenerator;
+    public static Random RANDOM_GENERATOR = new Random();
 
     /** Fields which determine the maximum number of drafts. */
     private final static int MAX_LP_DRAFTS = 4;
@@ -55,14 +55,6 @@ public class Events extends ListenerAdapter {
     /** Fields for storing queued draft numbers. */
     private ArrayHeapMinPQ<Integer> lpQueue;
     private ArrayHeapMinPQ<Integer> ioQueue;
-
-    /**
-     * Loads the bot's event listener with a random number generator
-     * @param generator the random number generator.
-     */
-    public Events(Random generator) {
-        numGenerator = generator;
-    }
 
     /**
      * Checks if the game set parameters make sense.
@@ -331,7 +323,7 @@ public class Events extends ListenerAdapter {
         } else {
             int draftButton = queue.removeSmallest();
             Draft newDraft =
-                    new Draft(sc, draftButton, prefix, author, numGenerator);
+                    new Draft(sc, draftButton, prefix, author);
 
             ongoingDrafts.put(draftButton, newDraft);
             newDraft.runCmd(sc);
@@ -529,8 +521,8 @@ public class Events extends ListenerAdapter {
                 break;
             case "genmaps":
                 if (mapsNeededValid(sc)) {
-                    MapGenerator maps = new MapGenerator(prefix, numGenerator,
-                            notInAnotherDraft(sc, numGenerator, drafts));
+                    MapGenerator maps = new MapGenerator(prefix,
+                            notInAnotherDraft(sc, RANDOM_GENERATOR, drafts));
                     maps.runCmd(sc);
                 }
                 break;

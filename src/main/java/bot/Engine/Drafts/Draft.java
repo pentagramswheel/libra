@@ -2,6 +2,7 @@ package bot.Engine.Drafts;
 
 import bot.Engine.Profiles.Profile;
 import bot.Engine.Section;
+import bot.Events;
 import bot.Tools.Command;
 import bot.Tools.Components;
 
@@ -63,9 +64,6 @@ public class Draft extends Section implements Command {
     /** The number of players required to formally start the draft. */
     public final static int NUM_PLAYERS_TO_START_DRAFT = 8;
 
-    /** A random number generator. */
-    private final Random numGenerator;
-
     /** The number of map generations made for this draft. */
     private int mapGens;
 
@@ -76,10 +74,9 @@ public class Draft extends Section implements Command {
      * @param draft the numbered draft that this draft is.
      * @param abbreviation the abbreviation of the section.
      * @param initialPlayer the first player of the draft.
-     * @param generator a random number generator.
      */
-    public Draft(SlashCommandEvent sc, int draft, String abbreviation,
-                 Member initialPlayer, Random generator) {
+    public Draft(SlashCommandEvent sc, int draft,
+                 String abbreviation, Member initialPlayer) {
         super(abbreviation);
 
         initialized = false;
@@ -98,7 +95,6 @@ public class Draft extends Section implements Command {
         players.put(initialPlayer.getId(), newPlayer);
 
         draftChat = getChannel(sc, getPrefix() + "-draft-chat-" + draft);
-        numGenerator = generator;
     }
 
     /**
@@ -327,7 +323,7 @@ public class Draft extends Section implements Command {
 
         while (numCaptains < 2) {
             int size = ids.size();
-            String randomID = ids.get(numGenerator.nextInt(size));
+            String randomID = ids.get(Events.RANDOM_GENERATOR.nextInt(size));
             DraftPlayer randomPlayer = getPlayers().get(randomID);
             boolean isCaptain = randomPlayer.isCaptainForTeam1()
                     || randomPlayer.isCaptainForTeam2();
