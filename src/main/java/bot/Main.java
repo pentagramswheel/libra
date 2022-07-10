@@ -234,7 +234,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             System.out.println();
-            JDA jda = JDABuilder.createLight(Config.botToken)
+            JDA jda = JDABuilder.createDefault(Config.botToken)
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .enableIntents(GatewayIntent.GUILD_PRESENCES)
                     .enableIntents(GatewayIntent.GUILD_MEMBERS)
