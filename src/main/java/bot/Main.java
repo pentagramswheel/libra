@@ -107,10 +107,12 @@ public class Main {
                 OptionType.USER, "player", "The player to look up", false);
         OptionData teamParam = new OptionData(
                 OptionType.STRING, "name", "Your team's name", true);
+        OptionData displayFC = new OptionData(
+                OptionType.BOOLEAN, "includefc", "...", false);
 
         fc.addOptions(fcParam);
         getfc.addOptions(viewParam);
-        view.addOptions(viewParam);
+        view.addOptions(viewParam, displayFC);
         nickname.addOptions(nicknameParam);
         pronouns.addOptions(pronounChoices);
 

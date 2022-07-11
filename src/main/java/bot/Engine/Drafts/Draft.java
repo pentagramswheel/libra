@@ -352,7 +352,7 @@ public class Draft extends Section implements Command {
         List<MessageEmbed> profiles = new ArrayList<>();
         for (String playerID : getPlayers().keySet()) {
             Profile profile = new Profile();
-            profiles.add(profile.view(bc, playerID, false));
+            profiles.add(profile.view(bc, playerID, false, true));
         }
 
         getDraftChannel().sendMessageEmbeds(profiles).queue();

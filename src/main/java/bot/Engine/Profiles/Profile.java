@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -56,9 +57,11 @@ public class Profile implements Command {
      *         null otherwise.
      */
     private String getParameter(List<OptionMapping> args, boolean isMember) {
-        if (args.isEmpty()) {
+        if (args.isEmpty()
+                || args.get(0).getType().equals(OptionType.BOOLEAN)) {
             return null;
-        } else if (isMember) {
+        } else if (isMember
+                && args.get(0).getType().equals(OptionType.MENTIONABLE)) {
             return args.remove(0).getAsMember().getId();
         } else {
             return args.remove(0).getAsString();
@@ -276,7 +279,7 @@ public class Profile implements Command {
                         + profile.getAsTag() + ".", false);
             } else {
                 sendResponse(sc, pronoun + " MIT profile does not exist yet. "
-                        + "Register with `/mit qprofile ...`\n"
+                        + "Register with\n`/mit qprofile ...` "
                         + "or `/mit profile fc` to proceed.", true);
             }
         } catch (IOException | GeneralSecurityException e) {
@@ -301,6 +304,21 @@ public class Profile implements Command {
         } else {
             eb.setColor(Main.mitColor);
             return null;
+        }
+    }
+
+    /**
+     * Checks whether to display a player's friend code in
+     * their profile.
+     * @param args the arguments of the command.
+     * @return True to display.
+     *         False otherwise.
+     */
+    private boolean displayFC(List<OptionMapping> args) {
+        if (args.isEmpty()) {
+            return true;
+        } else {
+            return args.remove(0).getAsBoolean();
         }
     }
 
@@ -345,11 +363,13 @@ public class Profile implements Command {
      * @param profile the player's profile.
      * @param fullDisplay a flag for knowing whether to display
      *                    the entire profile or not.
+     * @param showFC flag for checking whether to show a player's
+     *               friend code or not.
      * @return the pre-built summary.
      */
     private EmbedBuilder buildProfile(GenericInteractionCreateEvent interaction,
                                       String pronoun, String id, PlayerInfo profile,
-                                      boolean fullDisplay) {
+                                      boolean fullDisplay, boolean showFC) {
         EmbedBuilder eb = new EmbedBuilder();
         Member player = findMember(interaction, id);
 
@@ -359,13 +379,15 @@ public class Profile implements Command {
             eb.setTitle(player.getEffectiveName()
                     + " [" + player.getUser().getAsTag() + "]");
             eb.setDescription(pronoun + " MIT profile does not exist. "
-                    + "Register with `/mit qprofile ...`\n"
+                    + "Register with\n`/mit qprofile ...` "
                     + "or `/mit profile fc` to proceed.");
         } else {
             eb.setTitle(profile.getNickname() + " [" + profile.getAsTag() + "]");
             eb.setThumbnail(player.getEffectiveAvatarUrl());
-            eb.setFooter("FC SW-" + profile.getFC(),
-                    "https://images.squarespace-cdn.com/content/v1/5ce2bf96d2bf17000192fe2c/1596048502214-WL5LU68IOLM8WILBA57N/Friends+Icon.png?format=1000w");
+            if (showFC) {
+                eb.setFooter("FC SW-" + profile.getFC(),
+                        "https://images.squarespace-cdn.com/content/v1/5ce2bf96d2bf17000192fe2c/1596048502214-WL5LU68IOLM8WILBA57N/Friends+Icon.png?format=1000w");
+            }
 
             eb.addField("Pronouns", profile.getPronouns(), true);
             eb.addField("Playstyle", "`" + profile.getPlaystyle() + "`", true);
@@ -392,10 +414,12 @@ public class Profile implements Command {
      * @param id a player's Discord ID.
      * @param fullDisplay a flag for knowing whether to display
      *                    the entire profile or not.
+     * @param showFC flag for checking whether to show a player's
+     *               friend code or not.
      * @return a built summary of the player's profile.
      */
     public MessageEmbed view(GenericInteractionCreateEvent interaction,
-                             String id, boolean fullDisplay) {
+                             String id, boolean fullDisplay, boolean showFC) {
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
             TreeMap<Object, Object> database = link.readSection(interaction, TAB);
@@ -408,13 +432,13 @@ public class Profile implements Command {
                 String pronoun = "Your";
 
                 return buildProfile(interaction, pronoun,
-                        userID, profile, fullDisplay).build();
+                        userID, profile, fullDisplay, showFC).build();
             } else {
                 PlayerInfo profile = (PlayerInfo) database.get(id);
                 String pronoun = "Their";
 
                 return buildProfile(interaction, pronoun,
-                        id, profile, fullDisplay).build();
+                        id, profile, fullDisplay, showFC).build();
             }
         } catch (IOException | GeneralSecurityException e) {
             log("The profiles spreadsheet could not load.", true);
@@ -527,7 +551,7 @@ public class Profile implements Command {
                 log(sc.getUser().getAsTag() + "'s " + cmd + " was updated.", false);
             } else {
                 sendResponse(sc, "Your MIT profile does not exist yet. "
-                        + "Register with `/mit qprofile ...`\n"
+                        + "Register with\n`/mit qprofile ...` "
                         + "or `/mit profile fc` to proceed.", true);
             }
         } catch (IOException | GeneralSecurityException e) {
@@ -587,7 +611,7 @@ public class Profile implements Command {
                 break;
             case "view":
                 sc.deferReply(false).queue();
-                view(sc, getParameter(args, true), true);
+                view(sc, getParameter(args, true), true, displayFC(args));
                 break;
             case "nickname":
                 setField(sc, getParameter(args, false), null,
