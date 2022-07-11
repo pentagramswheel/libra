@@ -462,6 +462,9 @@ public class Events extends ListenerAdapter {
                 Profile profile = new Profile();
                 profile.runCmd(sc);
                 break;
+            case "ded":
+                sc.reply("<:Okayu_ded:788682812991209492>").queue();
+                break;
         }
 
         if (subGroup.equals("profile")) {

@@ -125,6 +125,10 @@ public class Main {
                 playstyle, weapons, rank, team,
                 delete);
 
+        // miscellaneous commands
+        SubcommandData ded = new SubcommandData("ded",
+                "Wug when someone drops before LPDC starts");
+
         // section commands
         CommandData lp = new CommandData("lp",
                 "Commands to use within LaunchPoint.");
@@ -211,7 +215,7 @@ public class Main {
 
         // implementing commands
         mit.addSubcommands(status, help,
-                draftdoc, qprofile);
+                draftdoc, qprofile, ded);
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
                 genmaps, leaderboard,
