@@ -5,7 +5,7 @@ import bot.Engine.Cycles.*;
 import bot.Engine.Drafts.*;
 import bot.Engine.Profiles.Profile;
 import bot.Tools.ArrayHeapMinPQ;
-import bot.Tools.FileHandler;
+import bot.Tools.Components;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -18,17 +18,15 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -200,35 +198,50 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Prints troubleshooting information.
-     * @param sc the user's inputted command.
+     * Prints help information.
+     * @param sm a menu selection to analyze. the user's inputted command.
      */
-    private void printTroubleshootString(SlashCommandEvent sc) {
-        sc.deferReply(true).queue();
+    private void printHelpOption(SelectionMenuEvent sm) {
+        sm.deferEdit().queue();
+
+        SelectOption chosenOption = sm.getInteraction().getSelectedOptions().get(0);
+        String value = chosenOption.getValue();
 
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("Command Troubleshooting");
-        eb.setColor(Color.BLUE);
-        eb.addField("Manual Draft System [Staff]",
-                "If a match report is giving you an error message, \n"
+        eb.setColor(Main.mitColor);
+
+        switch (value) {
+            case "0":
+                eb.setTitle("Libra's Automatic Draft System");
+                eb.setDescription("[Here's the quick overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit#heading=h.1tpgj6me74oq)");
+                break;
+            case "1":
+                eb.setTitle("Libra's Automatic Draft System");
+                eb.setDescription("[Here's the detailed overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit#heading=h.xt8dy64nsnj)");
+                break;
+            case "2":
+                eb.setTitle("Libra's Documentation");
+                eb.setDescription("[Here's the full document!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing)");
+                break;
+            case "3":
+                eb.setTitle("Libra's FAQ");
+                eb.setDescription("[Here are some answers!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit#heading=h.80874ddqf10r)");
+                break;
+            case "4":
+                eb.setTitle("Match Report Help (Staff)");
+                eb.setDescription("If a match report is giving you an error message, \n"
                         + "it is most likely due to a row in the spreadsheet \n"
                         + "missing information. For example, one common \n"
                         + "problem is presetting or overextending the \n"
-                        + "formulas past the bottommost row.",
-                false);
-        eb.addField("Automatic Draft System",
-                "(See the FAQ portion of `/mit draftdoc`)",
-                false);
-        eb.addField("Adding Roles to Players [Staff]",
-                "If the role for a player isn't showing up or seemingly \n"
-                        + "isn't being added, try *refreshing the roles* by opening \n"
-                        + "`Server Settings > User Management > Members`. \n"
-                        + "A second layer of refreshing can be done by \n"
-                        + "searching for a player's name in `... > Members`. \n"
-                        + "Note that it takes ~7 sec/player to add a role.",
-                false);
+                        + "formulas past the bottommost row.");
+                break;
+            default:
+                eb.setTitle("Roles Help (Staff)");
+                eb.setDescription("Uhh, let me get back to you on that!");
+                break;
+        }
 
-        sc.getHook().editOriginalEmbeds(eb.build()).queue();
+        sm.getHook().editOriginal("Let's see...").setEmbeds(eb.build()).queue();
     }
 
     /**
@@ -451,19 +464,16 @@ public class Events extends ListenerAdapter {
                         + author.getEffectiveName()).queue();
                 break;
             case "help":
-                printTroubleshootString(sc);
-                break;
-            case "draftdoc":
-                String docLink =
-                        "https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing";
-                sc.reply(docLink).queue();
+                sc.reply("What can I help you with?")
+                        .addActionRow(Components.ForGeneral.helpMenu("MT1"))
+                        .setEphemeral(true).queue();
                 break;
             case "qprofile":
                 Profile profile = new Profile();
                 profile.runCmd(sc);
                 break;
             case "ded":
-                sc.reply("<:Okayu_ded:788682812991209492>").queue();
+                sc.reply("https://discords.com/_next/image?url=https%3A%2F%2Fcdn.discordapp.com%2Femojis%2F788682812991209492.png%3Fv%3D1&w=64&q=75").queue();
                 break;
         }
 
@@ -683,6 +693,9 @@ public class Events extends ListenerAdapter {
         String suffix = menuName.substring(indexOfNum - 2, indexOfNum);
         int numMenu = Integer.parseInt(menuName.substring(indexOfNum));
         switch (suffix) {
+            case "MT":
+                printHelpOption(sm);
+                return;
             case "LP":
                 drafts = lpDrafts;
                 break;

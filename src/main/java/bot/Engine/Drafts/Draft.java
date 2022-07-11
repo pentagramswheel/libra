@@ -1,6 +1,5 @@
 package bot.Engine.Drafts;
 
-import bot.Engine.Profiles.Profile;
 import bot.Engine.Section;
 import bot.Events;
 import bot.Tools.Command;
@@ -11,7 +10,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -344,21 +342,6 @@ public class Draft extends Section implements Command {
     }
 
     /**
-     * Prints the profile summaries of all players
-     * within the draft.
-     * @param bc a button click to analyze.
-     */
-    private void printProfiles(ButtonClickEvent bc) {
-        List<MessageEmbed> profiles = new ArrayList<>();
-        for (String playerID : getPlayers().keySet()) {
-            Profile profile = new Profile();
-            profiles.add(profile.view(bc, playerID, false, true));
-        }
-
-        getDraftChannel().sendMessageEmbeds(profiles).queue();
-    }
-
-    /**
      * Attempts to start a draft.
      * @param bc a button click to analyze.
      */
@@ -393,9 +376,9 @@ public class Draft extends Section implements Command {
             String idSuffix = getPrefix().toUpperCase() + getNumDraft();
 
             buttons.add(Components.ForDraft.reassignCaptain(idSuffix));
-            buttons.add(Components.ForDraft.refresh(idSuffix));
             buttons.add(Components.ForDraft.requestSub(idSuffix));
             buttons.add(Components.ForDraft.joinAsSub(idSuffix));
+            buttons.add(Components.ForDraft.refresh(idSuffix));
 
             sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
                     buttons);
@@ -405,8 +388,10 @@ public class Draft extends Section implements Command {
 
             getProcess().refresh(null);
 
-//            wait(2000);
-//            printProfiles(bc);
+//            Profile profiles = new Profile();
+//            getDraftChannel().sendMessageEmbeds(
+//                    profiles.viewMultiple(bc, getPlayers().keySet(),
+//                            "Their", false, true)).queue();
         } else {
             refresh(bc);
             messageID = bc.getMessageId();
@@ -626,6 +611,7 @@ public class Draft extends Section implements Command {
     private void subIn(ButtonClickEvent bc, String playerID, String name) {
         DraftPlayer player;
         String statement;
+        boolean displayProfile = false;
 
         if (getPlayers().containsKey(playerID)) {
             player = getPlayers().get(playerID);
@@ -657,16 +643,19 @@ public class Draft extends Section implements Command {
             playerHistory.add(playerID);
 
             statement = "will be subbing";
+            displayProfile = true;
         }
 
         getDraftChannel().sendMessage(
                 player.getAsMention(playerID) + " " + statement + " "
-                + "for this draft. __Refresh the pinned interface "
+                + "for this draft. __`Refresh` the pinned interface "
                 + "to add them to a team!__").queue();
 
-//        Profile profile = new Profile();
-//        getDraftChannel().sendMessageEmbeds(
-//                profile.view(bc, playerID, false)).queue();
+        if (displayProfile) {
+//            Profile profile = new Profile();
+//            getDraftChannel().sendMessageEmbeds(
+//                    profile.view(bc, playerID, false, true)).queue();
+        }
     }
 
     /**
@@ -695,8 +684,12 @@ public class Draft extends Section implements Command {
      */
     public boolean forceEnd(SlashCommandEvent sc) {
         if (messageID == null) {
-            sendReply(sc, "Press the `Refresh` button twice then "
-                    + "try again.", true);
+            sendReply(sc, "`Refresh` the request once then try again.", true);
+            return false;
+        } else if (isInitialized() && getProcess().getMessageID() == null) {
+            sendReply(sc, "Press the `End Draft` button in "
+                    + getDraftChannel().getAsMention() + " "
+                    + "once then try again.", true);
             return false;
         } else {
             getChannel(sc, "\uD83D\uDCCD" + getPrefix() + "-looking-for-draft")
@@ -708,18 +701,16 @@ public class Draft extends Section implements Command {
 
             if (isInitialized() && getProcess().getMessageID() != null) {
                 getProcess().getMessage().delete().queue();
+                getDraftChannel().sendMessage(
+                        "The draft has been ended by staff. Sorry about the "
+                                + "early stop! Feel free to request a new one!").queue();
                 sendReply(sc, "Draft ended.", false);
             } else {
-                String update = "Draft ended. **Check** "
-                        + getDraftChannel().getAsMention() + " **to delete the "
-                        + "teams interface. It may be pinned.**";
-                sendReply(sc, update, false);
+                sendReply(sc, "Draft ended.", true);
             }
 
-            getDraftChannel().sendMessage(
-                    "The draft has been ended by staff. Sorry about the "
-                            + "early stop! Feel free to request a new one!").queue();
-            log("A draft was forcibly ended.", false);
+            log("A draft was forcibly ended by "
+                    + sc.getUser().getAsTag() + ".", false);
 
             return true;
         }
@@ -738,9 +729,9 @@ public class Draft extends Section implements Command {
         ArrayList<Button> buttons = new ArrayList<>();
         String idSuffix = getPrefix().toUpperCase() + getNumDraft();
         buttons.add(Components.ForDraft.joinDraft(idSuffix));
-        buttons.add(Components.ForDraft.refresh(idSuffix));
         buttons.add(Components.ForDraft.reping(idSuffix));
         buttons.add(Components.ForDraft.leave(idSuffix));
+        buttons.add(Components.ForDraft.refresh(idSuffix));
 
         String caption = getSectionRole() + " +" + (NUM_PLAYERS_TO_START_DRAFT - 1);
         sc.reply(caption).addActionRow(buttons).queue();

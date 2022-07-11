@@ -45,9 +45,7 @@ public class Main {
         SubcommandData status = new SubcommandData("status",
                 "Checks whether the bot is online or not.");
         SubcommandData help = new SubcommandData("help",
-                "Displays troubleshooting information for the commands.");
-        SubcommandData draftdoc = new SubcommandData("draftdoc",
-                "Retrieves the documentation for the automated draft system.");
+                "Answers questions via a help menu.");
 
         // quick profile commands
         SubcommandData qprofile = new SubcommandData("qprofile",
@@ -215,7 +213,7 @@ public class Main {
 
         // implementing commands
         mit.addSubcommands(status, help,
-                draftdoc, qprofile, ded);
+                qprofile, ded);
         mit.addSubcommandGroups(profile);
         lp.addSubcommands(
                 genmaps, leaderboard,

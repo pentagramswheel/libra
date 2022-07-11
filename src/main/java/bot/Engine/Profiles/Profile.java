@@ -24,6 +24,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -409,6 +410,47 @@ public class Profile implements Command {
     }
 
     /**
+     * Views players' profiles.
+     * @param interaction the user interaction calling this method.
+     * @param ids the players' Discord IDs.
+     * @param pronoun the player's neutral pronoun.
+     * @param fullDisplay a flag for knowing whether to display
+     *                    the entire profile or not.
+     * @param showFC flag for checking whether to show a player's
+     *               friend code or not.
+     * @return a built summary of the players' profiles..
+     */
+    public List<MessageEmbed> viewMultiple(GenericInteractionCreateEvent interaction,
+                                           Iterable<String> ids, String pronoun,
+                                           boolean fullDisplay, boolean showFC) {
+        try {
+            GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
+            TreeMap<Object, Object> database = link.readSection(interaction, TAB);
+            List<MessageEmbed> profiles = new ArrayList<>();
+            if (pronoun == null) {
+                pronoun = "Their";
+            }
+
+            if (database == null) {
+                sendResponse(interaction, "The profiles database could not load.", false);
+            } else {
+                for (String id : ids) {
+                    PlayerInfo profile = (PlayerInfo) database.get(id);
+
+                    profiles.add(buildProfile(interaction, pronoun,
+                            id, profile, fullDisplay, showFC).build());
+                }
+
+                return profiles;
+            }
+        } catch (IOException | GeneralSecurityException e) {
+            log("The profiles spreadsheet could not load.", true);
+        }
+
+        return null;
+    }
+
+    /**
      * Views a player's profile.
      * @param interaction the user interaction calling this method.
      * @param id a player's Discord ID.
@@ -419,29 +461,23 @@ public class Profile implements Command {
      * @return a built summary of the player's profile.
      */
     public MessageEmbed view(GenericInteractionCreateEvent interaction,
-                             String id, boolean fullDisplay, boolean showFC) {
-        try {
-            GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
-            TreeMap<Object, Object> database = link.readSection(interaction, TAB);
+                             String id, boolean fullDisplay,
+                             boolean showFC) {
+        if (id == null) {
+            id = interaction.getMember().getId();
+            List<MessageEmbed> profiles = viewMultiple(interaction,
+                    Collections.singleton(id), "Your", fullDisplay, showFC);
 
-            if (database == null) {
-                sendResponse(interaction, "The profiles database could not load.", false);
-            } else if (id == null) {
-                String userID = interaction.getMember().getId();
-                PlayerInfo profile = (PlayerInfo) database.get(userID);
-                String pronoun = "Your";
-
-                return buildProfile(interaction, pronoun,
-                        userID, profile, fullDisplay, showFC).build();
-            } else {
-                PlayerInfo profile = (PlayerInfo) database.get(id);
-                String pronoun = "Their";
-
-                return buildProfile(interaction, pronoun,
-                        id, profile, fullDisplay, showFC).build();
+            if (profiles != null) {
+                return profiles.remove(0);
             }
-        } catch (IOException | GeneralSecurityException e) {
-            log("The profiles spreadsheet could not load.", true);
+        } else {
+            List<MessageEmbed> profiles = viewMultiple(interaction,
+                    Collections.singleton(id), "Their", fullDisplay, showFC);
+
+            if (profiles != null) {
+                return profiles.remove(0);
+            }
         }
 
         return null;

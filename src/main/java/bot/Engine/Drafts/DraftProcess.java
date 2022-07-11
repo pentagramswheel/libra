@@ -152,11 +152,14 @@ public class DraftProcess {
             ping.append("have the captains alternate choosing teammates in a ")
                     .append("`1-2-1-1-...` pattern. Approve of a maplist ")
                     .append("using `/").append(draft.getPrefix()).append(" ")
-                    .append("genmaps`, and begin the draft when everyone ")
-                    .append("is ready. __If any problems occur with teams, ")
-                    .append("captains should reset the teams!__");
+                    .append("genmaps`, and **begin the draft** before ")
+                    .append("playing.\n\n")
+                    .append(" __If any problems occur with teams, ")
+                    .append("captains should reset the teams!__ ")
+                    .append("<:Wahoozones:766479174839173200>");
         } else {
-            ping.append("make sure everyone is on a team before continuing!");
+            ping.append("make sure everyone is on a team before continuing! ")
+                    .append("Remember you can check pins to scroll back to this.");
         }
 
         return ping.toString();
@@ -229,14 +232,13 @@ public class DraftProcess {
         if (hasStarted()) {
             buttons.add(Components.ForDraftProcess.plusOne(idSuffix));
             buttons.add(Components.ForDraftProcess.minusOne(idSuffix));
-            buttons.add(Components.ForDraftProcess.refresh(idSuffix));
             buttons.add(Components.ForDraftProcess.draftSubLink(interaction, idSuffix, draft));
         } else {
             buttons.add(Components.ForDraftProcess.resetTeams(idSuffix));
-            buttons.add(Components.ForDraftProcess.refresh(idSuffix));
             buttons.add(Components.ForDraftProcess.beginDraft(idSuffix));
         }
         buttons.add(Components.ForDraftProcess.endDraftProcess(idSuffix));
+        buttons.add(Components.ForDraftProcess.refresh(idSuffix));
 
         if (interaction != null) {
             interaction.getHook().editOriginal(getPing()).setActionRows(
@@ -249,14 +251,6 @@ public class DraftProcess {
                             (message) -> {
                                 message.pin().queue();
                                 draft.wait(1000);
-
-                                draft.getDraftChannel().sendMessage(
-                                        "I've attached the interface to the pins! "
-                                                + "Make sure captains click `Begin "
-                                                + "Draft` before you actually start "
-                                                + "playing though, **otherwise no "
-                                                + "one will get any points.** "
-                                                + "<:Wahoozones:766479174839173200>").queue();
                             });
         }
     }
@@ -318,7 +312,6 @@ public class DraftProcess {
      */
     public void resetTeams(ButtonClickEvent bc) {
         DraftPlayer author = draft.getPlayers().get(bc.getMember().getId());
-        messageID = bc.getMessageId();
         resetEndDraftButton();
 
         if (author == null) {
@@ -341,7 +334,6 @@ public class DraftProcess {
      */
     public void start(ButtonClickEvent bc) {
         DraftPlayer author = draft.getPlayers().get(bc.getMember().getId());
-        messageID = bc.getMessageId();
         resetEndDraftButton();
 
         if (author == null) {
@@ -450,6 +442,7 @@ public class DraftProcess {
     public boolean hasEnded(ButtonClickEvent bc) {
         String authorID = bc.getMember().getId();
         messageID = bc.getMessageId();
+
         if (!getTeam1().contains(authorID)
                 && !getTeam2().contains(authorID)) {
             draft.sendReply(bc, "You are not on one of the teams!", true);

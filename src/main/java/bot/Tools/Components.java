@@ -22,8 +22,36 @@ import java.util.TreeMap;
  */
 public class Components {
 
+    /** Components for general functions throughout MIT. */
+    public static class ForGeneral {
+
+        /**
+         * Builds the team selection menu.
+         * suffix the menu ID's suffix.
+         * @return said menu.
+         */
+        public static SelectionMenu helpMenu(String suffix) {
+            List<String> labels = new ArrayList<>();
+            List<String> values = new ArrayList<>();
+
+            labels.add("I want to know about the draft system!");
+            labels.add("I want to know everything about the draft system!");
+            labels.add("I want to see Libra's full documentation.");
+            labels.add("I want to see Libra's frequently asked questions!");
+            labels.add("(Staff) I'm having trouble logging match reports.");
+            labels.add("(Staff) I'm having trouble giving roles to players.");
+
+            for (int i = 0; i < labels.size(); i++) {
+                values.add(String.valueOf(i));
+            }
+
+            return new SelectionMenuBuilder("helpMenu" + suffix,
+                    labels, values, null).getMenu();
+        }
+    }
+
     /**
-     * Buttons for initializing a draft.
+     * Components for initializing a draft.
      */
     public static class ForDraft {
 
@@ -74,7 +102,8 @@ public class Components {
          */
         public static Button refresh(String suffix) {
             return new ButtonBuilder("requestRefresh" + suffix,
-                    "Refresh", null, 2).getButton();
+                    "update", "788354776999526410",
+                    null, 2).getButton();
         }
 
         /**
@@ -179,7 +208,8 @@ public class Components {
          */
         public static Button refresh(String suffix) {
             return new ButtonBuilder("processRefresh" + suffix,
-                    "Refresh", null, 2).getButton();
+                    "update", "788354776999526410",
+                    null, 2).getButton();
         }
 
         /**
