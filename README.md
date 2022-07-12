@@ -199,6 +199,9 @@ A class which awards players roles within MIT, processing the command `lp/io awa
 
 A class which graduates a user in a section within MIT, processing the command `lp/io grad`, granting the associated roles.
 
+###### Instance Variables
+1. `String TAB` - the tab to reference within the profiles spreadsheet.
+
 ----
 
 #### PlayerStats

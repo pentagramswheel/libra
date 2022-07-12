@@ -55,7 +55,7 @@ public interface Command {
      * @param interaction the user interaction calling this method.
      * @param id the Discord IO of the user.
      * @return the user.
-     *         Null otherwise.
+     *         null otherwise.
      */
     default Member findMember(GenericInteractionCreateEvent interaction,
                               String id) {
@@ -99,72 +99,28 @@ public interface Command {
     }
 
     /**
-     * Adds a role to a user.
+     * Modifies the roles of a user.
      * @param interaction the user interaction calling this method.
-     * @param id the user's Discord ID.
-     * @param role the role to add.
+     * @param id the Discord ID of the user.
+     * @param toAdd the roles to add to the user.
+     * @param toRemove the roles to remove from the user.
      */
-    default void addRole(GenericInteractionCreateEvent interaction,
-            String id, Role role) {
+    default void modifyRoles(GenericInteractionCreateEvent interaction,
+                        String id, List<Role> toAdd, List<Role> toRemove) {
         try {
             Guild server = interaction.getGuild();
             if (server == null) {
                 throw new NullPointerException("Server link disconnected.");
             }
 
-            Member user = server.retrieveMemberById(id).complete();
+            Member user = findMember(interaction, id);
             if (user == null) {
-                throw new NullPointerException("Could not find user.");
+                throw new NullPointerException("Member could not be found.");
             }
 
-            List<Role> roleList = user.getRoles();
-            while (!roleList.contains(role)) {
-                server.addRoleToMember(id, role).queue();
-
-                // prevent Discord rate limiting
-                wait(2000);
-
-                server = interaction.getGuild();
-                user = server.retrieveMemberById(id).complete();
-                roleList = user.getRoles();
-            }
+            server.modifyMemberRoles(user, toAdd, toRemove).queue();
         } catch (NullPointerException e) {
-            log("The role, " + role.getName() + ", could not be found.", true);
-        }
-    }
-
-    /**
-     * Removes a role from a user.
-     * @param interaction the user interaction calling this method.
-     * @param id the user's Discord ID.
-     * @param role the role to remove.
-     */
-    default void removeRole(GenericInteractionCreateEvent interaction,
-                            String id, Role role) {
-        try {
-            Guild server = interaction.getGuild();
-            if (server == null) {
-                throw new NullPointerException("Server link disconnected.");
-            }
-
-            Member user = server.retrieveMemberById(id).complete();
-            if (user == null) {
-                throw new NullPointerException("Could not find user.");
-            }
-
-            List<Role> roleList = user.getRoles();
-            while (roleList.contains(role)) {
-                server.removeRoleFromMember(id, role).queue();
-
-                // prevent Discord rate limiting
-                wait(2000);
-
-                server = interaction.getGuild();
-                user = server.retrieveMemberById(id).complete();
-                roleList = user.getRoles();
-            }
-        } catch (NullPointerException | IndexOutOfBoundsException e) {
-            log("The role, " + role.getName() + ", could not be found.", true);
+            log("The server or member could not be found.", true);
         }
     }
 

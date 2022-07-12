@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,11 +34,13 @@ public class Add extends Section implements Command {
      */
     private String enter(SlashCommandEvent sc, String playerID) {
         if (sc.getSubcommandName().equals("add")) {
-            addRole(sc, playerID, getRole(sc, getSection()));
-            String rulesChannelName = getPrefix() + "-draft-rules";
+            modifyRoles(sc, playerID,
+                    Collections.singletonList(
+                            getRole(sc, getSection())),
+                    null);
 
             String rulesChannel =
-                    getChannel(sc, rulesChannelName).getAsMention();
+                    getChannel(sc, getPrefix() + "-draft-rules").getAsMention();
             return "Welcome to " + getSection() + "! Make sure to read "
                     + rulesChannel + " before playing in any drafts!";
         } else {

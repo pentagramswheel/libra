@@ -237,7 +237,10 @@ public class Events extends ListenerAdapter {
                 break;
             default:
                 eb.setTitle("Roles Help (Staff)");
-                eb.setDescription("Uhh, let me get back to you on that!");
+                eb.setDescription("If the role for a player isn't showing up or seemingly \n"
+                        + "isn't being added, try *refreshing the roles* by opening \n"
+                        + "`Server Settings > User Management > Members`. \n"
+                        + "Note that it takes ~0.2 sec/player to add a role.");
                 break;
         }
 
@@ -464,7 +467,7 @@ public class Events extends ListenerAdapter {
                         + author.getEffectiveName()).queue();
                 break;
             case "help":
-                sc.reply("What can I help you with?")
+                sc.reply("What can I help you with? (:")
                         .addActionRow(Components.ForGeneral.helpMenu("MT1"))
                         .setEphemeral(true).queue();
                 break;
