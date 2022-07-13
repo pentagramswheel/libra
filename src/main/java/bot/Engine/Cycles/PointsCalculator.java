@@ -46,7 +46,6 @@ public class PointsCalculator extends Section implements Command {
      * Converts character-formatted column to its
      * integer format.
      * @param column the column to format.
-     * @return the integer-valued column.
      */
     private int columnToInt(String column) {
         return column.charAt(0) - 'A';
@@ -54,19 +53,15 @@ public class PointsCalculator extends Section implements Command {
 
     /**
      * Converts an integer-formatted column to its
-     * character-format.
+     * character format.
      * @param column the column to format.
-     * @return the lettered column.
      */
     private String intToColumn(int column) {
         char c = (char) column;
         return String.valueOf(c);
     }
 
-    /**
-     * Retrieves the lettered points columns.
-     * @return said letters.
-     */
+    /** Retrieves a list of the lettered points columns. */
     private List<String> getPointsColumns() {
         List<String> pointsColumns = new ArrayList<>(NUM_TOTAL_SCORES);
         for (int i = 0; i < NUM_TOTAL_SCORES; i++) {

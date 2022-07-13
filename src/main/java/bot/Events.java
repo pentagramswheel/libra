@@ -8,6 +8,7 @@ import bot.Tools.ArrayHeapMinPQ;
 import bot.Tools.Components;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -252,7 +253,8 @@ public class Events extends ListenerAdapter {
      * @param interaction the user interaction calling this method.
      * @param generator a number generator for error messaging.
      * @param drafts the list of drafts to check.
-     * @return their found draft, null otherwise.
+     * @return their found draft.
+     *         null otherwise.
      */
     private Draft notInAnotherDraft(GenericInteractionCreateEvent interaction,
                                     Random generator,
@@ -476,7 +478,10 @@ public class Events extends ListenerAdapter {
                 profile.runCmd(sc);
                 break;
             case "ded":
-                sc.reply("https://discords.com/_next/image?url=https%3A%2F%2Fcdn.discordapp.com%2Femojis%2F788682812991209492.png%3Fv%3D1&w=64&q=75").queue();
+//                sc.reply("https://discords.com/_next/image?url=https%3A%2F%2Fcdn.discordapp.com%2Femojis%2F788682812991209492.png%3Fv%3D1&w=64&q=75").queue();
+                sc.reply(Emoji.fromEmote(
+                        "Okayu_ded", 788682812991209492L, false)
+                        .getAsMention()).queue();
                 break;
         }
 

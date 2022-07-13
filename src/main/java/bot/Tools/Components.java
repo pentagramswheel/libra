@@ -3,14 +3,16 @@ package bot.Tools;
 import bot.Engine.Drafts.Draft;
 import bot.Engine.Drafts.DraftPlayer;
 
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeMap;
+import java.util.Map;
 
 /**
  * @author  Wil Aquino
@@ -26,13 +28,19 @@ public class Components {
     public static class ForGeneral {
 
         /**
-         * Builds the team selection menu.
-         * suffix the menu ID's suffix.
-         * @return said menu.
+         * Builds the help menu.
+         * @param suffix the menu ID's suffix.
          */
         public static SelectionMenu helpMenu(String suffix) {
             List<String> labels = new ArrayList<>();
             List<String> values = new ArrayList<>();
+            List<Emoji> emojis = Arrays.asList(
+                    Emoji.fromEmote("clipboardemoji", 689549199905259658L, false),
+                    Emoji.fromEmote("clipboard_1f4cb", 960518771276144641L, false),
+                    Emoji.fromEmote("openbook", 988635067733643294L, false),
+                    Emoji.fromEmote("thought1", 910997491829338153L, false),
+                    Emoji.fromEmote("writing", 622832106011230259L, false),
+                    Emoji.fromEmote("7212roleadmin", 962720955505971200L, false));
 
             labels.add("I want to know about the draft system!");
             labels.add("I want to know everything about the draft system!");
@@ -46,7 +54,7 @@ public class Components {
             }
 
             return new SelectionMenuBuilder("helpMenu" + suffix,
-                    labels, values, null).getMenu();
+                    labels, values, emojis).getMenu();
         }
     }
 
@@ -58,7 +66,6 @@ public class Components {
         /**
          * Builds the "Join Draft" button.
          * @param suffix the button ID's suffix.
-         * @return said button.
          */
         public static Button joinDraft(String suffix) {
             return new ButtonBuilder("join" + suffix,
@@ -68,7 +75,6 @@ public class Components {
         /**
          * Builds the "Reping" button.
          * @param suffix the button ID's suffix.
-         * @return said button.
          */
         public static Button reping(String suffix) {
             return new ButtonBuilder("reping" + suffix,
@@ -78,7 +84,6 @@ public class Components {
         /**
          * Builds the "Leave" button.
          * @param suffix the button ID's suffix.
-         * @return the button.
          */
         public static Button leave(String suffix) {
             return new ButtonBuilder("leave" + suffix,
@@ -88,7 +93,6 @@ public class Components {
         /**
          * Builds a captain reassignment button.
          * @param suffix the menu ID's suffix.
-         * @return said menu.
          */
         public static Button reassignCaptain(String suffix) {
             return new ButtonBuilder("reassign" + suffix,
@@ -98,7 +102,6 @@ public class Components {
         /**
          * Builds the "Refresh" button.
          * @param suffix the button ID's suffix.
-         * @return said button.
          */
         public static Button refresh(String suffix) {
             return new ButtonBuilder("requestRefresh" + suffix,
@@ -109,7 +112,6 @@ public class Components {
         /**
          * Builds the "Request Sub" button.
          * @param suffix the button ID's suffix.
-         * @return said button.
          */
         public static Button requestSub(String suffix) {
             return new ButtonBuilder("requestSub" + suffix,
@@ -119,7 +121,6 @@ public class Components {
         /**
          * Builds the "Join As Sub" button.
          * @param suffix the button ID's suffix.
-         * @return said button.
          */
         public static Button joinAsSub(String suffix) {
             return new ButtonBuilder("sub" + suffix,
@@ -136,7 +137,6 @@ public class Components {
          * Builds the team selection menu.
          * @param suffix the menu ID's suffix.
          * @param players the players of the draft.
-         * @return said menu.
          */
         public static SelectionMenu teamSelectionMenu(
                 String suffix, TreeMap<String, DraftPlayer> players) {
@@ -164,7 +164,6 @@ public class Components {
         /**
          * Builds the "Reset Teams" button.
          * @param suffix the button ID's suffix.
-         * @return said button.
          */
         public static Button resetTeams(String suffix) {
             return new ButtonBuilder("resetTeams" + suffix,
@@ -174,7 +173,6 @@ public class Components {
         /**
          * Builds the "Begin Draft" button.
          * @param suffix the button ID's suffix.
-         * @return said button.
          */
         public static Button beginDraft(String suffix) {
             return new ButtonBuilder("beginDraft" + suffix,
@@ -184,7 +182,6 @@ public class Components {
         /**
          * Builds the "+1" button.
          * @param suffix the button ID's suffix.
-         * @return said button.
          */
         public static Button plusOne(String suffix) {
             return new ButtonBuilder("plusOne" + suffix,
@@ -194,7 +191,6 @@ public class Components {
         /**
          * Builds the "-1" button.
          * @param suffix the button ID's suffix.
-         * @return said button.
          */
         public static Button minusOne(String suffix) {
             return new ButtonBuilder("minusOne" + suffix,
@@ -204,7 +200,6 @@ public class Components {
         /**
          * Builds the "Refresh" button.
          * @param suffix the button ID's suffix.
-         * @return said button.
          */
         public static Button refresh(String suffix) {
             return new ButtonBuilder("processRefresh" + suffix,
@@ -228,7 +223,6 @@ public class Components {
         /**
          * Builds the "End Draft" button.
          * @param suffix the button ID's suffix.
-         * @return the button.
          */
         public static Button endDraftProcess(String suffix) {
             return new ButtonBuilder("endDraftProcess" + suffix,

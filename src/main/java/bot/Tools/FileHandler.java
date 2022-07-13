@@ -54,7 +54,7 @@ public class FileHandler {
     }
 
     /**
-     * Retrievs the first line of the file.
+     * Retrieves the first line of the file.
      */
     public String readFirstLine() {
         try {

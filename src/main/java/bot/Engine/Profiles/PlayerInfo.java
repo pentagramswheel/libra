@@ -79,23 +79,17 @@ public class PlayerInfo {
         return numRow;
     }
 
-    /**
-     * Retrieves the Discord tag of the player.
-     */
+    /** Retrieves the Discord tag of the player. */
     public String getAsTag() {
         return tag;
     }
 
-    /**
-     * Retrieves the nickname of the player.
-     */
+    /** Retrieves the nickname of the player. */
     public String getNickname() {
         return nickname;
     }
 
-    /**
-     * Retrieves the friend code of the player.
-     */
+    /** Retrieves the friend code of the player. */
     public String getFC() {
         return friendcode;
     }
@@ -105,23 +99,17 @@ public class PlayerInfo {
         return pronouns;
     }
 
-    /**
-     * Retrieves the playstyle of the player.
-     */
+    /** Retrieves the playstyle of the player. */
     public String getPlaystyle() {
         return playstyle;
     }
 
-    /**
-     * Retrieves the weapon pool of the player.
-     */
+    /** Retrieves the weapon pool of the player. */
     public String getWeaponPool() {
         return weapons;
     }
 
-    /**
-     * Retrieves the rank of the player.
-     */
+    /** Retrieves the rank of the player. */
     public String getRank() {
         return rank;
     }

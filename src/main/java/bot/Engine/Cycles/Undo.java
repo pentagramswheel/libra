@@ -45,7 +45,6 @@ public class Undo extends ManualLog implements Command {
     /**
      * Retrieve the amount of set games were played.
      * @param args the user input.
-     * @return said amount.
      */
     public int getGamesPlayed(String[] args) {
         return Integer.parseInt(args[1]);
@@ -54,7 +53,6 @@ public class Undo extends ManualLog implements Command {
     /**
      * Retrieve the amount of won set games.
      * @param args the user input.
-     * @return said amount.
      */
     public int getGamesWon(String[] args) {
         return Integer.parseInt(args[2]);

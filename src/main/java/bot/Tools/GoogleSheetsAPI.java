@@ -117,7 +117,6 @@ public class GoogleSheetsAPI {
 
     /**
      * Retrieves ALL of the spreadsheets' data (including all tabs).
-     * @return said values.
      */
     public Values getSheet() {
         return sheetsService.spreadsheets().values();
@@ -136,7 +135,6 @@ public class GoogleSheetsAPI {
 
     /**
      * Retrieves the affiliated spreadsheet's ID.
-     * @return said ID.
      */
     public String getSpreadsheetID() {
         return spreadsheetID;
@@ -168,7 +166,8 @@ public class GoogleSheetsAPI {
      * @param tab the specific tab of the spreadsheet.
      * @param i the current row in the spreadsheet, offset by 1.
      * @param row the actual row of this entry.
-     *
+     * @return the classified row.
+     *         null otherwise.
      */
     private Object getSpecificRow(GenericInteractionCreateEvent interaction,
                            String tab, int i, List<Object> row) {
@@ -317,7 +316,6 @@ public class GoogleSheetsAPI {
      * @param startRow the row to start the edit range at.
      * @param endColumn the column to end the edit range at.
      * @param endRow the row to end the edit range at.
-     * @return the formatted range.
      */
     public String buildRange(String tab, String startColumn, int startRow,
                       String endColumn, int endRow) {
@@ -329,7 +327,6 @@ public class GoogleSheetsAPI {
     /**
      * Builds a row consisting of items from a list.
      * @param lst the list of items to populate the row with.
-     * @return the built row.
      */
     public ValueRange buildRow(List<Object> lst) {
         return new ValueRange().setValues(Collections.singletonList(lst));
@@ -338,7 +335,6 @@ public class GoogleSheetsAPI {
     /**
      * Builds a column consisting of items from a list.
      * @param lst the list of items to populate the column with.
-     * @return the built column.
      */
     public ValueRange buildColumn(List<Object> lst) {
         List<List<Object>> values = new ArrayList<>();

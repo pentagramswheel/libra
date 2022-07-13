@@ -111,9 +111,7 @@ public class Draft extends Section implements Command {
         initialized = toStatus;
     }
 
-    /**
-     * Retrieves which draft number this is.
-     */
+    /** Retrieves which draft number this is. */
     public int getNumDraft() {
         return numDraft;
     }
@@ -139,24 +137,17 @@ public class Draft extends Section implements Command {
                 getRole(interaction, getSection()));
     }
 
-    /**
-     * Retrieves the field for executing the draft.
-     */
+    /** Retrieves the field for executing the draft. */
     public DraftProcess getProcess() {
         return draftProcess;
     }
 
-    /**
-     * Retrieves the players of the draft.
-     */
+    /** Retrieves the players of the draft. */
     public TreeMap<String, DraftPlayer> getPlayers() {
         return players;
     }
 
-    /**
-     * Retrieves the draft chat channel which this draft
-     * is occurring in.
-     */
+    /** Retrieves the draft chat channel which this draft is occurring in. */
     public TextChannel getDraftChannel() {
         return draftChat;
     }
@@ -171,16 +162,12 @@ public class Draft extends Section implements Command {
         return channel.retrieveMessageById(messageID).complete();
     }
 
-    /**
-     * Increases this draft's amount of map generations by one.
-     */
+    /** Increases this draft's amount of map generations by one. */
     public void incrementMapGens() {
         mapGens++;
     }
 
-    /**
-     * Retrieves this draft's amount of map generations.
-     */
+    /** Retrieves this draft's amount of map generations. */
     public int getMapGens() {
         return mapGens;
     }
@@ -275,10 +262,7 @@ public class Draft extends Section implements Command {
         sendEmbed(interaction, eb);
     }
 
-    /**
-     * Formats a ping for gathering players.
-     * @return the request.
-     */
+    /** Formats a request ping for gathering players. */
     private String newPing() {
         int activePlayers = players.size() - numInactive;
         int pingsLeft = NUM_PLAYERS_TO_START_DRAFT - activePlayers;

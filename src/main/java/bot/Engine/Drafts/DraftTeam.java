@@ -27,18 +27,12 @@ public class DraftTeam {
         clear();
     }
 
-    /**
-     * Retrieves the players of the team.
-     * @return said players.
-     */
+    /** Retrieves the players of the team. */
     public TreeMap<String, DraftPlayer> getPlayers() {
         return players;
     }
 
-    /**
-     * Retrieves the team's total score.
-     * @return said score.
-     */
+    /** Retrieves the team's total score. */
     public int getScore() {
         return score;
     }

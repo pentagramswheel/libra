@@ -37,7 +37,6 @@ public interface Command {
     /**
      * Retrieves the users of a slash command.
      * @param sc the command to analyze.
-     * @return said users.
      */
     default List<OptionMapping> extractUsers(SlashCommandEvent sc) {
         List<OptionMapping> users = new ArrayList<>();
@@ -82,6 +81,7 @@ public interface Command {
      * @param interaction the user interaction calling this method.
      * @param role the name of the role.
      * @return the role.
+     *         null otherwise.
      */
     default Role getRole(GenericInteractionCreateEvent interaction,
                          String role) {
@@ -129,6 +129,7 @@ public interface Command {
      * @param interaction the user interaction calling this method.
      * @param channel the name of the channel.
      * @return the channel.
+     *         null otherwise.
      */
     default TextChannel getChannel(GenericInteractionCreateEvent interaction,
                                    String channel) {

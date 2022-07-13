@@ -76,46 +76,34 @@ public class DraftProcess {
         return started;
     }
 
-    /**
-     * Retrieves Team 1.
-     */
+    /** Retrieves Team 1. */
     public DraftTeam getTeam1() {
         return team1;
     }
 
-    /**
-     * Retrieves Team 2.
-     */
+    /** Retrieves Team 2. */
     public DraftTeam getTeam2() {
         return team2;
     }
 
-    /**
-     * Resets who have clicked the 'End Draft' button.
-     */
+    /** Resets who have clicked the 'End Draft' button. */
     private void resetEndDraftButton() {
         endButtonClicked.clear();
     }
 
-    /**
-     * Retrieves the message ID of this teams interface.
-     */
+    /** Retrieves the message ID of this teams interface. */
     public String getMessageID() {
         return messageID;
     }
 
-    /**
-     * Retrieves the teams interface of the draft.
-     */
+    /** Retrieves the teams interface of the draft. */
     public Message getMessage() {
         MessageChannel channel =
                 draft.getDraftChannel();
         return channel.retrieveMessageById(getMessageID()).complete();
     }
 
-    /**
-     * Retrieves the caption ping of the draft process.
-     */
+    /** Retrieves the caption ping of the draft process. */
     private String getPing() {
         StringBuilder ping = new StringBuilder();
         TreeMap<Integer, String> captainIDs = draft.determineCaptains(null);

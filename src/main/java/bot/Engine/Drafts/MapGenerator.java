@@ -64,11 +64,7 @@ public class MapGenerator extends Section implements Command {
         modes.add("Clam Blitz");
     }
 
-    /**
-     * Retrieves the LaunchPoint legal maps for each
-     * game mode.
-     * @return said legal maps.
-     */
+    /** Retrieves the LaunchPoint legal maps for each game mode. */
     private TreeMap<String, ArrayList<String>> getLegalLPMaps() {
         TreeMap<String, ArrayList<String>> legalMaps = new TreeMap<>();
         ArrayList<String> szMaps = new ArrayList<>(Arrays.asList(
@@ -101,11 +97,7 @@ public class MapGenerator extends Section implements Command {
         return legalMaps;
     }
 
-    /**
-     * Retrieves the Ink Odyssey legal maps for each
-     * game mode.
-     * @return said legal maps.
-     */
+    /** Retrieves the Ink Odyssey legal maps for each game mode. */
     private TreeMap<String, ArrayList<String>> getLegalIOMaps() {
         TreeMap<String, ArrayList<String>> legalMaps = new TreeMap<>();
         ArrayList<String> szMaps = new ArrayList<>(Arrays.asList(
@@ -142,7 +134,6 @@ public class MapGenerator extends Section implements Command {
     /**
      * Locates the URL of a map online.
      * @param map the map to search for.
-     * @return the map URL.
      */
     private String findMapURL(String map) {
         switch (map) {

@@ -73,44 +73,32 @@ public class PlayerStats {
         return numRow;
     }
 
-    /**
-     * Retrieve the name of the player on Discord.
-     */
+    /** Retrieve the name of the player on Discord. */
     public String getName() {
         return name;
     }
 
-    /**
-     * Retrieve the nickname of the player on Discord.
-     */
+    /** Retrieve the nickname of the player on Discord. */
     public String getNickname() {
         return nickname;
     }
 
-    /**
-     * Retrieve the player's amount of won sets.
-     */
+    /** Retrieve the player's amount of won sets. */
     public int getSetWins() {
         return setWins;
     }
 
-    /**
-     * Retrieve the player's amount of lost sets.
-     */
+    /** Retrieve the player's amount of lost sets. */
     public int getSetLosses() {
         return setLosses;
     }
 
-    /**
-     * Retrieve the player's amount of won games.
-     */
+    /** Retrieve the player's amount of won games. */
     public int getGamesWon() {
         return gamesWon;
     }
 
-    /**
-     * Retrieve the player's amount of lost games.
-     */
+    /** Retrieve the player's amount of lost games. */
     public int getGamesLost() {
         return gamesLost;
     }

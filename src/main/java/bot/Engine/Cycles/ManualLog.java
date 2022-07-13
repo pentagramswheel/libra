@@ -37,9 +37,8 @@ public class ManualLog extends Section implements Command {
     }
 
     /**
-     * Structures a user into a mentionable ping, ignoring nicknames.
+     * Formats a user into a mentionable ping, ignoring nicknames.
      * @param om an argument from a command.
-     * @return the formatted ping.
      */
     private String mentionableFor(OptionMapping om) {
         String id = om.getAsMember().getId();
@@ -80,18 +79,16 @@ public class ManualLog extends Section implements Command {
     }
 
     /**
-     * Retrieve the amount of set games were played.
+     * Retrieve the amount of draft games were played.
      * @param args the arguments of the command.
-     * @return said amount.
      */
     public int getGamesPlayed(List<OptionMapping> args) {
         return (int) args.get(0).getAsLong();
     }
 
     /**
-     * Retrieve the amount of won set games.
+     * Retrieve the amount of won draft games.
      * @param args the arguments of the command.
-     * @return said amount.
      */
     public int getGamesWon(List<OptionMapping> args) {
         return (int) args.get(1).getAsLong();

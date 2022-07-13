@@ -55,9 +55,7 @@ public class DraftPlayer {
         matchWins = matchLosses = 0;
     }
 
-    /**
-     * Retrieves the name of the player.
-     */
+    /** Retrieves the name of the player. */
     public String getName() {
         return name;
     }
@@ -154,30 +152,22 @@ public class DraftPlayer {
         subStatus = status;
     }
 
-    /**
-     * Increases the amount of times this player has subbed out by one.
-     */
+    /** Increases the amount of times this player has subbed out by one. */
     public void incrementSubs() {
         subs++;
     }
 
-    /**
-     * Retrieves the amount of times this player has subbed out.
-     */
+    /** Retrieves the amount of times this player has subbed out. */
     public int getSubAmount() {
         return subs;
     }
 
-    /**
-     * Retrieves the player's draft wins.
-     */
+    /** Retrieves the player's draft wins. */
     public int getWins() {
         return matchWins;
     }
 
-    /**
-     * Retrieves the player's draft losses.
-     */
+    /** Retrieves the player's draft losses. */
     public int getLosses() {
         return matchLosses;
     }
@@ -201,9 +191,7 @@ public class DraftPlayer {
         return isActive() && points > MINIMUM_POINTS;
     }
 
-    /**
-     * Increases the player's amount of wins by one.
-     */
+    /** Increases the player's amount of wins by one. */
     public void incrementWins() {
         if (incrementable()) {
             matchWins++;
@@ -217,9 +205,7 @@ public class DraftPlayer {
         }
     }
 
-    /**
-     * Increases the player's amount of losses by one.
-     */
+    /** Increases the player's amount of losses by one. */
     public void incrementLosses() {
         if (incrementable()) {
             matchLosses++;

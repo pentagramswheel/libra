@@ -56,9 +56,12 @@ public class Graduate extends Section implements Command {
                         Collections.singletonList(
                                 getRole(sc, getSection())));
 
+                String rulesChannel =
+                        getChannel(sc, "io-draft-rules").getAsMention();
                 exitMessage = "Congratulations! We look forward to "
                         + "seeing you in Ink Odyssey and outside "
-                        + "of MIT.";
+                        + "of MIT. Make sure to read " + rulesChannel
+                        + " before playing in any drafts!";
             } else {
                 modifyRoles(sc, playerID,
                         Collections.singletonList(

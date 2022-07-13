@@ -40,7 +40,6 @@ public class SelectionMenuBuilder {
 
     /**
      * Retrieves the built selection menu.
-     * @return said menu.
      */
     public SelectionMenu getMenu() {
         return menu;
