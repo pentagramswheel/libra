@@ -577,14 +577,17 @@ public class Events extends ListenerAdapter {
                 sc.reply(leaderboardLink).queue();
                 break;
             case "startdraft":
+                if (sc.getName().equals("fs")) {sc.reply("That command isn't ready yet. Stay tuned!").setEphemeral(true).queue(); break;} // for temp JAR
                 if (notInAnotherDraft(sc, null, drafts) == null) {
                     processDrafts(sc, prefix, author);
                 }
                 break;
             case "forcesub":
+                if (sc.getName().equals("fs")) {sc.reply("That command isn't ready yet. Stay tuned!").setEphemeral(true).queue(); break;} // for temp JAR
                 attemptForceSub(sc, drafts, args);
                 break;
             case "forceend":
+                if (sc.getName().equals("fs")) {sc.reply("That command isn't ready yet. Stay tuned!").setEphemeral(true).queue(); break;} // for temp JAR
                 attemptForceEnd(sc, drafts, queue, args);
                 break;
             case "log":

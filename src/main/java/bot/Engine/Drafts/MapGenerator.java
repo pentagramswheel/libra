@@ -375,6 +375,6 @@ public class MapGenerator extends Section implements Command {
         } else {
             sc.getHook().editOriginalEmbeds(matches).queue();
         }
-        log("A map list was generated.", false);
+        log("A maplist was generated.", false);
     }
 }
