@@ -51,19 +51,32 @@ public class Profile implements Command {
     private static final String TAB = "Profiles";
 
     /**
-     * Retrieves the parameter of a command, if any.
+     * Checks the name of a parameter of a command.
+     * @param args the arguments of the command.
+     * @param name the name to check for.
+     * @return True if the parameter has the correct name.
+     *         False otherwise.
+     */
+    private boolean parameterGood(List<OptionMapping> args, String name) {
+        if (args.isEmpty()) {
+            return false;
+        } else {
+            return args.get(0).getName().equals(name);
+        }
+    }
+
+    /**
+     * Retrieves a parameter of a command, if any.
      * @param args the arguments of the command.
      * @param isMember flag for knowing if the parameter is a member or not.
      * @return the parameter, if it exists.
      *         null otherwise.
      */
-    private String getParameter(List<OptionMapping> args, boolean isMember) {
-        if (args.isEmpty()
-                || args.get(0).getType().equals(OptionType.BOOLEAN)) {
-            return null;
-        } else if (isMember
-                && args.get(0).getType().equals(OptionType.MENTIONABLE)) {
+    private Object getParameter(List<OptionMapping> args, boolean isMember) {
+        if (isMember && args.get(0).getType().equals(OptionType.MENTIONABLE)) {
             return args.remove(0).getAsMember().getId();
+        } else if (args.get(0).getType().equals(OptionType.BOOLEAN)) {
+            return args.remove(0).getAsBoolean();
         } else {
             return args.remove(0).getAsString();
         }
@@ -144,12 +157,12 @@ public class Profile implements Command {
         sc.deferReply(true).queue();
 
         List<OptionMapping> args = sc.getOptions();
-        String fc = getParameter(args, false);
-        String nickname = getParameter(args, false);
-        String pronouns = getParameter(args, false);
-        String playstyle = getParameter(args, false);
-        String weapons = getParameter(args, false);
-        String rank = getParameter(args, false);
+        String fc = (String) getParameter(args, false);
+        String nickname = (String) getParameter(args, false);
+        String pronouns = (String) getParameter(args, false);
+        String playstyle = (String) getParameter(args, false);
+        String weapons = (String) getParameter(args, false);
+        String rank = (String) getParameter(args, false);
 
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
@@ -309,21 +322,6 @@ public class Profile implements Command {
     }
 
     /**
-     * Checks whether to display a player's friend code in
-     * their profile.
-     * @param args the arguments of the command.
-     * @return True to display.
-     *         False otherwise.
-     */
-    private boolean displayFC(List<OptionMapping> args) {
-        if (args.isEmpty()) {
-            return true;
-        } else {
-            return args.remove(0).getAsBoolean();
-        }
-    }
-
-    /**
      * Retrieves the win-loss score of a player within their
      * draft section, if it exists.
      * @param interaction the user interaction calling this method.
@@ -364,13 +362,16 @@ public class Profile implements Command {
      * @param profile the player's profile.
      * @param fullDisplay a flag for knowing whether to display
      *                    the entire profile or not.
-     * @param showFC flag for checking whether to show a player's
-     *               friend code or not.
+     * @param showInfo a flag for checking whether to show a player's
+     *                 additional info or not.
+     * @param shouldPrint a flag for checking whether the profile
+     *                   should be printed immediately or not.
      * @return the pre-built summary.
      */
     private EmbedBuilder buildProfile(GenericInteractionCreateEvent interaction,
                                       String pronoun, String id, PlayerInfo profile,
-                                      boolean fullDisplay, boolean showFC) {
+                                      boolean fullDisplay, boolean showInfo,
+                                      boolean shouldPrint) {
         EmbedBuilder eb = new EmbedBuilder();
         Member player = findMember(interaction, id);
 
@@ -383,9 +384,10 @@ public class Profile implements Command {
                     + "Register with\n`/mit qprofile ...` "
                     + "or `/mit profile fc` to proceed.");
         } else {
-            eb.setTitle(profile.getNickname() + " [" + profile.getAsTag() + "]");
+            eb.setTitle(profile.getNickname());
             eb.setThumbnail(player.getEffectiveAvatarUrl());
-            if (showFC) {
+            if (showInfo) {
+                eb.setTitle(profile.getNickname() + " [" + profile.getAsTag() + "]");
                 eb.setFooter("FC SW-" + profile.getFC(),
                         "https://images.squarespace-cdn.com/content/v1/5ce2bf96d2bf17000192fe2c/1596048502214-WL5LU68IOLM8WILBA57N/Friends+Icon.png?format=1000w");
             }
@@ -393,16 +395,15 @@ public class Profile implements Command {
             eb.addField("Pronouns", profile.getPronouns(), true);
             eb.addField("Playstyle", "`" + profile.getPlaystyle() + "`", true);
             eb.addField("Weapon Pool", "`" + profile.getWeaponPool() + "`", true);
-        }
-
-        if (fullDisplay) {
-            if (profile != null) {
+            if (fullDisplay) {
                 eb.addField("Score",
                         getScore(interaction, id, leaderboardID), true);
                 eb.addField("Team", profile.getTeam(), true);
                 eb.addField("Rank", profile.getRank(), true);
             }
+        }
 
+        if (shouldPrint) {
             sendEmbed(interaction, eb);
         }
 
@@ -416,13 +417,14 @@ public class Profile implements Command {
      * @param pronoun the player's neutral pronoun.
      * @param fullDisplay a flag for knowing whether to display
      *                    the entire profile or not.
-     * @param showFC flag for checking whether to show a player's
-     *               friend code or not.
-     * @return a built summary of the players' profiles..
+     * @param showInfo flag for checking whether to show a player's
+     *                 additional info or not.
+     * @return a built summary of the players' profiles.
      */
     public List<MessageEmbed> viewMultiple(GenericInteractionCreateEvent interaction,
                                            Iterable<String> ids, String pronoun,
-                                           boolean fullDisplay, boolean showFC) {
+                                           boolean fullDisplay, boolean showInfo,
+                                           boolean shouldPrint) {
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
             TreeMap<Object, Object> database = link.readSection(interaction, TAB);
@@ -437,8 +439,8 @@ public class Profile implements Command {
                 for (String id : ids) {
                     PlayerInfo profile = (PlayerInfo) database.get(id);
 
-                    profiles.add(buildProfile(interaction, pronoun,
-                            id, profile, fullDisplay, showFC).build());
+                    profiles.add(buildProfile(interaction, pronoun, id,
+                            profile, fullDisplay, showInfo, shouldPrint).build());
                 }
 
                 return profiles;
@@ -456,24 +458,28 @@ public class Profile implements Command {
      * @param id a player's Discord ID.
      * @param fullDisplay a flag for knowing whether to display
      *                    the entire profile or not.
-     * @param showFC flag for checking whether to show a player's
-     *               friend code or not.
+     * @param showInfo flag for checking whether to show a player's
+     *                 additional info or not.
+     * @param shouldPrint a flag for checking whether the profile
+     *                    should be printed immediately or not.
      * @return a built summary of the player's profile.
      */
     public MessageEmbed view(GenericInteractionCreateEvent interaction,
                              String id, boolean fullDisplay,
-                             boolean showFC) {
+                             boolean showInfo, boolean shouldPrint) {
         if (id == null) {
             id = interaction.getMember().getId();
             List<MessageEmbed> profiles = viewMultiple(interaction,
-                    Collections.singleton(id), "Your", fullDisplay, showFC);
+                    Collections.singleton(id), "Your",
+                    fullDisplay, showInfo, shouldPrint);
 
             if (profiles != null) {
                 return profiles.remove(0);
             }
         } else {
             List<MessageEmbed> profiles = viewMultiple(interaction,
-                    Collections.singleton(id), "Their", fullDisplay, showFC);
+                    Collections.singleton(id), "Their",
+                    fullDisplay, showInfo, shouldPrint);
 
             if (profiles != null) {
                 return profiles.remove(0);
@@ -640,39 +646,54 @@ public class Profile implements Command {
                 quickRegister(sc);
                 break;
             case "fc":
-                register(sc, getParameter(args, false));
+                register(sc, (String) getParameter(args, false));
                 break;
             case "getfc":
-                onlyGetFC(sc, getParameter(args, true));
+                onlyGetFC(sc, (String) getParameter(args, true));
                 break;
             case "view":
                 sc.deferReply(false).queue();
-                view(sc, getParameter(args, true), true, displayFC(args));
+                String id = null;
+                if (parameterGood(args, "player")) {
+                    id = (String) getParameter(args, true);
+                }
+
+                boolean fullDisplay = true;
+                if (parameterGood(args, "fullview")) {
+                    fullDisplay = (Boolean) getParameter(args, false);
+                }
+
+                boolean showInfo = true;
+                if (parameterGood(args, "includeinfo")) {
+                    showInfo = (Boolean) getParameter(args, false);
+                }
+
+                view(sc, id, fullDisplay, showInfo, true);
                 break;
             case "nickname":
-                setField(sc, getParameter(args, false), null,
+                setField(sc, (String) getParameter(args, false), null,
                         null, null, null, null);
                 break;
             case "pronouns":
-                setField(sc, null, getParameter(args, false),
+                setField(sc, null, (String) getParameter(args, false),
                         null, null, null, null);
                 break;
             case "playstyle":
                 setField(sc, null, null,
-                        getParameter(args, false), null, null, null);
+                        (String) getParameter(args, false), null, null, null);
                 break;
             case "weapons":
                 setField(sc, null, null,
-                        null, getParameter(args, false), null, null);
+                        null, (String) getParameter(args, false), null, null);
                 break;
             case "rank":
                 setField(sc, null, null,
-                        null, null, getParameter(args, false), null);
+                        null, null, (String) getParameter(args, false), null);
                 break;
 
             case "team":
                 setField(sc, null, null,
-                        null, null, null, getParameter(args, false));
+                        null, null, null, (String) getParameter(args, false));
                 break;
             case "delete":
                 delete(sc);

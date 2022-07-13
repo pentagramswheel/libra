@@ -1,5 +1,6 @@
 package bot.Engine.Drafts;
 
+import bot.Engine.Profiles.Profile;
 import bot.Engine.Section;
 import bot.Events;
 import bot.Tools.Command;
@@ -380,10 +381,11 @@ public class Draft extends Section implements Command {
 
             getProcess().refresh(null);
 
-//            Profile profiles = new Profile();
-//            getDraftChannel().sendMessageEmbeds(
-//                    profiles.viewMultiple(bc, getPlayers().keySet(),
-//                            "Their", false, true)).queue();
+            Profile profiles = new Profile();
+            getDraftChannel().sendMessageEmbeds(
+                    profiles.viewMultiple(bc, getPlayers().keySet(),
+                            "Their", false, true,
+                            false)).queue();
         } else {
             refresh(bc);
             messageID = bc.getMessageId();
@@ -640,13 +642,14 @@ public class Draft extends Section implements Command {
 
         getDraftChannel().sendMessage(
                 player.getAsMention(playerID) + " " + statement + " "
-                + "for this draft. __`Refresh` the pinned interface "
+                + "for this draft. __Refresh the pinned interface "
                 + "to add them to a team!__").queue();
 
         if (displayProfile) {
-//            Profile profile = new Profile();
-//            getDraftChannel().sendMessageEmbeds(
-//                    profile.view(bc, playerID, false, true)).queue();
+            Profile profile = new Profile();
+            getDraftChannel().sendMessageEmbeds(
+                    profile.view(bc, playerID, false, true,
+                            false)).queue();
         }
     }
 

@@ -103,14 +103,16 @@ public class Main {
 
         OptionData viewParam = new OptionData(
                 OptionType.USER, "player", "The player to look up", false);
+        OptionData fullView = new OptionData(
+                OptionType.BOOLEAN, "fullview", "Display all of your stats", false);
+        OptionData displayFC = new OptionData(
+                OptionType.BOOLEAN, "includeinfo", "Display your personal info", false);
         OptionData teamParam = new OptionData(
                 OptionType.STRING, "name", "Your team's name", true);
-        OptionData displayFC = new OptionData(
-                OptionType.BOOLEAN, "includefc", "...", false);
 
         fc.addOptions(fcParam);
         getfc.addOptions(viewParam);
-        view.addOptions(viewParam, displayFC);
+        view.addOptions(viewParam, fullView, displayFC);
         nickname.addOptions(nicknameParam);
         pronouns.addOptions(pronounChoices);
 
