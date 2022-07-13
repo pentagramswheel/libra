@@ -5,6 +5,7 @@ import bot.Events;
 import bot.Tools.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
@@ -225,7 +226,7 @@ public class MapGenerator extends Section implements Command {
         String lastMode = "";
         List<String> pastMaps = new ArrayList<>();
 
-        List<EmbedBuilder> matches = new ArrayList<>();
+        List<MessageEmbed> matches = new ArrayList<>();
         for (int i = 0; i < numMaps; i++) {
             if (numModes == 0) {
                 resetModes(modes);
@@ -250,10 +251,18 @@ public class MapGenerator extends Section implements Command {
             }
             pastMaps.add(modeMaps.remove(rIndex));
 
-            matches.add(buildMatch(currMode, currMap));
+            matches.add(buildMatch(currMode, currMap).build());
         }
 
-        sendEmbeds(sc, matches);
+        if (foundDraft != null) {
+            sc.getHook().editOriginalEmbeds(matches).queue(
+                    message -> {
+                        message.pin().queue();
+                        wait(1000);
+                    });
+        } else {
+            sc.getHook().editOriginalEmbeds(matches).queue();
+        }
         log("A map list was generated.", false);
     }
 }

@@ -236,7 +236,7 @@ public class DraftProcess {
             TextChannel channel = draft.getDraftChannel();
             channel.sendMessage(getPing()).setActionRows(
                     ActionRow.of(menus), ActionRow.of(buttons)).queue(
-                            (message) -> {
+                            message -> {
                                 message.pin().queue();
                                 draft.wait(1000);
                             });
@@ -450,7 +450,7 @@ public class DraftProcess {
             draft.toggleRequest(false);
 
             if (hasStarted()) {
-                getMessage().unpin().queue();
+                draft.unpinDraftChannelPins();
 
                 String idSuffix = draft.getPrefix() + draft.getNumDraft();
                 List<Button> buttons = new ArrayList<>();
@@ -467,7 +467,19 @@ public class DraftProcess {
                 AutoLog log = new AutoLog(draft.getPrefix());
                 log.matchReport(bc, draft);
             } else {
+                draft.unpinDraftChannelPins();
                 getMessage().delete().queue();
+
+                draft.getDraftChannel().sendMessage(
+                        "The draft has ended. Sorry about the early stop! "
+                        + "Feel free to request a new one!").queue();
+                draft.getMessage(bc).editMessage("This draft ended early.")
+                        .setActionRow(Components.ForDraft.refresh(
+                                        draft.getPrefix() + draft.getNumDraft())
+                                .asDisabled()).queue();
+
+                draft.log("A " + draft.getSection()
+                        + " draft was ended before it started.", false);
             }
 
             return true;

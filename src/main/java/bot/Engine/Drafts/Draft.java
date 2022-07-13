@@ -147,9 +147,17 @@ public class Draft extends Section implements Command {
         return players;
     }
 
-    /** Retrieves the draft chat channel which this draft is occurring in. */
+    /** Retrieves the respective draft chat channel. */
     public TextChannel getDraftChannel() {
         return draftChat;
+    }
+
+    /** Unpins anything in the respective draft chat channel. */
+    public void unpinDraftChannelPins() {
+        for (Message pin : getDraftChannel()
+                .retrievePinnedMessages().complete()) {
+            pin.unpin().complete();
+        }
     }
 
     /**
@@ -683,8 +691,10 @@ public class Draft extends Section implements Command {
                                     getPrefix() + getNumDraft())
                             .asDisabled()).queue();
 
-            if (isInitialized() && getProcess().getMessageID() != null) {
+            if (isInitialized()) {
+                unpinDraftChannelPins();
                 getProcess().getMessage().delete().queue();
+
                 getDraftChannel().sendMessage(
                         "The draft has been ended by staff. Sorry about the "
                                 + "early stop! Feel free to request a new one!").queue();
