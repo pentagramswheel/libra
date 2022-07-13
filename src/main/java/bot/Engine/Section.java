@@ -54,22 +54,34 @@ public class Section {
     public Section(String abbreviation) {
         prefix = abbreviation;
 
-        if (prefix.equals("lp")) {
-            name = "LaunchPoint";
-            role = "<@&732850504463286352>";
-            emote = "<:LaunchPoint:918936266190512168>";
-            color = Main.launchpointColor;
-            gradSheetID = Config.lpGradSheetID;
-            cyclesSheetID = Config.lpCyclesSheetID;
-            calculationsSheetID = Config.lpCyclesCalculationSheetID;
-        } else {
-            name = "Ink Odyssey";
-            role = "<@&918181354284408882>";
-            emote = "<:InkOdyssey:918936305788923944>";
-            color = Main.inkodysseyColor;
-            gradSheetID = Config.ioGradSheetID;
-            cyclesSheetID = Config.ioCyclesSheetID;
-            calculationsSheetID = Config.ioCyclesCalculationSheetID;
+        switch (prefix) {
+            case "fs":
+                name = "Freshwater Shoals";
+                role = "<@&996101473647743086>";
+                emote = "emoteHere";
+                color = Main.freshwatershoalsColor;
+                gradSheetID = Config.fsGradSheetID;
+                cyclesSheetID = null;
+                calculationsSheetID = null;
+                break;
+            case "lp":
+                name = "LaunchPoint";
+                role = "<@&732850504463286352>";
+                emote = "<:LaunchPoint:918936266190512168>";
+                color = Main.launchpointColor;
+                gradSheetID = Config.lpGradSheetID;
+                cyclesSheetID = Config.lpCyclesSheetID;
+                calculationsSheetID = Config.lpCyclesCalculationSheetID;
+                break;
+            default:
+                name = "Ink Odyssey";
+                role = "<@&918181354284408882>";
+                emote = "<:InkOdyssey:918936305788923944>";
+                color = Main.inkodysseyColor;
+                gradSheetID = Config.ioGradSheetID;
+                cyclesSheetID = Config.ioCyclesSheetID;
+                calculationsSheetID = Config.ioCyclesCalculationSheetID;
+                break;
         }
     }
 

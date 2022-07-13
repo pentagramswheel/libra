@@ -30,9 +30,10 @@ public class Main {
 
     /** Colors for the bot to reference. */
     public static Color mitColor = new Color(0, 154, 255);
+    public static Color freshwatershoalsColor = new Color(135, 0, 255);
     public static Color launchpointColor = new Color(13, 255, 0);
     public static Color inkodysseyColor = new Color(255, 0, 144);
-    public static Color freshwatershoalsColor = new Color(135, 0, 255);
+    public static Color inkodysseygraduateColor = new Color(255, 112, 191);
 
     /**
      * Implement the bot's slash commands.
@@ -130,6 +131,8 @@ public class Main {
                 "Wug when someone drops before LPDC starts");
 
         // section commands
+        CommandData fs = new CommandData("fs",
+                "Commands to use within Freshwater Shoals.");
         CommandData lp = new CommandData("lp",
                 "Commands to use within LaunchPoint.");
         CommandData io = new CommandData("io",
@@ -141,7 +144,10 @@ public class Main {
                 "Retrieves the leaderboard for the MIT section.");
 
         SubcommandData startdraft = new SubcommandData("startdraft",
-                "Requests an automatic draft with up to 8 players.");
+                "Requests a draft with up to 8 players.");
+        SubcommandData startdraft2 = new SubcommandData("startdraft",
+                "Requests a draft, with a specific gamemode.");
+
         SubcommandData forcesub = new SubcommandData("forcesub",
                 "Forces a player within a draft to become a sub.");
         SubcommandData forceend = new SubcommandData("forceend",
@@ -178,8 +184,16 @@ public class Main {
 
         OptionData maps = new OptionData(
                 OptionType.INTEGER, "matches",
-                "Amount of maps to generate.", true);
-        genmaps.addOptions(maps);
+                "Amount of maps to generate", true);
+        OptionData modeChoice = new OptionData(
+                OptionType.STRING, "mode",
+                "A single gamemode to focus on", false);
+        String[] modes = {"Turf War", "Splat Zones", "Tower Control",
+                "Rainmaker", "Clam Blitz"};
+        for (int i = 1; i <= modes.length; i++) {
+            modeChoice.addChoice(modes[i - 1], modes[i - 1]);
+        }
+        genmaps.addOptions(maps, modeChoice);
 
         OptionData leaderboardAward = new OptionData(OptionType.INTEGER, "role",
                 "The leaderboard role to give", true);
@@ -217,6 +231,10 @@ public class Main {
         mit.addSubcommands(status, help,
                 qprofile, ded);
         mit.addSubcommandGroups(profile);
+        fs.addSubcommands(
+                genmaps,
+                startdraft2, forcesub, forceend,
+                add, deny, grad);
         lp.addSubcommands(
                 genmaps, leaderboard,
                 startdraft, forcesub, forceend,
@@ -230,7 +248,7 @@ public class Main {
                 add, deny, grad,
                 cycleCalculate, award);
 
-        jda.updateCommands().addCommands(mit, lp, io).queue();
+        jda.updateCommands().addCommands(mit, fs, lp, io).queue();
     }
 
     /**

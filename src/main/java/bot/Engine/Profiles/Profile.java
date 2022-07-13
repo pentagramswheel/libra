@@ -309,12 +309,18 @@ public class Profile implements Command {
      */
     private String getSpreadsheetID(GenericInteractionCreateEvent interaction,
                               EmbedBuilder eb, List<Role> roles) {
-        if (roles.contains(getRole(interaction, "LaunchPoint"))) {
+        if (roles.contains(getRole(interaction, "Freshwater Shoals"))) {
+            eb.setColor(Main.freshwatershoalsColor);
+            return null;
+        } else if (roles.contains(getRole(interaction, "LaunchPoint"))) {
             eb.setColor(Main.launchpointColor);
             return Config.lpCyclesSheetID;
         } else if (roles.contains(getRole(interaction, "Ink Odyssey"))) {
             eb.setColor(Main.inkodysseyColor);
             return Config.ioCyclesSheetID;
+        } else if (roles.contains(getRole(interaction, "Ink Odyssey Graduate"))) {
+            eb.setColor(Main.inkodysseygraduateColor);
+            return null;
         } else {
             eb.setColor(Main.mitColor);
             return null;

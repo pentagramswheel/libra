@@ -65,26 +65,66 @@ public class MapGenerator extends Section implements Command {
         modes.add("Clam Blitz");
     }
 
-    /** Retrieves the LaunchPoint legal maps for each game mode. */
-    private TreeMap<String, ArrayList<String>> getLegalLPMaps() {
-        TreeMap<String, ArrayList<String>> legalMaps = new TreeMap<>();
-        ArrayList<String> szMaps = new ArrayList<>(Arrays.asList(
+    /** Retrieves the Freshwater Shoals legal maps for each game mode. */
+    private TreeMap<String, List<String>> getLegalFSMaps() {
+        TreeMap<String, List<String>> legalMaps = new TreeMap<>();
+        List<String> twMaps = new ArrayList<>(Arrays.asList(
                 "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
                 "Sturgeon Shipyard", "Skipper Pavilion", "The Reef",
                 "Humpback Pump Track", "Starfish Mainstage", "Wahoo World",
                 "Piranha Pit", "Manta Maria", "New Albacore Hotel",
                 "Musselforge Fitness", "Snapper Canal", "Goby Arena"));
-        ArrayList<String> tcMaps = new ArrayList<>(Arrays.asList(
+        List<String> szMaps = new ArrayList<>(Arrays.asList(
+                "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
+                "Sturgeon Shipyard", "Skipper Pavilion", "The Reef",
+                "Humpback Pump Track", "Starfish Mainstage", "Wahoo World",
+                "Piranha Pit", "Manta Maria", "New Albacore Hotel",
+                "Musselforge Fitness", "Snapper Canal", "Goby Arena"));
+        List<String> tcMaps = new ArrayList<>(Arrays.asList(
                 "Inkblot Art Academy", "Ancho-V Games", "Sturgeon Shipyard",
                 "Starfish Mainstage", "MakoMart", "The Reef", "Manta Maria",
                 "Piranha Pit", "Skipper Pavilion", "Snapper Canal",
                 "Humpback Pump Track"));
-        ArrayList<String> rmMaps = new ArrayList<>(Arrays.asList(
+        List<String> rmMaps = new ArrayList<>(Arrays.asList(
                 "Humpback Pump Track", "Starfish Mainstage", "Manta Maria",
                 "Sturgeon Shipyard", "Snapper Canal", "Ancho-V Games",
                 "MakoMart", "The Reef", "Inkblot Art Academy",
                 "Blackbelly Skatepark", "Musselforge Fitness", "Piranha Pit"));
-        ArrayList<String> cbMaps = new ArrayList<>(Arrays.asList(
+        List<String> cbMaps = new ArrayList<>(Arrays.asList(
+                "Inkblot Art Academy", "The Reef", "MakoMart", "Piranha Pit",
+                "Snapper Canal", "Humpback Pump Track", "Sturgeon Shipyard",
+                "Starfish Mainstage", "Ancho-V Games", "New Albacore Hotel",
+                "Manta Maria"));
+
+        legalMaps.put("Turf War", twMaps);
+        legalMaps.put("Splat Zones", szMaps);
+        legalMaps.put("Tower Control", tcMaps);
+        legalMaps.put("Rainmaker", rmMaps);
+        legalMaps.put("Clam Blitz", cbMaps);
+
+        return legalMaps;
+    }
+
+    /** Retrieves the LaunchPoint legal maps for each game mode. */
+    private TreeMap<String, List<String>> getLegalLPMaps() {
+        TreeMap<String, List<String>> legalMaps = new TreeMap<>();
+        List<String> szMaps = new ArrayList<>(Arrays.asList(
+                "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
+                "Sturgeon Shipyard", "Skipper Pavilion", "The Reef",
+                "Humpback Pump Track", "Starfish Mainstage", "Wahoo World",
+                "Piranha Pit", "Manta Maria", "New Albacore Hotel",
+                "Musselforge Fitness", "Snapper Canal", "Goby Arena"));
+        List<String> tcMaps = new ArrayList<>(Arrays.asList(
+                "Inkblot Art Academy", "Ancho-V Games", "Sturgeon Shipyard",
+                "Starfish Mainstage", "MakoMart", "The Reef", "Manta Maria",
+                "Piranha Pit", "Skipper Pavilion", "Snapper Canal",
+                "Humpback Pump Track"));
+        List<String> rmMaps = new ArrayList<>(Arrays.asList(
+                "Humpback Pump Track", "Starfish Mainstage", "Manta Maria",
+                "Sturgeon Shipyard", "Snapper Canal", "Ancho-V Games",
+                "MakoMart", "The Reef", "Inkblot Art Academy",
+                "Blackbelly Skatepark", "Musselforge Fitness", "Piranha Pit"));
+        List<String> cbMaps = new ArrayList<>(Arrays.asList(
                 "Inkblot Art Academy", "The Reef", "MakoMart", "Piranha Pit",
                 "Snapper Canal", "Humpback Pump Track", "Sturgeon Shipyard",
                 "Starfish Mainstage", "Ancho-V Games", "New Albacore Hotel",
@@ -99,26 +139,26 @@ public class MapGenerator extends Section implements Command {
     }
 
     /** Retrieves the Ink Odyssey legal maps for each game mode. */
-    private TreeMap<String, ArrayList<String>> getLegalIOMaps() {
-        TreeMap<String, ArrayList<String>> legalMaps = new TreeMap<>();
-        ArrayList<String> szMaps = new ArrayList<>(Arrays.asList(
+    private TreeMap<String, List<String>> getLegalIOMaps() {
+        TreeMap<String, List<String>> legalMaps = new TreeMap<>();
+        List<String> szMaps = new ArrayList<>(Arrays.asList(
                 "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
                 "Sturgeon Shipyard", "The Reef", "Wahoo World",
                 "Humpback Pump Track", "Piranha Pit", "Starfish Mainstage",
                 "Manta Maria", "Skipper Pavilion", "New Albacore Hotel",
                 "Musselforge Fitness", "Snapper Canal", "Goby Arena",
                 "Camp Triggerfish"));
-        ArrayList<String> tcMaps = new ArrayList<>(Arrays.asList(
+        List<String> tcMaps = new ArrayList<>(Arrays.asList(
                 "Inkblot Art Academy", "Sturgeon Shipyard", "Ancho-V Games",
                 "MakoMart", "The Reef", "Starfish Mainstage", "Manta Maria",
                 "Piranha Pit", "Snapper Canal", "Shellendorf Institute",
                 "Musselforge Fitness"));
-        ArrayList<String> rmMaps = new ArrayList<>(Arrays.asList(
+        List<String> rmMaps = new ArrayList<>(Arrays.asList(
                 "Starfish Mainstage", "Manta Maria", "Blackbelly Skatepark",
                 "Sturgeon Shipyard", "Humpback Pump Track", "Ancho-V Games",
                 "The Reef", "Inkblot Art Academy", "Snapper Canal",
                 "MakoMart", "Musselforge Fitness", "Piranha Pit"));
-        ArrayList<String> cbMaps = new ArrayList<>(Arrays.asList(
+        List<String> cbMaps = new ArrayList<>(Arrays.asList(
                 "Inkblot Art Academy", "The Reef", "MakoMart", "Snapper Canal",
                 "Piranha Pit", "Sturgeon Shipyard", "Humpback Pump Track",
                 "Starfish Mainstage", "New Albacore Hotel", "Manta Maria",
@@ -130,6 +170,18 @@ public class MapGenerator extends Section implements Command {
         legalMaps.put("Clam Blitz", cbMaps);
 
         return legalMaps;
+    }
+
+    /** Retrieves the legal maps for a section. */
+    private TreeMap<String, List<String>> getLegalMaps() {
+        switch (getPrefix()) {
+            case "fs":
+                return getLegalFSMaps();
+            case "lp":
+                return getLegalLPMaps();
+            default:
+                return getLegalIOMaps();
+        }
     }
 
     /**
@@ -202,47 +254,107 @@ public class MapGenerator extends Section implements Command {
     }
 
     /**
+     * Checks whether ther is a mode to focus on for the maplist.
+     * @param sc the user's inputted command.
+     * @param args the parameters of the command.
+     * @return -1 if a specific mode was not found.
+     *          0 if a mode was found, but an error occurred.
+     *          1 otherwise.
+     */
+    private int checkForMode(SlashCommandEvent sc, List<OptionMapping> args) {
+        String onlyMode = null;
+
+        if (!args.isEmpty()) {
+            onlyMode = args.get(0).getAsString();
+
+            if (onlyMode.equals("Turf War")
+                    && !getPrefix().equals("fs")) {
+                sendReply(sc, getSection() + " doesn't have access to such "
+                        + "a maplist!", true);
+                return 0;
+            }
+        }
+
+        if (foundDraft != null) {
+            if (!foundDraft.isInitialized()) {
+                sendReply(sc, "You cannot generate maps for your "
+                        + "draft yet!", true);
+                return 0;
+            } else if (onlyMode != null
+                    && (getPrefix().equals("lp") || getPrefix().equals("io"))) {
+                sendReply(sc, "You cannot generate one-gamemode "
+                        + "maplists during drafts!", true);
+                return 0;
+            } else if (!sc.getTextChannel().equals(
+                    foundDraft.getDraftChannel())) {
+                sendReply(sc, "You can only generate maplists for your draft in "
+                        + foundDraft.getDraftChannel().getAsMention() + "!", true);
+                return 0;
+            }
+        }
+
+        if (mapGenerationLimitHit()) {
+            sendReply(sc, "You can only generate two maplists "
+                    + "per draft!", true);
+            return 0;
+        }
+
+        if (onlyMode == null) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+
+    /**
      * Runs the map generation command.
      * @param sc the user's inputted command.
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
-        if (mapGenerationLimitHit()) {
-            sendReply(sc, "You can only generate two maplists per draft!", true);
+        List<OptionMapping> args = sc.getOptions();
+        int numMaps = (int) args.remove(0).getAsLong();
+
+        String onlyMode = null;
+        int check = checkForMode(sc, args);
+        if (check == 0) {
             return;
+        } else if (check == 1) {
+            onlyMode = args.remove(0).getAsString();
         }
         sc.deferReply(false).queue();
 
-        List<OptionMapping> args = sc.getOptions();
-        int numMaps = (int) args.get(0).getAsLong();
-
         int numModes = 0;
         List<String> modes = new ArrayList<>();
-        TreeMap<String, ArrayList<String>> legalMaps = getLegalLPMaps();
-        if (getSection().equals("io")) {
-            legalMaps = getLegalIOMaps();
-        }
+        TreeMap<String, List<String>> legalMaps = getLegalMaps();
 
         String lastMode = "";
         List<String> pastMaps = new ArrayList<>();
 
         List<MessageEmbed> matches = new ArrayList<>();
         for (int i = 0; i < numMaps; i++) {
-            if (numModes == 0) {
-                resetModes(modes);
-                numModes = 4;
-            }
+            int rIndex;
+            String currMode;
 
-            int rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
-            String currMode = modes.get(rIndex);
-            while (lastMode.equals(currMode)) {
+            if (onlyMode == null) {
+                if (numModes == 0) {
+                    resetModes(modes);
+                    numModes = 4;
+                }
+
                 rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
                 currMode = modes.get(rIndex);
+                while (lastMode.equals(currMode)) {
+                    rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
+                    currMode = modes.get(rIndex);
+                }
+                lastMode = modes.remove(rIndex);
+                numModes--;
+            } else {
+                currMode = onlyMode;
             }
-            lastMode = modes.remove(rIndex);
-            numModes--;
 
-            ArrayList<String> modeMaps = legalMaps.get(currMode);
+            List<String> modeMaps = legalMaps.get(currMode);
             rIndex = Events.RANDOM_GENERATOR.nextInt(modeMaps.size());
             String currMap = modeMaps.get(rIndex);
             while (pastMaps.contains(currMap)) {

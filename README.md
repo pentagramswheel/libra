@@ -97,9 +97,10 @@ The entry point of the bot. It constructs the bot and prepares it for processing
 ###### Instance Variables
 1. `String NAME` - the name of the bot.
 2. `Color mitColor` - the color of MIT.
-3. `Color launchpointColor` - the color of LaunchPoint.
-4. `Color inkodysseyColor` - the color of Ink Odyssey.
-5. `Color freshwatershoalsColor` - the color of Freshwater Shoals.
+3. `Color freshwatershoalsColor` - the color of Freshwater Shoals.
+4. `Color launchpointColor` - the color of LaunchPoint.
+5. `Color inkodysseyColor` - the color of Ink Odyssey.
+6. `Color inkodysseygraduateColor` - the color of Ink Odyssey graduates.
 
 ----
 
@@ -114,13 +115,16 @@ A class consisting of credential-specific information, pertaining to Discord and
 The class which parses through user-inputted commands, as referenced in `Usage`.
 
 ###### Instance Variables
-1. `Random RANDOM_GENERATOR` - a random number generator for the bot.  
-2. `int MAX_LP_DRAFTS` - the maximum number of LaunchPoint drafts.
-3. `int MAX_IO_DRAFTS` - the maximum number of Ink Odyssey drafts.
-4. `TreeMap<Integer, Draft> lpDrafts` - a map of numbers/buttons to LaunchPoint drafts.
-5. `TreeMap<Integer, Draft> ioDrafts` - a map of numbers/buttons to Ink Odyssey drafts.
-6. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered LaunchPoint drafts.
-7. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered Ink Odyssey drafts.
+1. `Random RANDOM_GENERATOR` - a random number generator for the bot. 
+2. `int MAX_FS_DRAFTS` - the maximum number of Freshwater Shoals drafts.
+3. `int MAX_LP_DRAFTS` - the maximum number of LaunchPoint drafts.
+4. `int MAX_IO_DRAFTS` - the maximum number of Ink Odyssey drafts.
+5. `TreeMap<Integer, Draft> fsDrafts` - a map of numbers/buttons to Freshwater Shoals drafts.
+6. `TreeMap<Integer, Draft> lpDrafts` - a map of numbers/buttons to LaunchPoint drafts.
+7. `TreeMap<Integer, Draft> ioDrafts` - a map of numbers/buttons to Ink Odyssey drafts.
+8. `ArrayHeapMinPQ<Integer> fsQueue` - a queue of numbered Freshwater Shoals drafts.
+9. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered LaunchPoint drafts.
+10. `ArrayHeapMinPQ<Integer> lpQueue` - a queue of numbered Ink Odyssey drafts.
 
 ----
 

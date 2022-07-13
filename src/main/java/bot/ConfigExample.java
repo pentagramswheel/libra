@@ -16,6 +16,9 @@ public final class ConfigExample {
     /** MIT profiles Google Sheets ID. */
     public final static String mitProfilesSheetID = "ID";
 
+    /** Freshwater Shoals graduates Google Sheets ID. */
+    public final static String fsGradSheetID ="ID";
+
     /** LaunchPoint graduates Google Sheets ID. */
     public final static String lpGradSheetID ="ID";
 

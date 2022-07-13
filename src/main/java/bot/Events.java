@@ -44,14 +44,17 @@ public class Events extends ListenerAdapter {
     public static Random RANDOM_GENERATOR = new Random();
 
     /** Fields which determine the maximum number of drafts. */
+    private final static int MAX_FS_DRAFTS = 8;
     private final static int MAX_LP_DRAFTS = 4;
     private final static int MAX_IO_DRAFTS = 2;
 
     /** Fields for storing numbers to drafts. */
+    private TreeMap<Integer, Draft> fsDrafts;
     private TreeMap<Integer, Draft> lpDrafts;
     private TreeMap<Integer, Draft> ioDrafts;
 
     /** Fields for storing queued draft numbers. */
+    private ArrayHeapMinPQ<Integer> fsQueue;
     private ArrayHeapMinPQ<Integer> lpQueue;
     private ArrayHeapMinPQ<Integer> ioQueue;
 
@@ -163,6 +166,8 @@ public class Events extends ListenerAdapter {
                 "helpdesk", false).get(0).getName();
         String entryChannel = server.getTextChannelsByName(
                 "mit-entry-confirmation", false).get(0).getName();
+        String fsDraftChannel = server.getTextChannelsByName(
+                "\uD83D\uDCCDfs-looking-for-draft", false).get(0).getName();
         String lpDraftChannel = server.getTextChannelsByName(
                  "\uD83D\uDCCDlp-looking-for-draft", false).get(0).getName();
         String lpReportsChannel = server.getTextChannelsByName(
@@ -183,6 +188,8 @@ public class Events extends ListenerAdapter {
         boolean isHelpdesk = channel.equals(helpdesk);
         boolean inEntryChannel = (subCmd.equals("add") || subCmd.equals("deny") || subCmd.equals("grad"))
                 && channel.equals(entryChannel);
+        boolean inFSChannel = prefix.equals("fs") && isDraftCommand
+                && channel.equals(fsDraftChannel);
         boolean inLPChannel = prefix.equals("lp") && isDraftCommand
                 && channel.equals(lpDraftChannel);
         boolean inIOChannel = prefix.equals("io") && isDraftCommand
@@ -193,7 +200,8 @@ public class Events extends ListenerAdapter {
                 && channel.equals(ioReportsChannel);
         boolean inTestChannel = channel.equals(testChannel);
 
-        return !(isHelpdesk || inEntryChannel || inLPChannel || inIOChannel
+        return !(isHelpdesk || inEntryChannel
+                || inFSChannel || inLPChannel || inIOChannel
                 || inLPReportsChannel || inIOReportsChannel
                 || inTestChannel);
     }
@@ -279,50 +287,36 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Checks whether a draft request expired or not.
+     * Times out drafts in a section if possible.
      * @param interaction the user interaction calling this method.
-     * @param numDraft the number draft to analyze.
-     * @param draft the actual draft to analyze.
      * @param drafts the source map of drafts.
      * @param queue the source queue of drafts.
-     * @return True if the draft request ran out of time.
-     *         False otherwise.
      */
-    private boolean draftExpired(GenericInteractionCreateEvent interaction,
-                                 int numDraft, Draft draft,
-                                 TreeMap<Integer, Draft> drafts,
-                                 ArrayHeapMinPQ<Integer> queue) {
-        if (draft.timedOut(interaction) && !draft.isInitialized()) {
-            drafts.remove(numDraft);
-            queue.add(numDraft, numDraft);
-            return true;
-        }
+    private void timeoutDrafts(GenericInteractionCreateEvent interaction,
+                              TreeMap<Integer, Draft> drafts,
+                              ArrayHeapMinPQ<Integer> queue) {
+        if (drafts != null) {
+            for (Map.Entry<Integer, Draft> mapping : drafts.entrySet()) {
+                int numDraft = mapping.getKey();
+                Draft draft = mapping.getValue();
 
-        return false;
+                if (!draft.isInitialized() && draft.timedOut(interaction)) {
+                    drafts.remove(numDraft);
+                    queue.add(numDraft, numDraft);
+                    break;
+                }
+            }
+        }
     }
 
     /**
      * Times out any drafts if possible.
      * @param interaction the user interaction calling this method.
      */
-    private void timeoutDrafts(GenericInteractionCreateEvent interaction) {
-        if (lpDrafts != null) {
-            for (Map.Entry<Integer, Draft> draft : lpDrafts.entrySet()) {
-                if (draftExpired(interaction, draft.getKey(), draft.getValue(),
-                        lpDrafts, lpQueue)) {
-                    break;
-                }
-            }
-        }
-
-        if (ioDrafts != null) {
-            for (Map.Entry<Integer, Draft> draft : ioDrafts.entrySet()) {
-                if (draftExpired(interaction, draft.getKey(), draft.getValue(),
-                        ioDrafts, ioQueue)) {
-                    break;
-                }
-            }
-        }
+    private void timeoutAnyDrafts(GenericInteractionCreateEvent interaction) {
+        timeoutDrafts(interaction, fsDrafts, fsQueue);
+        timeoutDrafts(interaction, lpDrafts, lpQueue);
+        timeoutDrafts(interaction, ioDrafts, ioQueue);
     }
 
     /**
@@ -333,7 +327,8 @@ public class Events extends ListenerAdapter {
      * @param ongoingDrafts the source map of drafts.
      * @param queue the source queue of drafts.
      */
-    private void processDraft(SlashCommandEvent sc, String prefix, Member author,
+    private void processDraft(SlashCommandEvent sc,
+                              String prefix, Member author,
                               TreeMap<Integer, Draft> ongoingDrafts,
                               ArrayHeapMinPQ<Integer> queue) {
         if (queue.size() == 0) {
@@ -362,8 +357,22 @@ public class Events extends ListenerAdapter {
      * @param prefix the prefix of the command.
      * @param author the user who ran the command.
      */
-    private void processDrafts(SlashCommandEvent sc, String prefix, Member author) {
+    private void processDrafts(SlashCommandEvent sc, String prefix,
+                               Member author) {
         switch (prefix) {
+            case "fs":
+                if (fsDrafts == null) {
+                    fsDrafts = new TreeMap<>();
+                }
+                if (fsQueue == null) {
+                    fsQueue = new ArrayHeapMinPQ<>();
+                    for (int i = 1; i <= MAX_FS_DRAFTS; i++) {
+                        fsQueue.add(i, i);
+                    }
+                }
+
+                processDraft(sc, prefix, author, fsDrafts, fsQueue);
+                break;
             case "lp":
                 if (lpDrafts == null) {
                     lpDrafts = new TreeMap<>();
@@ -394,8 +403,33 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Attempts to forcibly sub a player out of
-     * a draft.
+     * Checks if a number draft exists among a map of drafts.
+     * @param sc the user's inputted command.
+     * @param drafts the source map of drafts.
+     * @param args the arguments of the command.
+     * @return the number if it does exist.
+     *         -1 otherwise.
+     */
+    private int foundDraftNumber(SlashCommandEvent sc,
+                                 TreeMap<Integer, Draft> drafts,
+                                 List<OptionMapping> args) {
+        if (drafts == null) {
+            sc.reply("No drafts have been started yet.")
+                    .setEphemeral(true).queue();
+            return -1;
+        }
+
+        int numDraft = (int) args.get(0).getAsLong();
+        if (drafts.get(numDraft) == null) {
+            sc.reply("That number draft does not exist.")
+                    .setEphemeral(true).queue();
+        }
+
+        return numDraft;
+    }
+
+    /**
+     * Attempts to forcibly sub a player out of a draft.
      * @param sc the user's inputted command.
      * @param drafts the source map of drafts.
      * @param args the arguments of the command.
@@ -403,21 +437,14 @@ public class Events extends ListenerAdapter {
     private void attemptForceSub(SlashCommandEvent sc,
                                  TreeMap<Integer, Draft> drafts,
                                  List<OptionMapping> args) {
-        if (drafts == null) {
-            sc.reply("No drafts have been started yet.")
-                    .setEphemeral(true).queue();
-            return;
-        }
+        int numDraft = foundDraftNumber(sc, drafts, args);
 
-        int numDraft = (int) args.get(0).getAsLong();
-        Member playerToSub = args.get(1).getAsMember();
-        Draft draft = drafts.get(numDraft);
-
-        if (draft == null) {
-            sc.reply("That number draft does not exist.")
-                    .setEphemeral(true).queue();
-        } else {
-            draft.forceSub(sc, playerToSub.getId());
+        if (numDraft != -1) {
+            Draft draft = drafts.get(numDraft);
+            Member playerToSub = args.get(1).getAsMember();
+            if (draft != null) {
+                draft.forceSub(sc, playerToSub.getId());
+            }
         }
     }
 
@@ -431,20 +458,14 @@ public class Events extends ListenerAdapter {
                                  TreeMap<Integer, Draft> drafts,
                                  ArrayHeapMinPQ<Integer> queue,
                                  List<OptionMapping> args) {
-        if (drafts == null) {
-            sc.reply("No drafts have been started yet.")
-                    .setEphemeral(true).queue();
-            return;
-        }
+        int numDraft = foundDraftNumber(sc, drafts, args);
 
-        int numDraft = (int) args.get(0).getAsLong();
-        Draft draft = drafts.get(numDraft);
-        if (draft == null) {
-            sc.reply("That number draft does not exist.")
-                    .setEphemeral(true).queue();
-        } else if (draft.forceEnd(sc)) {
-            drafts.remove(numDraft);
-            queue.add(numDraft, numDraft);
+        if (numDraft != -1) {
+            Draft draft = drafts.get(numDraft);
+            if (draft != null && draft.forceEnd(sc)) {
+                drafts.remove(numDraft);
+                queue.add(numDraft, numDraft);
+            }
         }
     }
 
@@ -508,6 +529,11 @@ public class Events extends ListenerAdapter {
         ArrayHeapMinPQ<Integer> queue;
         String leaderboardLink;
         switch (prefix) {
+            case "fs":
+                drafts = fsDrafts;
+                queue = fsQueue;
+                leaderboardLink = "";
+                break;
             case "lp":
                 drafts = lpDrafts;
                 queue = lpQueue;
@@ -581,7 +607,8 @@ public class Events extends ListenerAdapter {
      */
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent sc) {
-        timeoutDrafts(sc);
+        timeoutAnyDrafts(sc);
+
         if (isStaffCommand(sc) || wrongChannelUsed(sc)) {
             sc.reply("You do not have permission to use this command here.")
                     .setEphemeral(true).queue();
@@ -593,6 +620,7 @@ public class Events extends ListenerAdapter {
             case "mit":
                 parseGeneralCommands(sc);
                 break;
+            case "fs":
             case "lp":
             case "io":
                 parseSectionCommands(sc);
@@ -606,7 +634,7 @@ public class Events extends ListenerAdapter {
      */
     @Override
     public void onButtonClick(@NotNull ButtonClickEvent bc) {
-        timeoutDrafts(bc);
+        timeoutAnyDrafts(bc);
 
         String btnName = bc.getButton().getId();
         int indexOfNum = btnName.length() - 1;
@@ -616,6 +644,10 @@ public class Events extends ListenerAdapter {
         String suffix = btnName.substring(indexOfNum - 2, indexOfNum);
         int numButton = Integer.parseInt(btnName.substring(indexOfNum));
         switch (suffix) {
+            case "FS":
+                drafts = fsDrafts;
+                queue = fsQueue;
+                break;
             case "LP":
                 drafts = lpDrafts;
                 queue = lpQueue;
@@ -692,7 +724,7 @@ public class Events extends ListenerAdapter {
      */
     @Override
     public void onSelectionMenu(@NotNull SelectionMenuEvent sm) {
-        timeoutDrafts(sm);
+        timeoutAnyDrafts(sm);
 
         String menuName = sm.getComponent().getId();
         int indexOfNum = menuName.length() - 1;
@@ -704,6 +736,9 @@ public class Events extends ListenerAdapter {
             case "MT":
                 printHelpOption(sm);
                 return;
+            case "FS":
+                drafts = fsDrafts;
+                break;
             case "LP":
                 drafts = lpDrafts;
                 break;

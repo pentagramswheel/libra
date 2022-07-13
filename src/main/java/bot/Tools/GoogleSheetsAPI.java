@@ -76,8 +76,8 @@ public class GoogleSheetsAPI {
                 java.util.logging.Logger.getLogger(FileDataStoreFactory.class.getName());
         buggyLogger.setLevel(java.util.logging.Level.SEVERE);
 
-        String resourcesPath = "src/main/resources";     // for local
-//        String resourcesPath = "resources";              // for JAR
+//        String resourcesPath = "src/main/resources";     // for local
+        String resourcesPath = "resources";              // for JAR
         String credentialsPath = resourcesPath + "/credentials.json";
         String tokensPath = "tokens";
 
@@ -95,8 +95,8 @@ public class GoogleSheetsAPI {
                 .setAccessType("offline")
                 .build();
 
-        LocalServerReceiver receiver = new LocalServerReceiver();                                   // for local
-//        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();     // for JAR
+//        LocalServerReceiver receiver = new LocalServerReceiver();                                   // for local
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();     // for JAR
         AuthorizationCodeInstalledApp oAuth = new AuthorizationCodeInstalledApp(
                 flow, receiver);
 

@@ -46,31 +46,50 @@ public class Graduate extends Section implements Command {
                             GoogleSheetsAPI link,
                             TreeMap<Object, Object> data) {
         try {
+            String rulesChannel;
             String exitMessage;
 
-            if (getPrefix().equals("lp")) {
-                modifyRoles(sc, playerID,
-                        Arrays.asList(
-                                getRole(sc, getSection() + " Graduate"),
-                                getRole(sc, "Ink Odyssey")),
-                        Collections.singletonList(
-                                getRole(sc, getSection())));
+            switch (getPrefix()) {
+                case "fs":
+                    modifyRoles(sc, playerID,
+                            Arrays.asList(
+                                    getRole(sc, getSection() + " Graduate"),
+                                    getRole(sc, "LaunchPoint")),
+                            Collections.singletonList(
+                                    getRole(sc, getSection())));
 
-                String rulesChannel =
-                        getChannel(sc, "io-draft-rules").getAsMention();
-                exitMessage = "Congratulations! We look forward to "
-                        + "seeing you in Ink Odyssey and outside "
-                        + "of MIT. Make sure to read " + rulesChannel
-                        + " before playing in any drafts!";
-            } else {
-                modifyRoles(sc, playerID,
-                        Collections.singletonList(
-                                getRole(sc, getSection() + " Graduate")),
-                        Collections.singletonList(
-                                getRole(sc, getSection())));
+                    rulesChannel =
+                            getChannel(sc, "lp-draft-rules").getAsMention();
+                    exitMessage = "Congratulations! We look forward to "
+                            + "seeing you in LaunchPoint. Make sure to "
+                            + "read " + rulesChannel + " before playing "
+                            + "in any drafts!";
+                    break;
+                case "lp":
+                    modifyRoles(sc, playerID,
+                            Arrays.asList(
+                                    getRole(sc, getSection() + " Graduate"),
+                                    getRole(sc, "Ink Odyssey")),
+                            Collections.singletonList(
+                                    getRole(sc, getSection())));
 
-                exitMessage = "Congratulations! We look forward to "
-                        + "seeing you beyond MIT.";
+                    rulesChannel =
+                            getChannel(sc, "io-draft-rules").getAsMention();
+                    exitMessage = "Congratulations! We look forward to "
+                            + "seeing you in Ink Odyssey. Make sure to "
+                            + "read " + rulesChannel + " before playing "
+                            + "in any drafts!";
+                    break;
+                default:
+                    modifyRoles(sc, playerID,
+                            Collections.singletonList(
+                                    getRole(sc, getSection() + " Graduate")),
+                            Collections.singletonList(
+                                    getRole(sc, getSection())));
+
+                    exitMessage = "Congratulations! We look forward to "
+                            + "seeing you beyond MIT.";
+                    break;
             }
 
             if (!data.containsKey(playerID)) {
