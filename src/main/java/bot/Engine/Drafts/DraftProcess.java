@@ -431,9 +431,9 @@ public class DraftProcess {
         String authorID = bc.getMember().getId();
         messageID = bc.getMessageId();
 
-        if (!getTeam1().contains(authorID)
-                && !getTeam2().contains(authorID)) {
-            draft.sendReply(bc, "You are not on one of the teams!", true);
+        DraftPlayer foundAuthor = draft.getPlayers().get(authorID);
+        if (foundAuthor == null || !foundAuthor.isActive()) {
+            draft.sendReply(bc, "You are not in the draft!", true);
             return false;
         }
 

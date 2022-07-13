@@ -38,7 +38,7 @@ public class Components {
                     Emoji.fromEmote("clipboardemoji", 689549199905259658L, false),
                     Emoji.fromEmote("clipboard_1f4cb", 960518771276144641L, false),
                     Emoji.fromEmote("openbook", 988635067733643294L, false),
-                    Emoji.fromEmote("thought1", 910997491829338153L, false),
+                    Emoji.fromEmote("faq", 694932182019473509L, false),
                     Emoji.fromEmote("writing", 622832106011230259L, false),
                     Emoji.fromEmote("7212roleadmin", 962720955505971200L, false));
 
