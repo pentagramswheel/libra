@@ -43,8 +43,7 @@ public class PointsCalculator extends Section implements Command {
     }
 
     /**
-     * Converts character-formatted column to its
-     * integer format.
+     * Converts character-formatted column to its integer format.
      * @param column the column to format.
      */
     private int columnToInt(String column) {
@@ -52,8 +51,7 @@ public class PointsCalculator extends Section implements Command {
     }
 
     /**
-     * Converts an integer-formatted column to its
-     * character format.
+     * Converts an integer-formatted column to its character format.
      * @param column the column to format.
      */
     private String intToColumn(int column) {
