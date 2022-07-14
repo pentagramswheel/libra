@@ -172,7 +172,7 @@ public class Main {
         SubcommandData award = new SubcommandData("award",
                 "Gives players leaderboard awards for the current MIT cycle.");
 
-        int numMentions = 10;
+        int numMentions = 25;
         OptionData numDraft = new OptionData(
                 OptionType.INTEGER, "numdraft", "The designated number of this draft", true);
         OptionData matches = new OptionData(
@@ -220,8 +220,10 @@ public class Main {
                 log.addOptions(newMention);
                 sub.addOptions(newMention);
             }
+            if (i <= numMentions - 1) {
+                award.addOptions(newMention);
+            }
 
-            award.addOptions(newMention);
             add.addOptions(newMention);
             deny.addOptions(newMention);
             grad.addOptions(newMention);

@@ -166,8 +166,8 @@ public class Events extends ListenerAdapter {
                 "helpdesk", false).get(0).getName();
         String entryChannel = server.getTextChannelsByName(
                 "mit-entry-confirmation", false).get(0).getName();
-        String fsDraftChannel = server.getTextChannelsByName(
-                "\uD83D\uDCCDfs-looking-for-draft", false).get(0).getName();
+//        String fsDraftChannel = server.getTextChannelsByName(
+//                "\uD83D\uDCCDfs-looking-for-draft", false).get(0).getName();
         String lpDraftChannel = server.getTextChannelsByName(
                  "\uD83D\uDCCDlp-looking-for-draft", false).get(0).getName();
         String lpReportsChannel = server.getTextChannelsByName(
@@ -188,8 +188,8 @@ public class Events extends ListenerAdapter {
         boolean isHelpdesk = channel.equals(helpdesk);
         boolean inEntryChannel = (subCmd.equals("add") || subCmd.equals("deny") || subCmd.equals("grad"))
                 && channel.equals(entryChannel);
-        boolean inFSChannel = prefix.equals("fs") && isDraftCommand
-                && channel.equals(fsDraftChannel);
+//        boolean inFSChannel = prefix.equals("fs") && isDraftCommand
+//                && channel.equals(fsDraftChannel);
         boolean inLPChannel = prefix.equals("lp") && isDraftCommand
                 && channel.equals(lpDraftChannel);
         boolean inIOChannel = prefix.equals("io") && isDraftCommand
@@ -201,7 +201,7 @@ public class Events extends ListenerAdapter {
         boolean inTestChannel = channel.equals(testChannel);
 
         return !(isHelpdesk || inEntryChannel
-                || inFSChannel || inLPChannel || inIOChannel
+                /*|| inFSChannel*/ || inLPChannel || inIOChannel
                 || inLPReportsChannel || inIOReportsChannel
                 || inTestChannel);
     }
@@ -499,7 +499,6 @@ public class Events extends ListenerAdapter {
                 profile.runCmd(sc);
                 break;
             case "ded":
-//                sc.reply("https://discords.com/_next/image?url=https%3A%2F%2Fcdn.discordapp.com%2Femojis%2F788682812991209492.png%3Fv%3D1&w=64&q=75").queue();
                 sc.reply(Emoji.fromEmote(
                         "Okayu_ded", 788682812991209492L, false)
                         .getAsMention()).queue();

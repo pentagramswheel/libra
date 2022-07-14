@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -588,7 +589,9 @@ public class Draft extends Section implements Command {
         } else if (subOut(sc, playerID, getPlayers().get(playerID),
                 "That player is not part of the draft.",
                 "That player has already been subbed out of the draft!")) {
-            String update = getSectionRole() + " +1 (sub, refresh the request)";
+            String update = getSectionRole() + " +1 (sub, " + Emoji.fromEmote(
+                            "refresh", 788354776999526410L, false)
+                    .getAsMention() + " refresh the request)";
             sendReply(sc, update, false);
 
             getDraftChannel().sendMessage(
@@ -679,7 +682,10 @@ public class Draft extends Section implements Command {
      */
     public boolean forceEnd(SlashCommandEvent sc) {
         if (messageID == null) {
-            sendReply(sc, "`Refresh` the request once then try again.", true);
+            sendReply(sc, Emoji.fromEmote(
+                            "refresh", 788354776999526410L, false)
+                    .getAsMention() + " Refresh the request once then try "
+                    + "again.", true);
             return false;
         } else if (isInitialized() && getProcess().getMessageID() == null) {
             sendReply(sc, "Press the `End Draft` button in "
