@@ -702,10 +702,12 @@ public class Events extends ListenerAdapter {
                 currProcess.start(bc);
                 break;
             case "plusOne":
-                currProcess.changePointsForTeam(bc, bc.getMember().getId(), true);
+                currProcess.changePointsForTeam(
+                        bc, bc.getMember().getId(), true);
                 break;
             case "minusOne":
-                currProcess.changePointsForTeam(bc, bc.getMember().getId(), false);
+                currProcess.changePointsForTeam(
+                        bc, bc.getMember().getId(), false);
                 break;
             case "processRefresh":
                 bc.deferEdit().queue();

@@ -292,9 +292,9 @@ public class Profile implements Command {
                 log("Profile FC retrieved for "
                         + profile.getAsTag() + ".", false);
             } else {
-                sendResponse(sc, pronoun + " MIT profile does not exist yet. "
-                        + "Register with\n`/mit qprofile ...` "
-                        + "or `/mit profile fc` to proceed.", true);
+                sendResponse(sc, "Your MIT profile does not exist yet. "
+                        + "Register with `/mit qprofile ...` or "
+                        + "`/mit profile fc` to proceed.", true);
             }
         } catch (IOException | GeneralSecurityException e) {
             log("The profiles spreadsheet could not load.", true);
@@ -599,8 +599,8 @@ public class Profile implements Command {
                 log(sc.getUser().getAsTag() + "'s " + cmd + " was updated.", false);
             } else {
                 sendResponse(sc, "Your MIT profile does not exist yet. "
-                        + "Register with\n`/mit qprofile ...` "
-                        + "or `/mit profile fc` to proceed.", true);
+                        + "Register with `/mit qprofile ...` or "
+                        + "`/mit profile fc` to proceed.", true);
             }
         } catch (IOException | GeneralSecurityException e) {
             log("The profiles spreadsheet could not load.", true);
@@ -612,14 +612,14 @@ public class Profile implements Command {
      * @param sc the user's inputted command.
      */
     private void delete(SlashCommandEvent sc) {
-        sc.deferReply(false).queue();
+        sc.deferReply(true).queue();
 
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
 
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
             if (database == null) {
-                sendResponse(sc, "The profiles database could not load.", false);
+                sendResponse(sc, "The profiles database could not load.", true);
             }
 
             String userID = sc.getMember().getId();
@@ -627,7 +627,7 @@ public class Profile implements Command {
                 PlayerInfo profile = (PlayerInfo) database.get(userID);
                 link.deleteRow(TAB, profile.getSpreadsheetPosition());
 
-                sendResponse(sc, "Your MIT profile has been deleted.", false);
+                sendResponse(sc, "Your MIT profile has been deleted.", true);
                 log("Profile deleted for " + sc.getUser().getAsTag()
                         + ".", false);
             } else {
@@ -655,7 +655,11 @@ public class Profile implements Command {
                 register(sc, (String) getParameter(args, false));
                 break;
             case "getfc":
-                onlyGetFC(sc, (String) getParameter(args, true));
+                if (parameterGood(args, "player")) {
+                    onlyGetFC(sc, (String) getParameter(args, true));
+                } else {
+                    onlyGetFC(sc, null);
+                }
                 break;
             case "view":
                 sc.deferReply(false).queue();
