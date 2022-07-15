@@ -126,22 +126,39 @@ public class Profile implements Command {
      * Reformats phrase into lines of set length.
      * @param phrase the phrase to format.
      * @param limit the number of items per line.
+     *              (0 indicates a reformat based on length/line).
      * @return the formatted pronouns.
      */
     private String reformatPhrase(String phrase, int limit) {
         String[] splitPhrase = phrase.split(", ");
         StringBuilder formattedPhrase = new StringBuilder();
 
+        StringBuilder line = new StringBuilder();
         for (int i = 1; i <= splitPhrase.length; i++) {
-            formattedPhrase.append(splitPhrase[i - 1]);
+            String currentSplit = splitPhrase[i - 1];
+            formattedPhrase.append(currentSplit);
+            line.append(currentSplit);
 
-            if (i < splitPhrase.length) {
+            if (limit == 0 && i < splitPhrase.length) {
+                String nextSplit = splitPhrase[i];
+                formattedPhrase.append(",");
+                line.append(",");
+
+                if (line.length() + nextSplit.length() >= 23) {
+                    formattedPhrase.append("\n");
+                    line = new StringBuilder();
+                } else {
+                    formattedPhrase.append(" ");
+                    line.append(" ");
+                }
+            } else if (i < splitPhrase.length) {
                 formattedPhrase.append(",");
                 if (i % limit == 0) {
                     formattedPhrase.append("\n");
                 } else {
                     formattedPhrase.append(" ");
                 }
+
             }
         }
 
@@ -164,6 +181,10 @@ public class Profile implements Command {
         String weapons = (String) getParameter(args, false);
         String rank = (String) getParameter(args, false);
 
+        String fcPattern = "\\d{4}-\\d{4}-\\d{4}";
+        String listPattern =
+                "[^\\s][\\w\\s\\/\\-\\.\\']+(?:,\\s[\\w\\']+[\\w\\s\\/\\-\\.\\']*)*";
+
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
@@ -174,7 +195,7 @@ public class Profile implements Command {
                         "You cannot use `qprofile`, because your profile "
                                 + "already exists. Use the other `profile` "
                                 + "commands as needed.", true);
-            } else if (!fc.matches("\\d{4}-\\d{4}-\\d{4}")) {
+            } else if (!fc.matches(fcPattern)) {
                 sendResponse(sc,
                         "Friend code should be in the format: "
                                 + "`8888-8888-8888`", true);
@@ -188,6 +209,12 @@ public class Profile implements Command {
                         "Inappropriate nickname/pronouns detected. Please use "
                                 + "another one or ask Technical Staff "
                                 + "about it!", true);
+            } else if (!pronouns.matches(listPattern) && !weapons.matches(listPattern)) {
+                sendResponse(sc,
+                        "Invalid pronouns/weapons format detected. Please "
+                                + "**strictly** use the following format: "
+                                + "`option 1, option 2, option 3, ...` (note "
+                                + "the `, `).", true);
             } else {
                 Member user = sc.getMember();
                 String discordTag = user.getUser().getAsTag();
@@ -195,7 +222,7 @@ public class Profile implements Command {
                 ValueRange newRow = link.buildRow(Arrays.asList(
                         user.getId(), discordTag, nickname,
                         fc, reformatPhrase(pronouns.toLowerCase(), 1),
-                        playstyle, reformatPhrase(weapons, 3), rank, "N/A"));
+                        playstyle, reformatPhrase(weapons, 0), rank, "N/A"));
                 link.appendRow(TAB, newRow);
 
                 sendResponse(sc, "Your MIT profile has been created! "
@@ -228,7 +255,7 @@ public class Profile implements Command {
             if (!fc.matches("\\d{4}-\\d{4}-\\d{4}")) {
                 sendResponse(sc,
                         "Friend code should be in the format: "
-                                + "`8888-8888-8888`", false);
+                                + "`8888-8888-8888`", true);
             } else if (database.containsKey(user.getId())) {
                 PlayerInfo profile = (PlayerInfo) database.get(user.getId());
 
@@ -243,7 +270,7 @@ public class Profile implements Command {
                 link.updateRange(updateRange, newRow);
 
                 sendResponse(sc,
-                        "Friend code updated!", false);
+                        "Friend code updated!", true);
                 log("Profile FC updated for " + profile.getAsTag() + ".", false);
             } else {
                 String discordTag = user.getUser().getAsTag();
@@ -255,7 +282,7 @@ public class Profile implements Command {
                 link.appendRow(TAB, newRow);
 
                 sendResponse(sc, "Your MIT profile has been created! "
-                        + "Use `/mit profile view` to view your profile.", false);
+                        + "Use `/mit profile view` to view your profile.", true);
                 log("Profile created for " + discordTag + ".", false);
             }
         } catch (IOException | GeneralSecurityException e) {
@@ -529,7 +556,11 @@ public class Profile implements Command {
 
         String weapons = profile.getWeaponPool();
         if (newWeapons != null) {
-            weapons = foundNewInfo = reformatPhrase(newWeapons, 3);
+            foundNewInfo = reformatPhrase(newWeapons, 0);
+            weapons = foundNewInfo;
+            if (foundNewInfo.charAt(0) == '\'') {
+                weapons = "'" + foundNewInfo;
+            }
         }
 
         String rank = profile.getRank();
@@ -566,6 +597,9 @@ public class Profile implements Command {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
 
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
+            String listPattern =
+                    "[^\\s][\\w\\s\\/\\-\\.\\']+(?:,\\s[\\w\\']+[\\w\\s\\/\\-\\.\\']*)*";
+
             if (database == null) {
                 sendResponse(sc, "The profiles database could not load.", false);
                 throw new IOException("The database could not load.");
@@ -579,6 +613,13 @@ public class Profile implements Command {
                 sendResponse(sc,
                         "Inappropriate input detected. Please use another one "
                                 + "or ask Technical Staff about it!", true);
+            } else if ((pronouns != null && !pronouns.matches(listPattern))
+                    || (weapons != null && !weapons.matches(listPattern))) {
+                sendResponse(sc,
+                        "Invalid pronouns/weapons format detected. Please "
+                                + "**strictly** use the following format: "
+                                + "`option 1, option 2, option 3, ...` (note "
+                                + "the `, `).", true);
             } else if (database.containsKey(sc.getMember().getId())) {
                 PlayerInfo profile = (PlayerInfo) database.get(
                         sc.getMember().getId());

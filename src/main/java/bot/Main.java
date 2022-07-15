@@ -57,7 +57,7 @@ public class Main {
         OptionData nicknameParam = new OptionData(
                 OptionType.STRING, "name", "Your preferred nickname", true);
         OptionData pronounChoices = new OptionData(
-                OptionType.STRING, "pronouns", "Your preferred pronouns", true);
+                OptionType.STRING, "pronouns", "Your preferred pronouns (e.g. she/her, he/they, ...)", true);
         OptionData playstyleChoices = new OptionData(
                 OptionType.STRING, "playstyle", "Your preferred playstyle/position", true);
         String[] playstyles = {"Slayer", "Skirmisher", "Support", "Anchor", "Flex"};
@@ -66,7 +66,7 @@ public class Main {
         }
 
         OptionData weaponsParam = new OptionData(
-                OptionType.STRING, "weapons", "Your preferred weapon pool", true);
+                OptionType.STRING, "weapons", "Your preferred weapon pool (e.g. Blasters, Scopes, ...)", true);
         OptionData rankChoices = new OptionData(
                 OptionType.STRING, "rank", "Your average rank", true);
         String[] ranks = {"C", "B", "A", "S", "S+", "X 2000",
