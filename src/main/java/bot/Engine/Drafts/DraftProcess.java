@@ -348,7 +348,8 @@ public class DraftProcess {
         if (team.getScore() < MAX_SCORE) {
             team.incrementScore();
         } else {
-            draft.sendResponse(bc, "You've already hit the point limit!", true);
+            draft.sendResponse(bc,
+                    "You have already hit the point limit!", true);
             return;
         }
 
@@ -464,8 +465,7 @@ public class DraftProcess {
                                 .asDisabled()).queue();
 
                 updateReport(bc);
-                AutoLog log = new AutoLog(draft.getPrefix());
-                log.matchReport(bc, draft);
+                new AutoLog(draft.getPrefix()).matchReport(bc, draft);
             } else {
                 draft.unpinDraftChannelPins();
                 getMessage().delete().queue();

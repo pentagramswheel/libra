@@ -171,13 +171,9 @@ public class Undo extends ManualLog implements Command {
 
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
+            TreeMap<Object, Object> data = link.readSection(sc, CYCLES_TAB);
             FileHandler undoFile = new FileHandler(
                     "load" + getPrefix().toUpperCase() + ".txt");
-
-            TreeMap<Object, Object> data = link.readSection(sc, CYCLES_TAB);
-            if (data == null) {
-                throw new IOException("The spreadsheet was empty.");
-            }
 
             String lastMessage = undoFile.readFirstLine();
             if (lastMessage == null) {

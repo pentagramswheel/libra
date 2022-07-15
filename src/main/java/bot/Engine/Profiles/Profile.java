@@ -188,33 +188,26 @@ public class Profile implements Command {
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
-            if (database == null) {
-                sendResponse(sc, "The profiles database could not load.", false);
-            } else if (database.containsKey(sc.getMember().getId())) {
-                sendResponse(sc,
-                        "You cannot use `qprofile`, because your profile "
-                                + "already exists. Use the other `profile` "
-                                + "commands as needed.", true);
+            if (database.containsKey(sc.getMember().getId())) {
+                editMessage(sc, "You cannot use `qprofile`, because your "
+                                + "profile already exists. Use the other "
+                                + "`profile` commands as needed.");
             } else if (!fc.matches(fcPattern)) {
-                sendResponse(sc,
-                        "Friend code should be in the format: "
-                                + "`8888-8888-8888`", true);
+                editMessage(sc,"Friend code should be in the format: "
+                                + "`8888-8888-8888`.");
             } else if (phraseTooLong(nickname) || phraseTooLong(pronouns)) {
-                sendResponse(sc,
-                        "Lengthy nickname/pronouns detected. Please use "
-                                + "another one or ask Technical Staff "
-                                + "about it!", true);
+                editMessage(sc, "Lengthy nickname/pronouns detected. Please "
+                                + "use another one or ask Technical Staff "
+                                + "about it!");
             } else if (blacklistedPhrase(nickname) || blacklistedPhrase(pronouns)) {
-                sendResponse(sc,
-                        "Inappropriate nickname/pronouns detected. Please use "
-                                + "another one or ask Technical Staff "
-                                + "about it!", true);
+                editMessage(sc,"Inappropriate nickname/pronouns detected. "
+                                + "Please use another one or ask Technical "
+                                + "Staff about it!");
             } else if (!pronouns.matches(listPattern) && !weapons.matches(listPattern)) {
-                sendResponse(sc,
-                        "Invalid pronouns/weapons format detected. Please "
-                                + "**strictly** use the following format: "
-                                + "`option 1, option 2, option 3, ...` (note "
-                                + "the `, `).", true);
+                editMessage(sc,"Invalid pronouns/weapons format detected. "
+                                + "Please **strictly** use the following "
+                                + "format: `option 1, option 2, option 3, "
+                                + "...` (note the `, `).");
             } else {
                 Member user = sc.getMember();
                 String discordTag = user.getUser().getAsTag();
@@ -225,11 +218,12 @@ public class Profile implements Command {
                         playstyle, reformatPhrase(weapons, 0), rank, "N/A"));
                 link.appendRow(TAB, newRow);
 
-                sendResponse(sc, "Your MIT profile has been created! "
-                        + "Use `/mit profile view` to view your profile.", true);
+                editMessage(sc, "Your MIT profile has been created! "
+                        + "Use `/mit profile view` to view your profile.");
                 log("Quick profile created for " + discordTag + ".", false);
             }
         } catch (IOException | GeneralSecurityException e) {
+            editMessage(sc, "The profiles database could not load.");
             log("The profiles spreadsheet could not load.", true);
         }
     }
@@ -246,16 +240,12 @@ public class Profile implements Command {
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
-            if (database == null) {
-                sendResponse(sc, "The profiles database could not load.", false);
-                return;
-            }
 
             Member user = sc.getMember();
             if (!fc.matches("\\d{4}-\\d{4}-\\d{4}")) {
-                sendResponse(sc,
+                editMessage(sc,
                         "Friend code should be in the format: "
-                                + "`8888-8888-8888`", true);
+                                + "`8888-8888-8888`.");
             } else if (database.containsKey(user.getId())) {
                 PlayerInfo profile = (PlayerInfo) database.get(user.getId());
 
@@ -269,8 +259,8 @@ public class Profile implements Command {
                         profile.getTeam()));
                 link.updateRange(updateRange, newRow);
 
-                sendResponse(sc,
-                        "Friend code updated!", true);
+                editMessage(sc,
+                        "Friend code updated to `" + "`.");
                 log("Profile FC updated for " + profile.getAsTag() + ".", false);
             } else {
                 String discordTag = user.getUser().getAsTag();
@@ -281,11 +271,12 @@ public class Profile implements Command {
                         "Unset", "Unset", "Unset", "N/A"));
                 link.appendRow(TAB, newRow);
 
-                sendResponse(sc, "Your MIT profile has been created! "
-                        + "Use `/mit profile view` to view your profile.", true);
+                editMessage(sc, "Your MIT profile has been created! "
+                        + "Use `/mit profile view` to view your profile.");
                 log("Profile created for " + discordTag + ".", false);
             }
         } catch (IOException | GeneralSecurityException e) {
+            editMessage(sc, "The profiles database could not load.");
             log("The profiles spreadsheet could not load.", true);
         }
     }
@@ -303,10 +294,7 @@ public class Profile implements Command {
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
             String pronoun = "Their";
 
-            if (database == null) {
-                sendResponse(sc, "The profiles database could not load.", false);
-                return;
-            } else if (id == null) {
+            if (id == null) {
                 id = sc.getMember().getId();
                 pronoun = "Your";
             }
@@ -314,16 +302,17 @@ public class Profile implements Command {
             if (database.containsKey(id)) {
                 PlayerInfo profile = (PlayerInfo) database.get(id);
 
-                sendResponse(sc, pronoun + " friend code is `SW-"
-                        + profile.getFC() + "`.", false);
+                editMessage(sc, pronoun + " friend code is `SW-"
+                        + profile.getFC() + "`.");
                 log("Profile FC retrieved for "
                         + profile.getAsTag() + ".", false);
             } else {
-                sendResponse(sc, "Your MIT profile does not exist yet. "
+                editMessage(sc, "Your MIT profile does not exist yet. "
                         + "Register with `/mit qprofile ...` or "
-                        + "`/mit profile fc` to proceed.", true);
+                        + "`/mit profile fc` to proceed.");
             }
         } catch (IOException | GeneralSecurityException e) {
+            editMessage(sc, "The profiles database could not load.");
             log("The profiles spreadsheet could not load.", true);
         }
     }
@@ -372,9 +361,7 @@ public class Profile implements Command {
             TreeMap<Object, Object> leaderboard =
                     link.readSection(interaction, Section.CYCLES_TAB);
 
-            if (leaderboard == null) {
-                throw new IOException("The spreadsheet was empty.");
-            } else if (leaderboard.containsKey(id)) {
+            if (leaderboard.containsKey(id)) {
                 PlayerStats stats = (PlayerStats) leaderboard.get(id);
                 return String.format(
                         "%s-%s", stats.getSetWins(), stats.getSetLosses());
@@ -466,18 +453,14 @@ public class Profile implements Command {
                 pronoun = "Their";
             }
 
-            if (database == null) {
-                sendResponse(interaction, "The profiles database could not load.", false);
-            } else {
-                for (String id : ids) {
-                    PlayerInfo profile = (PlayerInfo) database.get(id);
+            for (String id : ids) {
+                PlayerInfo profile = (PlayerInfo) database.get(id);
 
-                    profiles.add(buildProfile(interaction, pronoun, id,
-                            profile, fullDisplay, showInfo, shouldPrint).build());
-                }
-
-                return profiles;
+                profiles.add(buildProfile(interaction, pronoun, id,
+                        profile, fullDisplay, showInfo, shouldPrint).build());
             }
+
+            return profiles;
         } catch (IOException | GeneralSecurityException e) {
             log("The profiles spreadsheet could not load.", true);
         }
@@ -595,31 +578,27 @@ public class Profile implements Command {
 
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
-
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
             String listPattern =
                     "[^\\s][\\w\\s\\/\\-\\.\\']+(?:,\\s[\\w\\']+[\\w\\s\\/\\-\\.\\']*)*";
 
-            if (database == null) {
-                sendResponse(sc, "The profiles database could not load.", false);
-                throw new IOException("The database could not load.");
-            } else if (phraseTooLong(nickname) || phraseTooLong(pronouns)
+            if (phraseTooLong(nickname) || phraseTooLong(pronouns)
                     || phraseTooLong(team)) {
-                sendResponse(sc,
+                editMessage(sc,
                         "Lengthy team name detected. Please use another one "
-                                + "or ask Technical Staff about it!", true);
+                                + "or ask Technical Staff about it!");
             } else if (blacklistedPhrase(nickname) || blacklistedPhrase(pronouns)
                 || blacklistedPhrase(team) || blacklistedPhrase(weapons)) {
-                sendResponse(sc,
+                editMessage(sc,
                         "Inappropriate input detected. Please use another one "
-                                + "or ask Technical Staff about it!", true);
+                                + "or ask Technical Staff about it!");
             } else if ((pronouns != null && !pronouns.matches(listPattern))
                     || (weapons != null && !weapons.matches(listPattern))) {
-                sendResponse(sc,
+                editMessage(sc,
                         "Invalid pronouns/weapons format detected. Please "
                                 + "**strictly** use the following format: "
                                 + "`option 1, option 2, option 3, ...` (note "
-                                + "the `, `).", true);
+                                + "the `, `).");
             } else if (database.containsKey(sc.getMember().getId())) {
                 PlayerInfo profile = (PlayerInfo) database.get(
                         sc.getMember().getId());
@@ -635,15 +614,16 @@ public class Profile implements Command {
                 link.updateRange(updateRange, newRow);
 
                 String cmd = sc.getSubcommandName();
-                sendResponse(sc, "Your " + cmd + " has been updated to `"
-                        + changedField.replaceAll("\n", " ") + "`.", false);
+                editMessage(sc, "Your " + cmd + " has been updated to `"
+                        + changedField.replaceAll("\n", " ") + "`.");
                 log(sc.getUser().getAsTag() + "'s " + cmd + " was updated.", false);
             } else {
-                sendResponse(sc, "Your MIT profile does not exist yet. "
+                editMessage(sc, "Your MIT profile does not exist yet. "
                         + "Register with `/mit qprofile ...` or "
-                        + "`/mit profile fc` to proceed.", true);
+                        + "`/mit profile fc` to proceed.");
             }
         } catch (IOException | GeneralSecurityException e) {
+            editMessage(sc, "The profiles database could not load.");
             log("The profiles spreadsheet could not load.", true);
         }
     }
@@ -657,24 +637,21 @@ public class Profile implements Command {
 
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
-
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
-            if (database == null) {
-                sendResponse(sc, "The profiles database could not load.", true);
-            }
 
             String userID = sc.getMember().getId();
             if (database.containsKey(userID)) {
                 PlayerInfo profile = (PlayerInfo) database.get(userID);
                 link.deleteRow(TAB, profile.getSpreadsheetPosition());
 
-                sendResponse(sc, "Your MIT profile has been deleted.", true);
+                editMessage(sc, "Your MIT profile has been deleted.");
                 log("Profile deleted for " + sc.getUser().getAsTag()
                         + ".", false);
             } else {
-                sendResponse(sc, "Your MIT profile does not exist.", true);
+                editMessage(sc, "Your MIT profile does not exist.");
             }
         } catch (IOException | GeneralSecurityException e) {
+            editMessage(sc, "The profiles database could not load.");
             log("The profiles spreadsheet could not load.", true);
         }
     }

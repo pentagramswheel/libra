@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -382,11 +383,11 @@ public class Draft extends Section implements Command {
 
             getProcess().refresh(null);
 
-            Profile profiles = new Profile();
-            getDraftChannel().sendMessageEmbeds(
-                    profiles.viewMultiple(bc, getPlayers().keySet(),
-                            "Their", false, true,
-                            false)).queue();
+            List<MessageEmbed> profiles = new Profile().viewMultiple(bc,
+                    getPlayers().keySet(), "Their", false, true, false);
+            if (profiles != null) {
+                getDraftChannel().sendMessageEmbeds(profiles).queue();
+            }
         } else {
             refresh(bc);
             messageID = bc.getMessageId();
@@ -454,7 +455,7 @@ public class Draft extends Section implements Command {
         long waitTime = 1000 * 60 * 15;
 
         if (!getPlayers().containsKey(authorID)) {
-            sendReply(bc, "You're not in this draft!", true);
+            sendReply(bc, "You are not in this draft!", true);
         } else if (currentTime - startTime < waitTime) {
             long approxTime = (startTime + waitTime) / 1000;
             sendReply(bc,
@@ -649,10 +650,11 @@ public class Draft extends Section implements Command {
                 + "to add them to a team!__").queue();
 
         if (displayProfile) {
-            Profile profile = new Profile();
-            getDraftChannel().sendMessageEmbeds(
-                    profile.view(bc, playerID, false, true,
-                            false)).queue();
+            MessageEmbed profile = new Profile().view(bc,
+                    playerID, false, true, false);
+            if (profile != null) {
+                getDraftChannel().sendMessageEmbeds(profile).queue();
+            }
         }
     }
 

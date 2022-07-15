@@ -76,8 +76,11 @@ public class PointsCalculator extends Section implements Command {
      *               points calculation.
      * @param tab the name of the spreadsheet tab to edit.
      * @param link a connection to the leaderboard spreadsheet.
+     * @return True if leaderboard update ran without error.
+     *         False otherwise.
      */
-    private void updateLeaderboard(SlashCommandEvent sc, TreeMap<Object, Integer> scores,
+    private boolean updateLeaderboardUnsuccessful(SlashCommandEvent sc,
+                                   TreeMap<Object, Integer> scores,
                                    String tab, GoogleSheetsAPI link) {
         try {
             editMessage(sc, "Updating leaderboard...");
@@ -98,11 +101,14 @@ public class PointsCalculator extends Section implements Command {
             link.updateRange(updateRange, newColumn);
 
             link.sortByDescending(tab, String.valueOf(SCORE_COLUMNS_START), table.size());
+            return false;
         } catch (IOException e) {
             editMessage(sc, "An error occurred while updating the leaderboard.");
             log("An error occurred while updating the public leaderboard.",
                     true);
         }
+
+        return true;
     }
 
     /**
@@ -122,8 +128,9 @@ public class PointsCalculator extends Section implements Command {
      * @param size the amount of players eligible
      * @param tab the name of the spreadsheet tab to edit.
      * @param link a connection to the leaderboard spreadsheet.
-     * @return a map of final scores for all players who were eligible
+     * @return a map of final scores for all players who were eligible,
      *         for the Top 10.
+     *         null if an error occurred.
      */
     public TreeMap<Object, Integer> findTopTen(SlashCommandEvent sc,
                                                String section, int size,
@@ -171,6 +178,7 @@ public class PointsCalculator extends Section implements Command {
         } catch (IOException e) {
             editMessage(sc, "An error occurred while calculating the Top 10 players.");
             log("An error occurred with the Top 10 calculation.", true);
+            return null;
         }
 
         String output = "Top 10 for " + section + ":\n```"
@@ -185,8 +193,10 @@ public class PointsCalculator extends Section implements Command {
      * @param size the amount of players eligible
      * @param tab the name of the spreadsheet tab to edit.
      * @param link a connection to the leaderboard spreadsheet.
+     * @return True if the points calculation ran without error.
+     *         False otherwise.
      */
-    public void calculatePoints(SlashCommandEvent sc, int size,
+    public boolean calculatePointsUnsuccessful(SlashCommandEvent sc, int size,
                                 String tab, GoogleSheetsAPI link) {
         List<String> scoreColumns = new ArrayList<>(
                 Arrays.asList("D", "F", "G", "H", "K"));
@@ -235,10 +245,13 @@ public class PointsCalculator extends Section implements Command {
             }
 
             wait(5000);
+            return false;
         } catch (IOException e) {
             editMessage(sc, "An error occurred while calculating points.");
             log("An error occurred with the points calculation.", true);
         }
+
+        return true;
     }
 
     /**
@@ -256,9 +269,6 @@ public class PointsCalculator extends Section implements Command {
                                GoogleSheetsAPI fromLink, GoogleSheetsAPI toLink) {
         try {
             TreeMap<Object, Object> data = fromLink.readSection(sc, tab);
-            if (data == null) {
-                throw new IOException("The spreadsheet was empty.");
-            }
 
             int size = 0;
             for (Map.Entry<Object, Object> mapping : data.entrySet()) {
@@ -337,18 +347,25 @@ public class PointsCalculator extends Section implements Command {
             int totalPlayers = initializeCopy(
                     sc, currentTab, minimumSets, leaderboard, points);
             if (totalPlayers == -1) {
-                throw new IOException("Total players invalid.");
+                throw new IOException();
             }
 
             log("(Cycle Change) Points are being calculated...", false);
-            calculatePoints(sc, totalPlayers, currentTab, points);
+            if (calculatePointsUnsuccessful(sc, totalPlayers, currentTab, points)) {
+                throw new IOException();
+            }
 
             log("(Cycle Change) Retrieving Top 10 players...", false);
             TreeMap<Object, Integer> scores =
                     findTopTen(sc, getSection(), totalPlayers, currentTab, points);
+            if (scores == null) {
+                throw new IOException();
+            }
 
             log("(Cycle Change) Updating public leaderboard...", false);
-            updateLeaderboard(sc, scores, currentTab, leaderboard);
+            if (updateLeaderboardUnsuccessful(sc, scores, currentTab, leaderboard)) {
+                throw new IOException();
+            }
 
             // update the points spreadsheet up to the previous cycle
             points.renameTab(previousTab, "2 Cycles Ago");
@@ -362,12 +379,9 @@ public class PointsCalculator extends Section implements Command {
             wait(2000);
 
             editMessage(sc, "Here are your " + getSection() + " Cycle Top 10s!");
-            sendResponse(sc, "Please wait around one minute before performing "
-                    + "another cycle change. Thanks (:", true);
-
             log("Cycle change has been completed.", false);
         } catch (GeneralSecurityException | IOException e) {
-            sendResponse(sc, "A problem occurred during the calculation.", false);
+            sendResponse(sc, "An error occurred during the calculation.", false);
             log("A spreadsheet during calculations could not load.", true);
         }
     }

@@ -156,6 +156,9 @@ public interface Command {
      * Note: The interaction must have been acknowledged before
      *       this method. If the interaction has deferred its reply,
      *       its ephemeral state follows the declared reply state.
+     *       It is ideal to use this method to send another followup
+     *       message or prior to a pre-determined ephemeral, deferred
+     *       action.
      */
     default void sendResponse(GenericInteractionCreateEvent interaction,
                               String msg, boolean isEphemeral) {
@@ -268,11 +271,10 @@ public interface Command {
      * @param msg the message to to attach to the log.
      */
     default void log(String msg, boolean isProblem) {
-        Logger logger = LoggerFactory.getLogger(this.getClass());
         if (isProblem) {
-            logger.error(msg);
+            LoggerFactory.getLogger(this.getClass()).error(msg);
         } else {
-            logger.info(msg);
+            LoggerFactory.getLogger(this.getClass()).info(msg);
         }
     }
 }

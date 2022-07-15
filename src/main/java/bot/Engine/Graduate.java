@@ -36,6 +36,24 @@ public class Graduate extends Section implements Command {
         super(abbreviation);
     }
 
+    /** Retrieves the name of the next MIT section. */
+    private String getNextSection() {
+        if (getSection().equals("Freshwater Shoals")) {
+            return "LaunchPoint";
+        } else {
+            return "Ink Odyssey";
+        }
+    }
+
+    /** Retrieves the prefix of the next MIT section. */
+    private String getNextPrefix() {
+        if (getPrefix().equals("fs")) {
+            return "lp";
+        } else {
+            return "io";
+        }
+    }
+
     /**
      * Graduates a user within MIT.
      * @param sc the user's inputted command.
@@ -44,69 +62,48 @@ public class Graduate extends Section implements Command {
      */
     private String graduate(SlashCommandEvent sc, String playerID,
                             GoogleSheetsAPI link,
-                            TreeMap<Object, Object> data) {
-        try {
-            String rulesChannel;
-            String exitMessage;
+                            TreeMap<Object, Object> data) throws IOException {
+        String rulesChannel;
+        String exitMessage;
 
-            switch (getPrefix()) {
-                case "fs":
-                    modifyRoles(sc, playerID,
-                            Arrays.asList(
-                                    getRole(sc, getSection() + " Graduate"),
-                                    getRole(sc, "LaunchPoint")),
-                            Collections.singletonList(
-                                    getRole(sc, getSection())));
+        switch (getPrefix()) {
+            case "fs":
+            case "lp":
+                modifyRoles(sc, playerID,
+                        Arrays.asList(
+                                getRole(sc, getSection() + " Graduate"),
+                                getRole(sc, getNextSection())),
+                        Collections.singletonList(
+                                getRole(sc, getSection())));
 
-                    rulesChannel =
-                            getChannel(sc, "lp-draft-rules").getAsMention();
-                    exitMessage = "Congratulations! We look forward to "
-                            + "seeing you in LaunchPoint. Make sure to "
-                            + "read " + rulesChannel + " before playing "
-                            + "in any drafts!";
-                    break;
-                case "lp":
-                    modifyRoles(sc, playerID,
-                            Arrays.asList(
-                                    getRole(sc, getSection() + " Graduate"),
-                                    getRole(sc, "Ink Odyssey")),
-                            Collections.singletonList(
-                                    getRole(sc, getSection())));
+                rulesChannel = getChannel(sc, getNextPrefix()
+                        + "-draft-rules").getAsMention();
+                exitMessage = "Congratulations! We look forward to seeing "
+                        + "you in " + getNextSection() + ". Make sure to "
+                        + "to read " + rulesChannel + " before playing "
+                        + "in any drafts!";
+                break;
+            default:
+                modifyRoles(sc, playerID,
+                        Collections.singletonList(
+                                getRole(sc, getSection() + " Graduate")),
+                        Collections.singletonList(
+                                getRole(sc, getSection())));
 
-                    rulesChannel =
-                            getChannel(sc, "io-draft-rules").getAsMention();
-                    exitMessage = "Congratulations! We look forward to "
-                            + "seeing you in Ink Odyssey. Make sure to "
-                            + "read " + rulesChannel + " before playing "
-                            + "in any drafts!";
-                    break;
-                default:
-                    modifyRoles(sc, playerID,
-                            Collections.singletonList(
-                                    getRole(sc, getSection() + " Graduate")),
-                            Collections.singletonList(
-                                    getRole(sc, getSection())));
-
-                    exitMessage = "Congratulations! We look forward to "
-                            + "seeing you beyond MIT.";
-                    break;
-            }
-
-            if (!data.containsKey(playerID)) {
-                Member player = findMember(sc, playerID);
-                ValueRange newRow = link.buildRow(Arrays.asList(
-                            playerID, player.getUser().getAsTag(),
-                            player.getEffectiveName()));
-                link.appendRow(TAB, newRow);
-            }
-
-            return exitMessage;
-        } catch (IOException e) {
-            sendResponse(sc, "The spreadsheet could not load.", true);
-            log("The " + getSection()
-                    + " graduates spreadsheet could not load.", true);
-            return null;
+                exitMessage = "Congratulations! We look forward to "
+                        + "seeing you beyond MIT.";
+                break;
         }
+
+        if (!data.containsKey(playerID)) {
+            Member player = findMember(sc, playerID);
+            ValueRange newRow = link.buildRow(Arrays.asList(
+                        playerID, player.getUser().getAsTag(),
+                        player.getEffectiveName()));
+            link.appendRow(TAB, newRow);
+        }
+
+        return exitMessage;
     }
 
     /**
@@ -118,41 +115,34 @@ public class Graduate extends Section implements Command {
         sc.deferReply(false).queue();
         List<OptionMapping> args = sc.getOptions();
 
-        GoogleSheetsAPI link;
-        TreeMap<Object, Object> data;
         try {
-            link = new GoogleSheetsAPI(gradSheetID());
-            data = link.readSection(sc, TAB);
-            if (data == null) {
-                throw new IOException("The spreadsheet was empty.");
+            GoogleSheetsAPI link = new GoogleSheetsAPI(gradSheetID());
+            TreeMap<Object, Object> data = link.readSection(sc, TAB);
+
+            StringBuilder listOfUsers = new StringBuilder();
+            for (OptionMapping om : args) {
+                Member player = om.getAsMember();
+                String exitMessage = graduate(sc, player.getId(), link, data);
+                if (exitMessage == null) {
+                    throw new IOException();
+                }
+
+                Member finalUser = args.get(args.size() - 1).getAsMember();
+                if (player.getId().equals(finalUser.getId())) {
+                    listOfUsers.append(player.getAsMention())
+                            .append("\n\n")
+                            .append(exitMessage);
+                } else {
+                    listOfUsers.append(player.getAsMention()).append(" ");
+                }
             }
+
+            editMessage(sc, listOfUsers.toString());
+            log(args.size() + " " + getSection() + " graduate(s) processed.", false);
         } catch (IOException | GeneralSecurityException e) {
-            sendResponse(sc, "The spreadsheet could not load.", true);
+            editMessage(sc, "The spreadsheet could not load.");
             log("The " + getSection()
                     + " graduates spreadsheet could not load.", true);
-            return;
         }
-
-        StringBuilder listOfUsers = new StringBuilder();
-        for (OptionMapping om : args) {
-            Member player = om.getAsMember();
-            String exitMessage = graduate(sc, player.getId(),
-                    link, link.readSection(sc, TAB));
-            if (exitMessage == null) {
-                return;
-            }
-
-            Member finalUser = args.get(args.size() - 1).getAsMember();
-            if (player.getId().equals(finalUser.getId())) {
-                listOfUsers.append(player.getAsMention())
-                        .append("\n\n")
-                        .append(exitMessage);
-            } else {
-                listOfUsers.append(player.getAsMention()).append(" ");
-            }
-        }
-
-        editMessage(sc, listOfUsers.toString());
-        log(args.size() + " " + getSection() + " graduate(s) processed.", false);
     }
 }

@@ -191,28 +191,26 @@ public class GoogleSheetsAPI {
      *         null otherwise.
      */
     public TreeMap<Object, Object> readSection(
-            GenericInteractionCreateEvent interaction, String tab) {
-        try {
-            List<List<Object>> values = getSheetValues(tab);
+            GenericInteractionCreateEvent interaction, String tab)
+            throws IOException {
+        List<List<Object>> values = getSheetValues(tab);
 
-            TreeMap<Object, Object> data = new TreeMap<>();
-            if (values != null && !values.isEmpty()) {
-                for (int i = 1; i < values.size(); i++) {
-                    List<Object> row = values.get(i);
-                    Object id = row.remove(0);
-                    Object rowType = getSpecificRow(interaction, tab, i, row);
+        TreeMap<Object, Object> data = new TreeMap<>();
+        if (!values.isEmpty()) {
+            for (int i = 1; i < values.size(); i++) {
+                List<Object> row = values.get(i);
+                Object id = row.remove(0);
+                Object rowType = getSpecificRow(interaction, tab, i, row);
 
-                    data.put(id, rowType);
-                }
-
-                return data;
+                data.put(id, rowType);
             }
-        } catch (IOException e) {
-            Logger logger = LoggerFactory.getLogger(this.getClass());
-            logger.error("The data could not load.");
+        } else {
+            LoggerFactory.getLogger(this.getClass())
+                    .error("The spreadsheet was empty.");
+            throw new IOException();
         }
 
-        return null;
+        return data;
     }
 
     /**

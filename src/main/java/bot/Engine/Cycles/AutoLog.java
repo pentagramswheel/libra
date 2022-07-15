@@ -138,7 +138,6 @@ public class AutoLog extends Section {
         }
 
         TextChannel channel = draft.getChannel(bc, getPrefix() + "-match-report");
-//        TextChannel channel = draft.getTestingChannel();
         channel.sendMessageEmbeds(eb.build()).queue();
     }
 
@@ -200,9 +199,6 @@ public class AutoLog extends Section {
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
             TreeMap<Object, Object> data = link.readSection(bc, CYCLES_TAB);
-            if (data == null) {
-                throw new IOException("The spreadsheet was empty.");
-            }
 
             DraftTeam team1 = draft.getProcess().getTeam1();
             DraftTeam team2 = draft.getProcess().getTeam2();
@@ -221,7 +217,7 @@ public class AutoLog extends Section {
             draft.log(totalSize + " " + getPrefix().toUpperCase()
                     + " draft player(s) were automatically processed.", false);
         } catch (IOException | GeneralSecurityException e) {
-            draft.sendResponse(bc, "The leaderboard could not load.", true);
+            draft.editMessage(bc, "The leaderboard could not load.");
             draft.log("The " + getSection()
                     + " cycles spreadsheet could not load.", true);
         }
