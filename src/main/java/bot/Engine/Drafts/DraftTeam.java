@@ -52,8 +52,7 @@ public class DraftTeam {
     }
 
     /**
-     * Checks whether the team currently has no
-     * active players.
+     * Checks whether the team currently has no active players.
      * @return True if the team is empty or is full of
      *              inactive players.
      *         False otherwise.
