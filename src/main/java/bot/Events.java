@@ -495,8 +495,7 @@ public class Events extends ListenerAdapter {
                         .setEphemeral(true).queue();
                 break;
             case "qprofile":
-                Profile profile = new Profile();
-                profile.runCmd(sc);
+                new Profile().runCmd(sc);
                 break;
             case "ded":
                 sc.reply(Emoji.fromEmote(
@@ -506,8 +505,7 @@ public class Events extends ListenerAdapter {
         }
 
         if (subGroup.equals("profile")) {
-            Profile profile = new Profile();
-            profile.runCmd(sc);
+            new Profile().runCmd(sc);
         }
     }
 
@@ -550,20 +548,16 @@ public class Events extends ListenerAdapter {
         switch (subCmd) {
             case "add":
             case "deny":
-                Add newcomer = new Add(prefix);
-                newcomer.runCmd(sc);
+                new Add(prefix).runCmd(sc);
                 break;
             case "grad":
-                Graduate grad = new Graduate(prefix);
-                grad.runCmd(sc);
+                new Graduate(prefix).runCmd(sc);
                 break;
             case "award":
-                Award award = new Award(prefix);
-                award.runCmd(sc);
+                new Award(prefix).runCmd(sc);
                 break;
             case "cyclescalc":
-                PointsCalculator calculator = new PointsCalculator(prefix);
-                calculator.runCmd(sc);
+                new PointsCalculator(prefix).runCmd(sc);
                 break;
             case "genmaps":
                 if (mapsNeededValid(sc)) {
@@ -592,13 +586,11 @@ public class Events extends ListenerAdapter {
             case "log":
             case "sub":
                 if (gamesPlayedValid(sc)) {
-                    ManualLog log = new ManualLog(prefix);
-                    log.runCmd(sc);
+                    new ManualLog(prefix).runCmd(sc);
                 }
                 break;
             case "undo":
-                Undo undo = new Undo(prefix);
-                undo.runCmd(sc);
+                new Undo(prefix).runCmd(sc);
                 break;
         }
     }
@@ -614,19 +606,18 @@ public class Events extends ListenerAdapter {
         if (isStaffCommand(sc) || wrongChannelUsed(sc)) {
             sc.reply("You do not have permission to use this command here.")
                     .setEphemeral(true).queue();
-            return;
-        }
-
-        String cmdPrefix = sc.getName();
-        switch (cmdPrefix) {
-            case "mit":
-                parseGeneralCommands(sc);
-                break;
-            case "fs":
-            case "lp":
-            case "io":
-                parseSectionCommands(sc);
-                break;
+        } else {
+            String cmdPrefix = sc.getName();
+            switch (cmdPrefix) {
+                case "mit":
+                    parseGeneralCommands(sc);
+                    break;
+                case "fs":
+                case "lp":
+                case "io":
+                    parseSectionCommands(sc);
+                    break;
+            }
         }
     }
 
