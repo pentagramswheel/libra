@@ -15,7 +15,7 @@ public class DraftPlayer {
     /** Flag for checking whether this player is active or not. */
     private boolean active;
 
-    /** Flag for checking whether this player is a captain or not. */
+    /** Flags for checking whether this player is a captain or not. */
     private boolean captainStatus1, captainStatus2;
 
     /** Flag for checking whether this player has been assigned a team or not. */

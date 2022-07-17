@@ -40,12 +40,9 @@ public class DraftProcess {
     /** The teams of the draft. */
     private final DraftTeam team1, team2;
 
-    /** The max amount of won matches within a draft. */
-    private final static int MAX_SCORE = 4;
-
     /** The number of players required to formally end the draft. */
-    private final static int NUM_PLAYERS_TO_END_DRAFT_BEFORE_START = 5;
-    private final static int NUM_PLAYERS_TO_END_DRAFT_AFTER_START = 3;
+    private static final int NUM_PLAYERS_TO_END_DRAFT_BEFORE_START = 5;
+    private static final int NUM_PLAYERS_TO_END_DRAFT_AFTER_START = 3;
 
     /** The players who have clicked the 'End Draft` button consecutively. */
     private final HashSet<String> endButtonClicked;
@@ -63,6 +60,9 @@ public class DraftProcess {
 
         team1 = new DraftTeam();
         team2 = new DraftTeam();
+
+        team1.setOpponents(team2);
+        team2.setOpponents(team1);
 
         endButtonClicked = new HashSet<>();
     }
@@ -341,45 +341,24 @@ public class DraftProcess {
     /**
      * Adds points to teams.
      * @param team the winning team.
-     * @param otherTeam the losing team.
      */
-    private void givePoints(ButtonClickEvent bc,
-                            DraftTeam team, DraftTeam otherTeam) {
-        if (team.getScore() < MAX_SCORE) {
-            team.incrementScore();
+    private void givePoints(ButtonClickEvent bc, DraftTeam team) {
+        if (team.hasMaxScore()) {
+            draft.sendResponse(bc,"You have already hit the point limit!", true);
         } else {
-            draft.sendResponse(bc,
-                    "You have already hit the point limit!", true);
-            return;
-        }
-
-        for (DraftPlayer player : team.getPlayers().values()) {
-            player.incrementWins();
-        }
-        for (DraftPlayer player : otherTeam.getPlayers().values()) {
-            player.incrementLosses();
+            team.incrementScore();
         }
     }
 
     /**
      * Subtracts points from teams.
      * @param team the "winning" team.
-     * @param otherTeam the "losing" team.
      */
-    private void revertPoints(ButtonClickEvent bc,
-                              DraftTeam team, DraftTeam otherTeam) {
-        if (team.getScore() > 0) {
-            team.decrementScore();
-        } else {
+    private void revertPoints(ButtonClickEvent bc, DraftTeam team) {
+        if (team.hasMinScore()) {
             draft.sendResponse(bc, "You cannot have less than zero points!", true);
-            return;
-        }
-
-        for (DraftPlayer player : team.getPlayers().values()) {
-            player.decrementWins();
-        }
-        for (DraftPlayer player : otherTeam.getPlayers().values()) {
-            player.decrementLosses();
+        } else {
+            team.decrementScore();
         }
     }
 
@@ -395,7 +374,7 @@ public class DraftProcess {
         bc.deferEdit().queue();
         resetEndDraftButton();
 
-        DraftTeam team, otherTeam;
+        DraftTeam team;
         if (getTeam1().needsPlayers() || getTeam2().needsPlayers()) {
             draft.sendResponse(bc,
                     "Add your subs before continuing (Check the "
@@ -404,19 +383,17 @@ public class DraftProcess {
             return;
         } else if (getTeam1().contains(authorID)) {
             team = getTeam1();
-            otherTeam = getTeam2();
         } else if (getTeam2().contains(authorID)) {
             team = getTeam2();
-            otherTeam = getTeam1();
         } else {
             draft.sendResponse(bc, "You are not part of this draft!", true);
             return;
         }
 
         if (increment) {
-            givePoints(bc, team, otherTeam);
+            givePoints(bc, team);
         } else {
-            revertPoints(bc, team, otherTeam);
+            revertPoints(bc, team);
         }
 
         refresh(bc);

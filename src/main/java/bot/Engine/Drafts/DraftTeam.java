@@ -14,8 +14,15 @@ public class DraftTeam {
     /** The players of the team. */
     private final TreeMap<String, DraftPlayer> players;
 
+    /** The opposing team. */
+    private DraftTeam opponents;
+
     /** The team's total score. */
     private int score;
+
+    /** The minimum/maximum amount of won matches for a team. */
+    private static final int MIN_SCORE = 0;
+    private static final int MAX_SCORE = 4;
 
     /** The amount of players a team needs. */
     private int playersNeeded;
@@ -32,9 +39,40 @@ public class DraftTeam {
         return players;
     }
 
+    /**
+     * Sets the opponents of this team.
+     * @param team the opposing team.
+     */
+    public void setOpponents(DraftTeam team) {
+        opponents = team;
+    }
+
+    /** Retrieves the opposing team. */
+    public DraftTeam getOpponents() {
+        return opponents;
+    }
+
     /** Retrieves the team's total score. */
     public int getScore() {
         return score;
+    }
+
+    /**
+     * Checks whether the team has the minimum score or not.
+     * @return True if they do.
+     *         False otherwise.
+     */
+    public boolean hasMinScore() {
+        return getScore() == MIN_SCORE;
+    }
+
+    /**
+     * Checks whether the team has the maximum score or not.
+     * @return True if they do.
+     *         False otherwise.
+     */
+    public boolean hasMaxScore() {
+        return getScore() == MAX_SCORE;
     }
 
     /**
@@ -42,6 +80,13 @@ public class DraftTeam {
      */
     public void incrementScore() {
         score++;
+
+        for (DraftPlayer player : getPlayers().values()) {
+            player.incrementWins();
+        }
+        for (DraftPlayer player : getOpponents().getPlayers().values()) {
+            player.incrementLosses();
+        }
     }
 
     /**
@@ -49,6 +94,13 @@ public class DraftTeam {
      */
     public void decrementScore() {
         score--;
+
+        for (DraftPlayer player : getPlayers().values()) {
+            player.decrementWins();
+        }
+        for (DraftPlayer player : getOpponents().getPlayers().values()) {
+            player.decrementLosses();
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ import bot.Engine.Section;
 import bot.Events;
 import bot.Tools.Command;
 import bot.Tools.Components;
+import bot.Tools.DiscordWatch;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -36,11 +37,8 @@ public class Draft extends Section implements Command {
     /** Flag for checking whether this draft has initialized or not. */
     private boolean initialized;
 
-    /** The time limit for the request to expire. */
-    private int timeLimit;
-
-    /** The starting time of this draft's initial request. */
-    private final long startTime;
+    /** A watch for the draft to use. */
+    DiscordWatch watch;
 
     /** The formal number of this draft. */
     private final int numDraft;
@@ -81,9 +79,13 @@ public class Draft extends Section implements Command {
 
         initialized = false;
 
-        // time limit is 50 minutes initially
-        timeLimit = 1000 * 60 * 50;
-        startTime = System.currentTimeMillis();
+        watch = new DiscordWatch();
+
+        // set a timer for the draft's request
+        watch.startTimerOne(50);
+
+        // set a timer for when for allowing a reping
+        watch.startTimerTwo(15);
 
         numDraft = draft;
         players = new TreeMap<>();
@@ -104,6 +106,11 @@ public class Draft extends Section implements Command {
      */
     public boolean isInitialized() {
         return initialized;
+    }
+
+    /** Retrieves the draft's watch. */
+    public DiscordWatch getWatch() {
+        return watch;
     }
 
     /**
@@ -155,14 +162,6 @@ public class Draft extends Section implements Command {
         return draftChat;
     }
 
-    /** Unpins anything in the respective draft chat channel. */
-    public void unpinDraftChannelPins() {
-        for (Message pin : getDraftChannel()
-                .retrievePinnedMessages().complete()) {
-            pin.unpin().complete();
-        }
-    }
-
     /**
      * Retrieves the request interface of the draft.
      * @param interaction the user interaction calling this method.
@@ -190,10 +189,8 @@ public class Draft extends Section implements Command {
      *         False otherwise.
      */
     public boolean timedOut(GenericInteractionCreateEvent interaction) {
-        long currentTime = System.currentTimeMillis();
-
         if (!isInitialized() && messageID != null
-                && currentTime - startTime >= timeLimit) {
+                && getWatch().timerOneExpired()) {
             getMessage(interaction)
                     .editMessage("This draft has expired.")
                     .setActionRow(Components.ForDraft.refresh(
@@ -266,8 +263,9 @@ public class Draft extends Section implements Command {
                         + logList + ".", false);
             }
         } else {
-            long approxTime = (startTime + timeLimit) / 1000;
-            eb.addField("Expiration:", "<t:" + approxTime + ":R>", false);
+            eb.addField("Expiration:",
+                    DiscordWatch.discordTimeUntil(getWatch().getTimerOneEnd()),
+                    false);
         }
 
         sendEmbed(interaction, eb);
@@ -351,11 +349,9 @@ public class Draft extends Section implements Command {
             return;
         } else if (!playerHistory.contains(playerID)) {
             if (getPlayers().size() == NUM_PLAYERS_TO_START_DRAFT - 2) {
-                // add 10 minutes
-                timeLimit += 1000 * 60 * 10;
+                getWatch().timerOneAdd(10);
             } else if (getPlayers().size() >= (NUM_PLAYERS_TO_START_DRAFT / 2) - 1) {
-                // add 5 minutes
-                timeLimit += 1000 * 60 * 5;
+                getWatch().timerOneAdd(5);
             }
         }
 
@@ -450,16 +446,11 @@ public class Draft extends Section implements Command {
         String authorID = bc.getMember().getId();
         messageID = bc.getMessageId();
 
-        // set timer to 15 minutes
-        long currentTime = System.currentTimeMillis();
-        long waitTime = 1000 * 60 * 15;
-
         if (!getPlayers().containsKey(authorID)) {
             sendReply(bc, "You are not in this draft!", true);
-        } else if (currentTime - startTime < waitTime) {
-            long approxTime = (startTime + waitTime) / 1000;
-            sendReply(bc,
-                    String.format("Wait until <t:%s:t> to reping!", approxTime),
+        } else if (!getWatch().timerTwoExpired()) {
+            sendReply(bc, String.format("Wait until %s to reping!",
+                    DiscordWatch.discordTime(getWatch().getTimerTwoEnd())),
                     true);
         } else if (NUM_PLAYERS_TO_START_DRAFT - players.size()
                 > (NUM_PLAYERS_TO_START_DRAFT / 2) + 1) {
@@ -673,6 +664,14 @@ public class Draft extends Section implements Command {
         } else {
             subIn(bc, player.getId(), player.getEffectiveName());
             refresh(bc);
+        }
+    }
+
+    /** Unpins anything in the respective draft chat channel. */
+    public void unpinDraftChannelPins() {
+        for (Message pin : getDraftChannel()
+                .retrievePinnedMessages().complete()) {
+            pin.unpin().complete();
         }
     }
 

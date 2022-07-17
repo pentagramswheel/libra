@@ -24,6 +24,7 @@
     - [ButtonBuilder](#buttonbuilder)
     - [Command](#command)
     - [Components](#components)
+    - [DiscordWatch](#discordwatch)
     - [FileHandler](#filehandler)
     - [GoogleSheetsAPI](#googlesheetsapi)
     - [SelectionMenuBuilder](#selectionmenubuilder)
@@ -139,6 +140,18 @@ A class for storing components used throughout the bot.
 
 ----
 
+## DiscordWatch
+
+A class used as a timer and clock for Discord.
+
+###### Instance Variables
+1. `long timerStart` - the starting time of the first timer of the watch.
+2. `long timerDuration` - how long the first timer of the watch should last.
+3. `long timerStart2` - the starting time of the second timer of the watch.
+4. `long timerDuration2` - how long the second timer of the watch should last.
+
+----
+
 #### FileHandler
 
 A class which handles files (currently only for saving text).
@@ -217,11 +230,11 @@ A class for parenting MIT section-specific commands.
 4. `String emote` - the emote of this section.
 5. `Color color` - the color of this section.
 6. `String gradSheetID` - the graduates spreadsheet ID for this section.
-7. `String cyclesSheetID` - the cycles spreadsheet ID for this section.
+7. `String cyclesSheetID` - the Cycles spreadsheet ID for this section.
 8. `String calculationsSheetID` - the calculations spreadsheet ID for this section.
-9. `String CYCLES_TAB` - the tab to reference within the cycles spreadsheet.
-10. `String CYCLES_START_COLUMN` - the cycles spreadsheet column that starts the needed information.
-11. `String CYCLES_END_COLUMN` - the cycles spreadsheet column that ends the needed information.
+9. `String CYCLES_TAB` - the tab to reference within the Cycles spreadsheet.
+10. `String CYCLES_START_COLUMN` - the Cycles spreadsheet column that starts the needed information.
+11. `String CYCLES_END_COLUMN` - the Cycles spreadsheet column that ends the needed information.
 
 ----
 
@@ -258,17 +271,16 @@ A class which forms and starts drafts, processing the command `lp/io startdraft`
 
 ###### Instance Variables
 1. `boolean initialized` - a flag for checking if a draft has been initialized.
-2. `int timeLimit` - the time limit for a draft request to expire.
-3. `long startTime` - the starting time of the draft's initialization.
-4. `int numDraft` - the formal number of the draft, with respect to the draft maps in `Events`.
-5. `DraftProcess draftProcess` - the formal process for the draft's execution.
-6. `TreeMap<String, DraftPlayer> players` - the players of the draft.
-7. `HashSet<String> playerHistory` - a history of players which have entered the draft queue at any point.
-8. `int numInactive` - the number of inactive players within the draft.
-9. `TextChannel draftChat` - the draft chat which this draft is linked to.
-10. `String messageID` - the Discord message ID of the draft request.
-11. `int NUM_PLAYERS_TO_START_DRAFT` - the number of players to start the draft.
-13. `int mapGens` - the amount of times a map generation has occurred for the draft.
+2. `DiscordWatch watch` - a watch to use throughout the draft.
+3. `int numDraft` - the formal number of the draft, with respect to the draft maps in `Events`.
+4. `DraftProcess draftProcess` - the formal process for the draft's execution.
+5. `TreeMap<String, DraftPlayer> players` - the players of the draft.
+6. `HashSet<String> playerHistory` - a history of players which have entered the draft queue at any point.
+7. `int numInactive` - the number of inactive players within the draft.
+8. `TextChannel draftChat` - the draft chat which this draft is linked to.
+9. `String messageID` - the Discord message ID of the draft request.
+10. `int NUM_PLAYERS_TO_START_DRAFT` - the number of players to start the draft.
+11. `int mapGens` - the amount of times a map generation has occurred for the draft.
 
 ----
 
@@ -313,7 +325,9 @@ A class which represents teams within a draft.
 ###### Instance Variables
 1. `TreeMap<String, DraftPlayer> players` - the players of the team.
 2. `int score` - the team's total score.
-3. `int playersNeeded` - the amount of active players a team needs, at any given time.
+3. `int MIN_SCORE` - a team's minimum amount of points to gain.
+4. `int MAX_SCORE` - a team's maximum amount of points to gain.
+5. `int playersNeeded` - the amount of active players a team needs, at any given time.
 
 ----
 
