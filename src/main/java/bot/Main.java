@@ -148,12 +148,12 @@ public class Main {
         SubcommandData startdraft2 = new SubcommandData("startdraft",
                 "Requests a draft, with a specific gamemode.");
         OptionData draftChoice = new OptionData(
-                OptionType.STRING, "draftType",
+                OptionType.STRING, "type",
                 "Type of draft to play", false);
         String[] draftChoices = {"Ranked Modes", "Turf War Only", "Hide & Seek",
                 "Juggernaut", "Spawn Rush"};
         for (int i = 1; i <= draftChoices.length; i++) {
-            rankChoices.addChoice(draftChoices[i - 1], draftChoices[i - 1]);
+            draftChoice.addChoice(draftChoices[i - 1], draftChoices[i - 1]);
         }
         startdraft2.addOptions(draftChoice);
 
