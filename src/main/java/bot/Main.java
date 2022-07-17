@@ -147,6 +147,15 @@ public class Main {
                 "Requests a draft with up to 8 players.");
         SubcommandData startdraft2 = new SubcommandData("startdraft",
                 "Requests a draft, with a specific gamemode.");
+        OptionData draftChoice = new OptionData(
+                OptionType.STRING, "draftType",
+                "Type of draft to play", false);
+        String[] draftChoices = {"Ranked Modes", "Turf War Only", "Hide & Seek",
+                "Juggernaut", "Spawn Rush"};
+        for (int i = 1; i <= draftChoices.length; i++) {
+            rankChoices.addChoice(draftChoices[i - 1], draftChoices[i - 1]);
+        }
+        startdraft2.addOptions(draftChoice);
 
         SubcommandData forcesub = new SubcommandData("forcesub",
                 "Forces a player within a draft to become a sub.");
@@ -154,11 +163,11 @@ public class Main {
                 "Forces a draft to end.");
 
         SubcommandData log = new SubcommandData("log",
-                "Manually reports draft scores for up to four players.");
+                "Reports draft scores for up to four players.");
         SubcommandData sub = new SubcommandData("sub",
-                "Manually reports draft scores for up to four players who subbed.");
+                "Reports draft scores for up to four players who subbed.");
         SubcommandData undo = new SubcommandData("undo",
-                "Manually reverts the previous draft command, once and only once.");
+                "Reverts the previous draft command, once and only once.");
 
         SubcommandData add = new SubcommandData("add",
                 "Adds players into the designated area within MIT.");
@@ -185,15 +194,7 @@ public class Main {
         OptionData maps = new OptionData(
                 OptionType.INTEGER, "matches",
                 "Amount of maps to generate", true);
-        OptionData modeChoice = new OptionData(
-                OptionType.STRING, "mode",
-                "A single gamemode to focus on", false);
-        String[] modes = {"Turf War", "Splat Zones", "Tower Control",
-                "Rainmaker", "Clam Blitz"};
-        for (int i = 1; i <= modes.length; i++) {
-            modeChoice.addChoice(modes[i - 1], modes[i - 1]);
-        }
-        genmaps.addOptions(maps, modeChoice);
+        genmaps.addOptions(maps);
 
         OptionData leaderboardAward = new OptionData(OptionType.INTEGER, "role",
                 "The leaderboard role to give", true);

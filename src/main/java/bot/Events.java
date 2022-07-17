@@ -44,7 +44,7 @@ public class Events extends ListenerAdapter {
     public static Random RANDOM_GENERATOR = new Random();
 
     /** Fields which determine the maximum number of drafts. */
-    private final static int MAX_FS_DRAFTS = 8;
+    private final static int MAX_FS_DRAFTS = 3;
     private final static int MAX_LP_DRAFTS = 4;
     private final static int MAX_IO_DRAFTS = 2;
 

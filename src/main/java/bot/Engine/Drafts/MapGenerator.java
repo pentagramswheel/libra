@@ -40,22 +40,6 @@ public class MapGenerator extends Section implements Command {
     }
 
     /**
-     * Checks if the map generation can occur.
-     * @return True if the map generation can proceed.
-     *         False otherwise.
-     */
-    private boolean mapGenerationLimitHit() {
-        if (foundDraft == null) {
-            return false;
-        } else if (foundDraft.getMapGens() >= MAX_DRAFT_MAPLISTS) {
-            return true;
-        } else {
-            foundDraft.incrementMapGens();
-            return false;
-        }
-    }
-
-    /**
      * Resets the generator's available modes list.
      */
     private void resetModes(List<String> modes) {
@@ -254,55 +238,31 @@ public class MapGenerator extends Section implements Command {
     }
 
     /**
-     * Checks whether ther is a mode to focus on for the maplist.
+     * Checks if there is currently a problem with running the map
+     * generation command or not.
      * @param sc the user's inputted command.
-     * @param args the parameters of the command.
-     * @return -1 if a specific mode was not found.
-     *          0 if a mode was found, but an error occurred.
-     *          1 otherwise.
+     * @return True if there is a problem.
+     *         False otherwise.
      */
-    private int checkForMode(SlashCommandEvent sc, List<OptionMapping> args) {
-        String onlyMode = null;
-
-        if (!args.isEmpty()) {
-            onlyMode = args.get(0).getAsString();
-
-            if (onlyMode.equals("Turf War")
-                    && !getPrefix().equals("fs")) {
-                sendReply(sc, getSection() + " doesn't have access to such "
-                        + "a maplist!", true);
-                return 0;
-            }
-        }
-
-        if (foundDraft != null) {
-            if (!foundDraft.isInitialized()) {
-                sendReply(sc, "You cannot generate maps for your "
-                        + "draft yet!", true);
-                return 0;
-            } else if (onlyMode != null
-                    && (getPrefix().equals("lp") || getPrefix().equals("io"))) {
-                sendReply(sc, "You cannot generate one-gamemode "
-                        + "maplists during drafts!", true);
-                return 0;
-            } else if (!sc.getTextChannel().equals(
-                    foundDraft.getDraftChannel())) {
-                sendReply(sc, "You can only generate maplists for your draft in "
-                        + foundDraft.getDraftChannel().getAsMention() + "!", true);
-                return 0;
-            }
-        }
-
-        if (mapGenerationLimitHit()) {
+    private boolean problemExists(SlashCommandEvent sc) {
+        if (foundDraft == null) {
+            return false;
+        } else if (!foundDraft.isInitialized()) {
+            sendReply(sc, "You cannot generate maps for your "
+                    + "draft yet!", true);
+            return true;
+        } else if (!sc.getTextChannel().equals(
+                foundDraft.getDraftChannel())) {
+            sendReply(sc, "You can only generate maplists for your draft in "
+                    + foundDraft.getDraftChannel().getAsMention() + "!", true);
+            return true;
+        } else if (foundDraft.getMapGens() >= MAX_DRAFT_MAPLISTS) {
             sendReply(sc, "You can only generate two maplists "
                     + "per draft!", true);
-            return 0;
-        }
-
-        if (onlyMode == null) {
-            return -1;
+            return true;
         } else {
-            return 1;
+            foundDraft.incrementMapGens();
+            return false;
         }
     }
 
@@ -312,47 +272,34 @@ public class MapGenerator extends Section implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
-        List<OptionMapping> args = sc.getOptions();
-        int numMaps = (int) args.remove(0).getAsLong();
-
-        String onlyMode = null;
-        int check = checkForMode(sc, args);
-        if (check == 0) {
+        if (problemExists(sc)) {
             return;
-        } else if (check == 1) {
-            onlyMode = args.remove(0).getAsString();
         }
         sc.deferReply(false).queue();
 
         int numModes = 0;
         List<String> modes = new ArrayList<>();
-        TreeMap<String, List<String>> legalMaps = getLegalMaps();
-
         String lastMode = "";
+
+        int numMaps = (int) sc.getOptions().remove(0).getAsLong();
+        TreeMap<String, List<String>> legalMaps = getLegalMaps();
         List<String> pastMaps = new ArrayList<>();
 
         List<MessageEmbed> matches = new ArrayList<>();
         for (int i = 0; i < numMaps; i++) {
-            int rIndex;
-            String currMode;
+            if (numModes == 0) {
+                resetModes(modes);
+                numModes = 4;
+            }
 
-            if (onlyMode == null) {
-                if (numModes == 0) {
-                    resetModes(modes);
-                    numModes = 4;
-                }
-
+            int rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
+            String currMode = modes.get(rIndex);
+            while (lastMode.equals(currMode)) {
                 rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
                 currMode = modes.get(rIndex);
-                while (lastMode.equals(currMode)) {
-                    rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
-                    currMode = modes.get(rIndex);
-                }
-                lastMode = modes.remove(rIndex);
-                numModes--;
-            } else {
-                currMode = onlyMode;
             }
+            lastMode = modes.remove(rIndex);
+            numModes--;
 
             List<String> modeMaps = legalMaps.get(currMode);
             rIndex = Events.RANDOM_GENERATOR.nextInt(modeMaps.size());
@@ -375,6 +322,6 @@ public class MapGenerator extends Section implements Command {
         } else {
             sc.getHook().editOriginalEmbeds(matches).queue();
         }
-        log("A maplist was generated.", false);
+        log("A " + getSection() + " maplist was generated.", false);
     }
 }

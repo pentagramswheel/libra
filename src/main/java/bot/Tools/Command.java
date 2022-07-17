@@ -201,7 +201,7 @@ public interface Command {
      */
     default void sendEmbeds(GenericInteractionCreateEvent interaction,
                             List<EmbedBuilder> ebs) {
-        ArrayList<MessageEmbed> builtEmbeds = new ArrayList<>(ebs.size());
+        List<MessageEmbed> builtEmbeds = new ArrayList<>(ebs.size());
         for (EmbedBuilder embed : ebs) {
             builtEmbeds.add(embed.build());
         }
