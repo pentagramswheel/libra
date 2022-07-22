@@ -1,13 +1,13 @@
-package bot.Engine.Drafts;
+package bot.Engine.Games;
 
 import bot.Engine.Section;
+import bot.Engine.Templates.GameReqs;
 import bot.Events;
 import bot.Tools.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -24,7 +24,11 @@ import java.util.Arrays;
 public class MapGenerator extends Section implements Command {
 
     /** The draft associated with this map generation, if any. */
-    private final Draft foundDraft;
+    private final GameReqs foundDraft;
+
+    /** The default minimum/maximum amount of map generations. */
+    private final static int MIN_MAPS = 0;
+    private final static int MAX_MAPS = 9;
 
     /** The maximum number of maplists which a draft can generate. */
     private final static int MAX_DRAFT_MAPLISTS = 2;
@@ -34,7 +38,7 @@ public class MapGenerator extends Section implements Command {
      * @param abbreviation the abbreviation of the section.
      * @param draft a found draft.
      */
-    public MapGenerator(String abbreviation, Draft draft) {
+    public MapGenerator(String abbreviation, GameReqs draft) {
         super(abbreviation);
         foundDraft = draft;
     }
@@ -244,8 +248,14 @@ public class MapGenerator extends Section implements Command {
      * @return True if there is a problem.
      *         False otherwise.
      */
-    private boolean problemExists(SlashCommandEvent sc) {
-        if (foundDraft == null) {
+    private boolean problemExists(SlashCommandEvent sc, int numMaps) {
+        if (numMaps > MAX_MAPS) {
+            sendReply(sc, "Too many maps requested.", true);
+            return true;
+        } else if (numMaps < MIN_MAPS + 1) {
+            sendReply(sc, "Why would you request zero or less maps?", true);
+            return true;
+        } else if (foundDraft == null) {
             return false;
         } else if (!foundDraft.isInitialized()) {
             sendReply(sc, "You cannot generate maps for your "
@@ -256,12 +266,17 @@ public class MapGenerator extends Section implements Command {
             sendReply(sc, "You can only generate maplists for your draft in "
                     + foundDraft.getDraftChannel().getAsMention() + "!", true);
             return true;
-        } else if (foundDraft.getMapGens() >= MAX_DRAFT_MAPLISTS) {
-            sendReply(sc, "You can only generate two maplists "
-                    + "per draft!", true);
+        } else if (numMaps != foundDraft.getProperties().getTotalMatches()) {
+            sendReply(sc, "Your draft can only generate `"
+                            + foundDraft.getProperties().getTotalMatches()
+                            + "` maps.", true);
+            return true;
+        } else if (foundDraft.getProperties().getMapGens() >= MAX_DRAFT_MAPLISTS) {
+            sendReply(sc, "You can only generate two maplists per draft!",
+                    true);
             return true;
         } else {
-            foundDraft.incrementMapGens();
+            foundDraft.getProperties().incrementMapGens();
             return false;
         }
     }
@@ -272,7 +287,8 @@ public class MapGenerator extends Section implements Command {
      */
     @Override
     public void runCmd(SlashCommandEvent sc) {
-        if (problemExists(sc)) {
+        int numMaps = (int) sc.getOptions().remove(0).getAsLong();
+        if (problemExists(sc, numMaps)) {
             return;
         }
         sc.deferReply(false).queue();
@@ -281,7 +297,6 @@ public class MapGenerator extends Section implements Command {
         List<String> modes = new ArrayList<>();
         String lastMode = "";
 
-        int numMaps = (int) sc.getOptions().remove(0).getAsLong();
         TreeMap<String, List<String>> legalMaps = getLegalMaps();
         List<String> pastMaps = new ArrayList<>();
 

@@ -1,8 +1,8 @@
 package bot.Engine.Cycles;
 
-import bot.Engine.Drafts.Draft;
-import bot.Engine.Drafts.DraftPlayer;
-import bot.Engine.Drafts.DraftTeam;
+import bot.Engine.Games.Drafts.DraftGame;
+import bot.Engine.Games.Drafts.DraftPlayer;
+import bot.Engine.Games.Drafts.DraftTeam;
 import bot.Engine.Section;
 import bot.Tools.GoogleSheetsAPI;
 
@@ -95,7 +95,7 @@ public class AutoLog extends Section {
      * @param errorsFound array of errors found for each player, if any
      *                    (0 if no errors occurred, 1 otherwise).
      */
-    private void sendReport(ManualLog log, Draft draft, ButtonClickEvent bc,
+    private void sendReport(ManualLog log, DraftGame draft, ButtonClickEvent bc,
                             DraftTeam team1, DraftTeam team2,
                             int[] playerTypes, int[] errorsFound) {
         EmbedBuilder eb = new EmbedBuilder();
@@ -157,7 +157,7 @@ public class AutoLog extends Section {
      * @param link a connection to the spreadsheet.
      * @param data a map of all rows of the spreadsheet.
      */
-    private void updateSpreadsheet(ManualLog log, Draft draft,
+    private void updateSpreadsheet(ManualLog log, DraftGame draft,
                                    ButtonClickEvent bc, DraftTeam team,
                                    int[] playerTypes, int[] errorsFound, int offset,
                                    GoogleSheetsAPI link, TreeMap<Object, Object> data) {
@@ -195,7 +195,7 @@ public class AutoLog extends Section {
      * @param bc a button click to analyze.
      * @param draft the draft to report.
      */
-    public void matchReport(ButtonClickEvent bc, Draft draft) {
+    public void matchReport(ButtonClickEvent bc, DraftGame draft) {
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(cyclesSheetID());
             TreeMap<Object, Object> data = link.readSection(bc, CYCLES_TAB);

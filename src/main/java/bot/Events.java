@@ -2,8 +2,10 @@ package bot;
 
 import bot.Engine.*;
 import bot.Engine.Cycles.*;
-import bot.Engine.Drafts.*;
+import bot.Engine.Games.Drafts.*;
+import bot.Engine.Games.MapGenerator;
 import bot.Engine.Profiles.Profile;
+import bot.Engine.Templates.*;
 import bot.Tools.ArrayHeapMinPQ;
 import bot.Tools.Components;
 
@@ -49,9 +51,9 @@ public class Events extends ListenerAdapter {
     private final static int MAX_IO_DRAFTS = 2;
 
     /** Fields for storing numbers to drafts. */
-    private TreeMap<Integer, Draft> fsDrafts;
-    private TreeMap<Integer, Draft> lpDrafts;
-    private TreeMap<Integer, Draft> ioDrafts;
+    private TreeMap<Integer, GameReqs> fsDrafts;
+    private TreeMap<Integer, GameReqs> lpDrafts;
+    private TreeMap<Integer, GameReqs> ioDrafts;
 
     /** Fields for storing queued draft numbers. */
     private ArrayHeapMinPQ<Integer> fsQueue;
@@ -80,30 +82,6 @@ public class Events extends ListenerAdapter {
             return false;
         } else if (gamesPlayed > 19) {
             sc.reply("Are you sure that's how many games were played?")
-                    .setEphemeral(true).queue();
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks if the number of maps needed for a map generation
-     * makes sense.
-     * @param sc the user's inputted command.
-     * @return True if the number of maps was between 1 and 9.
-     *         False otherwise.
-     */
-    private boolean mapsNeededValid(SlashCommandEvent sc) {
-        List<OptionMapping> args = sc.getOptions();
-
-        int numMaps = (int) args.get(0).getAsLong();
-        if (numMaps > DraftPlayer.MAXIMUM_POINTS) {
-            sc.reply("Too many maps requested. The set would be too long!")
-                    .setEphemeral(true).queue();
-            return false;
-        } else if (numMaps < DraftPlayer.MINIMUM_POINTS + 1) {
-            sc.reply("Why would you request zero or less maps?")
                     .setEphemeral(true).queue();
             return false;
         }
@@ -264,15 +242,15 @@ public class Events extends ListenerAdapter {
      * @return their found draft.
      *         null otherwise.
      */
-    private Draft notInAnotherDraft(GenericInteractionCreateEvent interaction,
-                                    Random generator,
-                                    TreeMap<Integer, Draft> drafts) {
+    private GameReqs notInAnotherDraft(GenericInteractionCreateEvent interaction,
+                                        Random generator,
+                                        TreeMap<Integer, GameReqs> drafts) {
         String playerID = interaction.getMember().getId();
         if (drafts == null) {
             return null;
         }
 
-        for (Draft draft : drafts.values()) {
+        for (GameReqs draft : drafts.values()) {
             if (draft.getPlayers().containsKey(playerID)
                     && draft.getPlayers().get(playerID).isActive()) {
                 if (generator == null) {
@@ -293,12 +271,12 @@ public class Events extends ListenerAdapter {
      * @param queue the source queue of drafts.
      */
     private void timeoutDrafts(GenericInteractionCreateEvent interaction,
-                              TreeMap<Integer, Draft> drafts,
+                              TreeMap<Integer, GameReqs> drafts,
                               ArrayHeapMinPQ<Integer> queue) {
         if (drafts != null) {
-            for (Map.Entry<Integer, Draft> mapping : drafts.entrySet()) {
+            for (Map.Entry<Integer, GameReqs> mapping : drafts.entrySet()) {
                 int numDraft = mapping.getKey();
-                Draft draft = mapping.getValue();
+                GameReqs draft = mapping.getValue();
 
                 if (!draft.isInitialized() && draft.timedOut(interaction)) {
                     drafts.remove(numDraft);
@@ -329,14 +307,14 @@ public class Events extends ListenerAdapter {
      */
     private void processDraft(SlashCommandEvent sc,
                               String prefix, Member author,
-                              TreeMap<Integer, Draft> ongoingDrafts,
+                              TreeMap<Integer, GameReqs> ongoingDrafts,
                               ArrayHeapMinPQ<Integer> queue) {
         if (queue.size() == 0) {
             sc.reply("Wait until a draft has finished!").queue();
         } else {
             int draftButton = queue.removeSmallest();
-            Draft newDraft =
-                    new Draft(sc, draftButton, prefix, author);
+            DraftGame newDraft =
+                    new DraftGame(sc, draftButton, prefix, author);
 
             ongoingDrafts.put(draftButton, newDraft);
             newDraft.runCmd(sc);
@@ -411,7 +389,7 @@ public class Events extends ListenerAdapter {
      *         -1 otherwise.
      */
     private int foundDraftNumber(SlashCommandEvent sc,
-                                 TreeMap<Integer, Draft> drafts,
+                                 TreeMap<Integer, GameReqs> drafts,
                                  List<OptionMapping> args) {
         if (drafts == null) {
             sc.reply("No drafts have been started yet.")
@@ -435,12 +413,12 @@ public class Events extends ListenerAdapter {
      * @param args the arguments of the command.
      */
     private void attemptForceSub(SlashCommandEvent sc,
-                                 TreeMap<Integer, Draft> drafts,
+                                 TreeMap<Integer, GameReqs> drafts,
                                  List<OptionMapping> args) {
         int numDraft = foundDraftNumber(sc, drafts, args);
 
         if (numDraft != -1) {
-            Draft draft = drafts.get(numDraft);
+            GameReqs draft = drafts.get(numDraft);
             Member playerToSub = args.get(1).getAsMember();
             if (draft != null) {
                 draft.forceSub(sc, playerToSub.getId());
@@ -455,14 +433,14 @@ public class Events extends ListenerAdapter {
      * @param args the arguments of the command.
      */
     private void attemptForceEnd(SlashCommandEvent sc,
-                                 TreeMap<Integer, Draft> drafts,
+                                 TreeMap<Integer, GameReqs> drafts,
                                  ArrayHeapMinPQ<Integer> queue,
                                  List<OptionMapping> args) {
         int numDraft = foundDraftNumber(sc, drafts, args);
 
         if (numDraft != -1) {
-            Draft draft = drafts.get(numDraft);
-            if (draft != null && draft.forceEnd(sc)) {
+            GameReqs draft = drafts.get(numDraft);
+            if (draft != null && draft.canForceEnd(sc)) {
                 drafts.remove(numDraft);
                 queue.add(numDraft, numDraft);
             }
@@ -470,16 +448,12 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Runs a general command.
+     * Runs a Libra command.
      * @param sc the slash command to analyze.
      */
-    private void parseGeneralCommands(SlashCommandEvent sc) {
+    private void parseLibraCommands(SlashCommandEvent sc) {
         Member author = sc.getMember();
-        String subGroup = sc.getSubcommandGroup();
         String subCmd = sc.getSubcommandName();
-        if (subGroup == null) {
-            subGroup = "";
-        }
         if (subCmd == null) {
             subCmd = "";
         }
@@ -494,6 +468,24 @@ public class Events extends ListenerAdapter {
                         .addActionRow(Components.ForGeneral.helpMenu("MT1"))
                         .setEphemeral(true).queue();
                 break;
+        }
+    }
+
+    /**
+     * Runs a general command.
+     * @param sc the slash command to analyze.
+     */
+    private void parseGeneralCommands(SlashCommandEvent sc) {
+        String subGroup = sc.getSubcommandGroup();
+        String subCmd = sc.getSubcommandName();
+        if (subGroup == null) {
+            subGroup = "";
+        }
+        if (subCmd == null) {
+            subCmd = "";
+        }
+
+        switch (subCmd) {
             case "qprofile":
                 new Profile().runCmd(sc);
                 break;
@@ -522,7 +514,7 @@ public class Events extends ListenerAdapter {
             subCmd = "";
         }
 
-        TreeMap<Integer, Draft> drafts;
+        TreeMap<Integer, GameReqs> drafts;
         ArrayHeapMinPQ<Integer> queue;
         String leaderboardLink;
         switch (prefix) {
@@ -560,11 +552,9 @@ public class Events extends ListenerAdapter {
                 new PointsCalculator(prefix).runCmd(sc);
                 break;
             case "genmaps":
-                if (mapsNeededValid(sc)) {
-                    MapGenerator maps = new MapGenerator(prefix,
-                            notInAnotherDraft(sc, RANDOM_GENERATOR, drafts));
-                    maps.runCmd(sc);
-                }
+                MapGenerator maps = new MapGenerator(prefix,
+                        notInAnotherDraft(sc, RANDOM_GENERATOR, drafts));
+                maps.runCmd(sc);
                 break;
             case "leaderboard":
                 sc.reply(leaderboardLink).queue();
@@ -609,6 +599,9 @@ public class Events extends ListenerAdapter {
         } else {
             String cmdPrefix = sc.getName();
             switch (cmdPrefix) {
+                case "libra":
+                    parseLibraCommands(sc);
+                    break;
                 case "mit":
                     parseGeneralCommands(sc);
                     break;
@@ -632,7 +625,7 @@ public class Events extends ListenerAdapter {
         String btnName = bc.getButton().getId();
         int indexOfNum = btnName.length() - 1;
 
-        TreeMap<Integer, Draft> drafts;
+        TreeMap<Integer, GameReqs> drafts;
         ArrayHeapMinPQ<Integer> queue;
         String suffix = btnName.substring(indexOfNum - 2, indexOfNum);
         int numButton = Integer.parseInt(btnName.substring(indexOfNum));
@@ -651,7 +644,7 @@ public class Events extends ListenerAdapter {
                 break;
         }
 
-        Draft currDraft = drafts.get(numButton);
+        GameReqs currDraft = drafts.get(numButton);
         if (currDraft == null) {
             bc.reply("Sorry but that draft has expired. "
                             + "Feel free to start a new one!")
@@ -659,7 +652,7 @@ public class Events extends ListenerAdapter {
             return;
         }
 
-        DraftProcess currProcess = currDraft.getProcess();
+        ProcessReqs currProcess = currDraft.getProcess();
         switch (btnName.substring(0, indexOfNum - 2)) {
             case "join":
                 if (notInAnotherDraft(bc, null, drafts) == null) {
@@ -679,30 +672,31 @@ public class Events extends ListenerAdapter {
                 currDraft.requestSub(bc);
                 break;
             case "reassign":
-                currDraft.reassignCaptain(bc);
+                ((DraftGame) currDraft).reassignCaptain(bc);
                 break;
             case "sub":
                 if (notInAnotherDraft(bc, null, drafts) == null) {
                     currDraft.addSub(bc);
                 }
                 break;
+
             case "resetTeams":
-                currProcess.resetTeams(bc);
+                ((DraftProcess) currProcess).resetTeams(bc);
                 break;
             case "beginDraft":
-                currProcess.start(bc);
+                ((DraftProcess) currProcess).start(bc);
                 break;
             case "plusOne":
-                currProcess.changePointsForTeam(
+                ((DraftProcess) currProcess).changePointsForTeam(
                         bc, bc.getMember().getId(), true);
                 break;
             case "minusOne":
-                currProcess.changePointsForTeam(
+                ((DraftProcess) currProcess).changePointsForTeam(
                         bc, bc.getMember().getId(), false);
                 break;
             case "processRefresh":
                 bc.deferEdit().queue();
-                currDraft.getProcess().refresh(bc);
+                currProcess.refresh(bc);
                 break;
             case "endDraftProcess":
                 if (currProcess.hasEnded(bc)) {
@@ -724,7 +718,7 @@ public class Events extends ListenerAdapter {
         String menuName = sm.getComponent().getId();
         int indexOfNum = menuName.length() - 1;
 
-        TreeMap<Integer, Draft> drafts;
+        TreeMap<Integer, GameReqs> drafts;
         String suffix = menuName.substring(indexOfNum - 2, indexOfNum);
         int numMenu = Integer.parseInt(menuName.substring(indexOfNum));
         switch (suffix) {
@@ -742,7 +736,7 @@ public class Events extends ListenerAdapter {
                 break;
         }
 
-        DraftProcess currProcess = drafts.get(numMenu).getProcess();
+        DraftProcess currProcess = ((DraftGame) drafts.get(numMenu)).getProcess();
         if (menuName.substring(0, indexOfNum - 2).equals("teamSelection")) {
             currProcess.addPlayerToTeam(sm);
         }

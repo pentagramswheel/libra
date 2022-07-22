@@ -40,13 +40,17 @@ public class Main {
      * @param jda the bot in its built form.
      */
     public static void implementSlashCommands(JDA jda) {
-        // general commands
-        CommandData mit = new CommandData("mit",
-                "General commands to use within MIT.");
+        // libra commands
+        CommandData libra = new CommandData("libra",
+                "Commands specifically for Libra!");
         SubcommandData status = new SubcommandData("status",
                 "Checks whether the bot is online or not.");
         SubcommandData help = new SubcommandData("help",
                 "Answers questions via a help menu.");
+
+        // general commands
+        CommandData mit = new CommandData("mit",
+                "General commands to use within MIT.");
 
         // quick profile commands
         SubcommandData qprofile = new SubcommandData("qprofile",
@@ -231,8 +235,8 @@ public class Main {
         }
 
         // implementing commands
-        mit.addSubcommands(status, help,
-                qprofile, ded);
+        libra.addSubcommands(status, help);
+        mit.addSubcommands(qprofile, ded);
         mit.addSubcommandGroups(profile);
         fs.addSubcommands(
                 genmaps,
@@ -251,7 +255,7 @@ public class Main {
                 add, deny, grad,
                 cycleCalculate, award);
 
-        jda.updateCommands().addCommands(mit, fs, lp, io).queue();
+        jda.updateCommands().addCommands(libra, mit, fs, lp, io).queue();
     }
 
     /**

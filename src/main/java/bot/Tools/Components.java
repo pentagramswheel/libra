@@ -1,7 +1,7 @@
 package bot.Tools;
 
-import bot.Engine.Drafts.Draft;
-import bot.Engine.Drafts.DraftPlayer;
+import bot.Engine.Games.Player;
+import bot.Engine.Templates.GameReqs;
 
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -131,7 +131,7 @@ public class Components {
     /**
      * Components for running a draft.
      */
-    public static class ForDraftProcess {
+    public static class ForProcess {
 
         /**
          * Builds the team selection menu.
@@ -139,16 +139,15 @@ public class Components {
          * @param players the players of the draft.
          */
         public static SelectionMenu teamSelectionMenu(
-                String suffix, TreeMap<String, DraftPlayer> players) {
+                String suffix, TreeMap<String, ? extends Player> players) {
             List<String> labels = new ArrayList<>();
             List<String> values = new ArrayList<>();
 
-            for (Map.Entry<String, DraftPlayer> mapping : players.entrySet()) {
+            for (Map.Entry<String, ? extends Player> mapping : players.entrySet()) {
                 String id = mapping.getKey();
-                DraftPlayer player = mapping.getValue();
+                Player player = mapping.getValue();
 
-                if (player.isActive() && !player.isCaptainForTeam1()
-                        && !player.isCaptainForTeam2() && !player.hasTeam()) {
+                if (player.isActive() && !player.hasTeam()) {
                     labels.add(player.getName());
                     values.add(id);
                 }
@@ -208,13 +207,13 @@ public class Components {
         }
 
         /**
-         * Builds the "Request Sub" link button.
+         * Retrieves the "Request Sub" link button, for games.
          * @param interaction the user interaction calling this method.
          * @param suffix the button ID's suffix.
          * @param draft the draft request to link to.
          */
         public static Button draftSubLink(GenericInteractionCreateEvent interaction,
-                                          String suffix, Draft draft) {
+                                          String suffix, GameReqs draft) {
             String url = draft.getMessage(interaction).getJumpUrl();
             return new ButtonBuilder("requestSubLink" + suffix,
                     "Request Sub", url, 4).getButton();
