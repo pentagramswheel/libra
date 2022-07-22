@@ -1,4 +1,4 @@
-package bot.Engine.Drafts;
+package bot.Engine.Games.Drafts;
 
 import bot.Engine.Games.Team;
 

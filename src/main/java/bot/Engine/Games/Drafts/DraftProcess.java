@@ -1,4 +1,4 @@
-package bot.Engine.Drafts;
+package bot.Engine.Games.Drafts;
 
 import bot.Engine.Games.Process;
 import bot.Engine.Cycles.AutoLog;
@@ -25,7 +25,7 @@ import java.util.Map;
  * Date:    January 16, 2022
  * Project: Libra
  * Module:  DraftProcess.java
- * Purpose: Processes a draft, via a Teams interface.
+ * Purpose: Processes a draft, via a teams interface.
  */
 public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
         implements ProcessReqs {
@@ -51,13 +51,15 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
     @Override
     public String getPing() {
         StringBuilder ping = new StringBuilder();
-        TreeMap<Integer, String> captainIDs = getRequest().determineCaptains(null);
+        TreeMap<Integer, String> captainIDs =
+                getRequest().determineCaptains(null);
         DraftPlayer captain1 = getRequest().getPlayers().get(captainIDs.get(1));
         DraftPlayer captain2 = getRequest().getPlayers().get(captainIDs.get(2));
 
         ping.append(getRequest().getEmote()).append(" ");
         if (!hasStarted()) {
-            ping.append(String.format("*`| captain 1 - %s | captain 2 - %s |`*",
+            ping.append(
+                    String.format("*`| captain 1 - %s | captain 2 - %s |`*",
                             captain1.getName(),
                             captain2.getName()))
                     .append("\n");
@@ -111,19 +113,19 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
         List<Button> buttons = new ArrayList<>();
         resetEndDraftButton();
 
-        menus.add(Components.ForDraftProcess.teamSelectionMenu(
+        menus.add(Components.ForProcess.teamSelectionMenu(
                 idSuffix, getRequest().getPlayers()));
         if (hasStarted()) {
-            buttons.add(Components.ForDraftProcess.plusOne(idSuffix));
-            buttons.add(Components.ForDraftProcess.minusOne(idSuffix));
-            buttons.add(Components.ForDraftProcess.draftSubLink(
+            buttons.add(Components.ForProcess.plusOne(idSuffix));
+            buttons.add(Components.ForProcess.minusOne(idSuffix));
+            buttons.add(Components.ForProcess.draftSubLink(
                     interaction, idSuffix, getRequest()));
         } else {
-            buttons.add(Components.ForDraftProcess.resetTeams(idSuffix));
-            buttons.add(Components.ForDraftProcess.beginDraft(idSuffix));
+            buttons.add(Components.ForProcess.resetTeams(idSuffix));
+            buttons.add(Components.ForProcess.beginDraft(idSuffix));
         }
-        buttons.add(Components.ForDraftProcess.endDraftProcess(idSuffix));
-        buttons.add(Components.ForDraftProcess.refresh(idSuffix));
+        buttons.add(Components.ForProcess.endDraftProcess(idSuffix));
+        buttons.add(Components.ForProcess.refresh(idSuffix));
 
         if (interaction != null) {
             interaction.getHook().editOriginal(getPing()).setActionRows(
@@ -173,19 +175,6 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
         SelectOption chosenPlayer = sm.getInteraction().getSelectedOptions().get(0);
         String playerName = chosenPlayer.getLabel();
         String playerID = chosenPlayer.getValue();
-
-
-        getRequest().getPlayers().get("440059670170959874").setCaptainForTeam1(true);
-        getTeam1().clear();
-        getTeam2().clear();
-        getTeam2().add("440059670170959874", getRequest().getPlayers().get("440059670170959874"));
-        getTeam1().add("140942181023219713", getRequest().getPlayers().get("140942181023219713"));
-        getTeam1().add("350386286256848896", getRequest().getPlayers().get("350386286256848896"));
-        getTeam2().add("455295354318094347", getRequest().getPlayers().get("455295354318094347"));
-        getTeam2().add("422790410566500352", getRequest().getPlayers().get("422790410566500352"));
-        getTeam1().add("392468487857111044", getRequest().getPlayers().get("392468487857111044"));
-        getTeam1().add("191016647543357440", getRequest().getPlayers().get("191016647543357440"));
-
 
         if (author == null) {
             getRequest().sendReply(sm, "You are not in this draft!", true);
@@ -254,7 +243,8 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
      */
     private void givePoints(ButtonClickEvent bc, DraftTeam team) {
         if (team.hasMaximumScore()) {
-            getRequest().sendResponse(bc,"You have already hit the point limit!", true);
+            getRequest().sendResponse(bc,
+                    "You have already hit the point limit!", true);
         } else {
             team.incrementScore();
         }
@@ -317,6 +307,7 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
      * @return True if the draft has ended.
      *         False otherwise.
      */
+    @Override
     public boolean hasEnded(ButtonClickEvent bc) {
         if (super.hasEnded(bc)) {
             if (hasStarted()) {

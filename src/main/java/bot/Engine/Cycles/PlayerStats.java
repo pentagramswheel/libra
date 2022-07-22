@@ -31,10 +31,10 @@ public class PlayerStats {
     /** The amount of lost sets the player has attained. */
     private int setLosses;
 
-    /** The amount of won games the player has attained. */
+    /** The amount of won matches the player has attained. */
     private int gamesWon;
 
-    /** The amount of lost games the player has attained. */
+    /** The amount of lost matches the player has attained. */
     private int gamesLost;
 
     /**

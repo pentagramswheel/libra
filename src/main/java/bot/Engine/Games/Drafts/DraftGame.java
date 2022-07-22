@@ -1,15 +1,17 @@
-package bot.Engine.Drafts;
+package bot.Engine.Games.Drafts;
 
 import bot.Engine.Games.Game;
+import bot.Engine.Games.GameProperties;
 import bot.Engine.Games.GameType;
-import bot.Engine.Profiles.PlayerInfo;
+import bot.Engine.Games.Player;
 import bot.Engine.Profiles.Profile;
+import bot.Engine.Templates.GameReqs;
+import bot.Engine.Templates.ProcessReqs;
 import bot.Events;
 import bot.Tools.Components;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -27,10 +29,8 @@ import java.util.ArrayList;
  * Module:  DraftGame.java
  * Purpose: Formalizes and starts a draft, via a request interface.
  */
-public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPlayer> {
-
-//    /** The formal process for executing this draft. */
-//    private DraftProcess draftProcess;
+public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPlayer>
+        implements GameReqs {
 
     /**
      * Constructs a draft template and initializes the
@@ -42,7 +42,7 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
      */
     public DraftGame(SlashCommandEvent sc, int draft,
                  String abbreviation, Member initialPlayer) {
-        super(sc, GameType.RANKED, draft, abbreviation);
+        super(sc, GameType.DRAFT, draft, abbreviation);
 
         DraftPlayer newPlayer = new DraftPlayer(
                 initialPlayer.getEffectiveName(),
@@ -50,19 +50,59 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
         getPlayers().put(initialPlayer.getId(), newPlayer);
     }
 
-//    /** Retrieves the field for executing the draft. */
-//    public DraftProcess getProcess() {
-//        return draftProcess;
-//    }
+    /**
+     * Checks whether the request has been satisfied or not.
+     * @return True if eight players have joined the queue.
+     *         False otherwise.
+     */
+    @Override
+    public boolean isInitialized() {
+        return super.isInitialized();
+    }
 
-//    /**
-//     * Checks if the draft has formally started.
-//     * @return True if it has formally started.
-//     *         False otherwise.
-//     */
-//    private boolean draftStarted() {
-//        return isInitialized() && getProcess().hasStarted();
-//    }
+    /** Retrieves the game's properties. */
+    @Override
+    public GameProperties getProperties() {
+        return super.getProperties();
+    }
+
+    /** Retrieves the players of the game. */
+    @Override
+    public TreeMap<String, DraftPlayer> getPlayers() {
+        return super.getPlayers();
+    }
+
+    /**
+     * Retrieves the request interface of the draft.
+     * @param interaction the user interaction calling this method.
+     */
+    @Override
+    public Message getMessage(GenericInteractionCreateEvent interaction) {
+        return super.getMessage(interaction);
+    }
+
+    /** Retrieves the respective draft chat channel. */
+    @Override
+    public TextChannel getDraftChannel() {
+        return super.getDraftChannel();
+    }
+
+    /**
+     * Checks whether the request has timed out or not.
+     * @param interaction the user interaction calling this method.
+     * @return True if the request expired.
+     *         False otherwise.
+     */
+    @Override
+    public boolean timedOut(GenericInteractionCreateEvent interaction) {
+        return super.timedOut(interaction);
+    }
+
+    /** Retrieves the field for executing the draft. */
+    @Override
+    public DraftProcess getProcess() {
+        return super.getProcess();
+    }
 
     /**
      * Sends a draft confirmation summary with all players of the draft.
@@ -72,7 +112,7 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
     public void updateReport(GenericInteractionCreateEvent interaction) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        eb.setTitle("Draft Queue " + getNumDraft());
+        eb.setTitle(getProperties().getName() + " Queue " + getNumDraft());
 
         StringBuilder players = new StringBuilder();
         StringBuilder subs = new StringBuilder();
@@ -98,17 +138,6 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
 
         sendEmbed(interaction, buildEmbed(eb, players, subs));
     }
-
-//    /** Formats a request ping for gathering players. */
-//    private String newPing() {
-//        int activePlayers = players.size() - numInactive;
-//        int pingsLeft = NUM_PLAYERS_TO_START_DRAFT - activePlayers;
-//        if (draftStarted()) {
-//            pingsLeft = 0;
-//        }
-//
-//        return getSectionRole() + " +" + pingsLeft;
-//    }
 
     /**
      * Determines the captains of the draft.
@@ -166,6 +195,7 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
      * Attempts to start a draft.
      * @param bc a button click to analyze.
      */
+    @Override
     public void attemptDraft(ButtonClickEvent bc) {
         String playerID = bc.getMember().getId();
 
@@ -221,7 +251,34 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
     }
 
     /**
-     * Reassigns a captain of the draft, via a button.
+     * Repings for remaining players.
+     * @param bc a button click to analyze.
+     */
+    @Override
+    public void reping(ButtonClickEvent bc) {
+        super.reping(bc);
+    }
+
+    /**
+     * Removes a player from the draft.
+     * @param bc a button click to analyze.
+     */
+    @Override
+    public void removeFromQueue(ButtonClickEvent bc) {
+        super.removeFromQueue(bc);
+    }
+
+    /**
+     * Refreshes the draft request's caption.
+     * @param bc a button click to analyze.
+     */
+    @Override
+    public void refresh(ButtonClickEvent bc) {
+        super.refresh(bc);
+    }
+
+    /**
+     * Reassigns a captain of the draft.
      * @param bc a button click to analyze.
      */
     public void reassignCaptain(ButtonClickEvent bc) {
@@ -247,104 +304,6 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
         refresh(bc);
     }
 
-//    /**
-//     * Repings for remaining players.
-//     * @param bc a button click to analyze.
-//     */
-//    public void reping(ButtonClickEvent bc) {
-//        String authorID = bc.getMember().getId();
-//        setMessageID(bc.getMessageId());
-//
-//        if (!getPlayers().containsKey(authorID)) {
-//            sendReply(bc, "You are not in this draft!", true);
-//        } else if (!getWatch().timerTwoExpired()) {
-//            sendReply(bc, String.format("Wait until %s to reping!",
-//                    DiscordWatch.discordTime(getWatch().getTimerTwoEnd())),
-//                    true);
-//        } else if (getProperties().getMaximumPlayersToStart() - getPlayers().size()
-//                > (getProperties().getMaximumPlayersToStart() / 2) + 1) {
-//            int numPlayersLeft =
-//                    (getProperties().getMaximumPlayersToStart() / 2) + 1;
-//            sendReply(bc,
-//                    String.format("Reping only when you need +%s or less!",
-//                            numPlayersLeft), true);
-//        } else {
-//            bc.deferEdit().queue();
-//
-//            String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-//            bc.editButton(
-//                    Components.ForDraft.reping(idSuffix).asDisabled()).queue();
-//            sendResponse(bc, newPing() + " (reping)", false);
-//        }
-//    }
-
-//    /**
-//     * Removes a player from the draft, if possible, via a button.
-//     * @param bc a button click to analyze.
-//     */
-//    public void removeFromQueue(ButtonClickEvent bc) {
-//        String playerID = bc.getMember().getId();
-//        setMessageID(bc.getMessageId());
-//
-//        if (!getPlayers().containsKey(playerID)) {
-//            sendReply(bc, "You are not in this draft!", true);
-//        } else {
-//            getPlayers().remove(playerID);
-//            refresh(bc);
-//        }
-//    }
-
-//    /**
-//     * Removes a player from the draft, if possible, via a button.
-//     * @param bc a button click to analyze.
-//     */
-//    public void removeFromQueue(ButtonClickEvent bc) {
-//        if (canRemoveFromQueue(bc)) {
-//            refresh(bc);
-//        }
-//    }
-
-//    /**
-//     * Attempts to sub out a player from the draft.
-//     * @param interaction the user interaction calling this method.
-//     * @param playerID the Discord ID of the player.
-//     * @param player the player to sub out.
-//     * @param notFoundString a string to output if the player could not be found.
-//     * @param subbedTwiceString a string to output if the player has already
-//     *                          been subbed out from the draft.
-//     * @return True if the substitution was successful.
-//     *         False otherwise.
-//     */
-//    private boolean subOut(GenericInteractionCreateEvent interaction,
-//                        String playerID, DraftPlayer player,
-//                        String notFoundString, String subbedTwiceString) {
-//        if (player == null) {
-//            sendResponse(interaction, notFoundString, true);
-//            return false;
-//        } else if (!player.isActive()) {
-//            sendResponse(interaction, subbedTwiceString, true);
-//            return false;
-//        } else if (teamOneContains(playerID)) {
-//            getProcess().getTeam1().requestSub();
-//        } else if (teamTwoContains(playerID)) {
-//            getProcess().getTeam2().requestSub();
-//        }
-//
-//        player.setSubStatus(true);
-//        player.setActiveStatus(false);
-//        player.incrementSubs();
-//
-//        if (!draftStarted()) {
-//            player.setCaptainForTeam1(false);
-//            player.setCaptainForTeam2(false);
-//            determineCaptains(playerID);
-//        }
-//
-//        numInactive++;
-//
-//        return true;
-//    }
-
     /**
      * Resets any captains if a captain was subbed out.
      * @param oldCaptainID the Discord ID of the former captain.
@@ -361,10 +320,13 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
      * Requests a sub for a draft, if possible, via a button.
      * @param bc a button click to analyze.
      */
+    @Override
     public void requestSub(ButtonClickEvent bc) {
         if (canRequestSub(bc)) {
             resetCaptainsIfNeeded(bc.getMember().getId());
         }
+
+        refresh(bc);
     }
 
     /**
@@ -372,6 +334,7 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
      * @param sc a slash command to analyze.
      * @param playerID the Discord ID of the player to sub.
      */
+    @Override
     public void forceSub(SlashCommandEvent sc, String playerID) {
         if (canForceSub(sc, playerID) && !draftStarted()) {
             resetCaptainsIfNeeded(playerID);
@@ -382,6 +345,7 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
      * Adds a player to the draft's subs, if possible, via a button.
      * @param bc a button click to analyze.
      */
+    @Override
     public void addSub(ButtonClickEvent bc) {
         String id = bc.getMember().getId();
         String name = bc.getMember().getEffectiveName();
@@ -400,26 +364,14 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
         }
     }
 
-//    /**
-//     * Forcibly ends the draft.
-//     * @param sc a slash command to analyze.
-//     * @return True if the draft was forcibly ended.
-//     *         False otherwise.
-//     */
-//    public boolean canForceEnd(SlashCommandEvent sc) {
-//        if (isInitialized() && getProcess().getMessageID() == null) {
-//            sendReply(sc, "Press the `End Draft` button in "
-//                    + getDraftChannel().getAsMention() + " "
-//                    + "once then try again.", true);
-//            return false;
-//        } else if (super.canForceEnd(sc)) {
-//            if (isInitialized()) {
-//                getProcess().getMessage().delete().queue();
-//            }
-//
-//            return true;
-//        }
-//
-//        return false;
-//    }
+    /**
+     * Checks if the draft can be forcibly ended.
+     * @param sc a slash command to analyze.
+     * @return True if the draft was forcibly ended.
+     *         False otherwise.
+     */
+    @Override
+    public boolean canForceEnd(SlashCommandEvent sc) {
+        return super.canForceEnd(sc);
+    }
 }

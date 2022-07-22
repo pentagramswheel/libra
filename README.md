@@ -7,53 +7,65 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** July 15, 2022
+**Last Updated:** July 21, 2022
 
 **Formal Documentation:** <medium><a href='https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing'>How To Use Libra - MullowayIT's Bot Documentation</a></medium>
 
 **Table of Contents:**
-* [Introduction](#introduction)
-* [How to Install](#how-to-install)
-* [Classes and Data Structures](#classes-and-data-structures)
-  - [Main](#main)
-  - [Config](#config)
-  - [Events](#events)
-  - [Command](#command)
-  + [Tools](#tools)
-    - [ArrayHeapMinPQ](#arrayheapminpq)
-    - [ButtonBuilder](#buttonbuilder)
-    - [Command](#command)
-    - [Components](#components)
-    - [DiscordWatch](#discordwatch)
-    - [FileHandler](#filehandler)
-    - [GoogleSheetsAPI](#googlesheetsapi)
-    - [SelectionMenuBuilder](#selectionmenubuilder)
-  + [Engine](#engine)
-    - [Add](#add)
-    - [Award](#award)
-    - [Graduate](#graduate)
-    - [PlayerStats](#playerstats)
-  + [Cycles (Engine)](#cycles-engine)
-    - [AutoLog](#autolog)
-    - [ManualLog](#manuallog)
-    - [PointsCalculator](#pointscalculator)
-  + [Drafts (Engine)](#drafts-engine)
-    - [Draft](#draft)
-    - [DraftPlayer](#draftplayer)
-    - [DraftProcess](#draftprocess)
-    - [DraftTeam](#draftteam)
-    - [MapGenerator](#mapgenerator)
-    - [Undo](#undo)
-  + [Profiles (Engine)](#profiles-engine)
-    - [PlayerInfo](#playerinfo)
-    - [Profile](#profile)
-* [Persistence](#persistence)
-* [Licensing and Rights](#licensing-and-rights)
+- [Introduction](#introduction)
+- [How to Install](#how-to-install)
+- [Classes and Data Structures](#classes-and-data-structures)
+  + [Main](#main)
+  + [Config](#config)
+  + [Events](#events)
+  * [Tools](#tools)
+    + [ArrayHeapMinPQ](#arrayheapminpq)
+    + [ButtonBuilder](#buttonbuilder)
+    + [Components](#components)
+    + [DiscordWatch](#discordwatch)
+    + [FileHandler](#filehandler)
+    + [GoogleSheetsAPI](#googlesheetsapi)
+    + [SelectionMenuBuilder](#selectionmenubuilder)
+  * [Engine](#engine)
+    + [Add](#add)
+    + [Award](#award)
+    + [Graduate](#graduate)
+    + [Section](#section)
+  * [Cycles (Engine)](#cycles-engine)
+    + [AutoLog](#autolog)
+    + [ManualLog](#manuallog)
+    + [PlayerStats](#playerstats)
+    + [PointsCalculator](#pointscalculator)
+    + [Undo](#undo)
+  * [Games (Engine)](#games-engine)
+    + [Game](#game)
+    + [GameProperties](#gameproperties)
+    + [GameType](#gametype)
+    + [MapGenerator](#mapgenerator)
+    + [Player](#player)
+    + [Process](#process)
+    + [Team](#team)
+    + [Drafts (Games)](#drafts-games)
+      - [DraftGame](#draftgame)
+      - [DraftPlayer](#draftplayer)
+      - [DraftProcess](#draftprocess)
+      - [DraftTeam](#draftteam)
+  * [Profiles (Engine)](#profiles-engine)
+    + [PlayerInfo](#playerinfo)
+    + [Profile](#profile)
+  * [Templates (Engine)](#templates-engine)
+    + [Command](#command)
+    + [GameReqs](#gamereqs)
+    + [ProcessReqs](#processreqs)
+- [Persistence](#persistence)
+- [Licensing and Rights](#licensing-and-rights)
+
 
 
 
 ## Introduction
 Libra is a multi-functional Discord bot designed to handle many tasks, with respect to the Mulloway Institute of Turfing (MIT), a draft server for Nintendo's competitive shooter IP, Splatoon. Her main goal is to keep track of a player database, implement convenience features for running tournaments, and most importantly, host an automated draft system from beginning (queuing players) to end (reporting scores).
+
 
 
 
@@ -72,12 +84,13 @@ java src/main/java/bot/Main.java
 
 
 
+
 ## Classes and Data Structures
 #### Main
 
 The entry point of the bot. It constructs the bot and prepares it for processing commands.
 
-###### Instance Variables
+##### Instance Variables
 1. `String NAME` - the name of the bot.
 2. `Color mitColor` - the color of MIT.
 3. `Color freshwatershoalsColor` - the color of Freshwater Shoals.
@@ -97,7 +110,7 @@ A class consisting of credential-specific information, pertaining to Discord and
 
 The class which parses through user-inputted commands, as referenced in `Usage`.
 
-###### Instance Variables
+##### Instance Variables
 1. `Random RANDOM_GENERATOR` - a random number generator for the bot. 
 2. `int MAX_FS_DRAFTS` - the maximum number of Freshwater Shoals drafts.
 3. `int MAX_LP_DRAFTS` - the maximum number of LaunchPoint drafts.
@@ -128,23 +141,17 @@ A class which builds a button quickly.
 
 ----
 
-#### Command
-
-An interface outlining the format of the bot's command implementations.
-
-----
-
 #### Components
 
 A class for storing components used throughout the bot.
 
 ----
 
-## DiscordWatch
+#### DiscordWatch
 
 A class used as a timer and clock for Discord.
 
-###### Instance Variables
+##### Instance Variables
 1. `long timerStart` - the starting time of the first timer of the watch.
 2. `long timerDuration` - how long the first timer of the watch should last.
 3. `long timerStart2` - the starting time of the second timer of the watch.
@@ -165,7 +172,7 @@ A class which handles files (currently only for saving text).
 
 A class which navigates a Google Sheet (spreadsheet).
 
-###### Instance Variables
+##### Instance Variables
 1. `Sheets sheetsService` - an object representation for the Google Sheets SDK.
 2. `String spreadsheetID` - the credential ID of the spreadsheet.
 
@@ -175,7 +182,7 @@ A class which navigates a Google Sheet (spreadsheet).
 
 A class which builds a selection menu quickly.
 
-###### Instance Variables
+##### Instance Variables
 1. `SelectionMenu menu` - the menu that was built.
 
 ----
@@ -198,24 +205,8 @@ A class which awards players roles within MIT, processing the command `lp/io awa
 
 A class which graduates a user in a section within MIT, processing the command `lp/io grad`, granting the associated roles.
 
-###### Instance Variables
+##### Instance Variables
 1. `String TAB` - the tab to reference within the profiles spreadsheet.
-
-----
-
-#### PlayerStats
-
-A class for storing information about a player within MIT.
-
-###### Instance Variables
-1. `int numRow` - the numbered row of the player's data within their associated draft spreadsheet.
-2. `String tag` - the player's Discord tag.
-3. `String nickname` - the player's nickname on the server.
-4. `String friendcode` - the player's Nintendo Switch friend code.
-5. `String playstyle` - the player's preferred playstyle in-game.
-6. `String weapons` - the player's preferred weapons in-game.
-7. `String rank` - the player's average rank in-game.
-8. `String team` - the player's competitive team, if any.
 
 ----
 
@@ -223,7 +214,7 @@ A class for storing information about a player within MIT.
 
 A class for parenting MIT section-specific commands.
 
-###### Instance Variables
+##### Instance Variables
 1. `String name` - the name of this section.
 2. `String prefix` - the prefix of this section. 
 3. `String role` - the role of this section.
@@ -252,92 +243,29 @@ A class which manually updates the draft stats of a user by processing the `lp/i
 
 ----
 
+#### PlayerStats
+
+A class for storing information about a player within MIT.
+
+##### Instance Variables
+1. `int numRow` - the numbered row of the player's data within their associated draft spreadsheet.
+2. `String name` - the player's name.
+3. `String nickname` - the player's nickname on the server.
+4. `int setWins` - the player's amount of set wins.
+5. `int setLosses` - the player's amount of set losses.
+6. `int gamesWon` - the player's amount of won matches.
+7. `int gamesLost` - the player's amount lost matches.
+
+----
+
 #### PointsCalculator
 
 A class which calculates MIT leaderboard points for cycle changes.
 
-###### Instance Variables
+##### Instance Variables
 1. `int MAX_CATGEORY_POINTS` - the maximum amount of points per scoring category.
 2. `int NUM_TOTAL_SCORES` - the total scoring categories to calculate.
 3. `char SCORE_COLUMNS_START` - the first column where points are inputted.
-
-----
-
-### Drafts (Engine)
-
-#### Draft
-
-A class which forms and starts drafts, processing the command `lp/io startdraft` and handling other commands such as `lp/io forcesub`, etc.
-
-###### Instance Variables
-1. `boolean initialized` - a flag for checking if a draft has been initialized.
-2. `DiscordWatch watch` - a watch to use throughout the draft.
-3. `int numDraft` - the formal number of the draft, with respect to the draft maps in `Events`.
-4. `DraftProcess draftProcess` - the formal process for the draft's execution.
-5. `TreeMap<String, DraftPlayer> players` - the players of the draft.
-6. `HashSet<String> playerHistory` - a history of players which have entered the draft queue at any point.
-7. `int numInactive` - the number of inactive players within the draft.
-8. `TextChannel draftChat` - the draft chat which this draft is linked to.
-9. `String messageID` - the Discord message ID of the draft request.
-10. `int NUM_PLAYERS_TO_START_DRAFT` - the number of players to start the draft.
-11. `int mapGens` - the amount of times a map generation has occurred for the draft.
-
-----
-
-#### DraftPlayer
-
-A class which represents a player within a draft.
-
-###### Instance Variables
-1. `String name` -  the name of the player.
-2. `boolean active` - a flag for checking whether the player is active in the draft or not.
-3. `boolean captainStatus1, captainStatus2` - flags for checking captaincy with respect to the two teams of the draft.
-4. `boolean teamStatus` - a flag for checking the player's team status.
-5. `boolean subStatus` - a flag for checking the player's sub status.
-6. `int subs` - the number of times the player subbed out.
-7. `int MINIMUM_POINTS` - the minimum amount of points a player can have.
-8. `int MAXIMUM_POINTS` - the maximum amount of points a player can have.
-9. `int matchWins` - the player's match wins during the draft.
-10. `int matchLosses` - the player's match losses during the draft.
-
-----
-
-#### DraftProcess
-
-A class which manages and processes drafts.
-
-###### Instance Variables
-1. `boolean started` - a flag for checking if the draft has started.
-2. `Draft draft` - the draft which is to be processed.
-3. `DraftTeam team1, team2` - the teams of the draft.
-4. `int MAX_SCORE` - the maximum score for a team.
-5. `int NUM_PLAUERS_TO_END_DRAFT_BEFORE_START` - the number of players required to formally end the draft, if it hasn't actually started yet.
-6. `int NUM_PLAYERS_TO_END_DRAFT_AFTER_START` - the number of players required to formally end the draft, if it has started already.
-7. `HashSet<String> endButtonClicked` - the players who have clicked the "End Draft" button consecutively.
-8. `String messageID` - the Discord message ID of the draft request.
-
-----
-
-#### DraftTeam
-
-A class which represents teams within a draft.
-
-###### Instance Variables
-1. `TreeMap<String, DraftPlayer> players` - the players of the team.
-2. `int score` - the team's total score.
-3. `int MIN_SCORE` - a team's minimum amount of points to gain.
-4. `int MAX_SCORE` - a team's maximum amount of points to gain.
-5. `int playersNeeded` - the amount of active players a team needs, at any given time.
-
-----
-
-#### MapGenerator
-
-A class which generates map lists.
-
-###### Instance Variables
-1. `Draft foundDraft` - a draft associated with the map generator.
-2. `int MAX_DRAFT_MAPLISTS` - the maximum number of map generations for a draft.
 
 ----
 
@@ -347,13 +275,155 @@ A class which reverts draft commands, processing the command `lp/io undo`.
 
 ----
 
+### Games (Engine)
+
+#### Game
+
+A class which forms and starts drafts/games.
+
+##### Instance Variables
+
+(Generalized process S and player P)
+
+1. `boolean initialized` - a flag for checking if a draft/game has been initialized.
+2. `GameProperties properties` - the properties of the draft/game.
+3. `DiscordWatch watch` - a watch to use throughout the draft/game.
+4. `int numDraft` - the formal number of the draft/game, with respect to the draft maps in `Events`.
+5. `TreeMap<String, P> players` - the players of the draft/game.
+6. `HashSet<String> playerHistory` - a history of players which have entered the draft/game queue at any point.
+7. `int numInactive` - the number of inactive players within the draft/game.
+8. `TextChannel draftChat` - the draft chat which this draft/game is linked to.
+9. `String messageID` - the Discord message ID of the draft/game request.
+10. `S process` - the formal process for the draft/game's execution.
+
+----
+
+#### GameProperties
+
+A class which represents the properties of a draft/game.
+
+##### Instance Variables
+1. `GameType gameType` - the type of the draft/game.
+2. `String name` - the formal name of the draft/game.
+3. `int minimumPlayersToStart` - the minimum number of players to start the draft/game.
+4. `int maximumPlayersToStart` - the maximum number of players to start the draft/game.
+5. `int numMatches` - the number of total matches to play in the draft/game.
+6. `int winningScore` - the amount of points needed to win the draft/game.
+7. `int mapGens` -  the number of map generations made for the draft/game.
+
+----
+
+#### GameType
+
+A class which represents the type of a draft/game.
+
+##### Enumerations
+1. `DRAFT` - a type representations for Drafts (scored).
+2. `RANKED` - a type representation for Ranked games (unscored).
+3. `TURF_WAR` - a type representation for Turf War games (unscored).
+4. `HIDE_AND_SEEK` - a type representation for Hide and Seek games (unscored).
+5. `JUGGERNAUT` - a type representation for Juggernaut games (unscored).
+6. `SPAWN_RUSH` - a type representation for Spawn Rush games (unscored).
+
+----
+
+#### MapGenerator
+
+##### Instance Variables
+1. `GameReqs foundDraft` - a draft/game associated with the map generator.
+2. `int MIN_MAPS` - the minimum number of maps to generate in a single maplist.
+3. `int MAX_MAPS` - the maximum number of maps to generate in a single maplist.
+4. `int MAX_DRAFT_MAPLISTS` - the maximum number of map generations for a draft/game.
+
+----
+
+#### Player
+
+A class which represents a player within a draft/game.
+
+##### Instance Variables
+1. `String name` -  the name of the player.
+2. `boolean active` - a flag for checking whether the player is active in the draft/game or not.
+3. `boolean teamStatus` - a flag for checking the player's team status.
+5. `boolean subStatus` - a flag for checking the player's sub status.
+6. `int subs` - the number of times the player subbed out.
+
+----
+
+#### Process
+
+A class which formally manages and processes drafts/games.
+
+##### Instance Variables
+
+(Generalized draft/game G and team T)
+
+1. `boolean started` - a flag for checking if the draft/game has started.
+2. `G game` - the draft/game to be processed.
+3. `T team1, team2` - the teams of the draft/game.
+5. `HashSet<String> endButtonClicked` - the players who have clicked the `End Draft` button consecutively.
+6. `String messageID` - the Discord message ID of the draft/game request.
+
+----
+
+#### Team
+
+A class which represents a team within a draft/game.
+
+##### Instance Variables
+
+(Generalized player P)
+
+1. `int maxPlayers` - the maximum number of players on a team for a draft/game.
+2. `TreeMap<String, P>` - the players on a team for a draft/game.
+3. `int playersNeeded` - the amount of active players a team needs, at any given time, for a draft/game.
+
+----
+
+#### Drafts (Games)
+
+##### DraftGame
+
+A class which forms and starts a draft, processing the command `lp/io startdraft` and handling other commands such as `lp/io forcesub`, etc.
+
+----
+
+##### DraftPlayer
+
+###### Instance Variables
+1.`boolean captainStatus1, captainStatus2` - flags for checking captaincy with respect to the two teams of the draft.
+2. `int minimumPoints` - the minimum amount of points a player can have.
+3. `int maximumPoints` - the maximum amount of points a player can have.
+4. `int matchWins` - the player's match wins during the draft.
+5. `int matchLosses` - the player's match losses during the draft.
+
+----
+
+##### DraftProcess
+
+A class which formally manages and processes drafts.
+
+----
+
+##### DraftTeam
+
+A class which represents a team within a draft.
+
+###### Instance Variables
+1. `DraftTeam opponents` - the opponents of the team.
+2. `int minimumScore` - a team's minimum amount of points to gain.
+3. `int maximumScore` - a team's maximum amount of points to gain.
+4. `int score` - the team's total score.
+
+---- 
+
 ### Profiles (Engine)
 
 #### PlayerInfo
 
 A class for storing information about a player within MIT.
 
-###### Instance Variables
+##### Instance Variables
 1. `int numRow` - the numbered row of the player's data within their associated draft spreadsheet.
 2. `String tag` - the player's Discord tag.
 3. `String nickname` - the player's nickname on the server.
@@ -370,11 +440,34 @@ A class for storing information about a player within MIT.
 
 A class which manages the profile database of MIT.
 
-###### Instance Variables
+##### Instance Variables
 1. `String spreadsheetID` - the profiles spreadsheet ID.
 2. `String START_COLUMN` - the starting information column of the profiles spreadsheet.
 3. `String END_COLUMN` - the ending information column of the profiles spreadsheet.
 4. `String TAB` - the tab to reference within the profiles spreadsheet.
+
+----
+
+### Templates (Engine)
+
+#### Command
+
+An interface outlining the format of the bot's command implementations.
+
+----
+
+#### GameReqs
+
+A template for classes which forms and starts draft/games.
+
+----
+
+#### ProcessReqs
+
+A template for classes which formally manages and processes draft/games.
+
+----
+
 
 
 

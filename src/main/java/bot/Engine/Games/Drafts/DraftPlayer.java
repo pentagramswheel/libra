@@ -1,4 +1,4 @@
-package bot.Engine.Drafts;
+package bot.Engine.Games.Drafts;
 
 import bot.Engine.Games.Player;
 
@@ -26,7 +26,7 @@ public class DraftPlayer extends Player {
      * Constructs the attributes of the draft player.
      * @param playerName the name of the player.
      * @param ceiling the maximum number of points to set for the player.
-     * @param isSub a flag for checking if the player is a sub or not.
+     * @param isSub a flag for knowing if the player is a sub or not.
      */
     public DraftPlayer(String playerName, int ceiling, boolean isSub) {
         super(playerName, isSub);
@@ -73,16 +73,6 @@ public class DraftPlayer extends Player {
         return captainStatus2;
     }
 
-    /** Retrieves the player's draft wins. */
-    public int getWins() {
-        return matchWins;
-    }
-
-    /** Retrieves the player's draft losses. */
-    public int getLosses() {
-        return matchLosses;
-    }
-
     /**
      * Checks whether a player's points can be increased or not.
      * @return True if they can be increased.
@@ -95,7 +85,7 @@ public class DraftPlayer extends Player {
     /**
      * Checks whether a player's points can be decreased or not.
      * @param points the points to check.
-     * @return True if they can be increased.
+     * @return True if they can be decreased.
      *         False otherwise.
      */
     private boolean decrementable(int points) {
@@ -123,11 +113,21 @@ public class DraftPlayer extends Player {
         }
     }
 
-    /** Decreases the player's amount of wins by one. */
+    /** Decreases the player's amount of losses by one. */
     public void decrementLosses() {
         if (decrementable(getLosses())) {
             matchLosses--;
         }
+    }
+
+    /** Retrieves the player's draft wins. */
+    public int getWins() {
+        return matchWins;
+    }
+
+    /** Retrieves the player's draft losses. */
+    public int getLosses() {
+        return matchLosses;
     }
 
     /** Main method for testing. */
