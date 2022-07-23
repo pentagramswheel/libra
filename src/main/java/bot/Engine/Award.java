@@ -1,6 +1,6 @@
 package bot.Engine;
 
-import bot.Tools.Command;
+import bot.Engine.Templates.Command;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

@@ -204,22 +204,25 @@ public class Events extends ListenerAdapter {
 
         switch (value) {
             case "0":
-                eb.setTitle("Libra's Automatic Draft System");
-                eb.setDescription("[Here's the quick overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.2bded3quwjr1)");
-                break;
+                eb.setTitle("Libra's Automatic Minigame System");
+                eb.setDescription("[Here's the overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.rli2ybthizsd)");
             case "1":
+                eb.setTitle("Libra's Automatic Draft System");
+                eb.setDescription("[Here's the quick overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.rzj2bgwe2gos)");
+                break;
+            case "2":
                 eb.setTitle("Libra's Automatic Draft System");
                 eb.setDescription("[Here's the detailed overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.xt8dy64nsnj)");
                 break;
-            case "2":
+            case "3":
                 eb.setTitle("Libra's Documentation");
                 eb.setDescription("[Here's the full document!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing)");
                 break;
-            case "3":
+            case "4":
                 eb.setTitle("Libra's FAQ");
                 eb.setDescription("[Here are some answers!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.80874ddqf10r)");
                 break;
-            case "4":
+            case "5":
                 eb.setTitle("Match Report Help (Staff)");
                 eb.setDescription("If a match report is giving you an error message, \n"
                         + "it is most likely due to a row in the spreadsheet \n"

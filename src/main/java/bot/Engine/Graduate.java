@@ -1,6 +1,6 @@
 package bot.Engine;
 
-import bot.Tools.Command;
+import bot.Engine.Templates.Command;
 import bot.Tools.GoogleSheetsAPI;
 
 import net.dv8tion.jda.api.entities.Member;

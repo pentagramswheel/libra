@@ -1,4 +1,4 @@
-package bot.Tools;
+package bot.Engine.Templates;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;

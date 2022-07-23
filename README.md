@@ -7,7 +7,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** July 22, 2022
+**Last Updated:** July 23, 2022
 
 **Formal Documentation:** <medium><a href='https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing'>How To Use Libra - MullowayIT's Bot Documentation</a></medium>
 
@@ -20,12 +20,13 @@
   + [Events](#events)
   * [Tools](#tools)
     + [ArrayHeapMinPQ](#arrayheapminpq)
-    + [ButtonBuilder](#buttonbuilder)
     + [Components](#components)
     + [DiscordWatch](#discordwatch)
     + [FileHandler](#filehandler)
     + [GoogleSheetsAPI](#googlesheetsapi)
-    + [SelectionMenuBuilder](#selectionmenubuilder)
+    + [Builders (Tools)](#builders-tools)
+      - [ButtonBuilder](#buttonbuilder)
+      - [SelectionMenuBuilder](#selectionmenubuilder)
   * [Engine](#engine)
     + [Add](#add)
     + [Award](#award)
@@ -135,15 +136,6 @@ A class which builds a minimum heap priority queue (This class is taken from ano
 
 ----
 
-#### ButtonBuilder
-
-A class which builds a button quickly.
-
-###### Instance Variables
-1. `Button button` - the button that was built.
-
-----
-
 #### Components
 
 A class for storing components used throughout the bot.
@@ -181,12 +173,25 @@ A class which navigates a Google Sheet (spreadsheet).
 
 ----
 
-#### SelectionMenuBuilder
+#### Builders (Tools)
+
+##### ButtonBuilder
+
+A class which builds a button quickly.
+
+###### Instance Variables
+1. `Button button` - the button that was built.
+
+----
+
+##### SelectionMenuBuilder
 
 A class which builds a selection menu quickly.
 
-##### Instance Variables
+###### Instance Variables
 1. `SelectionMenu menu` - the menu that was built.
+
+----
 
 ----
 

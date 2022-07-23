@@ -2,7 +2,7 @@ package bot.Engine.Games;
 
 import bot.Engine.Profiles.Profile;
 import bot.Engine.Section;
-import bot.Tools.Command;
+import bot.Engine.Templates.Command;
 import bot.Tools.Components;
 import bot.Tools.DiscordWatch;
 

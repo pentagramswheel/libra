@@ -3,6 +3,8 @@ package bot.Tools;
 import bot.Engine.Games.Player;
 import bot.Engine.Templates.GameReqs;
 
+import bot.Tools.Builders.ButtonBuilder;
+import bot.Tools.Builders.SelectionMenuBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -35,6 +37,7 @@ public class Components {
             List<String> labels = new ArrayList<>();
             List<String> values = new ArrayList<>();
             List<Emoji> emojis = Arrays.asList(
+                    Emoji.fromEmote("3minigames", 773676980015988747L, false),
                     Emoji.fromEmote("clipboardemoji", 689549199905259658L, false),
                     Emoji.fromEmote("clipboard_1f4cb", 960518771276144641L, false),
                     Emoji.fromEmote("openbook", 988635067733643294L, false),
@@ -42,6 +45,7 @@ public class Components {
                     Emoji.fromEmote("writing", 622832106011230259L, false),
                     Emoji.fromEmote("7212roleadmin", 962720955505971200L, false));
 
+            labels.add("I want to know about the minigame system!");
             labels.add("I want to know about the draft system!");
             labels.add("I want to know everything about the draft system!");
             labels.add("I want to see Libra's full documentation.");

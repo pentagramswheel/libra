@@ -3,7 +3,7 @@ package bot.Engine.Games;
 import bot.Engine.Section;
 import bot.Engine.Templates.GameReqs;
 import bot.Events;
-import bot.Tools.Command;
+import bot.Engine.Templates.Command;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;

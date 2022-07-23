@@ -1,7 +1,7 @@
 package bot.Engine.Cycles;
 
 import bot.Engine.Section;
-import bot.Tools.Command;
+import bot.Engine.Templates.Command;
 import bot.Tools.FileHandler;
 import bot.Tools.GoogleSheetsAPI;
 
