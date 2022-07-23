@@ -206,6 +206,7 @@ public class Events extends ListenerAdapter {
             case "0":
                 eb.setTitle("Libra's Automatic Minigame System");
                 eb.setDescription("[Here's the overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.rli2ybthizsd)");
+                break;
             case "1":
                 eb.setTitle("Libra's Automatic Draft System");
                 eb.setDescription("[Here's the quick overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.rzj2bgwe2gos)");
