@@ -20,13 +20,25 @@ public class Team<P extends Player> {
     /** The amount of players a team needs. */
     private int playersNeeded;
 
+    /** The minimum/maximum amount of won matches for a team. */
+    private final int minimumScore;
+    private final int maximumScore;
+
+    /** The team's total score. */
+    private int score;
+
     /**
      * Starts a team within a game.
      * @param playerCeiling the maximum number of players to set for the team.
+     * @param pointCeiling the maximum number of points to set for the team.
      */
-    public Team(int playerCeiling) {
+    public Team(int playerCeiling, int pointCeiling) {
         maxPlayers = playerCeiling;
         players = new TreeMap<>();
+
+        minimumScore = score = 0;
+        maximumScore = pointCeiling;
+
         clear();
     }
 
@@ -87,5 +99,42 @@ public class Team<P extends Player> {
         }
         getPlayers().clear();
         playersNeeded = maxPlayers;
+    }
+
+    /**
+     * Adds a win to the team's score.
+     */
+    public void incrementScore() {
+        score++;
+    }
+
+    /**
+     * Subtracts a win from the team's score.
+     */
+    public void decrementScore() {
+        score--;
+    }
+
+    /** Retrieves the team's total score. */
+    public int getScore() {
+        return score;
+    }
+
+    /**
+     * Checks whether the team has the minimum score or not.
+     * @return True if they do.
+     *         False otherwise.
+     */
+    public boolean hasMinimumScore() {
+        return getScore() == minimumScore;
+    }
+
+    /**
+     * Checks whether the team has the maximum score or not.
+     * @return True if they do.
+     *         False otherwise.
+     */
+    public boolean hasMaximumScore() {
+        return getScore() == maximumScore;
     }
 }

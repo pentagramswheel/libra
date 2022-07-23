@@ -73,6 +73,15 @@ public class Components {
         }
 
         /**
+         * Builds the "Start Early" button.
+         * @param suffix the button ID's suffix.
+         */
+        public static Button setupEarly(String suffix) {
+            return new ButtonBuilder("setupEarly" + suffix,
+                    "Start Early", null, 0).getButton();
+        }
+
+        /**
          * Builds the "Reping" button.
          * @param suffix the button ID's suffix.
          */
@@ -91,15 +100,6 @@ public class Components {
         }
 
         /**
-         * Builds a captain reassignment button.
-         * @param suffix the menu ID's suffix.
-         */
-        public static Button reassignCaptain(String suffix) {
-            return new ButtonBuilder("reassign" + suffix,
-                    "Reassign", null, 0).getButton();
-        }
-
-        /**
          * Builds the "Refresh" button.
          * @param suffix the button ID's suffix.
          */
@@ -107,6 +107,15 @@ public class Components {
             return new ButtonBuilder("requestRefresh" + suffix,
                     "update", "788354776999526410",
                     null, 2).getButton();
+        }
+
+        /**
+         * Builds a captain reassignment button.
+         * @param suffix the menu ID's suffix.
+         */
+        public static Button reassignCaptain(String suffix) {
+            return new ButtonBuilder("reassign" + suffix,
+                    "Reassign", null, 0).getButton();
         }
 
         /**
@@ -179,6 +188,16 @@ public class Components {
         }
 
         /**
+         * Builds the "Refresh" button.
+         * @param suffix the button ID's suffix.
+         */
+        public static Button refresh(String suffix) {
+            return new ButtonBuilder("processRefresh" + suffix,
+                    "update", "788354776999526410",
+                    null, 2).getButton();
+        }
+
+        /**
          * Builds the "+1" button.
          * @param suffix the button ID's suffix.
          */
@@ -197,13 +216,12 @@ public class Components {
         }
 
         /**
-         * Builds the "Refresh" button.
+         * Builds the "Next Turn" button.
          * @param suffix the button ID's suffix.
          */
-        public static Button refresh(String suffix) {
-            return new ButtonBuilder("processRefresh" + suffix,
-                    "update", "788354776999526410",
-                    null, 2).getButton();
+        public static Button nextTurn(String suffix) {
+            return new ButtonBuilder("nextTurn" + suffix,
+                    "Next Turn", null, 0).getButton();
         }
 
         /**

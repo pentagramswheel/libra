@@ -2,8 +2,12 @@ package bot;
 
 import bot.Engine.*;
 import bot.Engine.Cycles.*;
-import bot.Engine.Games.Drafts.*;
+import bot.Engine.Games.Drafts.DraftGame;
+import bot.Engine.Games.Drafts.DraftProcess;
+import bot.Engine.Games.GameType;
 import bot.Engine.Games.MapGenerator;
+import bot.Engine.Games.Minigames.MiniGame;
+import bot.Engine.Games.Minigames.MiniProcess;
 import bot.Engine.Profiles.Profile;
 import bot.Engine.Templates.*;
 import bot.Tools.ArrayHeapMinPQ;
@@ -144,8 +148,8 @@ public class Events extends ListenerAdapter {
                 "helpdesk", false).get(0).getName();
         String entryChannel = server.getTextChannelsByName(
                 "mit-entry-confirmation", false).get(0).getName();
-//        String fsDraftChannel = server.getTextChannelsByName(
-//                "\uD83D\uDCCDfs-looking-for-draft", false).get(0).getName();
+        String fsDraftChannel = server.getTextChannelsByName(
+                "\uD83D\uDCCDfs-looking-for-draft", false).get(0).getName();
         String lpDraftChannel = server.getTextChannelsByName(
                  "\uD83D\uDCCDlp-looking-for-draft", false).get(0).getName();
         String lpReportsChannel = server.getTextChannelsByName(
@@ -166,12 +170,13 @@ public class Events extends ListenerAdapter {
         boolean isHelpdesk = channel.equals(helpdesk);
         boolean inEntryChannel = (subCmd.equals("add") || subCmd.equals("deny") || subCmd.equals("grad"))
                 && channel.equals(entryChannel);
-//        boolean inFSChannel = prefix.equals("fs") && isDraftCommand
-//                && channel.equals(fsDraftChannel);
+        boolean inFSChannel = prefix.equals("fs") && isDraftCommand
+                && channel.equals(fsDraftChannel);
         boolean inLPChannel = prefix.equals("lp") && isDraftCommand
                 && channel.equals(lpDraftChannel);
         boolean inIOChannel = prefix.equals("io") && isDraftCommand
                 && channel.equals(ioDraftChannel);
+
         boolean inLPReportsChannel = prefix.equals("lp") && isReportCommand
                 && channel.equals(lpReportsChannel);
         boolean inIOReportsChannel = prefix.equals("io") && isReportCommand
@@ -179,7 +184,7 @@ public class Events extends ListenerAdapter {
         boolean inTestChannel = channel.equals(testChannel);
 
         return !(isHelpdesk || inEntryChannel
-                /*|| inFSChannel*/ || inLPChannel || inIOChannel
+                || inFSChannel || inLPChannel || inIOChannel
                 || inLPReportsChannel || inIOReportsChannel
                 || inTestChannel);
     }
@@ -298,6 +303,40 @@ public class Events extends ListenerAdapter {
     }
 
     /**
+     * Creates a new draft depending on command parameters given by FS/LP/IO.
+     * @param sc the user's inputted command.
+     * @param prefix the prefix of the command.
+     * @param author the user who ran the command.
+     * @param draftButton the numbered button associated with this draft.
+     * @return the created draft.
+     */
+    private GameReqs newDraft(SlashCommandEvent sc,
+                                    String prefix, Member author,
+                                    int draftButton) {
+        if (!sc.getName().equals("fs")) {
+            return new DraftGame(sc, draftButton, prefix, author);
+        }
+
+        switch (sc.getOptions().get(0).getAsString()) {
+            case "Ranked Modes":
+                return new MiniGame(
+                        sc, GameType.RANKED, draftButton, prefix, author);
+            case "Turf War Only":
+                return new MiniGame(
+                        sc, GameType.TURF_WAR, draftButton, prefix, author);
+            case "Hide & Seek":
+                return new MiniGame(
+                        sc, GameType.HIDE_AND_SEEK, draftButton, prefix, author);
+            case "Juggernaut":
+                return new MiniGame(
+                        sc, GameType.JUGGERNAUT, draftButton, prefix, author);
+            default:
+                return new MiniGame(
+                        sc, GameType.SPAWN_RUSH, draftButton, prefix, author);
+        }
+    }
+
+    /**
      * Processes a draft, when possible.
      * @param sc the user's inputted command.
      * @param prefix the prefix of the command.
@@ -313,8 +352,7 @@ public class Events extends ListenerAdapter {
             sc.reply("Wait until a draft has finished!").queue();
         } else {
             int draftButton = queue.removeSmallest();
-            DraftGame newDraft =
-                    new DraftGame(sc, draftButton, prefix, author);
+            GameReqs newDraft = newDraft(sc, prefix, author, draftButton);
 
             ongoingDrafts.put(draftButton, newDraft);
             newDraft.runCmd(sc);
@@ -560,17 +598,14 @@ public class Events extends ListenerAdapter {
                 sc.reply(leaderboardLink).queue();
                 break;
             case "startdraft":
-                if (sc.getName().equals("fs")) {sc.reply("That command isn't ready yet. Stay tuned!").setEphemeral(true).queue(); break;} // for temp JAR
                 if (notInAnotherDraft(sc, null, drafts) == null) {
                     processDrafts(sc, prefix, author);
                 }
                 break;
             case "forcesub":
-                if (sc.getName().equals("fs")) {sc.reply("That command isn't ready yet. Stay tuned!").setEphemeral(true).queue(); break;} // for temp JAR
                 attemptForceSub(sc, drafts, args);
                 break;
             case "forceend":
-                if (sc.getName().equals("fs")) {sc.reply("That command isn't ready yet. Stay tuned!").setEphemeral(true).queue(); break;} // for temp JAR
                 attemptForceEnd(sc, drafts, queue, args);
                 break;
             case "log":
@@ -659,6 +694,9 @@ public class Events extends ListenerAdapter {
                     currDraft.attemptDraft(bc);
                 }
                 break;
+            case "setupEarly":
+                ((MiniGame) currDraft).setup(bc);
+                break;
             case "requestRefresh":
                 currDraft.refresh(bc);
                 break;
@@ -687,12 +725,15 @@ public class Events extends ListenerAdapter {
                 ((DraftProcess) currProcess).start(bc);
                 break;
             case "plusOne":
-                ((DraftProcess) currProcess).changePointsForTeam(
+                currProcess.changePointsForTeam(
                         bc, bc.getMember().getId(), true);
                 break;
             case "minusOne":
-                ((DraftProcess) currProcess).changePointsForTeam(
+                currProcess.changePointsForTeam(
                         bc, bc.getMember().getId(), false);
+                break;
+            case "nextTurn":
+                ((MiniProcess) currProcess).rotateTurns(bc);
                 break;
             case "processRefresh":
                 bc.deferEdit().queue();

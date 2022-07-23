@@ -67,6 +67,9 @@ public interface GameReqs {
     /**
      * Refreshes the draft request's caption.
      * @param bc a button click to analyze.
+     *
+     * Note: The interaction must not have been acknowledged
+     *       before this method.
      */
     void refresh(ButtonClickEvent bc);
 
@@ -109,4 +112,9 @@ public interface GameReqs {
      */
     boolean canForceEnd(SlashCommandEvent sc);
 
+    /**
+     * Runs the draft start command.
+     * @param sc the command to analyze.
+     */
+    void runCmd(SlashCommandEvent sc);
 }

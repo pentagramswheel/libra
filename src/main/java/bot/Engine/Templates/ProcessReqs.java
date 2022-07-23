@@ -25,8 +25,21 @@ public interface ProcessReqs {
     /**
      * Refreshes the process's interface.
      * @param interaction the user interaction calling this method.
+     *
+     * Note: The interaction must have been acknowledged
+     *       before this method.
      */
     void refresh(GenericInteractionCreateEvent interaction);
+
+    /**
+     * Adjusts the points for players within teams.
+     * @param bc a button click to analyze.
+     * @param authorID the Discord ID of the player which pressed the button.
+     * @param increment True if a point should be added to the author's team.
+     *                  False if a point should be deducted from the author's team.
+     */
+    void changePointsForTeam(ButtonClickEvent bc, String authorID,
+                             boolean increment);
 
     /**
      * Determines if the draft meets the requirements to be ended.
@@ -35,5 +48,4 @@ public interface ProcessReqs {
      *         False otherwise.
      */
     boolean hasEnded(ButtonClickEvent bc);
-
 }

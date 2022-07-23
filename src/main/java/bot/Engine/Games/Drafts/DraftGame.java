@@ -33,21 +33,21 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
         implements GameReqs {
 
     /**
-     * Constructs a draft template and initializes the
-     * draft start attributes.
+     * Constructs a draft and initializes the draft start attributes.
      * @param sc the user's inputted command.
      * @param draft the numbered draft that this draft is.
      * @param abbreviation the abbreviation of the section.
-     * @param initialPlayer the first player of the draft.
+     * @param initialPlayer the first player of the draft queue.
      */
     public DraftGame(SlashCommandEvent sc, int draft,
                  String abbreviation, Member initialPlayer) {
         super(sc, GameType.DRAFT, draft, abbreviation);
 
-        DraftPlayer newPlayer = new DraftPlayer(
+        String playerID = initialPlayer.getId();
+        getPlayers().put(playerID, new DraftPlayer(
                 initialPlayer.getEffectiveName(),
-                getProperties().getWinningScore(), false);
-        getPlayers().put(initialPlayer.getId(), newPlayer);
+                getProperties().getWinningScore(), false));
+        getHistory().add(playerID);
     }
 
     /**
@@ -60,13 +60,13 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
         return super.isInitialized();
     }
 
-    /** Retrieves the game's properties. */
+    /** Retrieves the draft's properties. */
     @Override
     public GameProperties getProperties() {
         return super.getProperties();
     }
 
-    /** Retrieves the players of the game. */
+    /** Retrieves the players of the draft. */
     @Override
     public TreeMap<String, DraftPlayer> getPlayers() {
         return super.getPlayers();
@@ -238,6 +238,7 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
             refresh(bc);
 
             getProcess().refresh(null);
+            wait(4000);
 
             List<MessageEmbed> profiles = new Profile().viewMultiple(bc,
                     getPlayers().keySet(), "Their", false, true, false);
@@ -260,7 +261,7 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
     }
 
     /**
-     * Removes a player from the draft.
+     * Removes a player from the draft queue.
      * @param bc a button click to analyze.
      */
     @Override
@@ -317,16 +318,18 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
     }
 
     /**
-     * Requests a sub for a draft, if possible, via a button.
+     * Requests a sub for a draft.
      * @param bc a button click to analyze.
      */
     @Override
     public void requestSub(ButtonClickEvent bc) {
-        if (canRequestSub(bc)) {
-            resetCaptainsIfNeeded(bc.getMember().getId());
-        }
+        if (canRequestSub(bc) && !draftStarted()) {
+            if (!draftStarted()) {
+                resetCaptainsIfNeeded(bc.getMember().getId());
+            }
 
-        refresh(bc);
+            refresh(bc);
+        }
     }
 
     /**
@@ -360,6 +363,7 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
                 getPlayers().put(id, new DraftPlayer(name,
                         getProperties().getWinningScore(), draftStarted()));
             }
+
             refresh(bc);
         }
     }
@@ -373,5 +377,14 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
     @Override
     public boolean canForceEnd(SlashCommandEvent sc) {
         return super.canForceEnd(sc);
+    }
+
+    /**
+     * Runs the draft start command.
+     * @param sc the user's inputted command.
+     */
+    @Override
+    public void runCmd(SlashCommandEvent sc) {
+        super.runCmd(sc);
     }
 }

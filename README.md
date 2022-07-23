@@ -7,7 +7,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** July 21, 2022
+**Last Updated:** July 22, 2022
 
 **Formal Documentation:** <medium><a href='https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing'>How To Use Libra - MullowayIT's Bot Documentation</a></medium>
 
@@ -50,6 +50,9 @@
       - [DraftPlayer](#draftplayer)
       - [DraftProcess](#draftprocess)
       - [DraftTeam](#draftteam)
+    + [Minigames (Games)](#minigames-games)
+      - [DraftGame](#minigame)
+      - [DraftProcess](#miniprocess)
   * [Profiles (Engine)](#profiles-engine)
     + [PlayerInfo](#playerinfo)
     + [Profile](#profile)
@@ -305,11 +308,13 @@ A class which represents the properties of a draft/game.
 ##### Instance Variables
 1. `GameType gameType` - the type of the draft/game.
 2. `String name` - the formal name of the draft/game.
-3. `int minimumPlayersToStart` - the minimum number of players to start the draft/game.
-4. `int maximumPlayersToStart` - the maximum number of players to start the draft/game.
-5. `int numMatches` - the number of total matches to play in the draft/game.
-6. `int winningScore` - the amount of points needed to win the draft/game.
-7. `int mapGens` -  the number of map generations made for the draft/game.
+3. `int playersPerTeam` - the number of players needed on each team.
+4. `int minimumPlayersToStart` - the minimum number of players to start the draft/game.
+5. `int maximumPlayersToStart` - the maximum number of players to start the draft/game.
+6. `int numMatches` - the number of total matches to play in the draft/game.
+7. `int rotation` - the number of matches to play before rotating teams, if any.
+8. `int winningScore` - the amount of points needed to win the draft/game.
+9. `int mapGens` -  the number of map generations made for the draft/game.
 
 ----
 
@@ -360,7 +365,8 @@ A class which formally manages and processes drafts/games.
 
 1. `boolean started` - a flag for checking if the draft/game has started.
 2. `G game` - the draft/game to be processed.
-3. `T team1, team2` - the teams of the draft/game.
+3. `T team1, team2, team3` - the teams of the draft/game.
+4. `int turn` - the current turn of the draft/game (if used).
 5. `HashSet<String> endButtonClicked` - the players who have clicked the `End Draft` button consecutively.
 6. `String messageID` - the Discord message ID of the draft/game request.
 
@@ -377,6 +383,9 @@ A class which represents a team within a draft/game.
 1. `int maxPlayers` - the maximum number of players on a team for a draft/game.
 2. `TreeMap<String, P>` - the players on a team for a draft/game.
 3. `int playersNeeded` - the amount of active players a team needs, at any given time, for a draft/game.
+4. `int minimumScore` - a team's minimum amount of points to gain, if any.
+3. `int maximumScore` - a team's maximum amount of points to gain, if any.
+4. `int score` - the team's total score, if any.
 
 ----
 
@@ -389,6 +398,8 @@ A class which forms and starts a draft, processing the command `lp/io startdraft
 ----
 
 ##### DraftPlayer
+
+A class which represents a player within a draft.
 
 ###### Instance Variables
 1.`boolean captainStatus1, captainStatus2` - flags for checking captaincy with respect to the two teams of the draft.
@@ -411,9 +422,23 @@ A class which represents a team within a draft.
 
 ###### Instance Variables
 1. `DraftTeam opponents` - the opponents of the team.
-2. `int minimumScore` - a team's minimum amount of points to gain.
-3. `int maximumScore` - a team's maximum amount of points to gain.
-4. `int score` - the team's total score.
+
+----
+
+#### Minigames (Games)
+
+##### MiniGame
+
+A class which forms and starts a minigame, processing the command `fs startdraft` and handling other commands such as `fs forcesub`, etc.
+
+###### Instance Variables
+1.`int cappedSize` - the maximum number of players allowed in the minigame (it becomes capped if the game starts early).
+
+----
+
+##### MiniProcess
+
+A class which formally manages and processes minigames.
 
 ---- 
 

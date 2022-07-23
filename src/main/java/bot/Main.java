@@ -153,7 +153,7 @@ public class Main {
                 "Requests a draft, with a specific gamemode.");
         OptionData draftChoice = new OptionData(
                 OptionType.STRING, "type",
-                "Type of draft to play", false);
+                "Type of draft to play", true);
         String[] draftChoices = {"Ranked Modes", "Turf War Only", "Hide & Seek",
                 "Juggernaut", "Spawn Rush"};
         for (int i = 1; i <= draftChoices.length; i++) {

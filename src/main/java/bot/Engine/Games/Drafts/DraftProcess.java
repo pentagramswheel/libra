@@ -41,7 +41,8 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
                         draftToProcess.getProperties().getWinningScore()),
                 new DraftTeam(
                         draftToProcess.getProperties().getMaximumPlayersToStart() / 2,
-                        draftToProcess.getProperties().getWinningScore()));
+                        draftToProcess.getProperties().getWinningScore()),
+                null);
 
         getTeam1().setOpponents(getTeam2());
         getTeam2().setOpponents(getTeam1());
@@ -92,18 +93,15 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
      */
     @Override
     public void updateReport(GenericInteractionCreateEvent interaction) {
-        EmbedBuilder eb = new EmbedBuilder();
-
-        String score = String.format("%s - %s",
-                getTeam1().getScore(), getTeam2().getScore());
-        eb.addField("Score:", score, false);
-
-        getRequest().sendEmbed(interaction, buildSummary(eb));
+        getRequest().sendEmbed(interaction, buildSummary(new EmbedBuilder()));
     }
 
     /**
      * Refreshes the process's interface.
      * @param interaction the user interaction calling this method.
+     *
+     * Note: The interaction must have been acknowledged
+     *       before this method.
      */
     @Override
     public void refresh(GenericInteractionCreateEvent interaction) {
@@ -238,67 +236,21 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
     }
 
     /**
-     * Adds points to teams.
-     * @param team the winning team.
-     */
-    private void givePoints(ButtonClickEvent bc, DraftTeam team) {
-        if (team.hasMaximumScore()) {
-            getRequest().sendResponse(bc,
-                    "You have already hit the point limit!", true);
-        } else {
-            team.incrementScore();
-        }
-    }
-
-    /**
-     * Subtracts points from teams.
-     * @param team the "winning" team.
-     */
-    private void revertPoints(ButtonClickEvent bc, DraftTeam team) {
-        if (team.hasMinimumScore()) {
-            getRequest().sendResponse(bc, "You cannot have less than zero points!", true);
-        } else {
-            team.decrementScore();
-        }
-    }
-
-    /**
      * Adjusts the points for players within teams.
      * @param bc a button click to analyze.
      * @param authorID the Discord ID of the player which pressed the button.
      * @param increment True if a point should be added to the author's team.
      *                  False if a point should be deducted from the author's team.
      */
+    @Override
     public void changePointsForTeam(ButtonClickEvent bc, String authorID,
                                     boolean increment) {
-        bc.deferEdit().queue();
-        resetEndDraftButton();
+        String errorMsg = "Add your subs before continuing (Check the "
+                + "the selection menu).";
 
-        DraftTeam team;
-        DraftPlayer author = getRequest().getPlayers().get(authorID);
-        if (author == null || !author.isActive()) {
-            getRequest().sendResponse(bc,
-                    "You are not in this draft!", true);
-            return;
-        } else if (getTeam1().needsPlayers() || getTeam2().needsPlayers()) {
-            getRequest().sendResponse(bc,
-                    "Add your subs before continuing (Check the "
-                            + "the selection menu).", true);
+        if (attemptedToChangePoints(bc, authorID, increment, errorMsg)) {
             refresh(bc);
-            return;
-        } else if (getTeam1().contains(authorID)) {
-            team = getTeam1();
-        } else {
-            team = getTeam2();
         }
-
-        if (increment) {
-            givePoints(bc, team);
-        } else {
-            revertPoints(bc, team);
-        }
-
-        refresh(bc);
     }
 
     /**

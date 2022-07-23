@@ -166,6 +166,38 @@ public class Profile implements Command {
     }
 
     /**
+     * Retrieves the Profiles database.
+     * @param interaction the user interaction calling this method.
+     * @param link a link to the Profiles spreadsheet.
+     * @return the database.
+     *         null otherwise.
+     */
+    public TreeMap<Object, Object> onlyGetDatabase(
+            GenericInteractionCreateEvent interaction,
+            GoogleSheetsAPI link) {
+        try {
+            if (link == null) {
+                link = new GoogleSheetsAPI(spreadsheetID);
+            }
+            return link.readSection(interaction, TAB);
+        } catch (IOException | GeneralSecurityException e) {
+            log("The profiles spreadsheet could not load.", true);
+            return null;
+        }
+    }
+
+    /**
+     * Looks up a player's profile.
+     * @param id the player's Discord ID.
+     * @param database a map of players' profiles, indexed by Discord ID.
+     * @return the player's profile.
+     *         null if it could not be found.
+     */
+    public PlayerInfo lookup(String id, TreeMap<Object, Object> database) {
+        return (PlayerInfo) database.get(id);
+    }
+
+    /**
      * Quickly registers a new player into the database by
      * loading multiple parameters
      * @param sc the user's inputted command.
@@ -247,7 +279,7 @@ public class Profile implements Command {
                         "Friend code should be in the format: "
                                 + "`8888-8888-8888`.");
             } else if (database.containsKey(user.getId())) {
-                PlayerInfo profile = (PlayerInfo) database.get(user.getId());
+                PlayerInfo profile = lookup(user.getId(), database);
 
                 String updateRange = link.buildRange(TAB,
                         START_COLUMN, profile.getSpreadsheetPosition(),
@@ -300,7 +332,7 @@ public class Profile implements Command {
             }
 
             if (database.containsKey(id)) {
-                PlayerInfo profile = (PlayerInfo) database.get(id);
+                PlayerInfo profile = lookup(id, database);
 
                 editMessage(sc, pronoun + " friend code is `SW-"
                         + profile.getFC() + "`.");
@@ -454,7 +486,7 @@ public class Profile implements Command {
             }
 
             for (String id : ids) {
-                PlayerInfo profile = (PlayerInfo) database.get(id);
+                PlayerInfo profile = lookup(id, database);
 
                 profiles.add(buildProfile(interaction, pronoun, id,
                         profile, fullDisplay, showInfo, shouldPrint).build());
@@ -600,8 +632,7 @@ public class Profile implements Command {
                                 + "`option 1, option 2, option 3, ...` (note "
                                 + "the `, `).");
             } else if (database.containsKey(sc.getMember().getId())) {
-                PlayerInfo profile = (PlayerInfo) database.get(
-                        sc.getMember().getId());
+                PlayerInfo profile = lookup(sc.getMember().getId(), database);
 
                 String updateRange = link.buildRange(TAB,
                         START_COLUMN, profile.getSpreadsheetPosition(),
@@ -641,7 +672,7 @@ public class Profile implements Command {
 
             String userID = sc.getMember().getId();
             if (database.containsKey(userID)) {
-                PlayerInfo profile = (PlayerInfo) database.get(userID);
+                PlayerInfo profile = lookup(userID, database);
                 link.deleteRow(TAB, profile.getSpreadsheetPosition());
 
                 editMessage(sc, "Your MIT profile has been deleted.");

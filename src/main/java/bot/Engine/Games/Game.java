@@ -5,13 +5,19 @@ import bot.Engine.Section;
 import bot.Tools.Command;
 import bot.Tools.Components;
 import bot.Tools.DiscordWatch;
+
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
@@ -59,10 +65,10 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
     private S process;
 
     /**
-     * Constructs a game template and initializes the start attributes.
+     * Constructs a draft/game and initializes the start attributes.
      * @param sc the user's inputted command.
-     * @param type the type of game this game is.
-     * @param draft the numbered draft that this game is.
+     * @param type the type of draft/game this game is.
+     * @param draft the numbered draft/game that this game is.
      * @param abbreviation the abbreviation of the section.
      */
     public Game(SlashCommandEvent sc, GameType type,
@@ -218,8 +224,6 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
      */
     public EmbedBuilder buildEmbed(EmbedBuilder eb, StringBuilder players,
                                    StringBuilder subs) {
-        eb.setTitle(getProperties().getName()
-                + " Queue " + getNumDraft());
         eb.setColor(getColor());
 
         eb.addField("Players:", players.toString(), false);
@@ -232,9 +236,13 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
                     "Go to (the pinged) "
                             + getDraftChannel().getAsMention() + "\n"
                             + "to begin the draft. Use this interface\n"
-                            + "to sub out as needed. __Before you\n"
-                            + "sub out -- make sure you got your\n"
-                            + "points in the draft chat__!";
+                            + "to sub out as needed. ";
+            if (!getPrefix().equals("fs")) {
+                notice += "__Before you\n"
+                        + "sub out -- make sure you got your\n"
+                        + "points in the draft chat__!";
+            }
+
             eb.addField("Notice:", notice, false);
         } else {
             eb.addField("Expiration:",
@@ -252,7 +260,8 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
     public void updateReport(GenericInteractionCreateEvent interaction) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        eb.setTitle(getProperties().getName() + " Queue " + getNumDraft());
+        eb.setTitle("Queue " + getNumDraft()
+                + " (" + getProperties().getName() + ")");
 
         StringBuilder players = new StringBuilder();
         StringBuilder subs = new StringBuilder();
@@ -318,7 +327,7 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
     }
 
     /**
-     * Removes a player from the draft.
+     * Removes a player from the queue.
      * @param bc a button click to analyze.
      */
     public void removeFromQueue(ButtonClickEvent bc) {
@@ -336,6 +345,9 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
     /**
      * Refreshes the draft request's caption.
      * @param bc a button click to analyze.
+     *
+     * Note: The interaction must not have been acknowledged
+     *       before this method.
      */
     public void refresh(ButtonClickEvent bc) {
         bc.deferEdit().queue();
@@ -377,6 +389,17 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
     }
 
     /**
+     * Checks whether a player is in Team 3 or not.
+     * @param playerID the Discord ID of the player to check.
+     * @return True if they are in Team 3.
+     *         False otherwise.
+     */
+    private boolean teamThreeContains(String playerID) {
+        return isInitialized() && getProcess().getTeam3() != null
+                && getProcess().getTeam3().contains(playerID);
+    }
+
+    /**
      * Checks whether a player can be subbed out of the draft or not.
      * @param interaction the user interaction calling this method.
      * @param playerID the Discord ID of the player.
@@ -391,15 +414,17 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
                               String playerID, P player,
                               String notFoundString, String subbedTwiceString) {
         if (player == null) {
-            sendResponse(interaction, notFoundString, true);
+            sendReply(interaction, notFoundString, true);
             return false;
         } else if (!player.isActive()) {
-            sendResponse(interaction, subbedTwiceString, true);
+            sendReply(interaction, subbedTwiceString, true);
             return false;
         } else if (teamOneContains(playerID)) {
             getProcess().getTeam1().requestSub();
         } else if (teamTwoContains(playerID)) {
             getProcess().getTeam2().requestSub();
+        } else if (teamThreeContains(playerID)) {
+            getProcess().getTeam3().requestSub();
         }
 
         player.setSubStatus(true);
@@ -525,20 +550,26 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
                 getProcess().getTeam1().add(playerID, player);
             } else if (teamTwoContains(playerID)) {
                 getProcess().getTeam2().add(playerID, player);
+            } else if (teamThreeContains(playerID)) {
+                getProcess().getTeam3().add(playerID, player);
             }
 
             statement = "will be coming back to sub";
         } else {
-            playerHistory.add(playerID);
+            getHistory().add(playerID);
 
             statement = "will be subbing";
             displayProfile = true;
         }
 
-        getDraftChannel().sendMessage(
-                String.format("<@%s>", playerID) + " " + statement + " "
-                        + "for this draft. __Refresh the pinned interface "
-                        + "to add them to a team!__").queue();
+        String update = String.format("<@%s> %s for this draft. ",
+                playerID, statement);
+        if (!getPrefix().equals("fs")) {
+            update += "__Refresh the pinned interface to add them to "
+                    + "a team!__";
+        }
+
+        getDraftChannel().sendMessage(update).queue();
 
         if (displayProfile) {
             MessageEmbed profile = new Profile().view(bc,
@@ -614,8 +645,9 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
             return;
         }
 
-        ArrayList<Button> buttons = new ArrayList<>();
+        List<Button> buttons = new ArrayList<>();
         String idSuffix = getPrefix().toUpperCase() + getNumDraft();
+
         buttons.add(Components.ForDraft.joinDraft(idSuffix));
         buttons.add(Components.ForDraft.reping(idSuffix));
         buttons.add(Components.ForDraft.leave(idSuffix));
@@ -623,7 +655,9 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
 
         String caption = getSectionRole() + " +"
                 + (getProperties().getMaximumPlayersToStart() - 1);
+
         sc.reply(caption).addActionRow(buttons).queue();
+        updateReport(sc);
 
         log("A " + getPrefix().toUpperCase()
                 + " draft has been requested.", false);

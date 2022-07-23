@@ -84,11 +84,34 @@ public class MapGenerator extends Section implements Command {
                 "Starfish Mainstage", "Ancho-V Games", "New Albacore Hotel",
                 "Manta Maria"));
 
+        List<String> hsMaps = new ArrayList<>(Arrays.asList(
+                "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
+                "Sturgeon Shipyard", "Skipper Pavilion", "The Reef",
+                "Humpback Pump Track", "Starfish Mainstage", "Wahoo World",
+                "Piranha Pit", "Manta Maria", "New Albacore Hotel",
+                "Musselforge Fitness", "Snapper Canal", "Goby Arena"));
+        List<String> jnMaps = new ArrayList<>(Arrays.asList(
+                "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
+                "Sturgeon Shipyard", "Skipper Pavilion", "The Reef",
+                "Humpback Pump Track", "Starfish Mainstage", "Wahoo World",
+                "Piranha Pit", "Manta Maria", "New Albacore Hotel",
+                "Musselforge Fitness", "Snapper Canal", "Goby Arena"));
+        List<String> srMaps = new ArrayList<>(Arrays.asList(
+                "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
+                "Sturgeon Shipyard", "Skipper Pavilion", "The Reef",
+                "Humpback Pump Track", "Starfish Mainstage", "Wahoo World",
+                "Piranha Pit", "Manta Maria", "New Albacore Hotel",
+                "Musselforge Fitness", "Snapper Canal", "Goby Arena"));
+
         legalMaps.put("Turf War", twMaps);
         legalMaps.put("Splat Zones", szMaps);
         legalMaps.put("Tower Control", tcMaps);
         legalMaps.put("Rainmaker", rmMaps);
         legalMaps.put("Clam Blitz", cbMaps);
+
+        legalMaps.put("Hide & Seek", hsMaps);
+        legalMaps.put("Juggernaut", jnMaps);
+        legalMaps.put("Spawn Rush", srMaps);
 
         return legalMaps;
     }
@@ -295,26 +318,43 @@ public class MapGenerator extends Section implements Command {
 
         int numModes = 0;
         List<String> modes = new ArrayList<>();
+
         String lastMode = "";
+        boolean oneModeFound = false;
+
+        if (foundDraft != null) {
+            GameProperties properties = foundDraft.getProperties();
+            oneModeFound = !properties.getGameType().equals(GameType.DRAFT)
+                    && !properties.getGameType().equals(GameType.RANKED);
+            if (oneModeFound) {
+                lastMode = properties.getName();
+            }
+        }
 
         TreeMap<String, List<String>> legalMaps = getLegalMaps();
         List<String> pastMaps = new ArrayList<>();
 
+        int rIndex;
         List<MessageEmbed> matches = new ArrayList<>();
         for (int i = 0; i < numMaps; i++) {
-            if (numModes == 0) {
-                resetModes(modes);
-                numModes = 4;
-            }
+            String currMode;
+            if (!oneModeFound) {
+                if (numModes == 0) {
+                    resetModes(modes);
+                    numModes = 4;
+                }
 
-            int rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
-            String currMode = modes.get(rIndex);
-            while (lastMode.equals(currMode)) {
                 rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
                 currMode = modes.get(rIndex);
+                while (lastMode.equals(currMode)) {
+                    rIndex = Events.RANDOM_GENERATOR.nextInt(numModes);
+                    currMode = modes.get(rIndex);
+                }
+                lastMode = modes.remove(rIndex);
+                numModes--;
+            } else {
+                currMode = lastMode;
             }
-            lastMode = modes.remove(rIndex);
-            numModes--;
 
             List<String> modeMaps = legalMaps.get(currMode);
             rIndex = Events.RANDOM_GENERATOR.nextInt(modeMaps.size());

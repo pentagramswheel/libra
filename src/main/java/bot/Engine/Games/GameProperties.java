@@ -15,8 +15,11 @@ public class GameProperties {
     /** The name of the game. */
     private final String name;
 
+    /** The amount of players needed for each team. */
+    private final int playersPerTeam;
+
     /** The minimum/maximum amount of players needed to start the game. */
-    private int minimumPlayersToStart;
+    private final int minimumPlayersToStart;
     private final int maximumPlayersToStart;
 
     /** The minimum/maximum amount of players needed to end the game. */
@@ -25,6 +28,9 @@ public class GameProperties {
 
     /** The maximum amount of matches to play within the game. */
     private final int numMatches;
+
+    /** The amount of matches to play before rotating teams. */
+    private final int rotation;
 
     /** The score needed to win the game. */
     private final int winningScore;
@@ -42,50 +48,74 @@ public class GameProperties {
         switch (type) {
             case DRAFT:
                 name = "Draft";
+                playersPerTeam = 4;
+
                 minimumPlayersToStart = maximumPlayersToStart = 8;
                 minimumPlayersToEnd = 3;
                 maximumPlayersToEnd = 5;
+
+                rotation = 0;
                 numMatches = 7;
                 winningScore = 4;
                 break;
             case RANKED:
                 name = "Ranked Modes";
+                playersPerTeam = 4;
+
                 minimumPlayersToStart = maximumPlayersToStart = 8;
                 minimumPlayersToEnd = 3;
                 maximumPlayersToEnd = 5;
+
+                rotation = 0;
                 numMatches = 7;
                 winningScore = 4;
                 break;
             case TURF_WAR:
-                name = "Turf War Only";
+                name = "Turf War";
+                playersPerTeam = 4;
+
                 minimumPlayersToStart = maximumPlayersToStart = 8;
                 minimumPlayersToEnd = 3;
                 maximumPlayersToEnd = 5;
+
+                rotation = 0;
                 numMatches = 7;
                 winningScore = 4;
                 break;
             case HIDE_AND_SEEK:
                 name = "Hide & Seek";
+                playersPerTeam = 4;
+
                 minimumPlayersToStart = maximumPlayersToStart = 8;
                 minimumPlayersToEnd = 3;
                 maximumPlayersToEnd = 5;
+
+                rotation = 2;
                 numMatches = 6;
                 winningScore = 0;
                 break;
             case JUGGERNAUT:
                 name = "Juggernaut";
+                playersPerTeam = 2;
+
                 minimumPlayersToStart = maximumPlayersToStart = 6;
                 minimumPlayersToEnd = 2;
                 maximumPlayersToEnd = 3;
+
+                rotation = 3;
                 numMatches = 6;
                 winningScore = 0;
                 break;
             default:
                 name = "Spawn Rush";
+                playersPerTeam = 4;
+
                 minimumPlayersToStart = 6;
                 maximumPlayersToStart = 8;
                 minimumPlayersToEnd = 2;
                 maximumPlayersToEnd = 3;
+
+                rotation = 2;
                 numMatches = 6;
                 winningScore = 0;
                 break;
@@ -104,12 +134,9 @@ public class GameProperties {
         return name;
     }
 
-    /**
-     * Stores the minimum players needed to start/continue the game.
-     * @param players the minimum amount to store.
-     */
-    public void setMinimumPlayersToStart(int players) {
-        minimumPlayersToStart = players;
+    /** Retrieves the amount of players needed per team. */
+    public int getPlayersPerTeam() {
+        return playersPerTeam;
     }
 
     /** Retrieves the minimum players needed to start the game. */
@@ -135,6 +162,11 @@ public class GameProperties {
     /** Retrieves the amount of matches meant to be played in the game. */
     public int getTotalMatches() {
         return numMatches;
+    }
+
+    /** Retrieves the amount of matches to play before rotating teams. */
+    public int getRotation() {
+        return rotation;
     }
 
     /** Retrieves the winning score of the game (0 if none). */
