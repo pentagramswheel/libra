@@ -38,6 +38,7 @@ public class Components {
             List<String> values = new ArrayList<>();
             List<Emoji> emojis = Arrays.asList(
                     Emoji.fromEmote("3minigames", 773676980015988747L, false),
+                    Emoji.fromEmote("3minigames", 773676980015988747L, false),
                     Emoji.fromEmote("clipboardemoji", 689549199905259658L, false),
                     Emoji.fromEmote("clipboard_1f4cb", 960518771276144641L, false),
                     Emoji.fromEmote("openbook", 988635067733643294L, false),
@@ -46,6 +47,7 @@ public class Components {
                     Emoji.fromEmote("7212roleadmin", 962720955505971200L, false));
 
             labels.add("I want to know about the minigame system!");
+            labels.add("I want to know everything about the minigame system!");
             labels.add("I want to know about the draft system!");
             labels.add("I want to know everything about the draft system!");
             labels.add("I want to see Libra's full documentation.");
@@ -82,7 +84,7 @@ public class Components {
          */
         public static Button setupEarly(String suffix) {
             return new ButtonBuilder("setupEarly" + suffix,
-                    "Start Early", null, 0).getButton();
+                    "Start Early", null, 1).getButton();
         }
 
         /**

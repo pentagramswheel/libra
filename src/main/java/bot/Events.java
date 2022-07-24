@@ -140,7 +140,8 @@ public class Events extends ListenerAdapter {
         Guild server = sc.getGuild();
         String prefix = sc.getName();
         String subCmd = sc.getSubcommandName();
-        if (prefix.equals("mit") || subCmd.equals("genmaps")) {
+        if (prefix.equals("libra") || prefix.equals("mit")
+                || subCmd.equals("genmaps")) {
             return false;
         }
 
@@ -205,25 +206,29 @@ public class Events extends ListenerAdapter {
         switch (value) {
             case "0":
                 eb.setTitle("Libra's Automatic Minigame System");
-                eb.setDescription("[Here's the overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.rli2ybthizsd)");
+                eb.setDescription("[Here's the overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.zdp2xwjnpzdw)");
                 break;
             case "1":
-                eb.setTitle("Libra's Automatic Draft System");
-                eb.setDescription("[Here's the quick overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.rzj2bgwe2gos)");
+                eb.setTitle("Libra's Automatic Minigame System");
+                eb.setDescription("[Here's the detailed overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.ysn2sl5wfhn4)");
                 break;
             case "2":
                 eb.setTitle("Libra's Automatic Draft System");
-                eb.setDescription("[Here's the detailed overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.xt8dy64nsnj)");
+                eb.setDescription("[Here's the quick overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.rzj2bgwe2gos)");
                 break;
             case "3":
+                eb.setTitle("Libra's Automatic Draft System");
+                eb.setDescription("[Here's the detailed overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.xt8dy64nsnj)");
+                break;
+            case "4":
                 eb.setTitle("Libra's Documentation");
                 eb.setDescription("[Here's the full document!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing)");
                 break;
-            case "4":
+            case "5":
                 eb.setTitle("Libra's FAQ");
                 eb.setDescription("[Here are some answers!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.80874ddqf10r)");
                 break;
-            case "5":
+            case "6":
                 eb.setTitle("Match Report Help (Staff)");
                 eb.setDescription("If a match report is giving you an error message, \n"
                         + "it is most likely due to a row in the spreadsheet \n"

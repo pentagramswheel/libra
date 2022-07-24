@@ -31,6 +31,11 @@ public class MiniProcess extends Process<MiniGame, Team<Player>, Player>
     /** The players who have clicked the 'Next Turn` button consecutively. */
     private final HashSet<String> nextButtonClicked;
 
+    /** Resets who have clicked the 'End Draft' button. */
+    public void resetNextButtonClicked() {
+        nextButtonClicked.clear();
+    }
+
     /**
      * Constructs a two-team minigame to process, with balanced teams.
      * @param minigameToProcess the draft to process.
@@ -203,6 +208,7 @@ public class MiniProcess extends Process<MiniGame, Team<Player>, Player>
 
             rotateTeams();
             incrementTurn(bc);
+            resetNextButtonClicked();
 
             refresh(bc);
         } else {

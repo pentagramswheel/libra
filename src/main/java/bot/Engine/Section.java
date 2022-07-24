@@ -58,7 +58,7 @@ public class Section {
             case "fs":
                 name = "Freshwater Shoals";
                 role = "<@&996101473647743086>";
-                emote = "emoteHere";
+                emote = "<:FreshwaterShoals:1000753801457840248>";
                 color = Main.freshwatershoalsColor;
                 gradSheetID = Config.fsGradSheetID;
                 cyclesSheetID = null;
