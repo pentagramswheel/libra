@@ -323,7 +323,7 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
      */
     @Override
     public void requestSub(ButtonClickEvent bc) {
-        if (canRequestSub(bc) && !draftStarted()) {
+        if (canRequestSub(bc)) {
             if (!draftStarted()) {
                 resetCaptainsIfNeeded(bc.getMember().getId());
             }

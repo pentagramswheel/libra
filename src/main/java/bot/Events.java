@@ -659,7 +659,110 @@ public class Events extends ListenerAdapter {
     }
 
     /**
-     * Checks for any button clicks.
+     * Processes a button click from game request interfaces.
+     * @param bc a button click to analyze.
+     * @param name the name of the button.
+     * @param indexOfNum the index of the button's assigned number.
+     * @param draft a draft request to analyze.
+     * @param drafts the map that the request belongs to.
+     * @return True if the parse matched with a button.
+     *         False otherwise
+     */
+    private boolean parseRequestClicks(ButtonClickEvent bc, String name,
+                                      int indexOfNum, GameReqs draft,
+                                      TreeMap<Integer, GameReqs> drafts) {
+        switch (name.substring(0, indexOfNum - 2)) {
+            case "join":
+                if (notInAnotherDraft(bc, null, drafts) == null) {
+                    draft.attemptDraft(bc);
+                }
+                return true;
+            case "setupEarly":
+                ((MiniGame) draft).setup(bc);
+                return true;
+            case "reping":
+                draft.reping(bc);
+                return true;
+            case "leave":
+                draft.removeFromQueue(bc);
+                return true;
+            case "requestRefresh":
+                draft.refresh(bc);
+                return true;
+            case "requestSub":
+                draft.requestSub(bc);
+                return true;
+            case "reassign":
+                ((DraftGame) draft).reassignCaptain(bc);
+                return true;
+            case "sub":
+                if (notInAnotherDraft(bc, null, drafts) == null) {
+                    draft.addSub(bc);
+                }
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Processes a button click from game request interfaces.
+     * @param bc a button click to analyze.
+     * @param name the name of the button.
+     * @param indexOfNum the index of the button's assigned number.
+     * @param numButton the button's assigned number.
+     * @param process a draft process to analyze.
+     * @param drafts the map that the respective request belongs to.
+     * @param queue the queue that the draft belongs to.
+     */
+    private void parseProcessClicks(ButtonClickEvent bc, String name,
+                                    int indexOfNum, int numButton,
+                                    ProcessReqs process,
+                                    TreeMap<Integer, GameReqs> drafts,
+                                    ArrayHeapMinPQ<Integer> queue) {
+        switch (name.substring(0, indexOfNum - 2)) {
+            case "resetTeams":
+                ((DraftProcess) process).resetTeams(bc);
+                break;
+            case "beginDraft":
+                ((DraftProcess) process).start(bc);
+                break;
+            case "plusOne":
+                process.changePointsForTeam(
+                        bc, bc.getMember().getId(), true);
+                break;
+            case "minusOne":
+                process.changePointsForTeam(
+                        bc, bc.getMember().getId(), false);
+                break;
+            case "nextTurn":
+                ((MiniProcess) process).rotateTurns(bc);
+                break;
+            case "endDraftProcess":
+                if (process.hasEnded(bc)) {
+                    drafts.remove(numButton);
+                    queue.add(numButton, numButton);
+                }
+                break;
+            case "processRefresh":
+                bc.deferEdit().queue();
+                process.refresh(bc);
+                break;
+        }
+    }
+
+    /**
+     * Prints a message if a draft expired.
+     * @param interaction the user interaction calling this method.
+     */
+    private void printExpirationMessage(GenericInteractionCreateEvent interaction) {
+        interaction.reply("Sorry but that draft has expired. "
+                        + "Feel free to start a new one!")
+                .setEphemeral(true).queue();
+    }
+
+    /**
+     * Processes button clicks.
      * @param bc a button click to analyze.
      */
     @Override
@@ -687,78 +790,31 @@ public class Events extends ListenerAdapter {
                 queue = ioQueue;
                 break;
         }
-
-        GameReqs currDraft = drafts.get(numButton);
-        if (currDraft == null) {
-            bc.reply("Sorry but that draft has expired. "
-                            + "Feel free to start a new one!")
-                    .setEphemeral(true).queue();
+        if (drafts == null) {
+            bc.getMessage().delete().queue();
+            printExpirationMessage(bc);
             return;
         }
 
-        ProcessReqs currProcess = currDraft.getProcess();
-        switch (btnName.substring(0, indexOfNum - 2)) {
-            case "join":
-                if (notInAnotherDraft(bc, null, drafts) == null) {
-                    currDraft.attemptDraft(bc);
-                }
-                break;
-            case "setupEarly":
-                ((MiniGame) currDraft).setup(bc);
-                break;
-            case "requestRefresh":
-                currDraft.refresh(bc);
-                break;
-            case "reping":
-                currDraft.reping(bc);
-                break;
-            case "leave":
-                currDraft.removeFromQueue(bc);
-                break;
-            case "requestSub":
-                currDraft.requestSub(bc);
-                break;
-            case "reassign":
-                ((DraftGame) currDraft).reassignCaptain(bc);
-                break;
-            case "sub":
-                if (notInAnotherDraft(bc, null, drafts) == null) {
-                    currDraft.addSub(bc);
-                }
-                break;
+        GameReqs currDraft = drafts.get(numButton);
+        if (currDraft == null) {
+            printExpirationMessage(bc);
+        } else if (!parseRequestClicks(bc, btnName, indexOfNum,
+                currDraft, drafts)) {
+            ProcessReqs currProcess = currDraft.getProcess();
 
-            case "resetTeams":
-                ((DraftProcess) currProcess).resetTeams(bc);
-                break;
-            case "beginDraft":
-                ((DraftProcess) currProcess).start(bc);
-                break;
-            case "plusOne":
-                currProcess.changePointsForTeam(
-                        bc, bc.getMember().getId(), true);
-                break;
-            case "minusOne":
-                currProcess.changePointsForTeam(
-                        bc, bc.getMember().getId(), false);
-                break;
-            case "nextTurn":
-                ((MiniProcess) currProcess).rotateTurns(bc);
-                break;
-            case "processRefresh":
-                bc.deferEdit().queue();
-                currProcess.refresh(bc);
-                break;
-            case "endDraftProcess":
-                if (currProcess.hasEnded(bc)) {
-                    drafts.remove(numButton);
-                    queue.add(numButton, numButton);
-                }
-                break;
+            if (currProcess == null) {
+                bc.getMessage().delete().queue();
+                printExpirationMessage(bc);
+            } else {
+                parseProcessClicks(bc, btnName, indexOfNum, numButton,
+                        currProcess, drafts, queue);
+            }
         }
     }
 
     /**
-     * Checks for any menu selections.
+     * Processes menu selections.
      * @param sm a menu selection to analyze.
      */
     @Override
@@ -785,9 +841,16 @@ public class Events extends ListenerAdapter {
                 drafts = ioDrafts;
                 break;
         }
+        if (drafts == null) {
+            sm.getMessage().delete().queue();
+            printExpirationMessage(sm);
+        }
 
         DraftProcess currProcess = ((DraftGame) drafts.get(numMenu)).getProcess();
-        if (menuName.substring(0, indexOfNum - 2).equals("teamSelection")) {
+        if (currProcess == null) {
+            sm.getMessage().delete().queue();
+            printExpirationMessage(sm);
+        } else if (menuName.substring(0, indexOfNum - 2).equals("teamSelection")) {
             currProcess.addPlayerToTeam(sm);
         }
     }
