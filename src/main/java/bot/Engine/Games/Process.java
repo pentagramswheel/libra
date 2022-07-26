@@ -458,12 +458,14 @@ public class Process<G extends Game<?, ?, T, P>, T extends Team<P>, P extends Pl
      *         False otherwise.
      */
     public boolean hasEnded(ButtonClickEvent bc) {
+        bc.deferEdit().queue();
+
         String authorID = bc.getMember().getId();
         setMessageID(bc.getMessageId());
 
         P foundAuthor = getRequest().getPlayers().get(authorID);
         if (foundAuthor == null || !foundAuthor.isActive()) {
-            getRequest().sendReply(bc, "You are not in the draft!", true);
+            getRequest().sendResponse(bc, "You are not in the draft!", true);
             return false;
         }
 
@@ -476,7 +478,6 @@ public class Process<G extends Game<?, ?, T, P>, T extends Team<P>, P extends Pl
         }
 
         if (numClicksLeft <= 0) {
-            bc.deferEdit().queue();
             getRequest().toggle(false);
 
             if (hasStarted()) {
@@ -519,7 +520,7 @@ public class Process<G extends Game<?, ?, T, P>, T extends Team<P>, P extends Pl
         } else {
             String reply = "You need `" + numClicksLeft
                     + "` other player(s) to end the draft.";
-            getRequest().sendReply(bc, reply, true);
+            getRequest().sendResponse(bc, reply, true);
 
             return false;
         }

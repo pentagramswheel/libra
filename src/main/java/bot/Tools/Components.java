@@ -39,8 +39,8 @@ public class Components {
             List<Emoji> emojis = Arrays.asList(
                     Emoji.fromEmote("3minigames", 773676980015988747L, false),
                     Emoji.fromEmote("3minigames", 773676980015988747L, false),
-                    Emoji.fromEmote("clipboardemoji", 689549199905259658L, false),
-                    Emoji.fromEmote("clipboard_1f4cb", 960518771276144641L, false),
+                    Emoji.fromEmote("3quest", 773676979798933506L, false),
+                    Emoji.fromEmote("3quest", 773676979798933506L, false),
                     Emoji.fromEmote("openbook", 988635067733643294L, false),
                     Emoji.fromEmote("faq", 694932182019473509L, false),
                     Emoji.fromEmote("writing", 622832106011230259L, false),
