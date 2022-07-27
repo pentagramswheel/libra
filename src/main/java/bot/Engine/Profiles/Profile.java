@@ -134,6 +134,27 @@ public class Profile implements Command {
     }
 
     /**
+     * Checks whether a weapon's length is too long or not.
+     * @param weapons the weapon names to check.
+     * @return True if a weapon is found to be too long.
+     *         False otherwise.
+     */
+    private boolean longWeaponLength(String weapons) {
+        if (weapons == null) {
+            return false;
+        }
+
+        String[] splitWeapons = weapons.split(", ");
+        for (String weapon : splitWeapons) {
+            if (weapon.length() > 27) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Reformats phrase into lines of set length.
      * @param phrase the phrase to format.
      * @param limit the number of items per line.
@@ -273,15 +294,17 @@ public class Profile implements Command {
         } else if (phraseTooLong(pronouns)) {
             printLengthError(sc, "pronouns");
         } else if (phraseTooLong(team)) {
-            printLengthError(sc, "team");
+            printLengthError(sc, "team name");
         } else if (blacklistedPhrase(nickname)) {
             printProfanityError(sc, "nickname");
         } else if (blacklistedPhrase(pronouns)) {
             printProfanityError(sc, "pronouns");
+        } else if (longWeaponLength(weapons)) {
+            printLengthError(sc, "weapon");
         } else if (blacklistedPhrase(weapons)) {
             printProfanityError(sc, "weapons");
         } else if (blacklistedPhrase(team)) {
-            printProfanityError(sc, "team");
+            printProfanityError(sc, "team name");
         } else if (pronouns != null && !pronouns.matches(PRONOUNS_PATTERN)) {
             printListError(sc, "pronouns");
         } else if (weapons != null && !weapons.matches(WEAPONS_PATTERN)) {
