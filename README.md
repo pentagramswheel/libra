@@ -7,9 +7,9 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** July 23, 2022
+**Last Updated:** July 26, 2022
 
-**Formal Documentation:** <medium><a href='https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing'>How To Use Libra - MullowayIT's Bot Documentation</a></medium>
+**Command and Usage Documentation:** <medium><a href='https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing'>How To Use Libra - MullowayIT's Bot Documentation</a></medium>
 
 **Table of Contents:**
 - [Introduction](#introduction)
@@ -68,13 +68,15 @@
 
 
 ## Introduction
-Libra is a multi-functional Discord bot designed to handle many tasks, with respect to the Mulloway Institute of Turfing (MIT), a draft server for Nintendo's competitive shooter IP, Splatoon. Her main goal is to keep track of a player database, implement convenience features for running tournaments, and most importantly, host an automated draft system from beginning (queuing players) to end (reporting scores).
+Libra is a multi-functional Discord bot designed to handle many tasks, with respect to the <medium><a href='https://twitter.com/MullowayIT'>Mulloway Institute of Turfing (MIT)</a></medium>, a draft server for Nintendo's competitive shooter IP, Splatoon. Her main goal is to keep track of a player database, implement convenience features for running tournaments, and most importantly, host several automated draft systems from beginning (queuing players) to end (reporting scores).
 
 
 
 
 ## How to Install
-After pulling this project, you can import it using the <medium><a href='https://www.jetbrains.com/help/idea/gradle.html'>JetBrains' official IntelliJ Gradle documentation</a></medium>. All dependencies will be imported upon starting up the project with Gradle (often included with IntelliJ). If another IDE or medium is being used, Gradle must be installed to import the project dependencies.
+After pulling this project, you can import it using the <medium><a href='https://www.jetbrains.com/help/idea/gradle.html'>JetBrains' official IntelliJ Gradle documentation</a></medium>. All dependencies will be imported upon starting up the project with Gradle (often included with IntelliJ).
+
+If another IDE or medium is being used, Gradle must be installed to import the project dependencies. If you prefer Maven, the Gradle dependencies listed in `build.gradle` can be translated.
 
 To fully configure the bot, the credentials listed in `ConfigExample.java` must be filled out in its entirety. Afterwards, the file must be renamed to `Config.java` for integration.
 
