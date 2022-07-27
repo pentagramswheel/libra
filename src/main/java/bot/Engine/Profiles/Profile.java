@@ -50,6 +50,17 @@ public class Profile implements Command {
     /** The tab name of the spreadsheet. */
     private static final String TAB = "Profiles";
 
+    /** A pattern for friend codes to follow. */
+    private static final String FC_PATTERN = "\\d{4}-\\d{4}-\\d{4}";
+
+    /** A pattern for pronouns to follow. */
+    private static final String PRONOUNS_PATTERN =
+            "[^\\s][\\w\\s\\/\\-\\.\\']+(?:,\\s[\\w\\']+[\\w\\s\\/\\-\\.\\']*)*";
+
+    /** A pattern for lists within strings to follow. */
+    private static final String WEAPONS_PATTERN =
+            "[^\\s][\\w\\s\\-\\.\\']+(?:,\\s[\\w\\']+[\\w\\s\\-\\.\\']*)*";
+
     /**
      * Checks the name of a parameter of a command.
      * @param args the arguments of the command.
@@ -83,6 +94,20 @@ public class Profile implements Command {
     }
 
     /**
+     * Checks whether a phrase is too long or not.
+     * @param phrase the phrase to check.
+     * @return True if it is too long.
+     *         False otherwise.
+     */
+    private boolean phraseTooLong(String phrase) {
+        if (phrase == null) {
+            return false;
+        }
+
+        return phrase.length() > 35;
+    }
+
+    /**
      * Checks whether a phrase is inappropriate or not.
      * @param phrase the phrase to check.
      * @return True if it is inappropriate.
@@ -106,20 +131,6 @@ public class Profile implements Command {
         }
 
         return false;
-    }
-
-    /**
-     * Checks whether a phrase is too long or not.
-     * @param phrase the phrase to check.
-     * @return True if it is too long.
-     *         False otherwise.
-     */
-    private boolean phraseTooLong(String phrase) {
-        if (phrase == null) {
-            return false;
-        }
-
-        return phrase.length() > 35;
     }
 
     /**
@@ -198,6 +209,91 @@ public class Profile implements Command {
     }
 
     /**
+     * Prints an error message for bad friend code inputs.
+     * @param sc the user's inputted command.
+     */
+    private void printFCError(SlashCommandEvent sc) {
+        editMessage(sc,"Friend code should be in the format: "
+                + "`8888-8888-8888`.");
+    }
+
+    /**
+     * Prints an error message for bad input lengths.
+     * @param sc the user's inputted command.
+     * @param name the name of the input.
+     */
+    private void printLengthError(SlashCommandEvent sc, String name) {
+        editMessage(sc, String.format("Lengthy %s detected. "
+                + "Please use another one or ask Technical Staff about it!",
+                name));
+    }
+
+    /**
+     * Prints an error message for inappropriate inputs.
+     * @param sc the user's inputted command.
+     * @param name the name of the input.
+     */
+    private void printProfanityError(SlashCommandEvent sc, String name) {
+        editMessage(sc,String.format("Inappropriate %s detected. "
+                + "Please use another one or ask Technical Staff about it!",
+                name));
+    }
+
+    /**
+     * Prints an error message for bad list inputs.
+     * @param sc the user's inputted command.
+     * @param name the name of the input,
+     */
+    private void printListError(SlashCommandEvent sc, String name) {
+        editMessage(sc,String.format("Invalid %s detected. "
+                + "Please **strictly** use the following format: "
+                + "`option 1, option 2, option 3, ...` (note the `, `).",
+                name));
+    }
+
+    /**
+     * Checks whether there is an error while inputting one of the fields
+     * of the profile or not.
+     * @param sc the user's inputted command.
+     * @param fc the user's friend code.
+     * @param nickname the user's nickname.
+     * @param pronouns the user's pronouns.
+     * @param weapons the user's main weapons.
+     * @param team the user's competitive team.
+     * @return True if there was no error.
+     *         False otherwise.
+     */
+    private boolean noParameterError(SlashCommandEvent sc, String fc,
+                                    String nickname, String pronouns,
+                                    String weapons, String team) {
+        if (fc != null && !fc.matches(FC_PATTERN)) {
+            printFCError(sc);
+        } else if (phraseTooLong(nickname)) {
+            printLengthError(sc, "nickname");
+        } else if (phraseTooLong(pronouns)) {
+            printLengthError(sc, "pronouns");
+        } else if (phraseTooLong(team)) {
+            printLengthError(sc, "team");
+        } else if (blacklistedPhrase(nickname)) {
+            printProfanityError(sc, "nickname");
+        } else if (blacklistedPhrase(pronouns)) {
+            printProfanityError(sc, "pronouns");
+        } else if (blacklistedPhrase(weapons)) {
+            printProfanityError(sc, "weapons");
+        } else if (blacklistedPhrase(team)) {
+            printProfanityError(sc, "team");
+        } else if (pronouns != null && !pronouns.matches(PRONOUNS_PATTERN)) {
+            printListError(sc, "pronouns");
+        } else if (weapons != null && !weapons.matches(WEAPONS_PATTERN)) {
+            printListError(sc, "weapons");
+        } else {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Quickly registers a new player into the database by
      * loading multiple parameters
      * @param sc the user's inputted command.
@@ -213,10 +309,6 @@ public class Profile implements Command {
         String weapons = (String) getParameter(args, false);
         String rank = (String) getParameter(args, false);
 
-        String fcPattern = "\\d{4}-\\d{4}-\\d{4}";
-        String listPattern =
-                "[^\\s][\\w\\s\\/\\-\\.\\']+(?:,\\s[\\w\\']+[\\w\\s\\/\\-\\.\\']*)*";
-
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
@@ -224,23 +316,8 @@ public class Profile implements Command {
                 editMessage(sc, "You cannot use `qprofile`, because your "
                                 + "profile already exists. Use the other "
                                 + "`profile` commands as needed.");
-            } else if (!fc.matches(fcPattern)) {
-                editMessage(sc,"Friend code should be in the format: "
-                                + "`8888-8888-8888`.");
-            } else if (phraseTooLong(nickname) || phraseTooLong(pronouns)) {
-                editMessage(sc, "Lengthy nickname/pronouns detected. Please "
-                                + "use another one or ask Technical Staff "
-                                + "about it!");
-            } else if (blacklistedPhrase(nickname) || blacklistedPhrase(pronouns)) {
-                editMessage(sc,"Inappropriate nickname/pronouns detected. "
-                                + "Please use another one or ask Technical "
-                                + "Staff about it!");
-            } else if (!pronouns.matches(listPattern) && !weapons.matches(listPattern)) {
-                editMessage(sc,"Invalid pronouns/weapons format detected. "
-                                + "Please **strictly** use the following "
-                                + "format: `option 1, option 2, option 3, "
-                                + "...` (note the `, `).");
-            } else {
+            } else if (noParameterError(sc, fc,
+                    nickname, pronouns, weapons, null)) {
                 Member user = sc.getMember();
                 String discordTag = user.getUser().getAsTag();
 
@@ -274,38 +351,37 @@ public class Profile implements Command {
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
 
             Member user = sc.getMember();
-            if (!fc.matches("\\d{4}-\\d{4}-\\d{4}")) {
-                editMessage(sc,
-                        "Friend code should be in the format: "
-                                + "`8888-8888-8888`.");
-            } else if (database.containsKey(user.getId())) {
-                PlayerInfo profile = lookup(user.getId(), database);
+            if (noParameterError(sc, fc, null, null, null, null)) {
+                if (database.containsKey(user.getId())) {
+                    PlayerInfo profile = lookup(user.getId(), database);
 
-                String updateRange = link.buildRange(TAB,
-                        START_COLUMN, profile.getSpreadsheetPosition(),
-                        END_COLUMN, profile.getSpreadsheetPosition());
-                ValueRange newRow = link.buildRow(Arrays.asList(
-                        profile.getAsTag(), profile.getNickname(),
-                        fc, profile.getPlaystyle(),
-                        profile.getWeaponPool(), profile.getRank(),
-                        profile.getTeam()));
-                link.updateRange(updateRange, newRow);
+                    String updateRange = link.buildRange(TAB,
+                            START_COLUMN, profile.getSpreadsheetPosition(),
+                            END_COLUMN, profile.getSpreadsheetPosition());
+                    ValueRange newRow = link.buildRow(Arrays.asList(
+                            profile.getAsTag(), profile.getNickname(),
+                            fc, profile.getPlaystyle(),
+                            profile.getWeaponPool(), profile.getRank(),
+                            profile.getTeam()));
+                    link.updateRange(updateRange, newRow);
 
-                editMessage(sc,
-                        "Friend code updated to `" + "`.");
-                log("Profile FC updated for " + profile.getAsTag() + ".", false);
-            } else {
-                String discordTag = user.getUser().getAsTag();
+                    editMessage(sc,
+                            "Friend code updated to `" + "`.");
+                    log("Profile FC updated for " + profile.getAsTag() + ".",
+                            false);
+                } else {
+                    String discordTag = user.getUser().getAsTag();
 
-                ValueRange newRow = link.buildRow(Arrays.asList(
-                        user.getId(), discordTag, user.getEffectiveName(),
-                        fc, "Unset",
-                        "Unset", "Unset", "Unset", "N/A"));
-                link.appendRow(TAB, newRow);
+                    ValueRange newRow = link.buildRow(Arrays.asList(
+                            user.getId(), discordTag, user.getEffectiveName(),
+                            fc, "Unset",
+                            "Unset", "Unset", "Unset", "N/A"));
+                    link.appendRow(TAB, newRow);
 
-                editMessage(sc, "Your MIT profile has been created! "
-                        + "Use `/mit profile view` to view your profile.");
-                log("Profile created for " + discordTag + ".", false);
+                    editMessage(sc, "Your MIT profile has been created! "
+                            + "Use `/mit profile view` to view your profile.");
+                    log("Profile created for " + discordTag + ".", false);
+                }
             }
         } catch (IOException | GeneralSecurityException e) {
             editMessage(sc, "The profiles database could not load.");
@@ -611,47 +687,30 @@ public class Profile implements Command {
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
-            String listPattern =
-                    "[^\\s][\\w\\s\\/\\-\\.\\']+(?:,\\s[\\w\\']+[\\w\\s\\/\\-\\.\\']*)*";
 
-            if (phraseTooLong(nickname) || phraseTooLong(pronouns)
-                    || phraseTooLong(team)) {
-                editMessage(sc,
-                        "Lengthy team name detected. Please use another one "
-                                + "or ask Technical Staff about it!");
-            } else if (blacklistedPhrase(nickname) || blacklistedPhrase(pronouns)
-                || blacklistedPhrase(team) || blacklistedPhrase(weapons)) {
-                editMessage(sc,
-                        "Inappropriate input detected. Please use another one "
-                                + "or ask Technical Staff about it!");
-            } else if ((pronouns != null && !pronouns.matches(listPattern))
-                    || (weapons != null && !weapons.matches(listPattern))) {
-                editMessage(sc,
-                        "Invalid pronouns/weapons format detected. Please "
-                                + "**strictly** use the following format: "
-                                + "`option 1, option 2, option 3, ...` (note "
-                                + "the `, `).");
-            } else if (database.containsKey(sc.getMember().getId())) {
-                PlayerInfo profile = lookup(sc.getMember().getId(), database);
+            if (noParameterError(sc, null, nickname, pronouns, weapons, team)) {
+                if (database.containsKey(sc.getMember().getId())) {
+                    PlayerInfo profile = lookup(sc.getMember().getId(), database);
 
-                String updateRange = link.buildRange(TAB,
-                        START_COLUMN, profile.getSpreadsheetPosition(),
-                        END_COLUMN, profile.getSpreadsheetPosition());
-                List<Object> updatedRow = withNewInfo(profile, nickname,
-                        pronouns, playstyle, weapons, rank, team);
-                String changedField = (String) updatedRow.remove(0);
+                    String updateRange = link.buildRange(TAB,
+                            START_COLUMN, profile.getSpreadsheetPosition(),
+                            END_COLUMN, profile.getSpreadsheetPosition());
+                    List<Object> updatedRow = withNewInfo(profile, nickname,
+                            pronouns, playstyle, weapons, rank, team);
+                    String changedField = (String) updatedRow.remove(0);
 
-                ValueRange newRow = link.buildRow(updatedRow);
-                link.updateRange(updateRange, newRow);
+                    ValueRange newRow = link.buildRow(updatedRow);
+                    link.updateRange(updateRange, newRow);
 
-                String cmd = sc.getSubcommandName();
-                editMessage(sc, "Your " + cmd + " has been updated to `"
-                        + changedField.replaceAll("\n", " ") + "`.");
-                log(sc.getUser().getAsTag() + "'s " + cmd + " was updated.", false);
-            } else {
-                editMessage(sc, "Your MIT profile does not exist yet. "
-                        + "Register with `/mit qprofile ...` or "
-                        + "`/mit profile fc` to proceed.");
+                    String cmd = sc.getSubcommandName();
+                    editMessage(sc, "Your " + cmd + " has been updated to `"
+                            + changedField.replaceAll("\n", " ") + "`.");
+                    log(sc.getUser().getAsTag() + "'s " + cmd + " was updated.", false);
+                } else {
+                    editMessage(sc, "Your MIT profile does not exist yet. "
+                            + "Register with `/mit qprofile ...` or "
+                            + "`/mit profile fc` to proceed.");
+                }
             }
         } catch (IOException | GeneralSecurityException e) {
             editMessage(sc, "The profiles database could not load.");

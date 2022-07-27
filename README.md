@@ -7,7 +7,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** July 26, 2022
+**Last Updated:** July 27, 2022
 
 **Command and Usage Documentation:** <medium><a href='https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing'>How To Use Libra - MullowayIT's Bot Documentation</a></medium>
 
@@ -477,6 +477,9 @@ A class which manages the profile database of MIT.
 2. `String START_COLUMN` - the starting information column of the profiles spreadsheet.
 3. `String END_COLUMN` - the ending information column of the profiles spreadsheet.
 4. `String TAB` - the tab to reference within the profiles spreadsheet.
+5. `String FC_PATTERN` - a pattern for friend codes to strictly follow.
+6. `String PRONOUNS_PATTERN` - a pattern for pronouns to strictly follow.
+7. `String WEAPONS_PATTERN` - a pattern for weapons to strictly follow.
 
 ----
 
