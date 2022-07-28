@@ -423,7 +423,7 @@ public class Profile implements Command {
         try {
             GoogleSheetsAPI link = new GoogleSheetsAPI(spreadsheetID);
             TreeMap<Object, Object> database = link.readSection(sc, TAB);
-            String pronoun = "Their";
+            String pronoun = null;
 
             if (id == null) {
                 id = sc.getMember().getId();
@@ -432,6 +432,9 @@ public class Profile implements Command {
 
             if (database.containsKey(id)) {
                 PlayerInfo profile = lookup(id, database);
+                if (pronoun == null) {
+                    pronoun = new PronounsBuilder(profile).getPossessiveTitleCase();
+                }
 
                 editMessage(sc, pronoun + " friend code is `SW-"
                         + profile.getFC() + "`.");
