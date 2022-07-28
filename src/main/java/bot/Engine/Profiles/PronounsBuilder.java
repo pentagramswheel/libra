@@ -28,14 +28,17 @@ public class PronounsBuilder {
   /** Pattern that matches ""ask" (for pronouns)" in the text */
   private static final Pattern askRegex = Pattern.compile("^ask$|(^|\\W)((pronouns? ?([ :]) ?(ask))|(ask (for )?pronouns?))(\\W|$)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
-  /** List of subjects matched (he, she, they etc) */
+  /** List of pronouns matched as subjects (he, she, they, it, etc) */
   private final List<String> subjects = new ArrayList<>();
 
-  /** List of objects matched (him, her, them etc) */
+  /** List of pronouns matched as objects (him, her, them, it, etc) */
   private final List<String> objects = new ArrayList<>();
 
-  /** List of possessives matched (his, hers, their etc) */
-  private final List<String> possessives = new ArrayList<>();
+  /** List of pronouns matched as possessive pronouns (his, hers, theirs, its, etc) */
+  private final List<String> possessivePronouns = new ArrayList<>();
+
+  /** List of pronouns matched as possessive adjectives (his, her, their, its, etc) */
+  private final List<String> possessiveAdjectives = new ArrayList<>();
 
   /**
    * Construct the PronounsBuilder by the Player's profile.
@@ -55,54 +58,69 @@ public class PronounsBuilder {
       return;
     }
 
-    // Use the three common pronouns (it and neo pronoun users, we still love you)
+    // Use the three common person pronouns (it and neo pronoun users, we still love you)
     boolean allMatched = allRegex.matcher(pronouns).find();
 
     // Use they for unknown/ask
     if (theyRegex.matcher(pronouns).find() || askRegex.matcher(pronouns).find() || allMatched) {
       subjects.add("they");
       objects.add("them");
-      possessives.add("their");
+      possessivePronouns.add("theirs");
+      possessiveAdjectives.add("their");
       return;
     }
 
     if (heRegex.matcher(pronouns).find() || allMatched) {
       subjects.add("he");
       objects.add("him");
-      possessives.add("his");
+      possessivePronouns.add("his");
+      possessiveAdjectives.add("his");
     }
 
     if (sheRegex.matcher(pronouns).find() || allMatched) {
       subjects.add("she");
       objects.add("her");
-      possessives.add("hers");
+      possessivePronouns.add("hers");
+      possessiveAdjectives.add("her");
     }
     
     if (itRegex.matcher(pronouns).find()) {
       subjects.add("it");
       objects.add("it");
-      possessives.add("its");
+      possessivePronouns.add("its");
+      possessiveAdjectives.add("its");
     }
   }
 
-  /** Get the full list of subjects matched (he, she, they etc) */
+  /** Get the full list of pronouns matched as subjects (he, she, they, it, etc) */
   public List<String> getSubjectsList() {
     return subjects;
   }
   
-  /** Get the full list of objects matched (him, her, them etc) */
+  /** Get the full list of pronouns matched as objects (him, her, them, it, etc) */
   public List<String> getObjectsList() {
     return objects;
   }
 
-  /** Get the full list of possessives matched (his, hers, their etc) */
-  public List<String> getPossessivesList() {
-    return possessives;
+  /** Get the full list of pronouns matched as possessive pronouns (his, hers, theirs, its, etc) */
+  public List<String> getPossessivePronounsList() {
+    return possessivePronouns;
+  }
+
+  /** Get the full list of pronouns matched as possessive adjectives (his, her, their, its, etc) */
+  public List<String> getPossessiveAdjectivesList() {
+    return possessiveAdjectives;
   }
 
   /***
-   * Get a random subject from the list of valid subjects.
-   * If there are no valid subjects, returns "they".
+   * Get a random subject pronoun valid for this instance [he, she, they, it, etc].
+   * If there are none valid, returns "they".
+   *
+   * <p>
+   * Note on English: subjects *usually go at the start* and before the verb.
+   * Subject pronouns replace the subject in the sentence.
+   * <p>
+   * e.g. When he was young and she was younger; "he" and "she" are subject pronouns.
    */
   public String getSubject() {
     switch (subjects.size()) {
@@ -116,16 +134,22 @@ public class PronounsBuilder {
   }
   
   /***
-   * Get a random subject from the list of valid subjects with the starting letter capitalized.
-   * If there are no valid subjects, returns "They".
+   * Get a random subject pronoun valid for this instance with the starting letter capitalized.
+   * If there are none valid, returns "They".
    */
   public String getSubjectTitleCase() {
     return toTitleCase(getSubject());
   }
 
   /**
-   * Get a random object from the list of valid objects.
-   * If there are no valid objects, returns "them".
+   * Get a random object pronoun valid for this instance [him, her, them, it, etc].
+   * If there are none valid, returns "them".
+   * 
+   * <p>
+   * Note on English: objects *usually go at the end* and after the verb. They are often in form "to [noun]".
+   * Object pronouns replace the object in the sentence.
+   * <p>
+   * e.g. The jellyfish shocked him; the captain shouted to her. "Him" and "her" are object pronouns (the jellyfish and the captain are subjects).
    */
   public String getObject() {
     switch (objects.size()) {
@@ -139,34 +163,72 @@ public class PronounsBuilder {
   }
 
   /***
-   * Get a random object from the list of valid subjects with the starting letter capitalized.
-   * If there are no valid subjects, returns "Them".
+   * Get a random object pronoun valid for this instance with the starting letter capitalized.
+   * If there are none valid, returns "Them".
    */
   public String getObjectTitleCase() {
     return toTitleCase(getObject());
   }
 
   /**
-   * Get a random possessive from the list of valid possessives.
-   * If there are no valid possessives, returns "their".
+   * Get a random possessive pronoun valid for this instance [his, hers, theirs, its, etc].
+   * If there are none valid, returns "theirs".
+   * 
+   * <p>
+   * Note on English: possessive pronouns *usually go at the end* and are *not* before a noun. 
+   * They indicate the ownership of the preceding noun.
+   * <p>
+   * e.g. The game is ours to take: "ours" is a possessive pronoun ("the game" is the owned noun).
+   * e.g. The captain shouted to the platoon of hers: "hers" is a possessive pronoun ("platoon" is the owned noun).
    */
-  public String getPossessive() {
-    switch (possessives.size()) {
+  public String getPossessivePronoun() {
+    switch (possessivePronouns.size()) {
       case 0:
-        return "their";
+        return "theirs";
       case 1:
-        return possessives.get(0);
+        return possessivePronouns.get(0);
       default:
-        return possessives.get(rand.nextInt(possessives.size()));
+        return possessivePronouns.get(rand.nextInt(possessivePronouns.size()));
     }
   }
 
   /***
-   * Get a random possessive from the list of valid subjects with the starting letter capitalized.
-   * If there are no valid subjects, returns "Their".
+   * Get a random possessive pronoun valid for this instance with the starting letter capitalized.
+   * If there are none valid, returns "Theirs".
    */
-  public String getPossessiveTitleCase() {
-    return toTitleCase(getPossessive());
+  public String getPossessivePronounTitleCase() {
+    return toTitleCase(getPossessivePronoun());
+  }
+
+  /**
+   * Get a random possessive adjective valid for this instance [his, her, their, its, etc].
+   * If there are none valid, returns "their".
+   * 
+   * <p>
+   * Note on English: possessive adjectives *usually go at the start* and *are* before a noun. 
+   * They indicate the ownership of the noun following.
+   * <p>
+   * e.g. Our game, their loss; "our" and "their" are possessive adjectives ("game" and "loss" are nouns following).
+   * <p>
+   * e.g. The captain shouted to her platoon: "her" is a possessive adjective.
+   */
+  public String getPossessiveAdjective() {
+    switch (possessiveAdjectives.size()) {
+      case 0:
+        return "their";
+      case 1:
+        return possessiveAdjectives.get(0);
+      default:
+        return possessiveAdjectives.get(rand.nextInt(possessiveAdjectives.size()));
+    }
+  }
+
+  /***
+   * Get a random possessive adjective valid for this instance with the starting letter capitalized.
+   * If there are none valid, returns "Their".
+   */
+  public String getPossessiveAdjectiveTitleCase() {
+    return toTitleCase(getPossessiveAdjective());
   }
 
   /***

@@ -433,7 +433,7 @@ public class Profile implements Command {
             if (database.containsKey(id)) {
                 PlayerInfo profile = lookup(id, database);
                 if (pronoun == null) {
-                    pronoun = new PronounsBuilder(profile).getPossessiveTitleCase();
+                    pronoun = new PronounsBuilder(profile).getPossessiveAdjectiveTitleCase();
                 }
 
                 editMessage(sc, pronoun + " friend code is `SW-"
