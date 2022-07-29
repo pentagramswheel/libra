@@ -518,7 +518,7 @@ The `lp/io cyclescalc` commands allow a user to perform a Cycle Top 10 calculati
 
 The `mit profile` commands allow a user to create and modify their official MIT profile.
 
-The <medium><a href='https://github.com/pentagramswheel/libra/blob/main/badwords.txt'>badwords.txt</a></medium> text file, partially created by `nantonakos`, is referenced when finding profanity within phrases.
+The <medium><a href='https://github.com/pentagramswheel/libra/blob/main/badwords.txt'>badwords.txt</a></medium> text file, partially created by <medium><a href='https://github.com/nantonakos/badwords'>nantonakos</a></medium>, is referenced when finding profanity within phrases.
 
 ----
 
