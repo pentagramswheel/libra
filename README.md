@@ -74,13 +74,13 @@ Libra is a multi-functional Discord bot designed to handle many tasks, with resp
 
 
 ## How to Install
-After pulling this project, you can import it using the <medium><a href='https://www.jetbrains.com/help/idea/gradle.html'>JetBrains' official IntelliJ Gradle documentation</a></medium>. All dependencies will be imported upon starting up the project with Gradle (often included with IntelliJ).
+After pulling this project, you can import it using the <medium><a href='https://www.jetbrains.com/help/idea/gradle.html'>JetBrains' official IntelliJ Gradle documentation</a></medium>. All dependencies will be imported upon starting up the project with Gradle.
 
-If another IDE or medium is being used, Gradle must be installed to import the project dependencies. If you prefer Maven, the Gradle dependencies listed in `build.gradle` can be translated.
+If another IDE or medium is being used, Gradle must be installed to import the project dependencies. If you prefer Maven, the Gradle dependencies listed in <medium><a href='https://github.com/pentagramswheel/libra/blob/main/build.gradle'>build.gradle</a></medium> can be translated.
 
-To fully configure the bot, the credentials listed in `ConfigExample.java` must be filled out in its entirety. Afterwards, the file must be renamed to `Config.java` for integration.
+To fully configure the bot, the credentials listed in the <medium><a href='https://github.com/pentagramswheel/libra/blob/main/src/main/java/bot/ConfigExample.java'>ConfigExample.java</a></medium> class must be filled out in its entirety. Afterwards, the file must be renamed to `Config.java` for integration.
 
-The main module to run is `Main.java` but to start the bot from the console, run the following:
+The main module to run is <medium><a href='https://github.com/pentagramswheel/libra/blob/main/src/main/java/bot/Main.java'>Main.java</a></medium> but to start the bot from the console, run the following:
 ```
 javac *
 java src/main/java/bot/Main.java
@@ -508,13 +508,17 @@ A template for classes which formally manages and processes draft/games.
 
 ## Persistence
 
-The project saves and loads data from four Google Sheets spreadsheets, two each for the `Log` and `Graduate` classes.
+The project saves and loads data from Google Sheets spreadsheets, for the <medium><a href='https://github.com/pentagramswheel/libra/blob/main/src/main/java/bot/Engine/Cycles/ManualLog.java'>ManualLog</a></medium>, <medium><a href='https://github.com/pentagramswheel/libra/blob/main/src/main/java/bot/Engine/Graduate.java'>Graduate</a></medium>, <medium><a href='https://github.com/pentagramswheel/libra/blob/main/src/main/java/bot/Engine/Cycles/PointsCalculator.java'>PointsCalculator</a></medium>, and <medium><a href='https://github.com/pentagramswheel/libra/blob/main/src/main/java/bot/Engine/Profiles/Profile.java'>Profile</a></medium> classes.
 
 These spreadsheets are connected and interacted with using the Google Sheets API, linked through the Gradle components of this project. Feature summary updates are also sent, through the channel the user originally typed commands in, by the bot using the Discord JDA API, also linked through Gradle.
 
 The `lp/io undo` commands allows a user to revert a cycle command, by saving and loading the previous cycle command, saved in text files.
 
-The `badwords.txt` text file, partially created by `nantonakos`, is referenced when finding profanity within phrases.
+The `lp/io cyclescalc` commands allow a user to perform a Cycle Top 10 calculation, while updating the section leaderboards.
+
+The `mit profile` commands allow a user to create and modify their official MIT profile.
+
+The <medium><a href='https://github.com/pentagramswheel/libra/blob/main/badwords.txt'>badwords.txt</a></medium> text file, partially created by `nantonakos`, is referenced when finding profanity within phrases.
 
 ----
 
@@ -523,4 +527,4 @@ The `badwords.txt` text file, partially created by `nantonakos`, is referenced w
 
 ## Licensing and Rights
 
-For more info on licensing and copyright, see the information listed under licensing file `LICENSE`.
+For more info on licensing and copyright, see the information listed under licensing file <medium><a href='https://github.com/pentagramswheel/libra/blob/main/LICENSE'>LICENSE</a></medium>.
