@@ -55,11 +55,11 @@ public class Profile implements Command {
 
     /** A pattern for pronouns to follow. */
     private static final String PRONOUNS_PATTERN =
-            "[^\\s][\\w\\s\\/\\-\\.\\']+(?:,\\s[\\w\\']+[\\w\\s\\/\\-\\.\\']*)*";
+            "(?:(?:, )?[\\w/]+(?: +[\\w/]+)*)+";
 
     /** A pattern for lists within strings to follow. */
     private static final String WEAPONS_PATTERN =
-            "[^\\s][\\w\\s\\-\\.\\']+(?:,\\s[\\w\\']+[\\w\\s\\-\\.\\']*)*";
+            "(?:(?:, )?[\\w'.\\-]+(?: +[\\w'.\\-]+)*)+";
 
     /**
      * Checks the name of a parameter of a command.
@@ -268,7 +268,8 @@ public class Profile implements Command {
     private void printListError(SlashCommandEvent sc, String name) {
         editMessage(sc,String.format("Invalid %s detected. "
                 + "Please **strictly** use the following format: "
-                + "`option 1, option 2, option 3, ...` (note the `, `).",
+                + "`option 1, option2, option 3, ...` (note the `, `). "
+                + "Otherwise see `/libra help` for more assistance.",
                 name));
     }
 
