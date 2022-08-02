@@ -47,6 +47,8 @@ public class Main {
                 "Checks whether the bot is online or not.");
         SubcommandData help = new SubcommandData("help",
                 "Answers questions via a help menu.");
+        SubcommandData fact = new SubcommandData("fact",
+                "Generates a fun fact about Libra!");
 
         // general commands
         CommandData mit = new CommandData("mit",
@@ -235,7 +237,7 @@ public class Main {
         }
 
         // implementing commands
-        libra.addSubcommands(status, help);
+        libra.addSubcommands(status, help, fact);
         mit.addSubcommands(qprofile, ded);
         mit.addSubcommandGroups(profile);
         fs.addSubcommands(

@@ -37,6 +37,7 @@ public class Components {
             List<String> labels = new ArrayList<>();
             List<String> values = new ArrayList<>();
             List<Emoji> emojis = Arrays.asList(
+                    Emoji.fromEmote("profilepurple", 937938482221965332L, false),
                     Emoji.fromEmote("3minigames", 773676980015988747L, false),
                     Emoji.fromEmote("3minigames", 773676980015988747L, false),
                     Emoji.fromEmote("3quest", 773676979798933506L, false),
@@ -46,6 +47,7 @@ public class Components {
                     Emoji.fromEmote("writing", 622832106011230259L, false),
                     Emoji.fromEmote("7212roleadmin", 962720955505971200L, false));
 
+            labels.add("I'm having trouble with my profile.");
             labels.add("I want to know about the minigame system!");
             labels.add("I want to know everything about the minigame system!");
             labels.add("I want to know about the draft system!");

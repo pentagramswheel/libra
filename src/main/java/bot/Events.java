@@ -205,42 +205,76 @@ public class Events extends ListenerAdapter {
 
         switch (value) {
             case "0":
-                eb.setTitle("Libra's Automatic Minigame System");
-                eb.setDescription("[Here's the quick overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.zdp2xwjnpzdw)");
+                eb.setTitle("Libra's Profile Troubleshooting");
+                eb.addField("General Formatting",
+                        "Lists should be in the format: `option 1, option2, ...`\n"
+                                + "Note how there are no unnecessary spaces between options.\n"
+                                + "The following common symbols are not allowed:\n"
+                                + "`! @ # $ % ^ & * ( ) [ ] { } \\ | ; : \" + = < > ?`", false);
+                eb.addField("Pronouns Tips",
+                        "Pronouns often come in the format: `she/her, he/they, ...`\n"
+                                + "We encourage you to put all of your preferred pronouns,\n"
+                                + "so other players know which ones you are most\n"
+                                + "comfortable with!\n\n"
+                                + "If you're fine with any pronouns, some give their\n"
+                                + "preference as `Any`. If you would rather have others just\n"
+                                + "ask, some give their preference as `Ask me`!", false);
+                eb.addField("Weapons Tips",
+                        "Weapons often come in the format:\n"
+                                + "`Octobrush, Blasters, Scopes, '89, ...`\n"
+                                + "While it's not a bad idea to include your entire weapon pool,\n"
+                                + "it's generally fine for other players to know just the\n"
+                                + "summarized version of your weapon pool.\n\n"
+                                + "For example, if you play all splatlings, instead of listing\n"
+                                + "every splatling, it is just as effective to just label them\n"
+                                + "simply as `Splatlings`! Some weapons are even known to\n"
+                                + "have an abbreviated name, such as Kensa (K)-branded\n"
+                                + "weapons.\n\n"
+                                + "`Kensa Splattershot Pro = Kensa Pro = KPro`\n"
+                                + "`(Regular) Splattershot Jr. = Vanilla Jr = VJr`\n"
+                                + "`Custom E-Liter 4K = Custom Liter = CLiter`", false);
+                eb.addField("Remark",
+                        "Although this formatting is somewhat strict, it is\n"
+                                + "to create a consistency amongst all profiles\n"
+                                + "and in case your profile is featured somewhere!", false);
                 break;
             case "1":
                 eb.setTitle("Libra's Automatic Minigame System");
-                eb.setDescription("[Here's the detailed overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.ysn2sl5wfhn4)");
+                eb.setDescription("[Here's the quick overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.zdp2xwjnpzdw)");
                 break;
             case "2":
-                eb.setTitle("Libra's Automatic Draft System");
-                eb.setDescription("[Here's the quick overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.rzj2bgwe2gos)");
+                eb.setTitle("Libra's Automatic Minigame System");
+                eb.setDescription("[Here's the detailed overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.ysn2sl5wfhn4)");
                 break;
             case "3":
                 eb.setTitle("Libra's Automatic Draft System");
-                eb.setDescription("[Here's the detailed overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.xt8dy64nsnj)");
+                eb.setDescription("[Here's the quick overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.rzj2bgwe2gos)");
                 break;
             case "4":
+                eb.setTitle("Libra's Automatic Draft System");
+                eb.setDescription("[Here's the detailed overview!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.xt8dy64nsnj)");
+                break;
+            case "5":
                 eb.setTitle("Libra's Documentation");
                 eb.setDescription("[Here's the full document!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing)");
                 break;
-            case "5":
+            case "6":
                 eb.setTitle("Libra's FAQ");
                 eb.setDescription("[Here are some answers!](https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing#heading=h.80874ddqf10r)");
                 break;
-            case "6":
+            case "7":
                 eb.setTitle("Match Report Help (Staff)");
-                eb.setDescription("If a match report is giving you an error message, \n"
-                        + "it is most likely due to a row in the spreadsheet \n"
-                        + "missing information. For example, one common \n"
-                        + "problem is presetting or overextending the \n"
+                eb.setDescription("If a match report is giving you an error message,\n"
+                        + "it is most likely due to a row in the spreadsheet\n"
+                        + "missing information. For example, one common\n"
+                        + "problem is presetting or overextending the\n"
                         + "formulas past the bottommost row.");
                 break;
             default:
                 eb.setTitle("Roles Help (Staff)");
-                eb.setDescription("If the role for a player isn't showing up or seemingly \n"
-                        + "isn't being added, try *refreshing the roles* by opening \n"
-                        + "`Server Settings > User Management > Members`. \n"
+                eb.setDescription("If the role for a player isn't showing up or seemingly\n"
+                        + "isn't being added, try *refreshing the roles* by opening\n"
+                        + "`Server Settings > User Management > Members`.\n"
                         + "Note that it takes ~0.2 sec/player to add a role.");
                 break;
         }
@@ -494,6 +528,52 @@ public class Events extends ListenerAdapter {
         }
     }
 
+    /** Retrieves an embedded fun fact about Libra. */
+    private EmbedBuilder getFunFact() {
+        EmbedBuilder eb = new EmbedBuilder();
+
+        String[] funFacts = {
+                "MIT, originally known only as **LaunchPoint** at the time,\n"
+                        + "was founded on July 15, 2020.",
+                "MIT transitioned to an organization on December 5, 2021,\n"
+                        + "with the announcement of Ink Odyssey.",
+                "The MIT Wahoo Zones inside joke was founded on how generated\n"
+                        + "draft maplists during earlier cycles of LaunchPoint would\n"
+                        + "often include at least one game of Wahoo Zones.",
+                "The MIT bread inside joke was founded on the fact that staff\n"
+                        + "member PTW's college lunches on Tuesdays/Thursdays were him\n"
+                        + "just stacking 6 slices of bread on a plate and eating it.",
+                "Before the creation of Libra, MIT used to have a dedicated\n"
+                        + "match report team to *manually* report draft scores (Often\n"
+                        + "10-11 spreadsheet entries **per player**).",
+                "Before the Patreon, Libra wasn't always running 24/7. The old\n"
+                        + "match reports team would coordinate 'shifts' with PTW, so\n"
+                        + "he could turn on the bot manually, often between college\n"
+                        + "classes.",
+                "The longest LPDC was LPDC2, which ran for around 8 hours, by\n"
+                        + "5 staff members.",
+                "Staff member Reef used to greet the staff chat every morning\n"
+                        + "with the following picture: \n"
+                        + "https://media.discordapp.net/attachments/845782222677213234/966973831896002591/7CC5DDF1-5967-4A8E-8CA4-9D2925808275.gif",
+                "Minnow and Megalodon Cup started as their own organization\n"
+                        + "named **Deep Sea Solutions**; founded on September 19, 2020;\n"
+                        + "before they merged with MIT on March 5, 2022.",
+                "The MIT organization idea and structure was planned at\n"
+                        + "a Nandos.",
+                "Libra's name was originated from a couple of ideas. One\n"
+                        + "notably being that she is the impartial handler of drafts.",
+                "Libra's current main is the slosher! She was the first one\n"
+                        + "to create a `/mit profile`! (Go look it up)"
+        };
+
+        int num = RANDOM_GENERATOR.nextInt(funFacts.length);
+        eb.setTitle("Libra Fun Fact #" + (num + 1));
+        eb.setColor(Main.mitColor);
+        eb.setDescription(funFacts[num]);
+
+        return eb;
+    }
+
     /**
      * Runs a Libra command.
      * @param sc the slash command to analyze.
@@ -514,6 +594,9 @@ public class Events extends ListenerAdapter {
                 sc.reply("What can I help you with? (:")
                         .addActionRow(Components.ForGeneral.helpMenu("MT1"))
                         .setEphemeral(true).queue();
+                break;
+            case "fact":
+                sc.replyEmbeds(getFunFact().build()).queue();
                 break;
         }
     }

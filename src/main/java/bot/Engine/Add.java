@@ -39,12 +39,6 @@ public class Add extends Section implements Command {
                             getRole(sc, getSection())),
                     null);
 
-            if (sc.getName().equals("fs")) { // for temp JAR
-                return "Welcome to " + getSection() + "! We hope that you "
-                        + "are as excited as we are for the upcoming, "
-                        + "new section.";
-            }
-
             String rulesChannel =
                     getChannel(sc, getPrefix() + "-draft-rules").getAsMention();
             return "Welcome to " + getSection() + "! Make sure to read "
