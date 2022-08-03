@@ -54,12 +54,10 @@ public class Profile implements Command {
     private static final String FC_PATTERN = "\\d{4}-\\d{4}-\\d{4}";
 
     /** A pattern for pronouns to follow. */
-    private static final String PRONOUNS_PATTERN =
-            "(?:(?:, )?[\\w/]+(?: +[\\w/]+)*)+";
+    private static final String PRONOUNS_PATTERN = "(?:(?:, )?[\\w/ ]+)+";
 
     /** A pattern for lists within strings to follow. */
-    private static final String WEAPONS_PATTERN =
-            "(?:(?:, )?[\\w'.\\-]+(?: +[\\w'.\\-]+)*)+";
+    private static final String WEAPONS_PATTERN = "(?:(?:, )?[\\w'. \\-]+)+";
 
     /**
      * Checks the name of a parameter of a command.
@@ -146,7 +144,7 @@ public class Profile implements Command {
 
         String[] splitWeapons = weapons.split(", ");
         for (String weapon : splitWeapons) {
-            if (weapon.length() > 27) {
+            if (weapon.trim().length() > 27) {
                 return true;
             }
         }
@@ -167,12 +165,12 @@ public class Profile implements Command {
 
         StringBuilder line = new StringBuilder();
         for (int i = 1; i <= splitPhrase.length; i++) {
-            String currentSplit = splitPhrase[i - 1];
+            String currentSplit = splitPhrase[i - 1].trim();
             formattedPhrase.append(currentSplit);
             line.append(currentSplit);
 
             if (limit == 0 && i < splitPhrase.length) {
-                String nextSplit = splitPhrase[i];
+                String nextSplit = splitPhrase[i].trim();
                 formattedPhrase.append(",");
                 line.append(",");
 
@@ -674,10 +672,9 @@ public class Profile implements Command {
 
         String weapons = profile.getWeaponPool();
         if (newWeapons != null) {
-            foundNewInfo = reformatPhrase(newWeapons, 0);
-            weapons = foundNewInfo;
-            if (foundNewInfo.charAt(0) == '\'') {
-                weapons = "'" + foundNewInfo;
+            weapons = foundNewInfo = reformatPhrase(newWeapons, 0);
+            if (weapons.charAt(0) == '\'') {
+                weapons = "'" + weapons;
             }
         }
 

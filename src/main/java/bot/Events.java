@@ -208,7 +208,7 @@ public class Events extends ListenerAdapter {
                 eb.setTitle("Libra's Profile Troubleshooting");
                 eb.addField("General Formatting",
                         "Lists should be in the format: `option 1, option2, ...`\n"
-                                + "Note how there are no unnecessary spaces between options.\n"
+                                + "Note how there is a `, ` (comma then space) between options.\n"
                                 + "The following common symbols are not allowed:\n"
                                 + "`! @ # $ % ^ & * ( ) [ ] { } \\ | ; : \" + = < > ?`", false);
                 eb.addField("Pronouns Tips",
@@ -551,10 +551,9 @@ public class Events extends ListenerAdapter {
                         + "he could turn on the bot manually, often between college\n"
                         + "classes.",
                 "The longest LPDC was LPDC2, which ran for around 8 hours, by\n"
-                        + "5 staff members.",
+                        + "5 staff members: TheMoo, Wug, Reef, Stan, Restia.",
                 "Staff member Reef used to greet the staff chat every morning\n"
-                        + "with the following picture: \n"
-                        + "https://media.discordapp.net/attachments/845782222677213234/966973831896002591/7CC5DDF1-5967-4A8E-8CA4-9D2925808275.gif",
+                        + "with the following picture:",
                 "Minnow and Megalodon Cup started as their own organization\n"
                         + "named **Deep Sea Solutions**; founded on September 19, 2020;\n"
                         + "before they merged with MIT on March 5, 2022.",
@@ -563,11 +562,16 @@ public class Events extends ListenerAdapter {
                 "Libra's name was originated from a couple of ideas. One\n"
                         + "notably being that she is the impartial handler of drafts.",
                 "Libra's current main is the slosher! She was the first one\n"
-                        + "to create a `/mit profile`! (Go look it up)"
+                        + "to create a `/mit profile`! (Go look it up)",
+                "The largest amount of LPDC drops was during LPDC5, with a\n"
+                        + "total of 32 drops."
         };
 
         int num = RANDOM_GENERATOR.nextInt(funFacts.length);
         eb.setTitle("Libra Fun Fact #" + (num + 1));
+        if (num == 7) {
+            eb.setImage("https://media.discordapp.net/attachments/845782222677213234/966973831896002591/7CC5DDF1-5967-4A8E-8CA4-9D2925808275.gif");
+        }
         eb.setColor(Main.mitColor);
         eb.setDescription(funFacts[num]);
 
