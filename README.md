@@ -7,7 +7,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** July 27, 2022
+**Last Updated:** August 4, 2022
 
 **Command and Usage Documentation:** <medium><a href='https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing'>How To Use Libra - MullowayIT's Bot Documentation</a></medium>
 
@@ -30,6 +30,7 @@
   * [Engine](#engine)
     + [Add](#add)
     + [Award](#award)
+    + [DraftCup](#draftcup)
     + [Graduate](#graduate)
     + [Section](#section)
   * [Cycles (Engine)](#cycles-engine)
@@ -208,6 +209,12 @@ A class which enters players into MIT, processing the command `lp/io add`.
 #### Award
 
 A class which awards players roles within MIT, processing the command `lp/io award`.
+
+----
+
+#### DraftCup
+
+A class which manages Draft Cup (tournament) work, processing the command `dc lookup`.
 
 ----
 

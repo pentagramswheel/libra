@@ -90,9 +90,9 @@ public class Main {
         SubcommandData fc = new SubcommandData("fc",
                 "Creates your profile by adding your friend code to it.");
         SubcommandData getfc = new SubcommandData("getfc",
-                "Retrieves the friend code of another user, if provided.");
+                "Retrieves the friend code of another player, if provided.");
         SubcommandData view = new SubcommandData("view",
-                "Looks up the profile of another user, if provided.");
+                "Looks up the profile of another player, if provided.");
         SubcommandData nickname = new SubcommandData("nickname",
                 "Modifies the nickname of your profile.");
         SubcommandData pronouns = new SubcommandData("pronouns",
@@ -109,7 +109,7 @@ public class Main {
                 "Deletes your profile.");
 
         OptionData viewParam = new OptionData(
-                OptionType.USER, "player", "The player to look up", false);
+                OptionType.USER, "player", "Tag of a player to look up", false);
         OptionData fullView = new OptionData(
                 OptionType.BOOLEAN, "fullview", "Display all of your stats", false);
         OptionData displayFC = new OptionData(
@@ -131,6 +131,12 @@ public class Main {
         profile.addSubcommands(fc, getfc, view, nickname, pronouns,
                 playstyle, weapons, rank, team,
                 delete);
+
+        // draft cup commands
+        CommandData dc = new CommandData("dc",
+                "Commands to use within Draft Cups.");
+        SubcommandData dcView = new SubcommandData("lookup",
+                "Intended to look up the profiles of players within draft cups.");
 
         // miscellaneous commands
         SubcommandData ded = new SubcommandData("ded",
@@ -220,11 +226,14 @@ public class Main {
                 forceend.addOptions(numDraft);
             } else {
                 newMention = new OptionData(
-                        OptionType.USER, String.format("player%s", i), "Tag of a player");
+                        OptionType.USER, String.format("player%s", i), "Tag of a player", false);
             }
 
             if (i <= 4) {
-                log.addOptions(newMention);
+                boolean toOriginal = newMention.isRequired();
+
+                dcView.addOptions(newMention.setRequired(true));
+                log.addOptions(newMention.setRequired(toOriginal));
                 sub.addOptions(newMention);
             }
             if (i <= numMentions - 1) {
@@ -240,6 +249,7 @@ public class Main {
         libra.addSubcommands(status, help, fact);
         mit.addSubcommands(qprofile, ded);
         mit.addSubcommandGroups(profile);
+        dc.addSubcommands(dcView);
         fs.addSubcommands(
                 genmaps,
                 startdraft2, forcesub, forceend,
@@ -257,7 +267,7 @@ public class Main {
                 add, deny, grad,
                 cycleCalculate, award);
 
-        jda.updateCommands().addCommands(libra, mit, fs, lp, io).queue();
+        jda.updateCommands().addCommands(libra, mit, dc, fs, lp, io).queue();
     }
 
     /**

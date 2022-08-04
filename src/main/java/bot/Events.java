@@ -619,19 +619,16 @@ public class Events extends ListenerAdapter {
             subCmd = "";
         }
 
-        switch (subCmd) {
-            case "qprofile":
-                new Profile().runCmd(sc);
-                break;
-            case "ded":
-                sc.reply(Emoji.fromEmote(
-                        "Okayu_ded", 788682812991209492L, false)
-                        .getAsMention()).queue();
-                break;
-        }
-
-        if (subGroup.equals("profile")) {
+        if (subGroup.equals("profile") || subCmd.equals("qprofile")) {
             new Profile().runCmd(sc);
+        } else {
+            switch (subCmd) {
+                case "ded":
+                    sc.reply(Emoji.fromEmote(
+                                    "Okayu_ded", 788682812991209492L, false)
+                            .getAsMention()).queue();
+                    break;
+            }
         }
     }
 
@@ -741,6 +738,8 @@ public class Events extends ListenerAdapter {
                 case "io":
                     parseSectionCommands(sc);
                     break;
+                case "dc":
+                    new DraftCup().runCmd(sc);
             }
         }
     }
