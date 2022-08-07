@@ -140,7 +140,7 @@ public class Events extends ListenerAdapter {
         Guild server = sc.getGuild();
         String prefix = sc.getName();
         String subCmd = sc.getSubcommandName();
-        if (prefix.equals("libra") || prefix.equals("mit")
+        if (prefix.equals("libra") || prefix.equals("mit") || prefix.equals("dc")
                 || subCmd.equals("genmaps")) {
             return false;
         }
