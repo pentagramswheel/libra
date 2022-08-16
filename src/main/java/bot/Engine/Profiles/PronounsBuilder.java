@@ -34,7 +34,7 @@ public class PronounsBuilder {
   /** List of pronouns matched as objects (him, her, them, it, etc) */
   private final List<String> objects = new ArrayList<>();
 
-  /** List of pronouns matched as possessive pronouns (his, hers, theirs, its, etc) */
+  /** List of pronouns matched as possessive pronouns (his, hers, theirs, its own, etc) */
   private final List<String> possessivePronouns = new ArrayList<>();
 
   /** List of pronouns matched as possessive adjectives (his, her, their, its, etc) */
@@ -67,7 +67,6 @@ public class PronounsBuilder {
       objects.add("them");
       possessivePronouns.add("theirs");
       possessiveAdjectives.add("their");
-      return;
     }
 
     if (heRegex.matcher(pronouns).find() || allMatched) {
@@ -87,7 +86,7 @@ public class PronounsBuilder {
     if (itRegex.matcher(pronouns).find()) {
       subjects.add("it");
       objects.add("it");
-      possessivePronouns.add("its");
+      possessivePronouns.add("its own");
       possessiveAdjectives.add("its");
     }
   }
@@ -102,7 +101,7 @@ public class PronounsBuilder {
     return objects;
   }
 
-  /** Get the full list of pronouns matched as possessive pronouns (his, hers, theirs, its, etc) */
+  /** Get the full list of pronouns matched as possessive pronouns (his, hers, theirs, its own, etc) */
   public List<String> getPossessivePronounsList() {
     return possessivePronouns;
   }
@@ -171,7 +170,7 @@ public class PronounsBuilder {
   }
 
   /**
-   * Get a random possessive pronoun valid for this instance [his, hers, theirs, its, etc].
+   * Get a random possessive pronoun valid for this instance [his, hers, theirs, its own, etc].
    * If there are none valid, returns "theirs".
    * 
    * <p>
@@ -240,4 +239,23 @@ public class PronounsBuilder {
     }
     return str.substring(0, 1).toUpperCase() + str.substring(1);
   }
+
+  
+  /**
+  // Example unit testing
+  public static void main(String[] args) {
+    final String profileMessage = "my pronouns are they/she/it and I am a squid-kid";
+    PronounsBuilder builder = new PronounsBuilder(profileMessage);
+    System.out.println("Raw: " + profileMessage);
+    System.out.println("Subjects: " + builder.getSubjectsList());
+    System.out.println("Objects: " + builder.getObjectsList());
+    System.out.println("Possessive pronouns: " + builder.getPossessivePronounsList());
+    System.out.println("Possessive adjectives: " + builder.getPossessiveAdjectivesList());
+    System.out.println("Chosen Subject: " + builder.getSubject());
+    System.out.println("Chosen Object: " + builder.getObject());
+    System.out.println("Chosen Possessive pronoun: " + builder.getPossessivePronoun());
+    System.out.println("Chosen Possessive adjective: " + builder.getPossessiveAdjective());
+    System.out.println(builder.getPossessiveAdjectiveTitleCase() + " FC is blah. " + builder.getSubjectTitleCase() + " play(s) Splatoon with " + builder.getPossessiveAdjective() + " friend and another friend of " + builder.getPossessivePronoun() + ".");
+  }
+  */
 }
