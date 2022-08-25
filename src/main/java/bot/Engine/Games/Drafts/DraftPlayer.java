@@ -130,14 +130,30 @@ public class DraftPlayer extends Player {
         return matchLosses;
     }
 
-    /** Main method for testing. */
-    public static void main(String[] args) {
-//        DraftPlayer p1 = new DraftPlayer("123456789");
-//        DraftPlayer p2 = new DraftPlayer("123456789");
-//
-//        System.out.println("p1.equals(p2) " + p1.equals(p2));
-//        System.out.println("p2.equals(p1) " + p2.equals(p1));
-//        System.out.println("p1.equals(p1) " + p1.equals(p1));
-//        System.out.println("p1 == p2 " + (p1 == p2));
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 89 * hash + (minimumPoints ^ (minimumPoints >>> 16));
+        hash = 89 * hash + (maximumPoints ^ (maximumPoints >>> 16));
+        hash = 89 * hash + (isCaptainForTeam1() ? 0 : 1);
+        hash = 89 * hash + (isCaptainForTeam2() ? 0 : 1);
+        hash = 89 * hash + (getWins() ^ (getWins() >>> 16));
+        hash = 89 * hash + (getLosses() ^ (getLosses() >>> 16));
+
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        DraftPlayer p = (DraftPlayer) o;
+        return minimumPoints == p.minimumPoints
+                && maximumPoints == p.maximumPoints
+                && isCaptainForTeam1() == p.isCaptainForTeam1()
+                && isCaptainForTeam2() == p.isCaptainForTeam2()
+                && getWins() == p.getWins() && getLosses() == p.getLosses();
     }
 }

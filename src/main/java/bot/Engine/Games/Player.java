@@ -111,4 +111,30 @@ public class Player {
     public int getSubAmount() {
         return subs;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 37;
+        hash = 89 * hash + (getName() != null ? getName().hashCode() : 0);
+        hash = 89 * hash + (isActive() ? 0 : 1);
+        hash = 89 * hash + (hasTeam() ? 0 : 1);
+        hash = 89 * hash + (isSub() ? 0 : 1);
+        hash = 89 * hash + (getSubAmount() ^ (getSubAmount() >>> 16));
+
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        } else if (this == o) {
+            return true;
+        }
+
+        Player p = (Player) o;
+        return getName().equals(p.getName())
+                && isActive() == p.isActive() && hasTeam() == p.hasTeam()
+                && isSub() == p.isSub() && getSubAmount() == p.getSubAmount();
+    }
 }
