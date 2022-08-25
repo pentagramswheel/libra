@@ -315,8 +315,9 @@ public class ManualLog extends Section implements Command {
             }
 
             sendReport(sc, userArgs, playerTypes, errorsFound);
-            log(userArgs.size() + " " + getPrefix().toUpperCase()
-                    + " draft player(s) were manually processed.", false);
+            log(userArgs.size() + " " + getPrefix().toUpperCase() + " "
+                    + "draft player(s) were manually processed by "
+                    + sc.getUser().getAsTag(), false);
         } catch (IOException | GeneralSecurityException e) {
             editMessage(sc, "The leaderboard could not load.");
             log("The " + getSection()

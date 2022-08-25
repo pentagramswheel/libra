@@ -112,6 +112,7 @@ public class Player {
         return subs;
     }
 
+    /** Overridden hash code for players. */
     @Override
     public int hashCode() {
         int hash = 37;
@@ -124,6 +125,7 @@ public class Player {
         return hash;
     }
 
+    /** Overridden equals checking for players. */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

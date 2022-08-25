@@ -130,6 +130,7 @@ public class DraftPlayer extends Player {
         return matchLosses;
     }
 
+    /** Overridden hash code for draft players. */
     @Override
     public int hashCode() {
         int hash = super.hashCode();
@@ -143,6 +144,7 @@ public class DraftPlayer extends Player {
         return hash;
     }
 
+    /** Overridden equals checking for players. */
     @Override
     public boolean equals(Object o) {
         if (!super.equals(o)) {
