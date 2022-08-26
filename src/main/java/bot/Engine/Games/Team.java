@@ -150,4 +150,41 @@ public class Team<P extends Player> {
     public boolean hasMaximumScore() {
         return getScore() == maximumScore;
     }
+    
+    /** Overridden hash code for teams. */
+    @Override
+    public int hashCode() {
+        int hash = 37;
+        hash = 89 * hash + (maxPlayers & (maxPlayers >>> 16));
+        hash = 89 * hash + (getPlayers() != null ? getPlayers().hashCode() : 0);
+        hash = 89 * hash + (playersNeeded & (playersNeeded >>> 16));
+        hash = 89 * hash + (minimumScore & (minimumScore >>> 16));
+        hash = 89 * hash + (maximumScore & (maximumScore >>> 16));
+        hash = 89 * hash + (getScore() & (getScore() >>> 16));
+
+        return hash;
+    }
+
+    /** Overridden equals checking for teams. */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        } else if (this == o) {
+            return true;
+        }
+
+        Team<P> t = (Team<P>) o;
+        String firstKey1 = getPlayers().firstKey();
+        String firstKey2 = t.getPlayers().firstKey();
+        String higherKey1 = getPlayers().higherKey(firstKey1);
+        String higherKey2 = getPlayers().higherKey(firstKey2);
+
+        return getPlayers().equals(t.getPlayers())
+                && firstKey1.equals(firstKey2) && higherKey1.equals(higherKey2)
+                && getPlayers().lastKey().equals(t.getPlayers().lastKey())
+                && getScore() == t.getScore()
+                && needsPlayers() == t.needsPlayers()
+                && isEmpty() == t.isEmpty();
+    }
 }

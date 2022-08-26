@@ -65,4 +65,26 @@ public class DraftTeam extends Team<DraftPlayer> {
             player.decrementLosses();
         }
     }
+
+    /** Overridden hash code for draft teams. */
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 89 * hash
+                + (getOpponents() != null ? getOpponents().hashCode() : 0);
+
+        return hash;
+    }
+
+    /** Overridden equals checking for draft teams. */
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        DraftTeam t = (DraftTeam) o;
+        return getOpponents().getPlayers()
+                .equals(t.getOpponents().getPlayers());
+    }
 }
