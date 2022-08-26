@@ -94,6 +94,25 @@ public class Player {
     }
 
     /**
+     * Subs the player out.
+     */
+    public void subOut() {
+        setSubStatus(true);
+        setActiveStatus(false);
+        incrementSubs();
+    }
+
+    /**
+     * Subs the player in.
+     * @param subStatus a flag to check whether the player
+     *                  is actually a sub or not.
+     */
+    public void subIn(boolean subStatus) {
+        setSubStatus(subStatus);
+        setActiveStatus(true);
+    }
+
+    /**
      * Checks if the player is a sub.
      * @return True if they are a sub.
      *         False otherwise.

@@ -42,6 +42,11 @@ public class Team<P extends Player> {
         clear();
     }
 
+    /** Retrieves the players of the team. */
+    public TreeMap<String, P> getPlayers() {
+        return players;
+    }
+
     /**
      * Adds a player to the team.
      * @param id the Discord ID of the player.
@@ -51,11 +56,6 @@ public class Team<P extends Player> {
         getPlayers().put(id, player);
         player.setTeamStatus(true);
         playersNeeded--;
-    }
-
-    /** Retrieves the players of the team. */
-    public TreeMap<String, P> getPlayers() {
-        return players;
     }
 
     /**
@@ -71,6 +71,15 @@ public class Team<P extends Player> {
     /** Increments the amount of players this team needs. */
     public void requestSub() {
         playersNeeded++;
+    }
+
+    /**
+     * Removes a player from the team.
+     * @param id the Discord ID of the player.
+     */
+    public void remove(String id) {
+        getPlayers().remove(id);
+        requestSub();
     }
 
     /**
@@ -105,14 +114,18 @@ public class Team<P extends Player> {
      * Adds a win to the team's score.
      */
     public void incrementScore() {
-        score++;
+        if (!hasMaximumScore()) {
+            score++;
+        }
     }
 
     /**
      * Subtracts a win from the team's score.
      */
     public void decrementScore() {
-        score--;
+        if (!hasMinimumScore()) {
+            score--;
+        }
     }
 
     /** Retrieves the team's total score. */

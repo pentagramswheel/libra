@@ -427,10 +427,7 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
             getProcess().getTeam3().requestSub();
         }
 
-        player.setSubStatus(true);
-        player.setActiveStatus(false);
-        player.incrementSubs();
-
+        player.subOut();
         numInactive++;
 
         return true;
@@ -540,19 +537,16 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
                         "You have already been subbed out twice! You cannot "
                                 + "sub anymore for this draft.", true);
                 return false;
-            }
-
-            player.setSubStatus(draftStarted());
-            player.setActiveStatus(true);
-            numInactive--;
-
-            if (teamOneContains(playerID)) {
+            } else if (teamOneContains(playerID)) {
                 getProcess().getTeam1().add(playerID, player);
             } else if (teamTwoContains(playerID)) {
                 getProcess().getTeam2().add(playerID, player);
             } else if (teamThreeContains(playerID)) {
                 getProcess().getTeam3().add(playerID, player);
             }
+
+            player.subIn(draftStarted());
+            numInactive--;
 
             statement = "will be coming back to sub";
         } else {

@@ -75,11 +75,12 @@ public class DraftPlayer extends Player {
 
     /**
      * Checks whether a player's points can be increased or not.
+     * @param points the points to check.
      * @return True if they can be increased.
      *         False otherwise.
      */
-    private boolean incrementable() {
-        return isActive() && getWins() + getLosses() < maximumPoints;
+    private boolean incrementable(int points) {
+        return isActive() && points < maximumPoints;
     }
 
     /**
@@ -94,7 +95,7 @@ public class DraftPlayer extends Player {
 
     /** Increases the player's amount of wins by one. */
     public void incrementWins() {
-        if (incrementable()) {
+        if (incrementable(getWins())) {
             matchWins++;
         }
     }
@@ -108,7 +109,7 @@ public class DraftPlayer extends Player {
 
     /** Increases the player's amount of losses by one. */
     public void incrementLosses() {
-        if (incrementable()) {
+        if (incrementable(getLosses())) {
             matchLosses++;
         }
     }

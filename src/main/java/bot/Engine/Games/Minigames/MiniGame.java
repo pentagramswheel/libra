@@ -342,14 +342,11 @@ public class MiniGame extends Game<MiniGame, MiniProcess, Team<Player>, Player>
         Team<Player> team3 = getProcess().getTeam3();
 
         if (team1.contains(playerID)) {
-            team1.getPlayers().remove(playerID);
-            team1.requestSub();
+            team1.remove(playerID);
         } else if (team2.contains(playerID)) {
-            team2.getPlayers().remove(playerID);
-            team2.requestSub();
+            team2.remove(playerID);
         } else if (team3 != null && team3.contains(playerID)) {
-            team3.getPlayers().remove(playerID);
-            team3.requestSub();
+            team3.remove(playerID);
         }
     }
 

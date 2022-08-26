@@ -39,6 +39,7 @@ public class DraftTeam extends Team<DraftPlayer> {
     /**
      * Adds a win to the team's score.
      */
+    @Override
     public void incrementScore() {
         super.incrementScore();
 
@@ -53,6 +54,7 @@ public class DraftTeam extends Team<DraftPlayer> {
     /**
      * Subtracts a win from the team's score.
      */
+    @Override
     public void decrementScore() {
         super.decrementScore();
 
