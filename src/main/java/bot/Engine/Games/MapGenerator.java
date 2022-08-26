@@ -116,6 +116,71 @@ public class MapGenerator extends Section implements Command {
         return legalMaps;
     }
 
+    private TreeMap<String, List<String>> getLegalFSMaps2() {
+        TreeMap<String, List<String>> legalMaps = new TreeMap<>();
+        List<String> twMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> szMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> tcMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> rmMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> cbMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+
+        List<String> hsMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> jnMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> srMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+
+        legalMaps.put("Turf War", twMaps);
+        legalMaps.put("Splat Zones", szMaps);
+        legalMaps.put("Tower Control", tcMaps);
+        legalMaps.put("Rainmaker", rmMaps);
+        legalMaps.put("Clam Blitz", cbMaps);
+
+        legalMaps.put("Hide & Seek", hsMaps);
+        legalMaps.put("Juggernaut", jnMaps);
+        legalMaps.put("Spawn Rush", srMaps);
+
+        return legalMaps;
+    }
+
     /** Retrieves the LaunchPoint legal maps for each game mode. */
     private TreeMap<String, List<String>> getLegalLPMaps() {
         TreeMap<String, List<String>> legalMaps = new TreeMap<>();
@@ -140,6 +205,41 @@ public class MapGenerator extends Section implements Command {
                 "Snapper Canal", "Humpback Pump Track", "Sturgeon Shipyard",
                 "Starfish Mainstage", "Ancho-V Games", "New Albacore Hotel",
                 "Manta Maria"));
+
+        legalMaps.put("Splat Zones", szMaps);
+        legalMaps.put("Tower Control", tcMaps);
+        legalMaps.put("Rainmaker", rmMaps);
+        legalMaps.put("Clam Blitz", cbMaps);
+
+        return legalMaps;
+    }
+
+    private TreeMap<String, List<String>> getLegalLPMaps2() {
+        TreeMap<String, List<String>> legalMaps = new TreeMap<>();
+        List<String> szMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> tcMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> rmMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> cbMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
 
         legalMaps.put("Splat Zones", szMaps);
         legalMaps.put("Tower Control", tcMaps);
@@ -183,6 +283,41 @@ public class MapGenerator extends Section implements Command {
         return legalMaps;
     }
 
+    private TreeMap<String, List<String>> getLegalIOMaps2() {
+        TreeMap<String, List<String>> legalMaps = new TreeMap<>();
+        List<String> szMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> tcMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> rmMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+        List<String> cbMaps = new ArrayList<>(Arrays.asList(
+                "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
+                "Undertow Spillway", "Mincemeat Metalworks",
+                "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
+                "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
+                "Wahoo World"));
+
+        legalMaps.put("Splat Zones", szMaps);
+        legalMaps.put("Tower Control", tcMaps);
+        legalMaps.put("Rainmaker", rmMaps);
+        legalMaps.put("Clam Blitz", cbMaps);
+
+        return legalMaps;
+    }
+
     /** Retrieves the legal maps for a section. */
     private TreeMap<String, List<String>> getLegalMaps() {
         switch (getPrefix()) {
@@ -192,6 +327,17 @@ public class MapGenerator extends Section implements Command {
                 return getLegalLPMaps();
             default:
                 return getLegalIOMaps();
+        }
+    }
+
+    private TreeMap<String, List<String>> getLegalMaps2() {
+        switch (getPrefix()) {
+            case "fs":
+                return getLegalFSMaps2();
+            case "lp":
+                return getLegalLPMaps2();
+            default:
+                return getLegalIOMaps2();
         }
     }
 
@@ -250,6 +396,35 @@ public class MapGenerator extends Section implements Command {
         }
     }
 
+    private String findMapURL2(String map) {
+        switch (map) {
+            case "Scorch Gorge":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/2/28/Scorch_Gorge_Promo.jpg/1600px-Scorch_Gorge_Promo.jpg";
+            case "Eeltail Alley":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/8/85/Eeltail_Alley_Promo.jpg/1600px-Eeltail_Alley_Promo.jpg";
+            case "Hagglefish Market":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/2/2e/S3HagglefishMarketIcon.webp/1600px-S3HagglefishMarketIcon.webp.png";
+            case "Undertow Spillway":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/f/f2/S3UndertowSpillwayIcon.webp/1600px-S3UndertowSpillwayIcon.webp.png";
+            case "Mincemeat Metalworks":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/a/a8/S3MincemeatMetalworksIcon.webp/1600px-S3MincemeatMetalworksIcon.webp.png";
+            case "Hammerhead Bridge":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/2/24/S3HammerheadBridgeIcon.jpeg/1600px-S3HammerheadBridgeIcon.jpeg";
+            case "Museum D'Alfonsino":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/e/e0/S3MuseumDAlfonsinoIcon.webp/1600px-S3MuseumDAlfonsinoIcon.webp.png";
+            case "Mahi-Mahi Resort":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/b/b7/S3MahiMahiResortIcon.jpeg/1600px-S3MahiMahiResortIcon.jpeg";
+            case "Inkblot Art Academy":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/b/bf/S3InkblotArtAcademyIcon.webp/1600px-S3InkblotArtAcademyIcon.webp.png";
+            case "Sturgeon Shipyard":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/c/cc/S3SturgeonShipyardIcon.webp/1600px-S3SturgeonShipyardIcon.webp.png";
+            case "MakoMart":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/3/36/S3MakoMartIcon.jpeg/1600px-S3MakoMartIcon.jpeg";
+            default:
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/f/fe/S3WahooWorldIcon.webp/1600px-S3WahooWorldIcon.webp.png";
+        }
+    }
+
     /**
      * Builds the match format in the form of an embed.
      * @param mode the mode of the match.
@@ -260,6 +435,15 @@ public class MapGenerator extends Section implements Command {
         eb.setColor(getColor())
                 .addField(mode, map, false)
                 .setThumbnail(findMapURL(map));
+
+        return eb;
+    }
+
+    private EmbedBuilder buildMatch2(String mode, String map) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(getColor())
+                .addField(mode, map, false)
+                .setThumbnail(findMapURL2(map));
 
         return eb;
     }
