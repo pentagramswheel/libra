@@ -1,13 +1,13 @@
 # Libra Design Documentation
 
 ![Libra](img/mit_libra.png)
-**Author(s):** Wil Aquino
+**Author(s):** <medium><a href='https://github.com/pentagramswheel'>Wil Aquino</a></medium>
 
-**Honorable Mention(s):** Turtle#1504
+**Honorable Mention(s):** <medium><a href='https://github.com/Turtle1504cb'>Turtle</a></medium>, <medium><a href='https://github.com/kjhf'>Slate</a></medium>
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** August 4, 2022
+**Last Updated:** August 27, 2022
 
 **Command and Usage Documentation:** <medium><a href='https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing'>How To Use Libra - MullowayIT's Bot Documentation</a></medium>
 
@@ -45,6 +45,7 @@
     + [GameType](#gametype)
     + [MapGenerator](#mapgenerator)
     + [Player](#player)
+    + [PlayerTests](#playertests)
     + [Process](#process)
     + [Team](#team)
     + [Drafts (Games)](#drafts-games)
@@ -58,6 +59,8 @@
   * [Profiles (Engine)](#profiles-engine)
     + [PlayerInfo](#playerinfo)
     + [Profile](#profile)
+    + [ProfileTests](#profiletests)
+    + [PronounsBuilder](#pronounsbuilder)
   * [Templates (Engine)](#templates-engine)
     + [Command](#command)
     + [GameReqs](#gamereqs)
@@ -369,6 +372,12 @@ A class which represents a player within a draft/game.
 
 ----
 
+#### PlayerTests
+
+A class for testing teams and players.
+
+----
+
 #### Process
 
 A class which formally manages and processes drafts/games.
@@ -484,9 +493,33 @@ A class which manages the profile database of MIT.
 2. `String START_COLUMN` - the starting information column of the profiles spreadsheet.
 3. `String END_COLUMN` - the ending information column of the profiles spreadsheet.
 4. `String TAB` - the tab to reference within the profiles spreadsheet.
-5. `String FC_PATTERN` - a pattern for friend codes to strictly follow.
-6. `String PRONOUNS_PATTERN` - a pattern for pronouns to strictly follow.
-7. `String WEAPONS_PATTERN` - a pattern for weapons to strictly follow.
+5. `Pattern FC_PATTERN` - a pattern for friend codes to strictly follow.
+6. `Pattern PRONOUNS_PATTERN` - a pattern for pronouns to strictly follow.
+7. `Pattern WEAPONS_PATTERN` - a pattern for weapons to strictly follow.
+
+----
+
+#### ProfileTests
+
+A class for testing various aspects of a profile.
+
+----
+
+#### PronounsBuilder
+
+A class for constructing gramattical pronouns.
+
+##### Instance Variables
+1. `Pattern HE_REGEX` - a pattern for matching pronouns with the phrase "he" in it.
+2. `Pattern SHE_REGEX` - a pattern for matching pronouns with the phrase "she" in it.
+3. `Pattern THEY_REGEX` - a pattern for matching pronouns with the phrase "they" in it.
+4. `Pattern IT_REGEX` - a pattern for matching pronouns with the phrase "it" in it.
+5. `Pattern ALL_REGEX` - a pattern for matching pronouns with the phrase "all" or "any" in it.
+6. `Pattern ASK_REGEX` - a pattern for matching pronouns with the phrase "ask" (for pronouns) in it.
+7. `List<String> subjects` - subjects for a person.
+8. `List<String> objects` - objects for a person.
+9. `List<String> possessivePronouns` - possessive pronouns for a person.
+10. `List<String> possessiveAdjectives` - possessive adjectives for a person.
 
 ----
 

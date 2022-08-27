@@ -51,13 +51,21 @@ public class Profile implements Command {
     private static final String TAB = "Profiles";
 
     /** A pattern for friend codes to follow. */
-    private static final String FC_PATTERN = "\\d{4}-\\d{4}-\\d{4}";
+    private static final Pattern FC_PATTERN = Pattern.compile(
+            "\\d{4}-\\d{4}-\\d{4}",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
     /** A pattern for pronouns to follow. */
-    private static final String PRONOUNS_PATTERN = "(?:(?:, )?[\\w/ ]+)+";
+    private static final Pattern PRONOUNS_PATTERN = Pattern.compile(
+            "(?:,?[\\w/ ]*)+",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+                    | Pattern.UNICODE_CHARACTER_CLASS);
 
     /** A pattern for lists within strings to follow. */
-    private static final String WEAPONS_PATTERN = "(?:(?:, )?[\\w'. \\-]+)+";
+    private static final Pattern WEAPONS_PATTERN = Pattern.compile(
+            "(?:,?[\\w'. \\-]*)+",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+                    | Pattern.UNICODE_CHARACTER_CLASS);
 
     /**
      * Checks the name of a parameter of a command.
@@ -120,7 +128,9 @@ public class Profile implements Command {
         phrase = phrase.toLowerCase();
 
         for (String badRegex : badWordFile.readContents()) {
-            Pattern pattern = Pattern.compile(badRegex);
+            Pattern pattern = Pattern.compile(badRegex,
+                    Pattern.CASE_INSENSITIVE | Pattern.MULTILINE
+                    | Pattern.UNICODE_CHARACTER_CLASS);
             Matcher matcher = pattern.matcher(phrase);
 
             if (matcher.find()) {
@@ -160,35 +170,45 @@ public class Profile implements Command {
      * @return the formatted pronouns.
      */
     private String reformatPhrase(String phrase, int limit) {
-        String[] splitPhrase = phrase.split(", ");
+        String[] splitPhrase = phrase.split(",");
+        int numPhrases = splitPhrase.length;
         StringBuilder formattedPhrase = new StringBuilder();
 
         StringBuilder line = new StringBuilder();
-        for (int i = 1; i <= splitPhrase.length; i++) {
+        for (int i = 1; i <= numPhrases; i++) {
             String currentSplit = splitPhrase[i - 1].trim();
+            if (currentSplit.isEmpty()) {
+                if (i == numPhrases) {
+                    int currLength = formattedPhrase.length();
+                    formattedPhrase.replace(currLength - 2, currLength, "");
+                }
+                continue;
+            }
+
             formattedPhrase.append(currentSplit);
             line.append(currentSplit);
 
-            if (limit == 0 && i < splitPhrase.length) {
-                String nextSplit = splitPhrase[i].trim();
-                formattedPhrase.append(",");
-                line.append(",");
+            if (i < numPhrases) {
+                if (limit == 0) {
+                    String nextSplit = splitPhrase[i].trim();
+                    formattedPhrase.append(",");
+                    line.append(",");
 
-                if (line.length() + nextSplit.length() >= 23) {
-                    formattedPhrase.append("\n");
-                    line = new StringBuilder();
+                    if (line.length() + nextSplit.length() >= 23) {
+                        formattedPhrase.append("\n");
+                        line = new StringBuilder();
+                    } else {
+                        formattedPhrase.append(" ");
+                        line.append(" ");
+                    }
                 } else {
-                    formattedPhrase.append(" ");
-                    line.append(" ");
+                    formattedPhrase.append(",");
+                    if (i % limit == 0) {
+                        formattedPhrase.append("\n");
+                    } else {
+                        formattedPhrase.append(" ");
+                    }
                 }
-            } else if (i < splitPhrase.length) {
-                formattedPhrase.append(",");
-                if (i % limit == 0) {
-                    formattedPhrase.append("\n");
-                } else {
-                    formattedPhrase.append(" ");
-                }
-
             }
         }
 
@@ -243,7 +263,8 @@ public class Profile implements Command {
      */
     private void printLengthError(SlashCommandEvent sc, String name) {
         editMessage(sc, String.format("Lengthy %s detected. "
-                + "Please use another one or ask Technical Staff about it!",
+                + "Please use another one or ask Technical Staff about it! "
+                + "Otherwise see `/libra help` for more assistance.",
                 name));
     }
 
@@ -254,7 +275,8 @@ public class Profile implements Command {
      */
     private void printProfanityError(SlashCommandEvent sc, String name) {
         editMessage(sc,String.format("Inappropriate %s detected. "
-                + "Please use another one or ask Technical Staff about it!",
+                + "Please use another one or ask Technical Staff about it! "
+                + "Otherwise see `/libra help` for more assistance.",
                 name));
     }
 
@@ -265,9 +287,9 @@ public class Profile implements Command {
      */
     private void printListError(SlashCommandEvent sc, String name) {
         editMessage(sc,String.format("Invalid %s detected. "
-                + "Please **strictly** use the following format: "
-                + "`option 1, option2, option 3, ...` (note the `, `). "
-                + "Otherwise see `/libra help` for more assistance.",
+                + "Only the following symbols are allowed: "
+                + "`[letters] [numbers] ['.-, for weapons] "
+                + "[/, for pronouns]`.",
                 name));
     }
 
@@ -286,7 +308,7 @@ public class Profile implements Command {
     private boolean noParameterError(SlashCommandEvent sc, String fc,
                                     String nickname, String pronouns,
                                     String weapons, String team) {
-        if (fc != null && !fc.matches(FC_PATTERN)) {
+        if (fc != null && !FC_PATTERN.matcher(fc).matches()) {
             printFCError(sc);
         } else if (phraseTooLong(nickname)) {
             printLengthError(sc, "nickname");
@@ -304,9 +326,11 @@ public class Profile implements Command {
             printProfanityError(sc, "weapons");
         } else if (blacklistedPhrase(team)) {
             printProfanityError(sc, "team name");
-        } else if (pronouns != null && !pronouns.matches(PRONOUNS_PATTERN)) {
+        } else if (pronouns != null
+                && !PRONOUNS_PATTERN.matcher(pronouns).matches()) {
             printListError(sc, "pronouns");
-        } else if (weapons != null && !weapons.matches(WEAPONS_PATTERN)) {
+        } else if (weapons != null
+                && !WEAPONS_PATTERN.matcher(weapons).matches()) {
             printListError(sc, "weapons");
         } else {
             return true;
@@ -381,7 +405,7 @@ public class Profile implements Command {
                             START_COLUMN, profile.getSpreadsheetPosition(),
                             END_COLUMN, profile.getSpreadsheetPosition());
                     ValueRange newRow = link.buildRow(Arrays.asList(
-                            profile.getAsTag(), profile.getNickname(),
+                            profile.getTag(), profile.getNickname(),
                             fc, profile.getPlaystyle(),
                             profile.getWeaponPool(), profile.getRank(),
                             profile.getTeam()));
@@ -389,7 +413,7 @@ public class Profile implements Command {
 
                     editMessage(sc,
                             "Friend code updated to `" + "`.");
-                    log("Profile FC updated for " + profile.getAsTag() + ".",
+                    log("Profile FC updated for " + profile.getTag() + ".",
                             false);
                 } else {
                     String discordTag = user.getUser().getAsTag();
@@ -438,7 +462,7 @@ public class Profile implements Command {
                 editMessage(sc, pronoun + " friend code is `SW-"
                         + profile.getFC() + "`.");
                 log("Profile FC retrieved for "
-                        + profile.getAsTag() + ".", false);
+                        + profile.getTag() + ".", false);
             } else {
                 editMessage(sc, "Your MIT profile does not exist yet. "
                         + "Register with `/mit qprofile ...` or "
@@ -540,7 +564,7 @@ public class Profile implements Command {
             eb.setTitle(profile.getNickname());
             eb.setThumbnail(player.getEffectiveAvatarUrl());
             if (showInfo) {
-                eb.setTitle(profile.getNickname() + " [" + profile.getAsTag() + "]");
+                eb.setTitle(profile.getNickname() + " [" + profile.getTag() + "]");
                 eb.setFooter("FC SW-" + profile.getFC(),
                         "https://images.squarespace-cdn.com/content/v1/5ce2bf96d2bf17000192fe2c/1596048502214-WL5LU68IOLM8WILBA57N/Friends+Icon.png?format=1000w");
             }
@@ -689,7 +713,7 @@ public class Profile implements Command {
         }
 
         return new ArrayList<>(Arrays.asList(foundNewInfo,
-                profile.getAsTag(), nickname, profile.getFC(),
+                profile.getTag(), nickname, profile.getFC(),
                 pronouns.toLowerCase(), playstyle, weapons, rank, team));
     }
 

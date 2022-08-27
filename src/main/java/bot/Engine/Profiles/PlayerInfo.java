@@ -80,7 +80,7 @@ public class PlayerInfo {
     }
 
     /** Retrieves the Discord tag of the player. */
-    public String getAsTag() {
+    public String getTag() {
         return tag;
     }
 
