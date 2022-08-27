@@ -59,10 +59,16 @@ public class Events extends ListenerAdapter {
     private TreeMap<Integer, GameReqs> lpDrafts;
     private TreeMap<Integer, GameReqs> ioDrafts;
 
+    private TreeMap<Integer, GameReqs> lpDrafts2;
+    private TreeMap<Integer, GameReqs> ioDrafts2;
+
     /** Fields for storing queued draft numbers. */
     private ArrayHeapMinPQ<Integer> fsQueue;
     private ArrayHeapMinPQ<Integer> lpQueue;
     private ArrayHeapMinPQ<Integer> ioQueue;
+
+    private ArrayHeapMinPQ<Integer> lpQueue2;
+    private ArrayHeapMinPQ<Integer> ioQueue2;
 
     /**
      * Checks if the game set parameters make sense.
@@ -210,11 +216,6 @@ public class Events extends ListenerAdapter {
                 break;
             case "1":
                 eb.setTitle("Libra's Profile Troubleshooting");
-                eb.addField("General Formatting",
-                        "Lists should be in the format: `option 1, option2, ...`\n"
-                                + "Note how there is a `, ` (comma then space) between options.\n"
-                                + "The following common symbols are not allowed:\n"
-                                + "`! @ # $ % ^ & * ( ) [ ] { } \\ | ; : \" + = < > ?`", false);
                 eb.addField("Pronouns Tips",
                         "Pronouns often come in the format: `she/her, he/they, ...`\n"
                                 + "We encourage you to put all of your preferred pronouns,\n"
@@ -238,7 +239,7 @@ public class Events extends ListenerAdapter {
                                 + "`(Regular) Splattershot Jr. = Vanilla Jr = VJr`\n"
                                 + "`Custom E-Liter 4K = Custom Liter = CLiter`", false);
                 eb.addField("Remark",
-                        "Although this formatting is somewhat strict, it is\n"
+                        "Although the formatting is somewhat strict, it is\n"
                                 + "to create a consistency amongst all profiles\n"
                                 + "and in case your profile is featured somewhere!", false);
                 break;
@@ -347,6 +348,9 @@ public class Events extends ListenerAdapter {
         timeoutDrafts(interaction, fsDrafts, fsQueue);
         timeoutDrafts(interaction, lpDrafts, lpQueue);
         timeoutDrafts(interaction, ioDrafts, ioQueue);
+
+//        timeoutDrafts(interaction, lpDrafts, lpQueue2);
+//        timeoutDrafts(interaction, ioDrafts, ioQueue2);
     }
 
     /**
