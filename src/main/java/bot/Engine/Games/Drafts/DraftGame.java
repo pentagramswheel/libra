@@ -3,10 +3,8 @@ package bot.Engine.Games.Drafts;
 import bot.Engine.Games.Game;
 import bot.Engine.Games.GameProperties;
 import bot.Engine.Games.GameType;
-import bot.Engine.Games.Player;
 import bot.Engine.Profiles.Profile;
 import bot.Engine.Templates.GameReqs;
-import bot.Engine.Templates.ProcessReqs;
 import bot.Events;
 import bot.Tools.Components;
 
@@ -224,12 +222,10 @@ public class DraftGame extends Game<DraftGame, DraftProcess, DraftTeam, DraftPla
             setProcess(new DraftProcess(this));
             List<Button> buttons = new ArrayList<>();
 
-            String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-
-            buttons.add(Components.ForDraft.reassignCaptain(idSuffix));
-            buttons.add(Components.ForDraft.requestSub(idSuffix));
-            buttons.add(Components.ForDraft.joinAsSub(idSuffix));
-            buttons.add(Components.ForDraft.refresh(idSuffix));
+            buttons.add(Components.ForDraft.reassignCaptain(suffix()));
+            buttons.add(Components.ForDraft.requestSub(suffix()));
+            buttons.add(Components.ForDraft.joinAsSub(suffix()));
+            buttons.add(Components.ForDraft.refresh(suffix()));
 
             sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
                     buttons);

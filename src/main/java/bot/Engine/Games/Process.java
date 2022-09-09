@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 
@@ -483,15 +482,15 @@ public class Process<G extends Game<?, ?, T, P>, T extends Team<P>, P extends Pl
             if (hasStarted()) {
                 getRequest().unpinDraftChannelPins();
 
-                String idSuffix = getRequest().getPrefix()
-                        + getRequest().getNumDraft();
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Components.ForProcess.endDraftProcess(idSuffix)
+                buttons.add(Components.ForProcess
+                        .endDraftProcess(getRequest().suffix())
                         .withStyle(ButtonStyle.SECONDARY).asDisabled());
 
                 getRequest().sendButtons(bc, "This draft has ended.", buttons);
                 getRequest().getMessage(bc).editMessage("This draft has ended.")
-                        .setActionRow(Components.ForDraft.refresh(idSuffix)
+                        .setActionRow(Components.ForDraft
+                                .refresh(getRequest().suffix())
                                 .asDisabled()).queue();
 
                 getRequest().getDraftChannel().sendMessage(

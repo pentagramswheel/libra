@@ -105,25 +105,23 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
      */
     @Override
     public void refresh(GenericInteractionCreateEvent interaction) {
-        String idSuffix = getRequest().getPrefix().toUpperCase()
-                + getRequest().getNumDraft();
         List<SelectionMenu> menus = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
         resetEndDraftButton();
 
         menus.add(Components.ForProcess.teamSelectionMenu(
-                idSuffix, getRequest().getPlayers()));
+                getRequest().suffix(), getRequest().getPlayers()));
         if (hasStarted()) {
-            buttons.add(Components.ForProcess.plusOne(idSuffix));
-            buttons.add(Components.ForProcess.minusOne(idSuffix));
+            buttons.add(Components.ForProcess.plusOne(getRequest().suffix()));
+            buttons.add(Components.ForProcess.minusOne(getRequest().suffix()));
             buttons.add(Components.ForProcess.draftSubLink(
-                    interaction, idSuffix, getRequest()));
+                    interaction, getRequest().suffix(), getRequest()));
         } else {
-            buttons.add(Components.ForProcess.resetTeams(idSuffix));
-            buttons.add(Components.ForProcess.beginDraft(idSuffix));
+            buttons.add(Components.ForProcess.resetTeams(getRequest().suffix()));
+            buttons.add(Components.ForProcess.beginDraft(getRequest().suffix()));
         }
-        buttons.add(Components.ForProcess.endDraftProcess(idSuffix));
-        buttons.add(Components.ForProcess.refresh(idSuffix));
+        buttons.add(Components.ForProcess.endDraftProcess(getRequest().suffix()));
+        buttons.add(Components.ForProcess.refresh(getRequest().suffix()));
 
         if (interaction != null) {
             interaction.getHook().editOriginal(getPing()).setActionRows(

@@ -124,25 +124,27 @@ public class MiniProcess extends Process<MiniGame, Team<Player>, Player>
     /**
      * Adds the main buttons to a list of buttons.
      * @param interaction the user interaction calling this method.
-     * @param idSuffix the identifying suffix of the button.
      * @param buttons the list of buttons to add to.
      */
     private void addMainButtons(GenericInteractionCreateEvent interaction,
-                                String idSuffix, List<Button> buttons) {
+                                List<Button> buttons) {
         switch (getRequest().getProperties().getGameType()) {
             case RANKED:
             case TURF_WAR:
-                buttons.add(Components.ForProcess.plusOne(idSuffix));
-                buttons.add(Components.ForProcess.minusOne(idSuffix));
+                buttons.add(Components.ForProcess
+                        .plusOne(getRequest().suffix()));
+                buttons.add(Components.ForProcess
+                        .minusOne(getRequest().suffix()));
                 break;
             default:
-                buttons.add(Components.ForProcess.nextTurn(idSuffix));
+                buttons.add(Components.ForProcess
+                        .nextTurn(getRequest().suffix()));
                 break;
         }
 
         if (interaction != null) {
             buttons.add(Components.ForProcess.draftSubLink(
-                    interaction, idSuffix, getRequest()));
+                    interaction, getRequest().suffix(), getRequest()));
         }
     }
 
@@ -155,14 +157,14 @@ public class MiniProcess extends Process<MiniGame, Team<Player>, Player>
      */
     @Override
     public void refresh(GenericInteractionCreateEvent interaction) {
-        String idSuffix = getRequest().getPrefix().toUpperCase()
-                + getRequest().getNumDraft();
         List<Button> buttons = new ArrayList<>();
         resetEndDraftButton();
 
-        addMainButtons(interaction, idSuffix, buttons);
-        buttons.add(Components.ForProcess.endDraftProcess(idSuffix));
-        buttons.add(Components.ForProcess.refresh(idSuffix));
+        addMainButtons(interaction, buttons);
+        buttons.add(Components.ForProcess
+                .endDraftProcess(getRequest().suffix()));
+        buttons.add(Components.ForProcess
+                .refresh(getRequest().suffix()));
 
         if (interaction != null) {
             interaction.getHook().editOriginal(getPing()).setActionRows(

@@ -171,13 +171,11 @@ public class MiniGame extends Game<MiniGame, MiniProcess, Team<Player>, Player>
         }
 
         startProcess();
+
         List<Button> buttons = new ArrayList<>();
-
-        String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-
-        buttons.add(Components.ForDraft.requestSub(idSuffix));
-        buttons.add(Components.ForDraft.joinAsSub(idSuffix));
-        buttons.add(Components.ForDraft.refresh(idSuffix));
+        buttons.add(Components.ForDraft.requestSub(suffix()));
+        buttons.add(Components.ForDraft.joinAsSub(suffix()));
+        buttons.add(Components.ForDraft.refresh(suffix()));
 
         sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
                 buttons);
@@ -229,13 +227,11 @@ public class MiniGame extends Game<MiniGame, MiniProcess, Team<Player>, Player>
             setup(bc);
         } else if (getPlayers().size() >= getProperties().getMinimumPlayersToStart()) {
             List<Button> buttons = new ArrayList<>();
-            String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-
-            buttons.add(Components.ForDraft.setupEarly(idSuffix));
-            buttons.add(Components.ForDraft.joinDraft(idSuffix));
-            buttons.add(Components.ForDraft.reping(idSuffix));
-            buttons.add(Components.ForDraft.leave(idSuffix));
-            buttons.add(Components.ForDraft.refresh(idSuffix));
+            buttons.add(Components.ForDraft.setupEarly(suffix()));
+            buttons.add(Components.ForDraft.joinDraft(suffix()));
+            buttons.add(Components.ForDraft.reping(suffix()));
+            buttons.add(Components.ForDraft.leave(suffix()));
+            buttons.add(Components.ForDraft.refresh(suffix()));
 
             sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
                     buttons);
@@ -271,12 +267,10 @@ public class MiniGame extends Game<MiniGame, MiniProcess, Team<Player>, Player>
 
             if (getPlayers().size() < getProperties().getMinimumPlayersToStart()) {
                 List<Button> buttons = new ArrayList<>();
-                String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-
-                buttons.add(Components.ForDraft.joinDraft(idSuffix));
-                buttons.add(Components.ForDraft.reping(idSuffix));
-                buttons.add(Components.ForDraft.leave(idSuffix));
-                buttons.add(Components.ForDraft.refresh(idSuffix));
+                buttons.add(Components.ForDraft.joinDraft(suffix()));
+                buttons.add(Components.ForDraft.reping(suffix()));
+                buttons.add(Components.ForDraft.leave(suffix()));
+                buttons.add(Components.ForDraft.refresh(suffix()));
 
                 sendButtons(bc, bc.getInteraction().getMessage().getContentRaw(),
                         buttons);
@@ -418,12 +412,10 @@ public class MiniGame extends Game<MiniGame, MiniProcess, Team<Player>, Player>
         }
 
         List<Button> buttons = new ArrayList<>();
-        String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-
-        buttons.add(Components.ForDraft.joinDraft(idSuffix));
-        buttons.add(Components.ForDraft.reping(idSuffix));
-        buttons.add(Components.ForDraft.leave(idSuffix));
-        buttons.add(Components.ForDraft.refresh(idSuffix));
+        buttons.add(Components.ForDraft.joinDraft(suffix()));
+        buttons.add(Components.ForDraft.reping(suffix()));
+        buttons.add(Components.ForDraft.leave(suffix()));
+        buttons.add(Components.ForDraft.refresh(suffix()));
 
         String caption = getSectionRole() + " +"
                 + (getProperties().getMaximumPlayersToStart() - 1)

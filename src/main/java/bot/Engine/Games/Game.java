@@ -125,6 +125,11 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
         return numDraft;
     }
 
+    /** Retrieves the request's suffix, often to attach to component IDs. */
+    public String suffix() {
+        return getPrefix().toUpperCase() + getNumDraft();
+    }
+
     /** Retrieves the players of the draft. */
     public TreeMap<String, P> getPlayers() {
         return players;
@@ -319,9 +324,8 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
         } else {
             bc.deferEdit().queue();
 
-            String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-            bc.editButton(
-                    Components.ForDraft.reping(idSuffix).asDisabled()).queue();
+            bc.editButton(Components.ForDraft.reping(suffix())
+                            .asDisabled()).queue();
             sendResponse(bc, newPing() + " (reping)", false);
         }
     }
@@ -640,12 +644,10 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
         }
 
         List<Button> buttons = new ArrayList<>();
-        String idSuffix = getPrefix().toUpperCase() + getNumDraft();
-
-        buttons.add(Components.ForDraft.joinDraft(idSuffix));
-        buttons.add(Components.ForDraft.reping(idSuffix));
-        buttons.add(Components.ForDraft.leave(idSuffix));
-        buttons.add(Components.ForDraft.refresh(idSuffix));
+        buttons.add(Components.ForDraft.joinDraft(suffix()));
+        buttons.add(Components.ForDraft.reping(suffix()));
+        buttons.add(Components.ForDraft.leave(suffix()));
+        buttons.add(Components.ForDraft.refresh(suffix()));
 
         String caption = getSectionRole() + " +"
                 + (getProperties().getMaximumPlayersToStart() - 1);
