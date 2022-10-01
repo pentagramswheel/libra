@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
 import java.awt.Color;
-import java.util.Random;
 
 /**
  * @author  Wil Aquino

@@ -2,13 +2,12 @@ package bot.Engine;
 
 import bot.Engine.Profiles.Profile;
 import bot.Engine.Templates.Command;
-import net.dv8tion.jda.api.entities.Member;
+
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
