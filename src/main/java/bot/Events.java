@@ -59,16 +59,10 @@ public class Events extends ListenerAdapter {
     private TreeMap<Integer, GameReqs> lpDrafts;
     private TreeMap<Integer, GameReqs> ioDrafts;
 
-    private TreeMap<Integer, GameReqs> lpDrafts2;
-    private TreeMap<Integer, GameReqs> ioDrafts2;
-
     /** Fields for storing queued draft numbers. */
     private ArrayHeapMinPQ<Integer> fsQueue;
     private ArrayHeapMinPQ<Integer> lpQueue;
     private ArrayHeapMinPQ<Integer> ioQueue;
-
-    private ArrayHeapMinPQ<Integer> lpQueue2;
-    private ArrayHeapMinPQ<Integer> ioQueue2;
 
     /**
      * Checks if the game set parameters make sense.
@@ -348,9 +342,6 @@ public class Events extends ListenerAdapter {
         timeoutDrafts(interaction, fsDrafts, fsQueue);
         timeoutDrafts(interaction, lpDrafts, lpQueue);
         timeoutDrafts(interaction, ioDrafts, ioQueue);
-
-//        timeoutDrafts(interaction, lpDrafts, lpQueue2);
-//        timeoutDrafts(interaction, ioDrafts, ioQueue2);
     }
 
     /**
@@ -453,7 +444,7 @@ public class Events extends ListenerAdapter {
 
                 processDraft(sc, prefix, author, lpDrafts, lpQueue);
                 break;
-            case "io":
+            default:
                 if (ioDrafts == null) {
                     ioDrafts = new TreeMap<>();
                 }
@@ -633,7 +624,7 @@ public class Events extends ListenerAdapter {
             switch (subCmd) {
                 case "ded":
                     sc.reply(Emoji.fromEmote(
-                                    "Okayu_ded", 788682812991209492L, false)
+                                    "Okayu_ded", 1016217763536187412L, false)
                             .getAsMention()).queue();
                     break;
             }
@@ -666,13 +657,13 @@ public class Events extends ListenerAdapter {
                 drafts = lpDrafts;
                 queue = lpQueue;
                 leaderboardLink =
-                        "https://docs.google.com/spreadsheets/d/1_Onv35V74U5SsODdkSMBqLVCwbkW6damsHzVoz1qWEg/edit?usp=sharing";
+                        "https://docs.google.com/spreadsheets/d/1DMGWmvIz23fcx7ZtIVxDCyl1zjgdOF_5vccdlmifa7o/edit?usp=sharing";
                 break;
             default:
                 drafts = ioDrafts;
                 queue = ioQueue;
                 leaderboardLink =
-                        "https://docs.google.com/spreadsheets/d/13_ndOyR7MDpgNk_MektNE1Mc6hW2wwctZieWCQ6ex_M/edit?usp=sharing";
+                        "https://docs.google.com/spreadsheets/d/12T6J0jd6Z8opkmYaj6LDRpvQIiW6vqXAZUG0heAFNxc/edit?usp=sharing";
                 break;
         }
 
@@ -935,6 +926,7 @@ public class Events extends ListenerAdapter {
                 drafts = ioDrafts;
                 break;
         }
+
         if (drafts == null) {
             sm.getMessage().delete().queue();
             printExpirationMessage(sm);

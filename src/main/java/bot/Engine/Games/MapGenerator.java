@@ -20,6 +20,7 @@ import java.util.Arrays;
  * Project: Libra
  * Module:  MapGenerator.java
  * Purpose: Generates a map list for a MIT area.
+ *          Optional maplists are shown for both Splatoon 2/3 (S2/3).
  */
 public class MapGenerator extends Section implements Command {
 
@@ -53,8 +54,8 @@ public class MapGenerator extends Section implements Command {
         modes.add("Clam Blitz");
     }
 
-    /** Retrieves the Freshwater Shoals legal maps for each game mode. */
-    private TreeMap<String, List<String>> getLegalFSMaps() {
+    /** Retrieves the Freshwater Shoals legal maps for each game mode (S2). */
+    private TreeMap<String, List<String>> getLegalFSMapsS2() {
         TreeMap<String, List<String>> legalMaps = new TreeMap<>();
         List<String> twMaps = new ArrayList<>(Arrays.asList(
                 "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
@@ -116,7 +117,8 @@ public class MapGenerator extends Section implements Command {
         return legalMaps;
     }
 
-    private TreeMap<String, List<String>> getLegalFSMaps2() {
+    /** Retrieves the Freshwater Shoals legal maps for each game mode (S3). */
+    private TreeMap<String, List<String>> getLegalFSMapsS3() {
         TreeMap<String, List<String>> legalMaps = new TreeMap<>();
         List<String> twMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
@@ -181,8 +183,8 @@ public class MapGenerator extends Section implements Command {
         return legalMaps;
     }
 
-    /** Retrieves the LaunchPoint legal maps for each game mode. */
-    private TreeMap<String, List<String>> getLegalLPMaps() {
+    /** Retrieves the LaunchPoint legal maps for each game mode (S2). */
+    private TreeMap<String, List<String>> getLegalLPMapsS2() {
         TreeMap<String, List<String>> legalMaps = new TreeMap<>();
         List<String> szMaps = new ArrayList<>(Arrays.asList(
                 "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
@@ -214,7 +216,8 @@ public class MapGenerator extends Section implements Command {
         return legalMaps;
     }
 
-    private TreeMap<String, List<String>> getLegalLPMaps2() {
+    /** Retrieves the LaunchPoint legal maps for each game mode (S3). */
+    private TreeMap<String, List<String>> getLegalLPMapsS3() {
         TreeMap<String, List<String>> legalMaps = new TreeMap<>();
         List<String> szMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
@@ -249,8 +252,8 @@ public class MapGenerator extends Section implements Command {
         return legalMaps;
     }
 
-    /** Retrieves the Ink Odyssey legal maps for each game mode. */
-    private TreeMap<String, List<String>> getLegalIOMaps() {
+    /** Retrieves the Ink Odyssey legal maps for each game mode (S2). */
+    private TreeMap<String, List<String>> getLegalIOMapsS2() {
         TreeMap<String, List<String>> legalMaps = new TreeMap<>();
         List<String> szMaps = new ArrayList<>(Arrays.asList(
                 "Inkblot Art Academy", "MakoMart", "Ancho-V Games",
@@ -283,7 +286,8 @@ public class MapGenerator extends Section implements Command {
         return legalMaps;
     }
 
-    private TreeMap<String, List<String>> getLegalIOMaps2() {
+    /** Retrieves the Ink Odyssey legal maps for each game mode (S3). */
+    private TreeMap<String, List<String>> getLegalIOMapsS3() {
         TreeMap<String, List<String>> legalMaps = new TreeMap<>();
         List<String> szMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
@@ -322,30 +326,19 @@ public class MapGenerator extends Section implements Command {
     private TreeMap<String, List<String>> getLegalMaps() {
         switch (getPrefix()) {
             case "fs":
-                return getLegalFSMaps();
+                return getLegalFSMapsS3();
             case "lp":
-                return getLegalLPMaps();
+                return getLegalLPMapsS3();
             default:
-                return getLegalIOMaps();
-        }
-    }
-
-    private TreeMap<String, List<String>> getLegalMaps2() {
-        switch (getPrefix()) {
-            case "fs":
-                return getLegalFSMaps2();
-            case "lp":
-                return getLegalLPMaps2();
-            default:
-                return getLegalIOMaps2();
+                return getLegalIOMapsS3();
         }
     }
 
     /**
-     * Locates the URL of a map online.
+     * Locates the URL of a S2 map online.
      * @param map the map to search for.
      */
-    private String findMapURL(String map) {
+    private String findS2MapURL(String map) {
         switch (map) {
             case "Humpback Pump Track":
                 return "https://static.wikia.nocookie.net/splatoon/images/a/a4/HumpbackPumpTrack.jpg";
@@ -396,12 +389,16 @@ public class MapGenerator extends Section implements Command {
         }
     }
 
-    private String findMapURL2(String map) {
+    /**
+     * Locates the URL of a S3 map online.
+     * @param map the map to search for.
+     */
+    private String findS3MapURL(String map) {
         switch (map) {
             case "Scorch Gorge":
-                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/2/28/Scorch_Gorge_Promo.jpg/1600px-Scorch_Gorge_Promo.jpg";
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/archive/c/c2/20220811180545%21S3_promo_screenshot_Scorch_Gorge_00.jpg";
             case "Eeltail Alley":
-                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/8/85/Eeltail_Alley_Promo.jpg/1600px-Eeltail_Alley_Promo.jpg";
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/archive/8/84/20220811180848%21S3_promo_screenshot_Eeltail_Alley_00.jpg";
             case "Hagglefish Market":
                 return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/2/2e/S3HagglefishMarketIcon.webp/1600px-S3HagglefishMarketIcon.webp.png";
             case "Undertow Spillway":
@@ -434,16 +431,7 @@ public class MapGenerator extends Section implements Command {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(getColor())
                 .addField(mode, map, false)
-                .setThumbnail(findMapURL(map));
-
-        return eb;
-    }
-
-    private EmbedBuilder buildMatch2(String mode, String map) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(getColor())
-                .addField(mode, map, false)
-                .setThumbnail(findMapURL2(map));
+                .setThumbnail(findS3MapURL(map));
 
         return eb;
     }
@@ -561,6 +549,7 @@ public class MapGenerator extends Section implements Command {
         } else {
             sc.getHook().editOriginalEmbeds(matches).queue();
         }
+
         log("A " + getSection() + " maplist was generated.", false);
     }
 }

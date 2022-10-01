@@ -495,9 +495,7 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
         } else if (canSubOut(sc, playerID, getPlayers().get(playerID),
                 "That player is not part of the draft.",
                 "That player has already been subbed out of the draft!")) {
-            String update = getSectionRole() + " +1 (sub, " + Emoji.fromEmote(
-                            "refresh", 788354776999526410L, false)
-                    .getAsMention() + " refresh the request)";
+            String update = getSectionRole() + " +1 (sub, refresh the request)" ;
             sendReply(sc, update, false);
 
             getDraftChannel().sendMessage(
