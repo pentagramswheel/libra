@@ -146,7 +146,7 @@ public class Events extends ListenerAdapter {
         }
 
         String helpdesk = server.getTextChannelsByName(
-                "helpdesk", false).get(0).getName();
+                "mit-helpdesk", false).get(0).getName();
         String entryChannel = server.getTextChannelsByName(
                 "mit-entry-confirmation", false).get(0).getName();
         String fsDraftChannel = server.getTextChannelsByName(
