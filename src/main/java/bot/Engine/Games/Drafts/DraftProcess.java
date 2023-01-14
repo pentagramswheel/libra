@@ -138,6 +138,15 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
         }
     }
 
+    /** Sends a reminder if both teams have been filled. */
+    private void checkForFullTeams() {
+        if (!getTeam1().needsPlayers() && !getTeam2().needsPlayers()) {
+            getRequest().getDraftChannel().sendMessage(
+                    "Don't forget to start the draft by clicking "
+                    + "`Begin Draft` and log points as you go!").queue();
+        }
+    }
+
     /**
      * Determines the team to add a player to.
      * @param sm a menu selection to analyze.
@@ -155,6 +164,8 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
             getRequest().sendResponse(sm,
                     "Your team doesn't need players right now!", true);
         }
+
+        checkForFullTeams();
     }
 
     /**
