@@ -7,15 +7,13 @@ import bot.Tools.Components;
 import bot.Tools.DiscordWatch;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -487,15 +485,30 @@ public class Game<G extends Game<?, S, T, P>, S extends Process<G, T, P>,
      */
     public boolean canForceSub(SlashCommandEvent sc, String playerID) {
         String authorID = sc.getMember().getId();
+        boolean hasStaffRole;
 
-        if (!getPlayers().containsKey(authorID)) {
+        try {
+            Guild server = sc.getGuild();
+            if (server == null) {
+                throw new NullPointerException("Role not found.");
+            }
+
+            hasStaffRole = sc.getMember().getRoles().contains(
+                    server.getRolesByName("Staff", true).get(0));
+        } catch (NullPointerException | IndexOutOfBoundsException e) {
+            sendReply(sc, "Staff role could not be checked for.", true);
+            log("Staff role during forcesub could not be found.", true);
+            return false;
+        }
+
+        if (!getPlayers().containsKey(authorID) && !hasStaffRole) {
             sendReply(sc, "You don't have access to that draft!", true);
         } else if (!isInitialized()) {
             sendReply(sc, "There's no point in subbing people out currently!", true);
         } else if (canSubOut(sc, playerID, getPlayers().get(playerID),
                 "That player is not part of the draft.",
                 "That player has already been subbed out of the draft!")) {
-            String update = getSectionRole() + " +1 (sub, refresh the request)" ;
+            String update = getSectionRole() + " +1 (sub, refresh the request)";
             sendReply(sc, update, false);
 
             getDraftChannel().sendMessage(
