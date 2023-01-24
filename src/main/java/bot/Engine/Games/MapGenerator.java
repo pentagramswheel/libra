@@ -396,7 +396,7 @@ public class MapGenerator extends Section implements Command {
     private String findS3MapURL(String map) {
         switch (map) {
             case "Scorch Gorge":
-                return "https://cdn.wikimg.net/en/splatoonwiki/images/thumb/e/e0/S3MuseumDAlfonsinoIcon.webp/1600px-S3MuseumDAlfonsinoIcon.webp.png";
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/1/1c/S3_Stage_Scorch_Gorge.png";
             case "Eeltail Alley":
                 return "https://cdn.wikimg.net/en/splatoonwiki/images/7/7d/S3_Stage_Eeltail_Alley.png";
             case "Hagglefish Market":
