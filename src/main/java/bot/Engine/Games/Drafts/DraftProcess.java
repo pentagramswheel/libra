@@ -142,7 +142,7 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
     private void checkForFullTeams() {
         if (!getTeam1().needsPlayers() && !getTeam2().needsPlayers()) {
             getRequest().getDraftChannel().sendMessage(
-                    "Don't forget to start the draft by clicking "
+                    "Once ready, don't forget to start the draft by clicking "
                     + "`Begin Draft` and log points as you go!").queue();
         }
     }
