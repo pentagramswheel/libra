@@ -7,7 +7,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** August 27, 2022
+**Last Updated:** February 28, 2023
 
 **Command and Usage Documentation:** <medium><a href='https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing'>How To Use Libra - MullowayIT's Bot Documentation</a></medium>
 
@@ -283,9 +283,10 @@ A class for storing information about a player within MIT.
 A class which calculates MIT leaderboard points for cycle changes.
 
 ##### Instance Variables
-1. `int MAX_CATGEORY_POINTS` - the maximum amount of points per scoring category.
-2. `int NUM_TOTAL_SCORES` - the total scoring categories to calculate.
-3. `char SCORE_COLUMNS_START` - the first column where points are inputted.
+1. `int MINIMUM_SETS` - the number of played sets needed to accrue points.
+2. `int MAX_CATGEORY_POINTS` - the maximum amount of points per scoring category.
+3. `int NUM_TOTAL_SCORES` - the total scoring categories to calculate.
+4. `char SCORE_COLUMNS_START` - the first column where points are inputted.
 
 ----
 

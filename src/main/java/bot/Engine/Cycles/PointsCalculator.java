@@ -26,6 +26,9 @@ import java.util.TreeMap;
  */
 public class PointsCalculator extends Section implements Command {
 
+    /** Minimum number of sets to play for points. */
+    private final static int MINIMUM_SETS = 0;
+
     /** Max score per category. */
     private final static int MAX_CATGEORY_POINTS = 10;
 
@@ -259,14 +262,12 @@ public class PointsCalculator extends Section implements Command {
      * Initializes the Points Calculation spreadsheet.
      * @param sc the user's inputted command.
      * @param tab the name of the spreadsheet tab to edit.
-     * @param minimumSets the minimum number of sets to be considered
-     *                    for point eligibility.
      * @param fromLink a connection to the leaderboard spreadsheet.
      * @param toLink a connection to the points spreadsheet.
      * @return the amount of players eligible for points.
      *         -1 if an error occurred.
      */
-    public int initializeCopy(SlashCommandEvent sc, String tab, int minimumSets,
+    public int initializeCopy(SlashCommandEvent sc, String tab,
                                GoogleSheetsAPI fromLink, GoogleSheetsAPI toLink) {
         try {
             TreeMap<Object, Object> data = fromLink.readSection(sc, tab);
@@ -278,7 +279,7 @@ public class PointsCalculator extends Section implements Command {
                 int setWins = player.getSetWins();
                 int setLosses = player.getSetLosses();
                 int setsPlayed = setWins + setLosses;
-                if (setsPlayed < minimumSets) {
+                if (setsPlayed < MINIMUM_SETS) {
                     continue;
                 }
 
@@ -331,12 +332,8 @@ public class PointsCalculator extends Section implements Command {
         String templateTab = "Blank";
 
         try {
-            int minimumSets = 3;
             GoogleSheetsAPI leaderboard = new GoogleSheetsAPI(cyclesSheetID());
             GoogleSheetsAPI points = new GoogleSheetsAPI(calculationsSheetID());
-            if (getSection().equals("Ink Odyssey")) {
-                minimumSets = 0;
-            }
 
             points.duplicateTab(templateTab, currentTab);
 
@@ -346,7 +343,7 @@ public class PointsCalculator extends Section implements Command {
             log("(Cycle Change) A leaderboard is being copied to the "
                     + getSection() + " points spreadsheet.", false);
             int totalPlayers = initializeCopy(
-                    sc, currentTab, minimumSets, leaderboard, points);
+                    sc, currentTab, leaderboard, points);
             if (totalPlayers == -1) {
                 throw new IOException();
             }
