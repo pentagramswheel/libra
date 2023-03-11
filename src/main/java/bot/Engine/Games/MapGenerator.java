@@ -125,50 +125,58 @@ public class MapGenerator extends Section implements Command {
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> szMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> tcMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> rmMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> cbMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
 
         List<String> hsMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> jnMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> srMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
 
         legalMaps.put("Turf War", twMaps);
         legalMaps.put("Splat Zones", szMaps);
@@ -224,25 +232,29 @@ public class MapGenerator extends Section implements Command {
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> tcMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> rmMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> cbMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
 
         legalMaps.put("Splat Zones", szMaps);
         legalMaps.put("Tower Control", tcMaps);
@@ -294,25 +306,29 @@ public class MapGenerator extends Section implements Command {
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> tcMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> rmMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
         List<String> cbMaps = new ArrayList<>(Arrays.asList(
                 "Scorch Gorge", "Eeltail Alley", "Hagglefish Market",
                 "Undertow Spillway", "Mincemeat Metalworks",
                 "Hammerhead Bridge", "Museum D'Alfonsino", "Mahi-Mahi Resort",
                 "Inkblot Art Academy", "Sturgeon Shipyard", "MakoMart",
-                "Wahoo World", "Brinewater Springs", "Flounder Heights"));
+                "Wahoo World", "Brinewater Springs", "Flounder Heights",
+                "Um'ami Ruins", "Manta Maria"));
 
         legalMaps.put("Splat Zones", szMaps);
         legalMaps.put("Tower Control", tcMaps);
@@ -418,9 +434,13 @@ public class MapGenerator extends Section implements Command {
             case "MakoMart":
                 return "https://cdn.wikimg.net/en/splatoonwiki/images/4/47/S3_Stage_MakoMart.png";
             case "Brinewater Springs":
-                return "https://cdn.wikimg.net/en/splatoonwiki/images/f/fc/S3_Stage_Brinewater_Springs.png"; // needs update
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/f/fc/S3_Stage_Brinewater_Springs.png";
             case "Flounder Heights":
-                return "https://cdn.wikimg.net/en/splatoonwiki/images/2/23/S3_Stage_Flounder_Heights.png"; // needs update
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/2/23/S3_Stage_Flounder_Heights.png";
+            case "Um'ami Ruins":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/9/95/S3_Stage_Um%27ami_Ruins.png";
+            case "Manta Maria":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/8/86/S3_Stage_Manta_Maria.png";
             default:
                 return "https://cdn.wikimg.net/en/splatoonwiki/images/7/71/S3_Stage_Wahoo_World.png";
         }

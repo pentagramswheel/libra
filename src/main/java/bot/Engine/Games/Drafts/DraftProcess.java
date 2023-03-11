@@ -140,7 +140,8 @@ public class DraftProcess extends Process<DraftGame, DraftTeam, DraftPlayer>
 
     /** Sends a reminder if both teams have been filled. */
     private void checkForFullTeams() {
-        if (!getTeam1().needsPlayers() && !getTeam2().needsPlayers()) {
+        if (!getTeam1().needsPlayers() && !getTeam2().needsPlayers()
+                && !hasStarted()) {
             getRequest().getDraftChannel().sendMessage(
                     "Once ready, don't forget to start the draft by clicking "
                     + "`Begin Draft` and log points as you go!").queue();
