@@ -153,8 +153,11 @@ public class Profile implements Command {
         }
 
         String[] splitWeapons = weapons.split(", ");
+        int maxLength = 27;
+
         for (String weapon : splitWeapons) {
-            if (weapon.trim().length() > 27) {
+            if (splitWeapons.length > maxLength
+                    || weapon.trim().length() > maxLength) {
                 return true;
             }
         }
@@ -321,7 +324,7 @@ public class Profile implements Command {
         } else if (blacklistedPhrase(pronouns)) {
             printProfanityError(sc, "pronouns");
         } else if (longWeaponLength(weapons)) {
-            printLengthError(sc, "weapon");
+            printLengthError(sc, "weapon(s)");
         } else if (blacklistedPhrase(weapons)) {
             printProfanityError(sc, "weapons");
         } else if (blacklistedPhrase(team)) {
