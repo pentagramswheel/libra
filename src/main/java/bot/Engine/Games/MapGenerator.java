@@ -302,7 +302,7 @@ public class MapGenerator extends Section implements Command {
                 "Eeltail Alley", "Flounder Heights", "Hagglefish Market",
                 "Inkblot Art Academy", "MakoMart", "Manta Maria",
                 "Museum d'Alfonsino", "Scorch Gorge", "Sturgeon Shipyard",
-                "Undertow Spillway", "Wahoo World"));
+                "Undertow Spillway"));
         List<String> rmMaps = new ArrayList<>(Arrays.asList(
                 "Eeltail Alley", "Hagglefish Market", "Hammerhead Bridge",
                 "Inkblot Art Academy", "MakoMart", "Manta Maria",
