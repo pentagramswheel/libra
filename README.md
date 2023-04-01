@@ -7,7 +7,7 @@
 
 **Creation Date:** February 17, 2021
 
-**Last Updated:** February 28, 2023
+**Last Updated:** April 1, 2023
 
 **Command and Usage Documentation:** <medium><a href='https://docs.google.com/document/d/1LoYjd2mqadu5g5D-BMNHfLk9zUouZZPzLWriu-vxCew/edit?usp=sharing'>How To Use Libra - MullowayIT's Bot Documentation</a></medium>
 
@@ -196,8 +196,6 @@ A class which builds a selection menu quickly.
 
 ###### Instance Variables
 1. `SelectionMenu menu` - the menu that was built.
-
-----
 
 ----
 
