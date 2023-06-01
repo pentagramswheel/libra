@@ -425,6 +425,10 @@ public class MapGenerator extends Section implements Command {
                 return "https://cdn.wikimg.net/en/splatoonwiki/images/9/95/S3_Stage_Um%27ami_Ruins.png";
             case "Manta Maria":
                 return "https://cdn.wikimg.net/en/splatoonwiki/images/8/86/S3_Stage_Manta_Maria.png";
+            case "Barnacle & Dime":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/2/2a/S3_Stage_Barnacle_%26_Dime.png";
+            case "Humpback Pump Track":
+                return "https://cdn.wikimg.net/en/splatoonwiki/images/5/57/S3_Stage_Humpback_Pump_Track.png";
             default:
                 return "https://cdn.wikimg.net/en/splatoonwiki/images/7/71/S3_Stage_Wahoo_World.png";
         }

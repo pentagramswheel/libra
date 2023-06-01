@@ -141,7 +141,7 @@ public class Events extends ListenerAdapter {
         String prefix = sc.getName();
         String subCmd = sc.getSubcommandName();
         if (prefix.equals("libra") || prefix.equals("mit") || prefix.equals("dc")
-                || subCmd.equals("genmaps")) {
+                || subCmd.equals("leaderboard") || subCmd.equals("genmaps")) {
             return false;
         }
 
