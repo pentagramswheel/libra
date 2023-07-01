@@ -228,25 +228,26 @@ public class MapGenerator extends Section implements Command {
     private TreeMap<String, List<String>> getLegalLPMapsS3() {
         TreeMap<String, List<String>> legalMaps = new TreeMap<>();
         List<String> szMaps = new ArrayList<>(Arrays.asList(
-                "Brinewater Springs", "Flounder Heights", "Hagglefish Market",
-                "Inkblot Art Academy", "Mahi-Mahi Resort", "MakoMart",
-                "Manta Maria", "Museum d'Alfonsino", "Sturgeon Shipyard",
-                "Um'ami Ruins", "Wahoo World"));
+                "Barnacle & Dime", "Brinewater Springs", "Flounder Heights",
+                "Hagglefish Market", "Humpback Pump Track",
+                "Inkblot Art Academy", "MakoMart", "Manta Maria",
+                "Museum d'Alfonsino", "Sturgeon Shipyard", "Um'ami Ruins"));
         List<String> tcMaps = new ArrayList<>(Arrays.asList(
-                "Flounder Heights", "Hagglefish Market",
+                "Barnacle & Dime", "Eeltail Alley", "Flounder Heights",
+                "Hagglefish Market", "Humpback Pump Track",
                 "Inkblot Art Academy", "MakoMart", "Manta Maria",
-                "Museum d'Alfonsino", "Scorch Gorge", "Sturgeon Shipyard",
-                "Um'ami Ruins", "Undertow Spillway"));
+                "Museum d'Alfonsino", "Sturgeon Shipyard",
+                "Undertow Spillway"));
         List<String> rmMaps = new ArrayList<>(Arrays.asList(
-                "Flounder Heights", "Hagglefish Market",
-                "Inkblot Art Academy", "MakoMart", "Manta Maria",
-                "Museum d'Alfonsino", "Scorch Gorge", "Sturgeon Shipyard",
-                "Um'ami Ruins", "Undertow Spillway"));
-        List<String> cbMaps = new ArrayList<>(Arrays.asList(
-                "Brinewater Springs", "Eeltail Alley", "Flounder Heights",
-                "Hagglefish Market", "Inkblot Art Academy", "MakoMart",
+                "Eeltail Alley", "Flounder Heights", "Hagglefish Market",
+                "Humpback Pump Track", "Inkblot Art Academy", "MakoMart",
                 "Manta Maria", "Museum d'Alfonsino", "Scorch Gorge",
-                "Sturgeon Shipyard", "Um'ami Ruins"));
+                "Sturgeon Shipyard", "Undertow Spillway"));
+        List<String> cbMaps = new ArrayList<>(Arrays.asList(
+                "Barnacle & Dime", "Brinewater Springs", "Flounder Heights",
+                "Hagglefish Market", "Humpback Pump Track",
+                "Inkblot Art Academy", "MakoMart", "Manta Maria",
+                "Museum d'Alfonsino", "Scorch Gorge", "Um'ami Ruins"));
 
         legalMaps.put("Splat Zones", szMaps);
         legalMaps.put("Tower Control", tcMaps);
@@ -294,25 +295,25 @@ public class MapGenerator extends Section implements Command {
     private TreeMap<String, List<String>> getLegalIOMapsS3() {
         TreeMap<String, List<String>> legalMaps = new TreeMap<>();
         List<String> szMaps = new ArrayList<>(Arrays.asList(
-                "Brinewater Springs", "Flounder Heights", "Hagglefish Market",
-                "Inkblot Art Academy", "MakoMart", "Manta Maria",
-                "Museum d'Alfonsino", "Sturgeon Shipyard", "Uma'mi Ruins",
-                "Wahoo World"));
+                "Barnacle & Dime", "Flounder Heights", "Hagglefish Market",
+                "Humpback Pump Track", "Inkblot Art Academy",
+                "Mahi-Mahi Resort", "MakoMart", "Manta Maria",
+                "Museum d'Alfonsino", "Sturgeon Shipyard", "Wahoo World"));
         List<String> tcMaps = new ArrayList<>(Arrays.asList(
-                "Eeltail Alley", "Flounder Heights", "Hagglefish Market",
+                "Barnacle & Dime", "Eeltail Alley", "Hagglefish Market",
                 "Inkblot Art Academy", "MakoMart", "Manta Maria",
                 "Museum d'Alfonsino", "Scorch Gorge", "Sturgeon Shipyard",
                 "Undertow Spillway"));
         List<String> rmMaps = new ArrayList<>(Arrays.asList(
-                "Eeltail Alley", "Hagglefish Market", "Hammerhead Bridge",
-                "Inkblot Art Academy", "MakoMart", "Manta Maria",
+                "Barnacle & Dime", "Eeltail Alley", "Hagglefish Market",
+                "Humpback Pump Track", "MakoMart", "Manta Maria",
                 "Museum d'Alfonsino", "Scorch Gorge", "Sturgeon Shipyard",
                 "Undertow Spillway"));
         List<String> cbMaps = new ArrayList<>(Arrays.asList(
-                "Eeltail Alley", "Hagglefish Market", "Inkblot Art Academy",
-                "Mahi-Mahi Resort", "MakoMart", "Manta Maria",
-                "Museum d'Alfonsino", "Scorch Gorge", "Sturgeon Shipyard",
-                "Um'ami Ruins"));
+                "Barnacle & Dime", "Brinewater Springs", "Hagglefish Market",
+                "Humpback Pump Track", "Inkblot Art Academy", "Mahi-Mahi Resort",
+                "MakoMart", "Manta Maria", "Museum d'Alfonsino", "Scorch Gorge",
+                "Sturgeon Shipyard", "Um'ami Ruins"));
 
         legalMaps.put("Splat Zones", szMaps);
         legalMaps.put("Tower Control", tcMaps);
